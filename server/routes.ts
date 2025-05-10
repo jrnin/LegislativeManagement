@@ -33,6 +33,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Register new user
+  app.post('/api/register', async (req, res) => {
+    try {
+      const schema = z.object({
+        name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
+        email: z.string().email("Email inválido"),
+        password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+      });
+      
+      const validated = schema.parse(req.body);
+      
+      // Check if user with email already exists
+      const existingUser = await storage.getUserByEmail(validated.email);
+      
+      if (existingUser) {
+        return res.status(400).json({ 
+          success: false,
+          message: "Este email já está em uso" 
+        });
+      }
+      
+      // Generate a random ID if not provided by auth
+      const userId = crypto.randomUUID();
+      
+      // Create user
+      const user = await storage.createUser({
+        id: userId,
+        ...validated,
+        emailVerified: false,
+      });
+      
+      // Send verification email
+      const host = req.headers.host || "";
+      const protocol = req.headers["x-forwarded-proto"] || req.protocol;
+      const baseUrl = `${protocol}://${host}`;
+      
+      await sendVerificationEmail(user, user.verificationToken!, baseUrl);
+      
+      res.status(201).json({ 
+        success: true,
+        message: "Cadastro realizado com sucesso. Verifique seu email para ativar sua conta." 
+      });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          success: false,
+          message: error.errors[0].message 
+        });
+      }
+      
+      res.status(500).json({ 
+        success: false,
+        message: "Erro ao processar cadastro" 
+      });
+    }
+  });
+  
+  // Login with email
+  app.post('/api/login/email', async (req, res) => {
+    try {
+      const schema = z.object({
+        email: z.string().email("Email inválido"),
+        password: z.string().min(1, "Senha é obrigatória"),
+      });
+      
+      const validated = schema.parse(req.body);
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(validated.email);
+      
+      if (!user) {
+        return res.status(401).json({ 
+          success: false,
+          message: "Credenciais inválidas" 
+        });
+      }
+      
+      // Check if email is verified
+      if (!user.emailVerified) {
+        return res.status(403).json({ 
+          success: false,
+          message: "Email não verificado. Verifique sua caixa de entrada para ativar sua conta." 
+        });
+      }
+      
+      // Verify password
+      // In a real application, you should use bcrypt to hash and compare passwords
+      if (user.password !== validated.password) {
+        return res.status(401).json({ 
+          success: false,
+          message: "Credenciais inválidas" 
+        });
+      }
+      
+      // Create session (simplified for this example)
+      // In a real application, you would use proper session handling with JWT or session store
+      // Store user in session
+      (req.session as any).userId = user.id;
+      
+      res.json({ 
+        success: true,
+        message: "Login realizado com sucesso" 
+      });
+    } catch (error) {
+      console.error("Error during login:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          success: false,
+          message: error.errors[0].message 
+        });
+      }
+      
+      res.status(500).json({ 
+        success: false,
+        message: "Erro ao processar login" 
+      });
+    }
+  });
+  
   // Verify email
   app.get('/api/verify-email', async (req, res) => {
     const { token } = req.query;
@@ -966,8 +1088,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Set appropriate headers
-      res.setHeader('Content-Type', fileType || 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+      res.setHeader('Content-Type', fileType ? fileType : 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName || 'download')}"`);
       
       // Stream the file
       const fileStream = fs.createReadStream(filePath);

@@ -3,7 +3,8 @@ import {
   Search, 
   Bell, 
   Menu,
-  X
+  X,
+  LogOut
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
