@@ -1,0 +1,272 @@
+import {
+  pgTable,
+  text,
+  varchar,
+  timestamp,
+  serial,
+  integer,
+  boolean,
+  json,
+  jsonb,
+  primaryKey,
+  index,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+// Session storage table (mandatory for Replit Auth)
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey(),
+  email: varchar("email").unique().notNull(),
+  name: varchar("name").notNull(),
+  profileImageUrl: varchar("profile_image_url"),
+  cpf: varchar("cpf").unique(),
+  birthDate: timestamp("birth_date"),
+  zipCode: varchar("zip_code"),
+  address: varchar("address"),
+  neighborhood: varchar("neighborhood"),
+  number: varchar("number"),
+  city: varchar("city"),
+  state: varchar("state"),
+  role: varchar("role").default("councilor").notNull(), // "admin" or "councilor"
+  legislatureId: integer("legislature_id"),
+  maritalStatus: varchar("marital_status"),
+  occupation: varchar("occupation"),
+  education: varchar("education"),
+  password: varchar("password"),
+  emailVerified: boolean("email_verified").default(false),
+  verificationToken: varchar("verification_token"),
+  emailVerificationSentAt: timestamp("email_verification_sent_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  legislature: one(legislatures, {
+    fields: [users.legislatureId],
+    references: [legislatures.id],
+  }),
+  authoredActivities: many(legislativeActivitiesAuthors),
+}));
+
+// Legislature table
+export const legislatures = pgTable("legislatures", {
+  id: serial("id").primaryKey(),
+  number: integer("number").notNull().unique(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const legislaturesRelations = relations(legislatures, ({ many }) => ({
+  users: many(users),
+  events: many(events),
+}));
+
+// Events table
+export const events = pgTable("events", {
+  id: serial("id").primaryKey(),
+  eventNumber: integer("event_number").notNull(),
+  eventDate: timestamp("event_date").notNull(),
+  eventTime: varchar("event_time").notNull(),
+  location: varchar("location").notNull(),
+  mapUrl: varchar("map_url"),
+  category: varchar("category").notNull(), // "Sessão Ordinária" or "Sessão Extraordinária"
+  legislatureId: integer("legislature_id").notNull(),
+  description: text("description").notNull(),
+  status: varchar("status").notNull(), // "Aberto", "Andamento", "Concluido", "Cancelado"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const eventsRelations = relations(events, ({ one, many }) => ({
+  legislature: one(legislatures, {
+    fields: [events.legislatureId],
+    references: [legislatures.id],
+  }),
+  activities: many(legislativeActivities),
+}));
+
+// Legislative Activities table
+export const legislativeActivities = pgTable("legislative_activities", {
+  id: serial("id").primaryKey(),
+  activityNumber: integer("activity_number").notNull(),
+  activityDate: timestamp("activity_date").notNull(),
+  description: text("description").notNull(),
+  eventId: integer("event_id").notNull(),
+  activityType: varchar("activity_type").notNull(), // "Pauta", "Indicação", "Requerimento", "Resolução", "Mensagem", "Moção", "Projeto de Lei"
+  filePath: varchar("file_path"),
+  fileName: varchar("file_name"),
+  fileType: varchar("file_type"),
+  needsApproval: boolean("needs_approval").default(false),
+  approved: boolean("approved").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const legislativeActivitiesRelations = relations(legislativeActivities, ({ one, many }) => ({
+  event: one(events, {
+    fields: [legislativeActivities.eventId],
+    references: [events.id],
+  }),
+  authors: many(legislativeActivitiesAuthors),
+  documents: many(documents, {
+    relationName: "activity_documents",
+  }),
+}));
+
+// Legislative Activities Authors (many-to-many)
+export const legislativeActivitiesAuthors = pgTable(
+  "legislative_activities_authors",
+  {
+    activityId: integer("activity_id").notNull(),
+    userId: varchar("user_id").notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.activityId, table.userId] }),
+  }),
+);
+
+export const legislativeActivitiesAuthorsRelations = relations(
+  legislativeActivitiesAuthors,
+  ({ one }) => ({
+    activity: one(legislativeActivities, {
+      fields: [legislativeActivitiesAuthors.activityId],
+      references: [legislativeActivities.id],
+    }),
+    user: one(users, {
+      fields: [legislativeActivitiesAuthors.userId],
+      references: [users.id],
+    }),
+  }),
+);
+
+// Documents table
+export const documents = pgTable("documents", {
+  id: serial("id").primaryKey(),
+  documentNumber: integer("document_number").notNull(),
+  documentType: varchar("document_type").notNull(), // "Pauta", "Decreto", "Decreto Legislativo", "Lei Complementar", "Oficio"
+  documentDate: timestamp("document_date").notNull(),
+  authorType: varchar("author_type").notNull(), // "Legislativo", "Executivo"
+  description: text("description").notNull(),
+  filePath: varchar("file_path"),
+  fileName: varchar("file_name"),
+  fileType: varchar("file_type"),
+  status: varchar("status").notNull(), // "Vigente", "Revogada", "Alterada", "Suspenso"
+  activityId: integer("activity_id"), // Related legislative activity (optional)
+  parentDocumentId: integer("parent_document_id"), // For document versioning
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const documentsRelations = relations(documents, ({ one, many }) => ({
+  activity: one(legislativeActivities, {
+    fields: [documents.activityId],
+    references: [legislativeActivities.id],
+    relationName: "activity_documents",
+  }),
+  parentDocument: one(documents, {
+    fields: [documents.parentDocumentId],
+    references: [documents.id],
+  }),
+  childDocuments: many(documents, {
+    relationName: "document_versions",
+  }),
+}));
+
+// Dashboard Stats View (for quick dashboard data retrieval)
+export type DashboardStats = {
+  legislatureCount: number;
+  activeEventCount: number;
+  pendingActivityCount: number;
+  documentCount: number;
+};
+
+// Insert schemas
+export const insertUserSchema = createInsertSchema(users).pick({
+  email: true,
+  name: true,
+  cpf: true,
+  birthDate: true,
+  zipCode: true,
+  address: true,
+  neighborhood: true,
+  number: true,
+  city: true,
+  state: true,
+  role: true,
+  legislatureId: true,
+  maritalStatus: true,
+  occupation: true,
+  education: true,
+  password: true,
+});
+
+export const insertLegislatureSchema = createInsertSchema(legislatures).pick({
+  number: true,
+  startDate: true, 
+  endDate: true,
+});
+
+export const insertEventSchema = createInsertSchema(events).pick({
+  eventNumber: true,
+  eventDate: true,
+  eventTime: true,
+  location: true,
+  mapUrl: true,
+  category: true,
+  legislatureId: true,
+  description: true,
+  status: true,
+});
+
+export const insertLegislativeActivitySchema = createInsertSchema(legislativeActivities).pick({
+  activityNumber: true,
+  activityDate: true,
+  description: true,
+  eventId: true,
+  activityType: true,
+  needsApproval: true,
+});
+
+export const insertDocumentSchema = createInsertSchema(documents).pick({
+  documentNumber: true,
+  documentType: true,
+  documentDate: true,
+  authorType: true,
+  description: true,
+  status: true,
+  activityId: true,
+  parentDocumentId: true,
+});
+
+// Type definitions
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+
+export type InsertLegislature = z.infer<typeof insertLegislatureSchema>;
+export type Legislature = typeof legislatures.$inferSelect;
+
+export type InsertEvent = z.infer<typeof insertEventSchema>;
+export type Event = typeof events.$inferSelect;
+
+export type InsertLegislativeActivity = z.infer<typeof insertLegislativeActivitySchema>;
+export type LegislativeActivity = typeof legislativeActivities.$inferSelect & {
+  authors?: User[];
+};
+
+export type InsertDocument = z.infer<typeof insertDocumentSchema>;
+export type Document = typeof documents.$inferSelect;
