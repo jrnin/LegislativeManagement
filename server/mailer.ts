@@ -3,16 +3,16 @@ import { User } from "@shared/schema";
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.mailtrap.io",
-  port: parseInt(process.env.SMTP_PORT || "2525"),
+  host: process.env.SMTP_HOST || "smtp.hostinger.com",
+  port: parseInt(process.env.SMTP_PORT || "465"),
   auth: {
-    user: process.env.SMTP_USER || "",
-    pass: process.env.SMTP_PASS || "",
+    user: process.env.SMTP_USER || "contato@hubpublico.com.br",
+    pass: process.env.SMTP_PASS || "@J1r10487@",
   },
 });
 
 // System email settings
-const systemEmail = process.env.SYSTEM_EMAIL || "noreply@sistema-legislativo.com";
+const systemEmail = process.env.SYSTEM_EMAIL || "contato@hubpublico.com.br";
 const systemName = "Sistema de Gerenciamento Legislativo";
 
 // Email templates

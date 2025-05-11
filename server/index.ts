@@ -1,10 +1,57 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+/**
+ * Configura um usuário root para administração do sistema
+ */
+async function setupRootUser() {
+  try {
+    // Credenciais do usuário root (fixas para este usuário especial)
+    const rootEmail = "root@sistema-legislativo.com";
+    const rootPassword = "admin@123"; // Senha padrão inicial que pode ser alterada depois
+    
+    // Verificar se o usuário root já existe
+    const existingUser = await storage.getUserByEmail(rootEmail);
+    
+    if (existingUser) {
+      log("Usuário root já existe no sistema");
+      return;
+    }
+    
+    // Criar usuário root
+    log("Criando usuário root administrativo...");
+    
+    // Gerar ID e hash da senha
+    const userId = "root";
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(rootPassword, salt);
+    
+    // Criar usuário com atributos específicos
+    await storage.createUser({
+      id: userId,
+      name: "Administrador do Sistema",
+      email: rootEmail,
+      password: hashedPassword,
+      role: "admin", // Nível máximo de acesso
+      emailVerified: true // Já verificado
+    });
+    
+    log("Usuário root criado com sucesso");
+    log("Email: root@sistema-legislativo.com");
+    log("Senha: admin@123");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+    log(`Erro ao criar usuário root: ${errorMessage}`);
+  }
+}
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -37,6 +84,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Configurar usuário root na inicialização
+  await setupRootUser();
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
