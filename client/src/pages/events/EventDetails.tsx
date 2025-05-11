@@ -98,14 +98,14 @@ export default function EventDetails() {
   const [voteValue, setVoteValue] = useState<string>("");
   const [voteComment, setVoteComment] = useState<string>("");
   const [attendanceStatus, setAttendanceStatus] = useState<string>("Presente");
+  const [isManagingAttendance, setIsManagingAttendance] = useState<boolean>(false);
+  const [councilors, setCouncilors] = useState<any[]>([]);
+  const [loadingCouncilors, setLoadingCouncilors] = useState<boolean>(false);
   const [attendanceNotes, setAttendanceNotes] = useState<string>("");
   const [isVoteDialogOpen, setIsVoteDialogOpen] = useState<boolean>(false);
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState<boolean>(false);
   const [currentDocumentId, setCurrentDocumentId] = useState<number | null>(null);
-  const [councilors, setCouncilors] = useState<any[]>([]);
-  const [isManagingAttendance, setIsManagingAttendance] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [loadingCouncilors, setLoadingCouncilors] = useState<boolean>(false);
   
   // Fetch event details
   const { data: eventDetails, isLoading, isError } = useQuery({
@@ -160,7 +160,7 @@ export default function EventDetails() {
         }
       }
     };
-
+    
     fetchCouncilors();
   }, [isAuthenticated, isManagingAttendance, toast]);
 
@@ -208,8 +208,8 @@ export default function EventDetails() {
     
     try {
       await apiRequest(
-        `/api/events/${eventId}/attendance`,
         "POST",
+        `/api/events/${eventId}/attendance`,
         {
           userId,
           status,
@@ -556,18 +556,118 @@ export default function EventDetails() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">Lista de Presença</h2>
-              {isAuthenticated && event.status === "Aberto" && !userAttendance && (
-                <Button 
-                  onClick={() => setIsAttendanceDialogOpen(true)}
-                  className="gap-2"
-                >
-                  <Check className="w-4 h-4" />
-                  Registrar Presença
-                </Button>
-              )}
+              <div className="flex gap-2">
+                {isAuthenticated && event.status === "Aberto" && !userAttendance && (
+                  <Button 
+                    onClick={() => setIsAttendanceDialogOpen(true)}
+                    className="gap-2"
+                  >
+                    <Check className="w-4 h-4" />
+                    Registrar Presença
+                  </Button>
+                )}
+                {isAuthenticated && user?.role === "admin" && (
+                  <Button 
+                    onClick={() => setIsManagingAttendance(!isManagingAttendance)}
+                    variant={isManagingAttendance ? "default" : "outline"}
+                    className="gap-2"
+                  >
+                    <UserCheck className="w-4 h-4" />
+                    {isManagingAttendance ? "Voltar" : "Gerenciar Presenças"}
+                  </Button>
+                )}
+              </div>
             </div>
             
-            {attendance.length === 0 ? (
+            {isManagingAttendance ? (
+              <div className="space-y-6">
+                <h3 className="text-lg font-medium">Gerenciar Presenças de Vereadores</h3>
+                
+                {loadingCouncilors ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    <span className="ml-2">Carregando vereadores...</span>
+                  </div>
+                ) : councilors.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <User className="w-12 h-12 mb-4 text-muted-foreground" />
+                    <h3 className="text-xl font-medium">Nenhum vereador encontrado</h3>
+                    <p className="text-muted-foreground">Não há vereadores cadastrados no sistema.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {councilors.map((councilor) => {
+                        // Verificar se o vereador já tem presença registrada
+                        const existingAttendance = attendance.find((a: any) => a.userId === councilor.id);
+                        
+                        return (
+                          <Card key={councilor.id} className={
+                            existingAttendance 
+                              ? existingAttendance.status === "Presente" 
+                                ? "border-green-500 bg-green-50" 
+                                : "border-red-500 bg-red-50"
+                              : ""
+                          }>
+                            <CardHeader className="p-4 pb-2">
+                              <div className="flex items-center gap-3">
+                                <Avatar>
+                                  <AvatarImage src={councilor.profileImageUrl || ""} alt={councilor.name} />
+                                  <AvatarFallback>{councilor.name.substring(0, 2)}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                  <CardTitle className="text-base">{councilor.name}</CardTitle>
+                                  <CardDescription>{councilor.email}</CardDescription>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardFooter className="p-4 pt-2 flex justify-between">
+                              {existingAttendance ? (
+                                <div className="flex items-center">
+                                  <Badge className={existingAttendance.status === "Presente" ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-red-100 text-red-800 hover:bg-red-100"}>
+                                    {existingAttendance.status}
+                                  </Badge>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="ml-2"
+                                    onClick={() => handleCouncilorAttendance(
+                                      councilor.id, 
+                                      existingAttendance.status === "Presente" ? "Ausente" : "Presente"
+                                    )}
+                                  >
+                                    <RefreshCw className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                                    onClick={() => handleCouncilorAttendance(councilor.id, "Presente")}
+                                  >
+                                    <Check className="h-4 w-4 mr-1" /> Presente
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200"
+                                    onClick={() => handleCouncilorAttendance(councilor.id, "Ausente")}
+                                  >
+                                    <X className="h-4 w-4 mr-1" /> Ausente
+                                  </Button>
+                                </div>
+                              )}
+                            </CardFooter>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : attendance.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <User className="w-12 h-12 mb-4 text-muted-foreground" />
                 <h3 className="text-xl font-medium">Nenhuma presença registrada</h3>
