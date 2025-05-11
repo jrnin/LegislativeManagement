@@ -57,12 +57,17 @@ export const upload = multer({
 });
 
 /**
- * Middleware to check if user is authenticated
+ * Middleware to check if user is authenticated with custom session
  */
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  if (!req.isAuthenticated()) {
+  const userId = (req.session as any).userId;
+  
+  if (!userId) {
     return res.status(401).json({ message: "Você precisa estar autenticado para acessar este recurso." });
   }
+  
+  // Attach the userId to the request
+  (req as any).userId = userId;
   next();
 }
 
@@ -70,18 +75,21 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
  * Middleware to check if user is an administrator
  */
 export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  if (!req.isAuthenticated()) {
+  const userId = (req.session as any).userId;
+  
+  if (!userId) {
     return res.status(401).json({ message: "Você precisa estar autenticado para acessar este recurso." });
   }
   
   try {
-    const userId = (req.user as any).claims.sub;
     const user = await storage.getUser(userId);
     
     if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Acesso restrito. Apenas administradores podem realizar esta ação." });
     }
     
+    // Attach the user to the request for convenience
+    (req as any).user = user;
     next();
   } catch (error) {
     console.error("Error checking admin status:", error);
@@ -93,13 +101,16 @@ export async function requireAdmin(req: Request, res: Response, next: NextFuncti
  * Middleware to load the current user from the database
  */
 export async function loadUser(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated()) {
+  const userId = (req.session as any).userId;
+  
+  if (userId) {
     try {
-      const userId = (req.user as any).claims.sub;
       const user = await storage.getUser(userId);
       
       if (user) {
+        // Store the user in res.locals for views and in req for API access
         res.locals.currentUser = user;
+        (req as any).currentUser = user;
       }
     } catch (error) {
       console.error("Error loading user:", error);
