@@ -763,67 +763,95 @@ export class DatabaseStorage implements IStorage {
     documents: Document[];
     legislature: Legislature;
   } | undefined> {
-    const [event] = await db.select().from(events).where(eq(events.id, id));
-    
-    if (!event) {
-      return undefined;
-    }
-    
-    // Get legislature
-    const [legislature] = await db.select().from(legislatures).where(eq(legislatures.id, event.legislatureId));
-    
-    // Get activities
-    const activitiesResult = await db
-      .select()
-      .from(legislativeActivities)
-      .where(eq(legislativeActivities.eventId, id));
-    
-    // Get attendance
-    const attendanceResult = await this.getEventAttendanceByEventId(id);
-    
-    // Get documents related to this event
-    console.log("Getting documents for event ID:", id);
-    let documentsResult = [];
     try {
-      documentsResult = await db
+      console.log("Getting event details for ID:", id);
+      
+      // Get event
+      const [event] = await db.select().from(events).where(eq(events.id, id));
+      
+      if (!event) {
+        console.log("Event not found with ID:", id);
+        return undefined;
+      }
+      
+      // Get legislature
+      const [legislature] = await db.select().from(legislatures).where(eq(legislatures.id, event.legislatureId));
+      
+      // Get activities
+      const activitiesResult = await db
         .select()
-        .from(documents)
-        .where(eq(documents.eventId, id));
-      console.log("Documents found:", documentsResult.length);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-      documentsResult = [];
-    }
-    
-    // For each activity, get authors
-    const activitiesWithAuthors = await Promise.all(
-      activitiesResult.map(async (activity) => {
-        const authorsJunction = await db
+        .from(legislativeActivities)
+        .where(eq(legislativeActivities.eventId, id));
+      
+      console.log(`Found ${activitiesResult.length} activities for event ID ${id}`);
+      
+      // Get attendance
+      const attendanceResult = await this.getEventAttendanceByEventId(id);
+      console.log(`Found ${attendanceResult.length} attendance records for event ID ${id}`);
+      
+      // Get documents related to this event - fix potential issue with equals operator
+      let documentsResult = [];
+      try {
+        const query = db
           .select()
-          .from(legislativeActivitiesAuthors)
-          .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
-          
-        const authorIds = authorsJunction.map(junction => junction.userId);
+          .from(documents)
+          .where(eq(documents.eventId, id));
         
-        const authorsData = await db
-          .select()
-          .from(users)
-          .where(inArray(users.id, authorIds));
-          
-        return {
-          ...activity,
-          authors: authorsData,
-        };
-      })
-    );
-    
-    return {
-      ...event,
-      legislature,
-      activities: activitiesWithAuthors,
-      attendance: attendanceResult,
-      documents: documentsResult,
-    };
+        console.log("SQL Query for documents:", query.toSQL().sql);
+        documentsResult = await query;
+        console.log(`Found ${documentsResult.length} documents for event ID ${id}`);
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+        documentsResult = [];
+      }
+      
+      // For each activity, get authors
+      const activitiesWithAuthors = await Promise.all(
+        activitiesResult.map(async (activity) => {
+          try {
+            const authorsJunction = await db
+              .select()
+              .from(legislativeActivitiesAuthors)
+              .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
+            
+            if (!authorsJunction.length) {
+              return { ...activity, authors: [] };
+            }
+            
+            const authorIds = authorsJunction.map(junction => junction.userId);
+            
+            let authorsData = [];
+            // Only execute the query if we have authors
+            if (authorIds.length > 0) {
+              authorsData = await db
+                .select()
+                .from(users)
+                .where(inArray(users.id, authorIds));
+            }
+            
+            return {
+              ...activity,
+              authors: authorsData,
+            };
+          } catch (error) {
+            console.error(`Error fetching authors for activity ${activity.id}:`, error);
+            return { ...activity, authors: [] };
+          }
+        })
+      );
+      
+      // Construct and return the complete event details
+      return {
+        ...event,
+        legislature,
+        activities: activitiesWithAuthors,
+        attendance: attendanceResult,
+        documents: documentsResult,
+      };
+    } catch (error) {
+      console.error("Error in getEventWithDetails:", error);
+      throw error;
+    }
   }
   
   /**
