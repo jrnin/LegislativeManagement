@@ -117,17 +117,7 @@ export default function EventList() {
     return statusMap[status] || "";
   };
 
-  // If user role is not admin, redirect to dashboard
-  useEffect(() => {
-    if (user && user.role !== "admin") {
-      toast({
-        variant: "destructive",
-        title: "Acesso negado",
-        description: "Apenas administradores podem gerenciar eventos.",
-      });
-      navigate("/");
-    }
-  }, [user, navigate, toast]);
+  // Não há mais restrições para usuários do tipo "Vereador" acessarem a página de eventos
 
   const columns: ColumnDef<Event>[] = [
     {

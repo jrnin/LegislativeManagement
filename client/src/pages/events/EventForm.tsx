@@ -135,17 +135,7 @@ export default function EventForm() {
     }
   };
 
-  // Redirect if not admin
-  useEffect(() => {
-    if (user && user.role !== "admin") {
-      toast({
-        variant: "destructive",
-        title: "Acesso negado",
-        description: "Apenas administradores podem gerenciar eventos.",
-      });
-      navigate("/");
-    }
-  }, [user, navigate, toast]);
+  // Não há mais restrições para usuários do tipo "Vereador" acessarem o formulário de eventos
 
   if (eventLoading) {
     return <div className="flex justify-center items-center h-96">Carregando...</div>;
