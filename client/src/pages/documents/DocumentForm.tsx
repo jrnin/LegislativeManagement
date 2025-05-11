@@ -553,7 +553,7 @@ export default function DocumentForm() {
                           <SelectItem value="0">Nenhum</SelectItem>
                           {events.map((event) => (
                             <SelectItem key={event.id} value={event.id.toString()}>
-                              {event.title} - {event.eventDate ? formatDate(event.eventDate.toString()) : ""}
+                              Sessão {event.category} Nº {event.eventNumber} - {event.eventDate ? formatDate(event.eventDate.toString()) : ""}
                             </SelectItem>
                           ))}
                         </SelectContent>
