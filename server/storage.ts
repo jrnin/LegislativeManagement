@@ -768,44 +768,58 @@ export class DatabaseStorage implements IStorage {
       
       // Abordagem com SQL bruto para garantir compatibilidade
       // Busca o evento
-      const eventQuery = `
-        SELECT e.*, l.id as legislature_id, l.number as legislature_number, 
-               l.start_date, l.end_date
-        FROM events e 
-        JOIN legislatures l ON e.legislature_id = l.id
-        WHERE e.id = $1
-      `;
+      const eventQuery = db.select({
+        id: events.id,
+        eventNumber: events.eventNumber,
+        eventDate: events.eventDate,
+        eventTime: events.eventTime,
+        location: events.location,
+        mapUrl: events.mapUrl,
+        category: events.category,
+        description: events.description,
+        status: events.status,
+        legislatureId: events.legislatureId,
+        createdAt: events.createdAt,
+        updatedAt: events.updatedAt,
+        legislature_id: legislatures.id,
+        legislature_number: legislatures.number,
+        start_date: legislatures.startDate,
+        end_date: legislatures.endDate
+      })
+      .from(events)
+      .innerJoin(legislatures, eq(events.legislatureId, legislatures.id))
+      .where(eq(events.id, id));
       
-      const eventResult = await db.execute(sql.raw(eventQuery, [id]));
-      console.log("Event query result:", eventResult.rows[0] ? "Found" : "Not found");
+      const eventResult = await eventQuery;
+      console.log("Event query result:", eventResult[0] ? "Found" : "Not found");
       
-      if (!eventResult.rows.length) {
+      if (!eventResult.length) {
         console.log("Event not found with ID:", id);
         return undefined;
       }
       
       // Extrair evento e legislature
-      const eventData = eventResult.rows[0];
+      const eventData = eventResult[0];
       const event = {
         id: eventData.id,
-        eventNumber: eventData.event_number,
-        eventDate: new Date(eventData.event_date),
-        eventTime: eventData.event_time,
+        eventNumber: eventData.eventNumber,
+        eventDate: eventData.eventDate,
+        eventTime: eventData.eventTime,
         location: eventData.location,
-        mapUrl: eventData.map_url,
+        mapUrl: eventData.mapUrl,
         category: eventData.category,
         description: eventData.description,
         status: eventData.status,
-        legislatureId: eventData.legislature_id,
-        createdAt: eventData.created_at,
-        updatedAt: eventData.updated_at
+        legislatureId: eventData.legislatureId,
+        createdAt: eventData.createdAt,
+        updatedAt: eventData.updatedAt
       };
       
       const legislature = {
         id: eventData.legislature_id,
         number: eventData.legislature_number,
-        startDate: new Date(eventData.start_date),
-        endDate: new Date(eventData.end_date),
+        startDate: eventData.start_date,
+        endDate: eventData.end_date,
         createdAt: null,
         updatedAt: null
       };
@@ -813,47 +827,25 @@ export class DatabaseStorage implements IStorage {
       console.log("Event data processed successfully");
       
       // Buscar atividades do evento
-      const activitiesQuery = `
-        SELECT * FROM legislative_activities
-        WHERE event_id = $1
-        ORDER BY activity_date DESC
-      `;
-      
-      const activitiesResult = await db.execute(sql.raw(activitiesQuery, [id]));
-      console.log(`Found ${activitiesResult.rows.length} activities for event`);
+      const activitiesResult = await db
+        .select()
+        .from(legislativeActivities)
+        .where(eq(legislativeActivities.eventId, id))
+        .orderBy(desc(legislativeActivities.activityDate));
+      console.log(`Found ${activitiesResult.length} activities for event`);
       
       // Buscar atendimentos do evento
       const attendanceResult = await this.getEventAttendanceByEventId(id);
       console.log(`Found ${attendanceResult.length} attendance records`);
       
       // Buscar documentos do evento
-      const documentsQuery = `
-        SELECT * FROM documents 
-        WHERE event_id = $1
-      `;
-      
       let documentsResult = [];
       try {
-        const documentsQueryResult = await db.execute(sql.raw(documentsQuery, [id]));
-        console.log(`Found ${documentsQueryResult.rows.length} documents`);
-        
-        documentsResult = documentsQueryResult.rows.map(doc => ({
-          id: doc.id,
-          documentNumber: doc.document_number,
-          documentType: doc.document_type,
-          documentDate: new Date(doc.document_date),
-          authorType: doc.author_type,
-          description: doc.description,
-          filePath: doc.file_path,
-          fileName: doc.file_name,
-          fileType: doc.file_type,
-          status: doc.status,
-          activityId: doc.activity_id,
-          eventId: doc.event_id,
-          parentDocumentId: doc.parent_document_id,
-          createdAt: doc.created_at,
-          updatedAt: doc.updated_at
-        }));
+        documentsResult = await db
+          .select()
+          .from(documents)
+          .where(eq(documents.eventId, id));
+        console.log(`Found ${documentsResult.length} documents`);
       } catch (error) {
         console.error("Error fetching documents:", error);
         documentsResult = [];
@@ -861,52 +853,34 @@ export class DatabaseStorage implements IStorage {
       
       // Processar atividades e autores
       const activitiesWithAuthors = await Promise.all(
-        activitiesResult.rows.map(async (activityRow) => {
-          const activity = {
-            id: activityRow.id,
-            activityNumber: activityRow.activity_number,
-            activityDate: new Date(activityRow.activity_date),
-            activityType: activityRow.activity_type,
-            description: activityRow.description,
-            status: activityRow.status,
-            category: activityRow.category,
-            priority: activityRow.priority,
-            eventId: activityRow.event_id,
-            filePath: activityRow.file_path,
-            fileName: activityRow.file_name,
-            fileType: activityRow.file_type,
-            approved: activityRow.approved,
-            createdAt: activityRow.created_at,
-            updatedAt: activityRow.updated_at,
-            authors: []
-          };
-          
+        activitiesResult.map(async (activity) => {
           try {
-            // Buscar autores
-            const authorQuery = `
-              SELECT u.* FROM users u
-              JOIN legislative_activities_authors laa ON u.id = laa.user_id
-              WHERE laa.activity_id = $1
-            `;
+            // Buscar autores usando Drizzle
+            const authorsResult = await db
+              .select({
+                id: users.id,
+                name: users.name,
+                email: users.email,
+                role: users.role,
+                profileImageUrl: users.profileImageUrl,
+                active: users.active,
+                createdAt: users.createdAt,
+                updatedAt: users.updatedAt
+              })
+              .from(users)
+              .innerJoin(
+                legislativeActivitiesAuthors,
+                eq(users.id, legislativeActivitiesAuthors.userId)
+              )
+              .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
             
-            const authorsResult = await db.execute(sql.raw(authorQuery, [activity.id]));
-            
-            if (authorsResult.rows.length > 0) {
-              activity.authors = authorsResult.rows.map(author => ({
-                id: author.id,
-                name: author.name,
-                email: author.email,
-                role: author.role,
-                profileImageUrl: author.profile_image_url,
-                active: author.active,
-                createdAt: author.created_at,
-                updatedAt: author.updated_at
-              }));
-            }
+            // Adiciona os autores à atividade
+            activity.authors = authorsResult;
             
             return activity;
           } catch (error) {
             console.error(`Error fetching authors for activity ${activity.id}:`, error);
+            activity.authors = [];
             return activity;
           }
         })
