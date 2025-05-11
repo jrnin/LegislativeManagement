@@ -14,7 +14,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Document, LegislativeActivity } from "@shared/schema";
+import { Document, LegislativeActivity, Event } from "@shared/schema";
 import { formatDate } from "@/utils/formatters";
 import { File, FileCheck, Upload, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,7 @@ const formSchema = z.object({
   description: z.string().min(3, { message: "Descrição é obrigatória" }),
   status: z.string().min(1, { message: "Situação é obrigatória" }),
   activityId: z.coerce.number().optional(),
+  eventId: z.coerce.number().optional(),
   parentDocumentId: z.coerce.number().optional(),
   file: z.any().optional(),
 });
@@ -50,6 +51,10 @@ export default function DocumentForm() {
 
   const { data: activities = [] } = useQuery<LegislativeActivity[]>({
     queryKey: ["/api/activities"],
+  });
+
+  const { data: events = [] } = useQuery<Event[]>({
+    queryKey: ["/api/events"],
   });
 
   const { data: documents = [] } = useQuery<Document[]>({
@@ -86,6 +91,7 @@ export default function DocumentForm() {
       description: "",
       status: "",
       activityId: undefined,
+      eventId: undefined,
       parentDocumentId: undefined,
       file: undefined,
     }
@@ -100,8 +106,9 @@ export default function DocumentForm() {
         authorType: document.authorType || "",
         description: document.description || "",
         status: document.status || "",
-        activityId: document.activityId,
-        parentDocumentId: document.parentDocumentId,
+        activityId: document.activityId ?? undefined,
+        eventId: document.eventId ?? undefined,
+        parentDocumentId: document.parentDocumentId ?? undefined,
         file: undefined,
       });
     }
