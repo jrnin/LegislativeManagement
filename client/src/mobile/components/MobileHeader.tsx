@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
-import { Menu, Bell, X, ArrowLeft } from 'lucide-react';
+import { Menu, Bell, X, ArrowLeft, Search } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import SearchDialog from '@/components/search/SearchDialog';
 import MobileSidebar from './MobileSidebar';
 
 interface MobileHeaderProps {
@@ -22,6 +23,7 @@ export default function MobileHeader({
   const [location] = useLocation();
   const { user } = useAuth();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Get page title based on current location if not provided
   const getPageTitle = () => {
@@ -80,6 +82,15 @@ export default function MobileHeader({
         </div>
         
         <div className="flex items-center gap-2">
+          {/* Botão de busca */}
+          <button 
+            className="p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+            onClick={() => setIsSearchOpen(true)}
+          >
+            <Search className="h-5 w-5 text-slate-700" />
+          </button>
+          
+          {/* Botão de notificações */}
           <button 
             className="p-1.5 rounded-full hover:bg-slate-100 transition-colors relative"
             onClick={() => setNotificationsOpen(!notificationsOpen)}
@@ -98,6 +109,12 @@ export default function MobileHeader({
             </AvatarFallback>
           </Avatar>
         </div>
+        
+        {/* Diálogo de busca (compartilhado com desktop) */}
+        <SearchDialog 
+          open={isSearchOpen} 
+          onOpenChange={setIsSearchOpen} 
+        />
       </div>
     </header>
   );

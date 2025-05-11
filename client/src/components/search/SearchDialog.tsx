@@ -35,7 +35,11 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
 
   // Fetch search results based on the term and active tab
   const { data: searchResults, isLoading } = useQuery<SearchResult[]>({
-    queryKey: ['/api/search', debouncedSearchTerm, activeTab],
+    queryKey: [
+      `/api/search?q=${encodeURIComponent(debouncedSearchTerm)}${activeTab !== 'all' ? `&type=${activeTab}` : ''}`,
+      debouncedSearchTerm,
+      activeTab
+    ],
     enabled: debouncedSearchTerm.length > 2,
   });
 
@@ -55,10 +59,8 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
     onOpenChange(false);
   };
 
-  // Filter results based on active tab
-  const filteredResults = searchResults?.filter(result => 
-    activeTab === 'all' || result.type === activeTab
-  ) || [];
+  // Use the results from the API which are already filtered
+  const filteredResults = searchResults || [];
 
   // Get icon for each result type
   const getResultIcon = (type: string) => {
