@@ -572,7 +572,7 @@ export default function UserForm() {
                         <FormLabel>Legislatura</FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
-                          defaultValue={field.value}
+                          defaultValue={field.value ? String(field.value) : undefined}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -581,8 +581,8 @@ export default function UserForm() {
                           </FormControl>
                           <SelectContent>
                             {legislatures.map((legislature) => (
-                              <SelectItem key={legislature.id} value={legislature.id.toString()}>
-                                {legislature.number}ª Legislatura ({legislature.startDate.split('T')[0]} - {legislature.endDate.split('T')[0]})
+                              <SelectItem key={legislature.id} value={legislature.id}>
+                                {legislature.number}ª Legislatura ({typeof legislature.startDate === 'string' ? legislature.startDate.split('T')[0] : new Date(legislature.startDate).toISOString().split('T')[0]} - {typeof legislature.endDate === 'string' ? legislature.endDate.split('T')[0] : new Date(legislature.endDate).toISOString().split('T')[0]})
                               </SelectItem>
                             ))}
                           </SelectContent>
