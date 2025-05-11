@@ -666,16 +666,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get event with all details (activities, attendance, etc)
   app.get('/api/events/:id/details', requireAuth, async (req, res) => {
     try {
-      const eventDetails = await storage.getEventWithDetails(Number(req.params.id));
+      const eventId = Number(req.params.id);
+      console.log(`API: Getting details for event ID: ${eventId}`);
       
+      // Verificar se o ID do evento é válido
+      if (isNaN(eventId) || eventId <= 0) {
+        console.error(`Invalid event ID: ${req.params.id}`);
+        return res.status(400).json({ message: "ID de evento inválido" });
+      }
+      
+      // Buscar evento com detalhes
+      const eventDetails = await storage.getEventWithDetails(eventId);
+      
+      // Verificar se o evento foi encontrado
       if (!eventDetails) {
+        console.log(`Event not found for ID: ${eventId}`);
         return res.status(404).json({ message: "Evento não encontrado" });
       }
       
+      // Log de sucesso
+      console.log(`Successfully fetched details for event ID: ${eventId}`);
       res.json(eventDetails);
     } catch (error) {
       console.error("Error fetching event details:", error);
-      res.status(500).json({ message: "Erro ao buscar detalhes do evento" });
+      res.status(500).json({ 
+        message: "Erro ao buscar detalhes do evento",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
   
