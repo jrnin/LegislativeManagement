@@ -80,10 +80,8 @@ export default function LoginPage() {
           description: "Você será redirecionado para a página inicial",
         });
         
-        // Redirecionar após um pequeno atraso para permitir que o cache seja invalidado
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 500);
+        // Redirecionar para página inicial
+        window.location.href = "/";
       } else {
         toast({
           title: "Erro ao fazer login",

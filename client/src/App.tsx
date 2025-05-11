@@ -60,11 +60,11 @@ function UnauthenticatedApp() {
 }
 
 function App() {
-  const { isLoading, isAuthenticated } = useAuth();
-  
   // Verificar se estamos na rota de verificação de e-mail
   const isVerifyEmailRoute = window.location.pathname === "/verify-email";
   const isLoginRoute = window.location.pathname === "/login";
+  
+  const { isLoading, isAuthenticated } = useAuth();
   
   return (
     <TooltipProvider>
