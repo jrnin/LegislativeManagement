@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 // Schema de validação para login
 const loginSchema = z.object({
@@ -64,42 +65,38 @@ export default function LoginPage() {
     window.location.href = "/api/login";
   };
 
+  // Importar o hook useAuth
+  const { login } = useAuth();
+
   // Função de login com email/senha
   const handleLogin = async (values: LoginFormValues) => {
     try {
       setIsLoggingIn(true);
-      const response = await apiRequest("POST", "/api/login/email", values);
-      const data = await response.json();
+      const result = await login(values.email, values.password);
       
-      if (data.success) {
+      if (result.success) {
         toast({
           title: "Login realizado com sucesso",
           description: "Você será redirecionado para a página inicial",
         });
-        window.location.href = "/";
+        
+        // Redirecionar após um pequeno atraso para permitir que o cache seja invalidado
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 500);
       } else {
         toast({
           title: "Erro ao fazer login",
-          description: data.message || "Credenciais inválidas",
+          description: result.message,
           variant: "destructive",
         });
       }
     } catch (error: any) {
       console.error("Erro ao fazer login:", error);
       
-      let errorMessage = "Ocorreu um erro durante o login";
-      
-      if (error.status === 401) {
-        errorMessage = "Credenciais inválidas";
-      } else if (error.status === 403) {
-        errorMessage = "Email não verificado. Verifique sua caixa de entrada para ativar sua conta.";
-      } else if (error.data?.message) {
-        errorMessage = error.data.message;
-      }
-      
       toast({
         title: "Erro ao fazer login",
-        description: errorMessage,
+        description: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
         variant: "destructive",
       });
     } finally {
