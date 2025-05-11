@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { requireAdmin, handleFileUpload } from "./middlewares";
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from "./sendgrid";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest } from "./sendgrid";
 import { z } from "zod";
 import crypto from "crypto";
 import fs from "fs";

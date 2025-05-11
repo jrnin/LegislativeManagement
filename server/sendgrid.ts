@@ -17,7 +17,7 @@ const SENDER_NAME = 'Sistema de Gerenciamento Legislativo';
  * Interface para parâmetros de e-mail
  */
 interface EmailParams {
-  to: string;
+  to: string | undefined;
   subject: string;
   text?: string;
   html?: string;
@@ -28,15 +28,21 @@ interface EmailParams {
  */
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
+    // Verificar se o email está definido e não vazio
+    if (!params.to) {
+      console.error('SendGrid error: email de destino não especificado');
+      return false;
+    }
+    
     await mailService.send({
-      to: params.to,
+      to: params.to || '',
       from: {
         email: SENDER_EMAIL,
         name: SENDER_NAME
       },
       subject: params.subject,
-      text: params.text,
-      html: params.html,
+      text: params.text || '',
+      html: params.html || '',
     });
     return true;
   } catch (error) {
