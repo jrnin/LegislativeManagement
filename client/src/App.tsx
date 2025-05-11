@@ -12,6 +12,7 @@ import LegislatureList from "@/pages/legislatures/LegislatureList";
 import LegislatureForm from "@/pages/legislatures/LegislatureForm";
 import EventList from "@/pages/events/EventList";
 import EventForm from "@/pages/events/EventForm";
+import EventDetails from "@/pages/events/EventDetails";
 import ActivityList from "@/pages/legislative-activities/ActivityList";
 import ActivityForm from "@/pages/legislative-activities/ActivityForm";
 import DocumentList from "@/pages/documents/DocumentList";
@@ -31,7 +32,8 @@ function AuthenticatedApp() {
         <Route path="/legislatures/:id" component={LegislatureForm} />
         <Route path="/events" component={EventList} />
         <Route path="/events/new" component={EventForm} />
-        <Route path="/events/:id" component={EventForm} />
+        <Route path="/events/edit/:id" component={EventForm} />
+        <Route path="/events/:id" component={EventDetails} />
         <Route path="/activities" component={ActivityList} />
         <Route path="/activities/new" component={ActivityForm} />
         <Route path="/activities/:id" component={ActivityForm} />

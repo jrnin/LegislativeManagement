@@ -1260,6 +1260,238 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // EVENT ATTENDANCE ROUTES
+  
+  // Get attendance for an event
+  app.get('/api/events/:eventId/attendance', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const attendance = await storage.getEventAttendanceByEventId(eventId);
+      res.json(attendance);
+    } catch (error) {
+      console.error("Error fetching event attendance:", error);
+      res.status(500).json({ message: "Erro ao buscar registro de presença" });
+    }
+  });
+  
+  // Register attendance for an event
+  app.post('/api/events/:eventId/attendance', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const userId = (req.user as any).id;
+      
+      const attendanceData = {
+        eventId,
+        userId,
+        status: req.body.status || "Presente",
+        registeredAt: new Date(),
+        registeredBy: userId,
+        notes: req.body.notes || null
+      };
+      
+      const attendance = await storage.createEventAttendance(attendanceData);
+      res.status(201).json(attendance);
+    } catch (error) {
+      console.error("Error registering attendance:", error);
+      res.status(500).json({ message: "Erro ao registrar presença" });
+    }
+  });
+  
+  // Update attendance (admin only)
+  app.put('/api/events/attendance/:id', requireAdmin, async (req, res) => {
+    try {
+      const attendanceId = Number(req.params.id);
+      const updatedAttendance = await storage.updateEventAttendance(attendanceId, req.body);
+      
+      if (!updatedAttendance) {
+        return res.status(404).json({ message: "Registro de presença não encontrado" });
+      }
+      
+      res.json(updatedAttendance);
+    } catch (error) {
+      console.error("Error updating attendance:", error);
+      res.status(500).json({ message: "Erro ao atualizar registro de presença" });
+    }
+  });
+
+  // Delete attendance (admin only)
+  app.delete('/api/events/attendance/:id', requireAdmin, async (req, res) => {
+    try {
+      const attendanceId = Number(req.params.id);
+      const result = await storage.deleteEventAttendance(attendanceId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Registro de presença não encontrado" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting attendance:", error);
+      res.status(500).json({ message: "Erro ao excluir registro de presença" });
+    }
+  });
+  
+  // DOCUMENT VOTES ROUTES
+  
+  // Get votes for a document
+  app.get('/api/documents/:documentId/votes', requireAuth, async (req, res) => {
+    try {
+      const documentId = Number(req.params.documentId);
+      const votes = await storage.getDocumentVotesByDocumentId(documentId);
+      res.json(votes);
+    } catch (error) {
+      console.error("Error fetching document votes:", error);
+      res.status(500).json({ message: "Erro ao buscar votos do documento" });
+    }
+  });
+  
+  // Get user's vote on a document
+  app.get('/api/documents/:documentId/my-vote', requireAuth, async (req, res) => {
+    try {
+      const documentId = Number(req.params.documentId);
+      const userId = (req.user as any).id;
+      
+      const vote = await storage.getDocumentVoteByUserAndDocument(userId, documentId);
+      
+      if (!vote) {
+        return res.status(404).json({ message: "Voto não encontrado" });
+      }
+      
+      res.json(vote);
+    } catch (error) {
+      console.error("Error fetching document vote:", error);
+      res.status(500).json({ message: "Erro ao buscar voto do documento" });
+    }
+  });
+  
+  // Vote on a document
+  app.post('/api/documents/:documentId/vote', requireAuth, async (req, res) => {
+    try {
+      const documentId = Number(req.params.documentId);
+      const userId = (req.user as any).id;
+      
+      // Validate vote
+      if (!['Favorável', 'Contrário', 'Abstenção'].includes(req.body.vote)) {
+        return res.status(400).json({ message: "Voto inválido. Deve ser 'Favorável', 'Contrário' ou 'Abstenção'" });
+      }
+      
+      const voteData = {
+        documentId,
+        userId,
+        vote: req.body.vote,
+        votedAt: new Date(),
+        comment: req.body.comment || null
+      };
+      
+      const vote = await storage.createDocumentVote(voteData);
+      res.status(201).json(vote);
+    } catch (error) {
+      console.error("Error voting on document:", error);
+      res.status(500).json({ message: "Erro ao registrar voto" });
+    }
+  });
+  
+  // Update vote (owner or admin)
+  app.put('/api/documents/votes/:id', requireAuth, async (req, res) => {
+    try {
+      const voteId = Number(req.params.id);
+      const userId = (req.user as any).id;
+      const isAdmin = (req.user as any).role === 'admin';
+      
+      // Get existing vote
+      const existingVote = await storage.getDocumentVote(voteId);
+      
+      if (!existingVote) {
+        return res.status(404).json({ message: "Voto não encontrado" });
+      }
+      
+      // Check if user is the owner of the vote or an admin
+      if (existingVote.userId !== userId && !isAdmin) {
+        return res.status(403).json({ message: "Não autorizado a editar este voto" });
+      }
+      
+      // Validate vote
+      if (req.body.vote && !['Favorável', 'Contrário', 'Abstenção'].includes(req.body.vote)) {
+        return res.status(400).json({ message: "Voto inválido. Deve ser 'Favorável', 'Contrário' ou 'Abstenção'" });
+      }
+      
+      const updatedVote = await storage.updateDocumentVote(voteId, {
+        ...req.body,
+        updatedAt: new Date()
+      });
+      
+      res.json(updatedVote);
+    } catch (error) {
+      console.error("Error updating vote:", error);
+      res.status(500).json({ message: "Erro ao atualizar voto" });
+    }
+  });
+  
+  // Delete vote (admin only)
+  app.delete('/api/documents/votes/:id', requireAdmin, async (req, res) => {
+    try {
+      const voteId = Number(req.params.id);
+      const result = await storage.deleteDocumentVote(voteId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Voto não encontrado" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting vote:", error);
+      res.status(500).json({ message: "Erro ao excluir voto" });
+    }
+  });
+  
+  // ACTIVITY TIMELINE ROUTES
+  
+  // Get timeline for an activity
+  app.get('/api/legislative-activities/:activityId/timeline', requireAuth, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      const timeline = await storage.getActivityTimelineByActivityId(activityId);
+      res.json(timeline);
+    } catch (error) {
+      console.error("Error fetching activity timeline:", error);
+      res.status(500).json({ message: "Erro ao buscar linha do tempo da atividade" });
+    }
+  });
+  
+  // Add event to activity timeline
+  app.post('/api/legislative-activities/:activityId/timeline', requireAuth, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      const userId = (req.user as any).id;
+      
+      const timelineData = {
+        activityId,
+        eventDate: new Date(),
+        description: req.body.description,
+        eventType: req.body.eventType || "Atualização",
+        createdBy: userId,
+        metadata: req.body.metadata || {}
+      };
+      
+      const timelineEvent = await storage.createActivityTimeline(timelineData);
+      res.status(201).json(timelineEvent);
+    } catch (error) {
+      console.error("Error adding timeline event:", error);
+      res.status(500).json({ message: "Erro ao adicionar evento na linha do tempo" });
+    }
+  });
+
+  // Get councilors list
+  app.get('/api/councilors', requireAuth, async (req, res) => {
+    try {
+      const councilors = await storage.getCouncilors();
+      res.json(councilors);
+    } catch (error) {
+      console.error("Error fetching councilors:", error);
+      res.status(500).json({ message: "Erro ao buscar vereadores" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
