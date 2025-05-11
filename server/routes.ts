@@ -202,13 +202,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         await sendWelcomeEmail(user, baseUrl);
         
-        return res.redirect('/?verified=true');
+        return res.redirect('/verify-email?verified=true');
       } else {
-        return res.status(400).json({ message: "Token inválido ou expirado" });
+        return res.redirect('/verify-email?verified=false&message=Token+inválido+ou+expirado');
       }
     } catch (error) {
       console.error("Error verifying email:", error);
-      return res.status(500).json({ message: "Erro ao verificar email" });
+      return res.redirect('/verify-email?verified=false&message=Erro+ao+verificar+email');
     }
   });
   

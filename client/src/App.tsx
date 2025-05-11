@@ -5,6 +5,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import Layout from "@/components/layout/Layout";
 import LoginPage from "@/pages/login/LoginPage";
+import EmailVerificationPage from "@/pages/login/EmailVerificationPage";
 import UserList from "@/pages/users/UserList";
 import UserForm from "@/pages/users/UserForm";
 import LegislatureList from "@/pages/legislatures/LegislatureList";
@@ -43,8 +44,27 @@ function AuthenticatedApp() {
   );
 }
 
+function UnauthenticatedApp() {
+  return (
+    <Switch>
+      <Route path="/login" component={LoginPage} />
+      <Route path="/verify-email" component={EmailVerificationPage} />
+      <Route>
+        {() => {
+          window.location.href = "/login";
+          return null;
+        }}
+      </Route>
+    </Switch>
+  );
+}
+
 function App() {
   const { isLoading, isAuthenticated } = useAuth();
+  
+  // Verificar se estamos na rota de verificação de e-mail
+  const isVerifyEmailRoute = window.location.pathname === "/verify-email";
+  const isLoginRoute = window.location.pathname === "/login";
   
   return (
     <TooltipProvider>
@@ -56,7 +76,11 @@ function App() {
       ) : isAuthenticated ? (
         <AuthenticatedApp />
       ) : (
-        <LoginPage />
+        isVerifyEmailRoute || isLoginRoute ? (
+          <UnauthenticatedApp />
+        ) : (
+          <LoginPage />
+        )
       )}
     </TooltipProvider>
   );

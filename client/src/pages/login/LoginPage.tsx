@@ -77,12 +77,29 @@ export default function LoginPage() {
           description: "Você será redirecionado para a página inicial",
         });
         window.location.href = "/";
+      } else {
+        toast({
+          title: "Erro ao fazer login",
+          description: data.message || "Credenciais inválidas",
+          variant: "destructive",
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao fazer login:", error);
+      
+      let errorMessage = "Ocorreu um erro durante o login";
+      
+      if (error.status === 401) {
+        errorMessage = "Credenciais inválidas";
+      } else if (error.status === 403) {
+        errorMessage = "Email não verificado. Verifique sua caixa de entrada para ativar sua conta.";
+      } else if (error.data?.message) {
+        errorMessage = error.data.message;
+      }
+      
       toast({
         title: "Erro ao fazer login",
-        description: error instanceof Error ? error.message : "Credenciais inválidas",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -106,12 +123,27 @@ export default function LoginPage() {
         });
         setActiveTab("login");
         registerForm.reset();
+      } else {
+        toast({
+          title: "Erro ao cadastrar",
+          description: data.message || "Ocorreu um erro ao processar seu cadastro",
+          variant: "destructive",
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao cadastrar:", error);
+      
+      let errorMessage = "Ocorreu um erro ao processar seu cadastro";
+      
+      if (error.status === 400) {
+        errorMessage = error.data?.message || "Dados de cadastro inválidos";
+      } else if (error.data?.message) {
+        errorMessage = error.data.message;
+      }
+      
       toast({
         title: "Erro ao cadastrar",
-        description: error instanceof Error ? error.message : "Ocorreu um erro ao processar seu cadastro",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
