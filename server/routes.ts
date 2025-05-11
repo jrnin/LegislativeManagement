@@ -439,11 +439,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Update user
-      const updatedUser = await storage.updateUser(userId, {
+      // Create update data
+      const updateData = {
         ...validated,
         birthDate: validated.birthDate ? new Date(validated.birthDate) : undefined,
-      });
+      };
+      
+      // If password is being updated, hash it
+      if (validated.password) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(validated.password, salt);
+        updateData.password = hashedPassword;
+      }
+      
+      // Update user
+      const updatedUser = await storage.updateUser(userId, updateData);
       
       if (!updatedUser) {
         return res.status(404).json({ message: "Usuário não encontrado" });

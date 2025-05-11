@@ -17,7 +17,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Legislature } from "@shared/schema";
 
-const formSchema = z.object({
+const createFormSchema = z.object({
+  name: z.string().min(3, { message: "Nome deve ter no mínimo 3 caracteres" }),
+  email: z.string().email({ message: "Email inválido" }),
+  cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, { message: "CPF inválido. Use o formato 000.000.000-00" }),
+  birthDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Data de nascimento inválida" }),
+  zipCode: z.string().regex(/^\d{5}-\d{3}$/, { message: "CEP inválido. Use o formato 00000-000" }),
+  address: z.string().min(3, { message: "Endereço é obrigatório" }),
+  neighborhood: z.string().min(1, { message: "Bairro é obrigatório" }),
+  number: z.string().min(1, { message: "Número é obrigatório" }),
+  city: z.string().min(2, { message: "Cidade é obrigatória" }),
+  state: z.string().length(2, { message: "Estado deve ter 2 caracteres" }),
+  role: z.enum(["admin", "councilor"], { message: "Selecione um perfil válido" }),
+  legislatureId: z.string().optional(),
+  maritalStatus: z.string().optional(),
+  occupation: z.string().optional(),
+  education: z.string().optional(),
+  password: z.string().min(6, { message: "Senha deve ter no mínimo 6 caracteres" }),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "As senhas não conferem",
+  path: ["confirmPassword"],
+});
+
+const updateFormSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter no mínimo 3 caracteres" }),
   email: z.string().email({ message: "Email inválido" }),
   cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, { message: "CPF inválido. Use o formato 000.000.000-00" }),
@@ -45,7 +68,9 @@ const formSchema = z.object({
   path: ["confirmPassword"],
 });
 
-type FormData = z.infer<typeof formSchema>;
+type CreateFormData = z.infer<typeof createFormSchema>;
+type UpdateFormData = z.infer<typeof updateFormSchema>;
+type FormData = CreateFormData | UpdateFormData;
 
 export default function UserForm() {
   const [_, navigate] = useLocation();
@@ -65,7 +90,7 @@ export default function UserForm() {
   });
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(isEditing ? updateFormSchema : createFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -559,37 +584,53 @@ export default function UserForm() {
                   />
                 )}
                 
-                {!isEditing && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Senha</FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="Senha" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Confirmar Senha</FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="Confirme a senha" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">{isEditing ? "Alterar Senha" : "Senha"}</h3>
+                  <Separator />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{isEditing ? "Nova Senha" : "Senha"}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password" 
+                            placeholder={isEditing ? "Nova senha (deixe em branco para manter a atual)" : "Senha"} 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        {isEditing && (
+                          <FormDescription>
+                            Deixe em branco para manter a senha atual
+                          </FormDescription>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirmar Senha</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password" 
+                            placeholder="Confirme a senha" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
               
               <div className="flex justify-end space-x-4">
