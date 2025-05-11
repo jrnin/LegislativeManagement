@@ -111,6 +111,7 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
     references: [legislatures.id],
   }),
   activities: many(legislativeActivities),
+  documents: many(documents, { relationName: "event_documents" }),
 }));
 
 // Legislative Activities table
@@ -180,6 +181,7 @@ export const documents = pgTable("documents", {
   fileType: varchar("file_type"),
   status: varchar("status").notNull(), // "Vigente", "Revogada", "Alterada", "Suspenso"
   activityId: integer("activity_id"), // Related legislative activity (optional)
+  eventId: integer("event_id"), // Related event (optional)
   parentDocumentId: integer("parent_document_id"), // For document versioning
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -190,6 +192,11 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
     fields: [documents.activityId],
     references: [legislativeActivities.id],
     relationName: "activity_documents",
+  }),
+  event: one(events, {
+    fields: [documents.eventId],
+    references: [events.id],
+    relationName: "event_documents",
   }),
   parentDocument: one(documents, {
     fields: [documents.parentDocumentId],
