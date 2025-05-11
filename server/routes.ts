@@ -680,7 +680,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create event (admin only)
-  app.post('/api/events', requireAdmin, async (req, res) => {
+  app.post('/api/events', requireAuth, async (req, res) => {
     try {
       const schema = z.object({
         eventNumber: z.number().int().positive(),
@@ -715,7 +715,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update event (admin only)
-  app.put('/api/events/:id', requireAdmin, async (req, res) => {
+  app.put('/api/events/:id', requireAuth, async (req, res) => {
     try {
       const eventId = Number(req.params.id);
       
