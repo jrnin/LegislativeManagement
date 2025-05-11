@@ -509,7 +509,7 @@ export default function DocumentForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Nenhuma</SelectItem>
+                          <SelectItem value="0">Nenhuma</SelectItem>
                           {activities.map((activity) => (
                             <SelectItem key={activity.id} value={activity.id.toString()}>
                               {activity.activityType} Nº {activity.activityNumber} - {formatDate(activity.activityDate)}
@@ -541,7 +541,7 @@ export default function DocumentForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Nenhum</SelectItem>
+                          <SelectItem value="0">Nenhum</SelectItem>
                           {documents.map((doc) => (
                             <SelectItem key={doc.id} value={doc.id.toString()}>
                               {doc.documentType} Nº {doc.documentNumber} - {formatDate(doc.documentDate)}
