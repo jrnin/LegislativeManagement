@@ -782,10 +782,18 @@ export class DatabaseStorage implements IStorage {
     const attendanceResult = await this.getEventAttendanceByEventId(id);
     
     // Get documents related to this event
-    const documentsResult = await db
-      .select()
-      .from(documents)
-      .where(eq(documents.eventId, id));
+    console.log("Getting documents for event ID:", id);
+    let documentsResult = [];
+    try {
+      documentsResult = await db
+        .select()
+        .from(documents)
+        .where(eq(documents.eventId, id));
+      console.log("Documents found:", documentsResult.length);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+      documentsResult = [];
+    }
     
     // For each activity, get authors
     const activitiesWithAuthors = await Promise.all(
