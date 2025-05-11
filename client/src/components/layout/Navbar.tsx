@@ -22,15 +22,15 @@ interface NavbarProps {
 }
 
 export default function Navbar({ setSidebarOpen }: NavbarProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
 
   const getInitials = (name: string) => {
-    return name.split(" ").map(part => part[0]).join("").toUpperCase();
+    return name ? name.split(" ").map(part => part[0]).join("").toUpperCase() : "U";
   };
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    await logout();
   };
   
   return (

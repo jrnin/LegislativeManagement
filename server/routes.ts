@@ -223,6 +223,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Logout route
+  app.get('/api/logout', (req, res) => {
+    try {
+      // Clear the session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Erro ao fazer logout:', err);
+          return res.status(500).json({
+            success: false,
+            message: 'Erro ao encerrar a sessão'
+          });
+        }
+        
+        // Redirect to login page
+        res.json({
+          success: true,
+          message: 'Logout realizado com sucesso'
+        });
+      });
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao processar logout'
+      });
+    }
+  });
+  
   // Verify email
   app.get('/api/verify-email', async (req, res) => {
     const { token } = req.query;
