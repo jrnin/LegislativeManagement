@@ -179,13 +179,16 @@ export default function UserForm() {
     // Remove a senha se estiver vazia na edição (mantém a senha atual)
     const submitData = { ...data };
     
-    if (isEditing && !submitData.password) {
-      delete submitData.password;
-      delete submitData.confirmPassword;
-    }
-    
     if (isEditing) {
-      updateMutation.mutate(submitData);
+      // Se a senha está vazia, não a inclua no payload de envio
+      if (!submitData.password || submitData.password === '') {
+        const dataToSubmit = { ...submitData };
+        // Usando cópia separada para evitar problemas com tipagem
+        const { password, confirmPassword, ...restData } = dataToSubmit;
+        updateMutation.mutate(restData as FormData);
+      } else {
+        updateMutation.mutate(submitData);
+      }
     } else {
       createMutation.mutate(submitData);
     }

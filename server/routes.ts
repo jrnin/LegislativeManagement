@@ -402,10 +402,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/users/:id', requireAuth, async (req: any, res) => {
     try {
       const userId = req.params.id;
-      const currentUserIsAdmin = (req.user.claims.sub && (await storage.getUser(req.user.claims.sub))?.role === "admin");
+      const currentUserId = req.userId; // Pega o ID do usuário da sessão
+      const currentUser = await storage.getUser(currentUserId);
+      const currentUserIsAdmin = currentUser?.role === "admin";
       
       // Only allow admins to update other users
-      if (userId !== req.user.claims.sub && !currentUserIsAdmin) {
+      if (userId !== currentUserId && !currentUserIsAdmin) {
         return res.status(403).json({ message: "Permissão negada" });
       }
       
@@ -465,6 +467,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
+      }
+      
+      // Verificar se é um erro do drizzle ou do PostgreSQL
+      const err = error as any;
+      if (err.code && (err.code.startsWith('22') || err.code.startsWith('23'))) {
+        // Códigos 22xxx são erros de dados e 23xxx são violações de integridade
+        return res.status(400).json({ 
+          message: "Erro nos dados enviados. Verifique os campos e tente novamente.",
+          detail: err.detail || err.message
+        });
       }
       
       res.status(500).json({ message: "Erro ao atualizar usuário" });
