@@ -684,11 +684,11 @@ export default function EventDetails() {
               {isAuthenticated && user?.role === "admin" && (
                 <Button 
                   variant="outline" 
-                  onClick={() => navigate('/documents/new')}
+                  onClick={() => navigate(`/documents/new?eventId=${eventId}`)}
                   className="gap-2"
                 >
                   <FileText className="w-4 h-4" />
-                  Novo Documento
+                  Novo Documento para este Evento
                 </Button>
               )}
             </div>

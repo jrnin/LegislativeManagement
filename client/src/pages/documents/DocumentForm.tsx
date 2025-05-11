@@ -35,7 +35,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export default function DocumentForm() {
-  const [_, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const params = useParams();
   const documentId = params.id;
   const isEditing = !!documentId;
@@ -43,6 +43,10 @@ export default function DocumentForm() {
   const [formFile, setFormFile] = useState<File | null>(null);
   const [documentHistory, setDocumentHistory] = useState<Document[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  
+  // Pegar eventId da URL (se presente)
+  const urlParams = new URLSearchParams(window.location.search);
+  const eventIdFromUrl = urlParams.get('eventId');
 
   const { data: document, isLoading: documentLoading } = useQuery<Document>({
     queryKey: [`/api/documents/${documentId}`],
@@ -91,7 +95,7 @@ export default function DocumentForm() {
       description: "",
       status: "",
       activityId: undefined,
-      eventId: undefined,
+      eventId: eventIdFromUrl ? Number(eventIdFromUrl) : undefined,
       parentDocumentId: undefined,
       file: undefined,
     }

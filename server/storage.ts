@@ -109,6 +109,7 @@ export interface IStorage {
   getEventWithDetails(id: number): Promise<Event & {
     activities: LegislativeActivity[];
     attendance: EventAttendance[];
+    documents: Document[];
     legislature: Legislature;
   } | undefined>;
   
@@ -784,7 +785,7 @@ export class DatabaseStorage implements IStorage {
     const documentsResult = await db
       .select()
       .from(documents)
-      .where(eq(documents.event_id, id));
+      .where(eq(documents.eventId, id));
     
     // For each activity, get authors
     const activitiesWithAuthors = await Promise.all(
