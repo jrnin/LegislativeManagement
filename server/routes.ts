@@ -1256,9 +1256,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Arquivo não encontrado" });
       }
       
+      // Check if download is requested
+      const isDownload = req.query.download === 'true';
+      
       // Set appropriate headers
       res.setHeader('Content-Type', fileType ? fileType : 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName || 'download')}"`);
+      
+      if (isDownload) {
+        // Force download with attachment disposition
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName || 'download')}"`);
+      } else {
+        // Allow browser to display the file if possible (PDF, images, etc)
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName || 'view')}"`);
+      }
       
       // Stream the file
       const fileStream = fs.createReadStream(filePath);
