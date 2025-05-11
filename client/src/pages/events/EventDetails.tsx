@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { Loader2, Calendar, MapPin, User, FileText, Clock, Check, X, MessageSquare } from "lucide-react";
+import { Loader2, Calendar, MapPin, User, FileText, Clock, Check, X, MessageSquare, Download } from "lucide-react";
 
 import {
   Tabs,
@@ -444,6 +444,34 @@ export default function EventDetails() {
                                   <span className="text-sm">{author.name}</span>
                                 </div>
                               ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Seção para visualização do arquivo */}
+                        {(activity.filePath || activity.fileName) && (
+                          <div className="sm:col-span-2 mt-4">
+                            <p className="text-sm text-muted-foreground mb-2">Arquivo</p>
+                            <div className="flex items-center gap-2 p-3 border rounded-md bg-slate-50">
+                              <FileText className="h-5 w-5 text-blue-600" />
+                              <span className="text-sm font-medium flex-1 truncate">
+                                {activity.fileName || "Documento da atividade"}
+                              </span>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="ml-auto" 
+                                onClick={() => window.open(`/api/files/activities/${activity.id}`, '_blank')}
+                              >
+                                Visualizar
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => window.open(`/api/files/activities/${activity.id}?download=true`, '_blank')}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
                         )}
