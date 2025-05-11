@@ -759,6 +759,7 @@ export class DatabaseStorage implements IStorage {
   async getEventWithDetails(id: number): Promise<Event & {
     activities: LegislativeActivity[];
     attendance: EventAttendance[];
+    documents: Document[];
     legislature: Legislature;
   } | undefined> {
     const [event] = await db.select().from(events).where(eq(events.id, id));
@@ -778,6 +779,12 @@ export class DatabaseStorage implements IStorage {
     
     // Get attendance
     const attendanceResult = await this.getEventAttendanceByEventId(id);
+    
+    // Get documents related to this event
+    const documentsResult = await db
+      .select()
+      .from(documents)
+      .where(eq(documents.eventId, id));
     
     // For each activity, get authors
     const activitiesWithAuthors = await Promise.all(
@@ -806,6 +813,7 @@ export class DatabaseStorage implements IStorage {
       legislature,
       activities: activitiesWithAuthors,
       attendance: attendanceResult,
+      documents: documentsResult,
     };
   }
   

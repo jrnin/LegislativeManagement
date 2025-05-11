@@ -470,83 +470,42 @@ export default function EventDetails() {
                           </Badge>
                           <span>{activity.type}</span>
                         </div>
-                        <h3 className="text-base font-medium">
-                          {activity.description}
-                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {format(new Date(activity.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                        </p>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-4">
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Data</p>
-                          <p className="font-medium">
-                            {format(new Date(activity.activityDate), "PPP", { locale: ptBR })}
-                          </p>
-                        </div>
+                    <AccordionContent className="pb-4">
+                      <div className="space-y-4">
+                        <p>{activity.description}</p>
                         
                         <div>
-                          <p className="text-sm text-muted-foreground">Status</p>
-                          <p className="font-medium">{activity.status}</p>
+                          <h4 className="text-sm font-medium mb-2">Autores:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {activity.authors?.map((author: any) => (
+                              <div key={author.id} className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                                <Avatar className="h-6 w-6">
+                                  <AvatarImage src={author.profileImageUrl || ""} />
+                                  <AvatarFallback>{author.name?.substring(0, 2)}</AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm">{author.name}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                         
-                        <div className="sm:col-span-2">
-                          <p className="text-sm text-muted-foreground">Descrição</p>
-                          <p>{activity.description}</p>
-                        </div>
-                        
-                        {activity.authors?.length > 0 && (
-                          <div className="sm:col-span-2">
-                            <p className="text-sm text-muted-foreground mb-2">Autores</p>
-                            <div className="flex flex-wrap gap-2">
-                              {activity.authors.map((author: any) => (
-                                <div key={author.id} className="flex items-center gap-2 p-2 border rounded-md">
-                                  <Avatar className="w-6 h-6">
-                                    <AvatarImage src={author.profileImageUrl || ""} alt={author.name} />
-                                    <AvatarFallback>{author.name.substring(0, 2)}</AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-sm">{author.name}</span>
-                                </div>
-                              ))}
-                            </div>
+                        {activity.filePath && (
+                          <div className="mt-4">
+                            <Button 
+                              variant="outline" 
+                              className="gap-2"
+                              onClick={() => window.open(`/api/files/activities/${activity.id}`, '_blank')}
+                            >
+                              <Download className="h-4 w-4" />
+                              Baixar Anexo
+                            </Button>
                           </div>
                         )}
-                        
-                        {/* Seção para visualização do arquivo */}
-                        {(activity.filePath || activity.fileName) && (
-                          <div className="sm:col-span-2 mt-4">
-                            <p className="text-sm text-muted-foreground mb-2">Arquivo</p>
-                            <div className="flex items-center gap-2 p-3 border rounded-md bg-slate-50">
-                              <FileText className="h-5 w-5 text-blue-600" />
-                              <span className="text-sm font-medium flex-1 truncate">
-                                {activity.fileName || "Documento da atividade"}
-                              </span>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="ml-auto" 
-                                onClick={() => window.open(`/api/files/activities/${activity.id}`, '_blank')}
-                              >
-                                Visualizar
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => window.open(`/api/files/activities/${activity.id}?download=true`, '_blank')}
-                              >
-                                <Download className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
-                          onClick={() => navigate(`/legislative-activities/${activity.id}`)}
-                        >
-                          Ver Detalhes
-                        </Button>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -560,129 +519,121 @@ export default function EventDetails() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">Lista de Presença</h2>
-              <div className="flex gap-2">
-                {isAuthenticated && event.status === "Aberto" && !userAttendance && (
-                  <Button 
-                    onClick={() => setIsAttendanceDialogOpen(true)}
-                    className="gap-2"
-                  >
-                    <Check className="w-4 h-4" />
-                    Registrar Presença
-                  </Button>
-                )}
-                {isAuthenticated && user?.role === "admin" && (
-                  <Button 
-                    onClick={() => setIsManagingAttendance(!isManagingAttendance)}
-                    variant={isManagingAttendance ? "default" : "outline"}
-                    className="gap-2"
-                  >
-                    <UserCheck className="w-4 h-4" />
-                    {isManagingAttendance ? "Voltar" : "Gerenciar Presenças"}
-                  </Button>
-                )}
-              </div>
+              {isAuthenticated && user?.role === "admin" && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsManagingAttendance(!isManagingAttendance)}
+                  className="gap-2"
+                >
+                  {isManagingAttendance ? (
+                    <>
+                      <X className="w-4 h-4" />
+                      Cancelar
+                    </>
+                  ) : (
+                    <>
+                      <UserCheck className="w-4 h-4" />
+                      Gerenciar Presenças
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
             
-            {isManagingAttendance ? (
-              <div className="space-y-6">
-                <h3 className="text-lg font-medium">Gerenciar Presenças de Vereadores</h3>
-                
-                {loadingCouncilors ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <span className="ml-2">Carregando vereadores...</span>
-                  </div>
-                ) : councilors.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <User className="w-12 h-12 mb-4 text-muted-foreground" />
-                    <h3 className="text-xl font-medium">Nenhum vereador encontrado</h3>
-                    <p className="text-muted-foreground">Não há vereadores cadastrados no sistema.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {councilors.map((councilor) => {
-                        // Verificar se o vereador já tem presença registrada
-                        const existingAttendance = attendance.find((a: any) => a.userId === councilor.id);
-                        
-                        return (
-                          <Card key={councilor.id} className={
-                            existingAttendance 
-                              ? existingAttendance.status === "Presente" 
-                                ? "border-green-500 bg-green-50" 
-                                : "border-red-500 bg-red-50"
-                              : ""
-                          }>
-                            <CardHeader className="p-4 pb-2">
-                              <div className="flex items-center gap-3">
-                                <Avatar>
-                                  <AvatarImage src={councilor.profileImageUrl || ""} alt={councilor.name} />
-                                  <AvatarFallback>{councilor.name.substring(0, 2)}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                  <CardTitle className="text-base">{councilor.name}</CardTitle>
-                                  <CardDescription>{councilor.email}</CardDescription>
-                                </div>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="p-4 pt-2 flex justify-between">
-                              {existingAttendance ? (
-                                <div className="flex items-center">
-                                  <Badge className={existingAttendance.status === "Presente" ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-red-100 text-red-800 hover:bg-red-100"}>
-                                    {existingAttendance.status}
-                                  </Badge>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="ml-2"
-                                    onClick={() => handleCouncilorAttendance(
-                                      councilor.id, 
-                                      existingAttendance.status === "Presente" ? "Ausente" : "Presente"
-                                    )}
-                                  >
-                                    <RefreshCw className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              ) : (
-                                <div className="flex gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
-                                    onClick={() => handleCouncilorAttendance(councilor.id, "Presente")}
-                                  >
-                                    <Check className="h-4 w-4 mr-1" /> Presente
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200"
-                                    onClick={() => handleCouncilorAttendance(councilor.id, "Ausente")}
-                                  >
-                                    <X className="h-4 w-4 mr-1" /> Ausente
-                                  </Button>
-                                </div>
-                              )}
-                            </CardFooter>
-                          </Card>
-                        );
-                      })}
+            {isManagingAttendance && isAuthenticated && user?.role === "admin" && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="text-lg">Registrar Presenças</CardTitle>
+                  <CardDescription>Registre a presença dos vereadores neste evento</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loadingCouncilors ? (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
-                  </div>
-                )}
-              </div>
-            ) : attendance.length === 0 ? (
+                  ) : (
+                    <div className="space-y-4">
+                      {councilors.length === 0 ? (
+                        <p>Nenhum vereador encontrado</p>
+                      ) : (
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                          {councilors.map((councilor) => {
+                            const councilAttendance = attendance.find((a: any) => a.userId === councilor.id);
+                            
+                            return (
+                              <Card key={councilor.id} className={councilAttendance ? "border-green-200" : ""}>
+                                <CardContent className="p-4">
+                                  <div className="flex flex-col space-y-3">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar>
+                                        <AvatarImage src={councilor.profileImageUrl || ""} alt={councilor.name} />
+                                        <AvatarFallback>{councilor.name?.substring(0, 2) || "?"}</AvatarFallback>
+                                      </Avatar>
+                                      <div>
+                                        <p className="font-medium">{councilor.name}</p>
+                                        <p className="text-sm text-muted-foreground">Vereador</p>
+                                      </div>
+                                    </div>
+                                    
+                                    {councilAttendance ? (
+                                      <div className="flex items-center p-2 bg-green-50 rounded-md">
+                                        <Check className="w-4 h-4 mr-2 text-green-600" />
+                                        <span className="text-sm">Registrado como <strong>{councilAttendance.status}</strong></span>
+                                      </div>
+                                    ) : (
+                                      <div className="flex gap-2 mt-2">
+                                        <Button 
+                                          size="sm" 
+                                          className="flex-1"
+                                          onClick={() => handleCouncilorAttendance(councilor.id, "Presente")}
+                                        >
+                                          Presente
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          className="flex-1"
+                                          onClick={() => handleCouncilorAttendance(councilor.id, "Justificado")}
+                                        >
+                                          Justificar
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-end">
+                        <Button 
+                          variant="ghost" 
+                          onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "attendance"] })}
+                          className="gap-2"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          Atualizar Lista
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            
+            {attendance.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <User className="w-12 h-12 mb-4 text-muted-foreground" />
+                <UserCheck className="w-12 h-12 mb-4 text-muted-foreground" />
                 <h3 className="text-xl font-medium">Nenhuma presença registrada</h3>
-                <p className="text-muted-foreground">Este evento ainda não possui registros de presença.</p>
+                <p className="text-muted-foreground">Ainda não há registros de presença para este evento.</p>
               </div>
             ) : (
               <Table>
-                <TableCaption>Lista de presença do evento</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Participante</TableHead>
+                    <TableHead>Vereador</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Registrado em</TableHead>
                     <TableHead>Observações</TableHead>
@@ -728,9 +679,21 @@ export default function EventDetails() {
         
         <TabsContent value="documents" className="pt-4">
           <div className="space-y-4">
-            <h2 className="text-xl font-bold">Documentos</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold">Documentos</h2>
+              {isAuthenticated && user?.role === "admin" && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/documents/new')}
+                  className="gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  Novo Documento
+                </Button>
+              )}
+            </div>
             
-            {activities.length === 0 || !activities.some((a: any) => a.relatedDocuments?.length > 0) ? (
+            {!eventDetails.documents || eventDetails.documents.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <FileText className="w-12 h-12 mb-4 text-muted-foreground" />
                 <h3 className="text-xl font-medium">Nenhum documento registrado</h3>
@@ -738,140 +701,121 @@ export default function EventDetails() {
               </div>
             ) : (
               <div className="space-y-6">
-                {activities
-                  .filter((activity: any) => activity.relatedDocuments?.length > 0)
-                  .map((activity: any) => (
-                    <Card key={activity.id}>
-                      <CardHeader>
-                        <CardTitle className="text-lg">
-                          Documentos da Atividade #{activity.activityNumber}
-                        </CardTitle>
-                        <CardDescription>
-                          {activity.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Descrição</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead>Seu Voto</TableHead>
-                              <TableHead className="text-right">Ações</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {activity.relatedDocuments.map((documentId: number) => {
-                              const document = activity.documents?.find((d: any) => d.id === documentId);
-                              const userVote = getUserVoteForDocument(documentId);
-                              
-                              if (!document) return null;
-                              
-                              return (
-                                <TableRow key={document.id}>
-                                  <TableCell>
-                                    <div>
-                                      <p className="font-medium">{document.description}</p>
-                                      <p className="text-sm text-muted-foreground">
-                                        #{document.documentNumber}
-                                      </p>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge variant="outline">
-                                      {document.status}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    {userVote ? (
-                                      <Badge 
-                                        variant="outline" 
-                                        className={
-                                          userVote.vote === "Favorável"
-                                            ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                            : userVote.vote === "Contrário"
-                                              ? "bg-red-100 text-red-800 hover:bg-red-100"
-                                              : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                                        }
-                                      >
-                                        {userVote.vote}
-                                      </Badge>
-                                    ) : (
-                                      <span className="text-muted-foreground text-sm">Não votou</span>
-                                    )}
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                      <Button 
-                                        variant="outline" 
-                                        size="sm"
-                                        onClick={() => navigate(`/documents/${document.id}`)}
-                                      >
-                                        Ver Documento
-                                      </Button>
-                                      {isAuthenticated && (
-                                        <Button 
-                                          size="sm" 
-                                          onClick={() => openVoteDialog(document.id)}
-                                        >
-                                          {userVote ? "Editar Voto" : "Votar"}
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
-                  ))}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Documentos do Evento</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Número</TableHead>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead>Data</TableHead>
+                          <TableHead>Autor</TableHead>
+                          <TableHead>Situação</TableHead>
+                          <TableHead>Arquivo</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {eventDetails.documents.map((document: any) => (
+                          <TableRow key={document.id}>
+                            <TableCell className="font-medium">{document.documentNumber}</TableCell>
+                            <TableCell>{document.documentType}</TableCell>
+                            <TableCell>
+                              {document.documentDate ? format(new Date(document.documentDate), "dd/MM/yyyy") : "-"}
+                            </TableCell>
+                            <TableCell>{document.authorType}</TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant="outline"
+                                className={
+                                  document.status === "Vigente" 
+                                    ? "bg-green-100 text-green-800 hover:bg-green-100" 
+                                    : document.status === "Revogada" 
+                                      ? "bg-red-100 text-red-800 hover:bg-red-100"
+                                      : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                                }
+                              >
+                                {document.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {document.fileName ? (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => window.open(`/api/files/documents/${document.id}`, '_blank')}
+                                  className="gap-1"
+                                >
+                                  <FileText className="h-4 w-4" />
+                                  <span className="max-w-[100px] truncate">{document.fileName}</span>
+                                </Button>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => navigate(`/documents/${document.id}`)}
+                              >
+                                Detalhes
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
         </TabsContent>
       </Tabs>
       
-      {/* Dialog for voting */}
+      {/* Dialogs for voting and attendance confirmation */}      
       <Dialog open={isVoteDialogOpen} onOpenChange={setIsVoteDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Registrar Voto</DialogTitle>
+            <DialogTitle>Votar no Documento</DialogTitle>
             <DialogDescription>
-              Escolha uma opção para registrar seu voto e adicione um comentário se desejar.
+              Registre seu voto e comentário opcional para este documento.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex flex-col space-y-4 py-4">
-            <div className="flex gap-2 justify-center flex-wrap">
-              <VoteOption 
-                value="Favorável" 
-                label="Favorável" 
-                selected={voteValue === "Favorável"}
-                onClick={() => setVoteValue("Favorável")}
-              />
-              <VoteOption 
-                value="Contrário" 
-                label="Contrário" 
-                selected={voteValue === "Contrário"}
-                onClick={() => setVoteValue("Contrário")}
-              />
-              <VoteOption 
-                value="Abstenção" 
-                label="Abstenção" 
-                selected={voteValue === "Abstenção"}
-                onClick={() => setVoteValue("Abstenção")}
-              />
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Selecione seu voto:</h4>
+              <div className="flex flex-wrap gap-2">
+                <VoteOption 
+                  value="Favorável" 
+                  label="Favorável" 
+                  selected={voteValue === "Favorável"} 
+                  onClick={() => setVoteValue("Favorável")} 
+                />
+                <VoteOption 
+                  value="Contrário" 
+                  label="Contrário" 
+                  selected={voteValue === "Contrário"} 
+                  onClick={() => setVoteValue("Contrário")} 
+                />
+                <VoteOption 
+                  value="Abstenção" 
+                  label="Abstenção" 
+                  selected={voteValue === "Abstenção"} 
+                  onClick={() => setVoteValue("Abstenção")} 
+                />
+              </div>
             </div>
             
             <div className="space-y-2">
-              <label htmlFor="comment" className="text-sm font-medium">
-                Comentário (opcional)
-              </label>
-              <Textarea
-                id="comment"
-                placeholder="Adicione um comentário ao seu voto..."
+              <h4 className="text-sm font-medium">Comentário (opcional):</h4>
+              <Textarea 
+                placeholder="Adicione um comentário ao seu voto"
                 value={voteComment}
                 onChange={(e) => setVoteComment(e.target.value)}
                 rows={3}
@@ -879,62 +823,41 @@ export default function EventDetails() {
             </div>
           </div>
           
-          <DialogFooter className="gap-2 sm:justify-end">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => setIsVoteDialogOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              type="button"
-              onClick={handleVoteSubmit}
-              disabled={!voteValue}
-            >
-              Confirmar Voto
-            </Button>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsVoteDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleVoteSubmit} disabled={!voteValue}>Enviar Voto</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       
-      {/* Dialog for attendance */}
       <Dialog open={isAttendanceDialogOpen} onOpenChange={setIsAttendanceDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Registrar Presença</DialogTitle>
             <DialogDescription>
-              Registre sua presença no evento.
+              Confirme sua presença neste evento.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex flex-col space-y-4 py-4">
+          <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <label htmlFor="status" className="text-sm font-medium">
-                Status de Presença
-              </label>
-              <Select 
-                value={attendanceStatus} 
-                onValueChange={setAttendanceStatus}
-              >
-                <SelectTrigger id="status">
+              <h4 className="text-sm font-medium">Status:</h4>
+              <Select value={attendanceStatus} onValueChange={setAttendanceStatus}>
+                <SelectTrigger>
                   <SelectValue placeholder="Selecione um status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Presente">Presente</SelectItem>
+                  <SelectItem value="Atrasado">Atrasado</SelectItem>
                   <SelectItem value="Justificado">Justificado</SelectItem>
-                  <SelectItem value="Ausente">Ausente</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div className="space-y-2">
-              <label htmlFor="notes" className="text-sm font-medium">
-                Observações (opcional)
-              </label>
-              <Textarea
-                id="notes"
-                placeholder="Adicione observações sobre sua presença..."
+              <h4 className="text-sm font-medium">Observações (opcional):</h4>
+              <Textarea 
+                placeholder="Adicione uma observação se necessário"
                 value={attendanceNotes}
                 onChange={(e) => setAttendanceNotes(e.target.value)}
                 rows={3}
@@ -942,20 +865,9 @@ export default function EventDetails() {
             </div>
           </div>
           
-          <DialogFooter className="gap-2 sm:justify-end">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => setIsAttendanceDialogOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              type="button"
-              onClick={handleAttendanceSubmit}
-            >
-              Confirmar Presença
-            </Button>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAttendanceDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleAttendanceSubmit}>Confirmar Presença</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
