@@ -784,7 +784,7 @@ export class DatabaseStorage implements IStorage {
     const documentsResult = await db
       .select()
       .from(documents)
-      .where(eq(documents.eventId, id));
+      .where(eq(documents.event_id, id));
     
     // For each activity, get authors
     const activitiesWithAuthors = await Promise.all(
