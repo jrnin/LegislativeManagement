@@ -30,13 +30,13 @@ export default function Dashboard() {
     return <MobileDashboard />;
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (dateString: string | Date) => {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     return date.toLocaleDateString('pt-BR');
   };
 
-  const formatDateTime = (dateString: string, timeString: string) => {
-    const date = new Date(dateString);
+  const formatDateTime = (dateString: string | Date, timeString: string) => {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     return `${date.toLocaleDateString('pt-BR')} - ${timeString}`;
   };
 
