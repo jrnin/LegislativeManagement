@@ -1068,6 +1068,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: z.string(),
         status: z.string(),
         activityId: z.number().int().positive().optional(),
+        eventId: z.number().int().positive().optional(),
         parentDocumentId: z.number().int().positive().optional(),
       });
       
@@ -1076,6 +1077,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         documentNumber: Number(req.body.documentNumber),
         activityId: req.body.activityId ? Number(req.body.activityId) : undefined,
+        eventId: req.body.eventId ? Number(req.body.eventId) : undefined,
         parentDocumentId: req.body.parentDocumentId ? Number(req.body.parentDocumentId) : undefined,
       };
       

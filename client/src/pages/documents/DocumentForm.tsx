@@ -536,6 +536,40 @@ export default function DocumentForm() {
                 
                 <FormField
                   control={form.control}
+                  name="eventId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Evento Relacionado</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value?.toString()}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um evento (opcional)" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="0">Nenhum</SelectItem>
+                          {events.map((event) => (
+                            <SelectItem key={event.id} value={event.id.toString()}>
+                              {event.title} - {event.eventDate ? formatDate(event.eventDate.toString()) : ""}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Evento legislativo que está relacionado a este documento
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
                   name="parentDocumentId"
                   render={({ field }) => (
                     <FormItem>
