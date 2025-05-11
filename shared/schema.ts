@@ -185,6 +185,81 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
   childDocuments: many(documents, {
     relationName: "document_versions",
   }),
+  votes: many(documentVotes),
+}));
+
+// Document Votes table - For councilors to vote on documents
+export const documentVotes = pgTable("document_votes", {
+  id: serial("id").primaryKey(),
+  documentId: integer("document_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  vote: varchar("vote").notNull(), // "Aprovado" or "Reprovado"
+  votedAt: timestamp("voted_at").defaultNow(),
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const documentVotesRelations = relations(documentVotes, ({ one }) => ({
+  document: one(documents, {
+    fields: [documentVotes.documentId],
+    references: [documents.id],
+  }),
+  user: one(users, {
+    fields: [documentVotes.userId],
+    references: [users.id],
+  }),
+}));
+
+// Event Attendance table - To track councilor attendance at events
+export const eventAttendance = pgTable("event_attendance", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  status: varchar("status").notNull(), // "Presente" or "Ausente"
+  registeredAt: timestamp("registered_at").defaultNow(),
+  registeredBy: varchar("registered_by").notNull(), // Admin user who registered attendance
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const eventAttendanceRelations = relations(eventAttendance, ({ one }) => ({
+  event: one(events, {
+    fields: [eventAttendance.eventId],
+    references: [events.id],
+  }),
+  user: one(users, {
+    fields: [eventAttendance.userId],
+    references: [users.id],
+  }),
+  registrar: one(users, {
+    fields: [eventAttendance.registeredBy],
+    references: [users.id],
+  }),
+}));
+
+// Activity Timeline table - To track activity changes and status updates
+export const activityTimeline = pgTable("activity_timeline", {
+  id: serial("id").primaryKey(),
+  activityId: integer("activity_id").notNull(),
+  eventType: varchar("event_type").notNull(), // "Criação", "Atualização", "Votação", "Aprovação", "Reprovação"
+  description: text("description").notNull(),
+  createdBy: varchar("created_by").notNull(),
+  eventDate: timestamp("event_date").defaultNow(),
+  metadata: json("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const activityTimelineRelations = relations(activityTimeline, ({ one }) => ({
+  activity: one(legislativeActivities, {
+    fields: [activityTimeline.activityId],
+    references: [legislativeActivities.id],
+  }),
+  user: one(users, {
+    fields: [activityTimeline.createdBy],
+    references: [users.id],
+  }),
 }));
 
 // Dashboard Stats View (for quick dashboard data retrieval)
@@ -270,3 +345,32 @@ export type LegislativeActivity = typeof legislativeActivities.$inferSelect & {
 
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type Document = typeof documents.$inferSelect;
+
+export const insertDocumentVoteSchema = createInsertSchema(documentVotes).pick({
+  documentId: true,
+  userId: true,
+  vote: true,
+  comment: true,
+});
+export type InsertDocumentVote = z.infer<typeof insertDocumentVoteSchema>;
+export type DocumentVote = typeof documentVotes.$inferSelect;
+
+export const insertEventAttendanceSchema = createInsertSchema(eventAttendance).pick({
+  eventId: true,
+  userId: true,
+  status: true,
+  registeredBy: true,
+  notes: true,
+});
+export type InsertEventAttendance = z.infer<typeof insertEventAttendanceSchema>;
+export type EventAttendance = typeof eventAttendance.$inferSelect;
+
+export const insertActivityTimelineSchema = createInsertSchema(activityTimeline).pick({
+  activityId: true,
+  eventType: true,
+  description: true,
+  createdBy: true,
+  metadata: true,
+});
+export type InsertActivityTimeline = z.infer<typeof insertActivityTimelineSchema>;
+export type ActivityTimeline = typeof activityTimeline.$inferSelect;
