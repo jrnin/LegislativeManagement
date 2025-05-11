@@ -22,6 +22,18 @@ import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, 
 import crypto from "crypto";
 
 // Interface for storage operations
+export type SearchResult = {
+  id: string | number;
+  title: string;
+  description?: string;
+  type: 'user' | 'legislature' | 'event' | 'activity' | 'document';
+  date?: string;
+  status?: string;
+  category?: string;
+  url: string;
+  highlight?: string;
+};
+
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
@@ -102,6 +114,9 @@ export interface IStorage {
   
   // Get all councilors
   getCouncilors(): Promise<User[]>;
+  
+  // Search operations
+  searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -800,6 +815,190 @@ export class DatabaseStorage implements IStorage {
   async getCouncilors(): Promise<User[]> {
     const councilors = await db.select().from(users).where(eq(users.role, "councilor"));
     return councilors;
+  }
+  
+  /**
+   * Search across all entities
+   */
+  async searchGlobal(query: string, type?: string): Promise<SearchResult[]> {
+    if (!query || query.length < 3) {
+      return [];
+    }
+    
+    // Prepare search term for LIKE queries
+    const searchTerm = `%${query.toLowerCase()}%`;
+    const results: SearchResult[] = [];
+    
+    // Function to find matches and highlight them
+    const findHighlight = (text: string | null) => {
+      if (!text) return undefined;
+      
+      const lowerText = text.toLowerCase();
+      const lowerQuery = query.toLowerCase();
+      const index = lowerText.indexOf(lowerQuery);
+      
+      if (index === -1) return undefined;
+      
+      // Get a slice of text around the match
+      const start = Math.max(0, index - 20);
+      const end = Math.min(text.length, index + query.length + 20);
+      return text.slice(start, end);
+    };
+    
+    // Search users if not filtering by type or type is 'user'
+    if (!type || type === 'all' || type === 'user') {
+      const userResults = await db
+        .select()
+        .from(users)
+        .where(
+          or(
+            like(sql`LOWER(${users.name})`, searchTerm),
+            like(sql`LOWER(${users.email})`, searchTerm)
+          )
+        )
+        .limit(10);
+      
+      results.push(
+        ...userResults.map(user => ({
+          id: user.id,
+          title: user.name,
+          description: user.email,
+          type: 'user',
+          status: user.active ? 'ativo' : 'inativo',
+          url: `/users/${user.id}`,
+          highlight: findHighlight(user.name),
+        }))
+      );
+    }
+    
+    // Search legislatures if not filtering by type or type is 'legislature'
+    if (!type || type === 'all' || type === 'legislature') {
+      const legislatureResults = await db
+        .select()
+        .from(legislatures)
+        .where(
+          or(
+            like(sql`LOWER(${legislatures.name})`, searchTerm),
+            like(sql`LOWER(${legislatures.description})`, searchTerm)
+          )
+        )
+        .limit(10);
+      
+      results.push(
+        ...legislatureResults.map(legislature => ({
+          id: legislature.id,
+          title: legislature.name,
+          description: legislature.description,
+          type: 'legislature',
+          date: legislature.startDate?.toISOString(),
+          status: new Date() >= new Date(legislature.startDate) && 
+                 new Date() <= new Date(legislature.endDate) ? 'ativo' : 'inativo',
+          url: `/legislatures/${legislature.id}`,
+          highlight: findHighlight(legislature.description),
+        }))
+      );
+    }
+    
+    // Search events if not filtering by type or type is 'event'
+    if (!type || type === 'all' || type === 'event') {
+      const eventResults = await db
+        .select()
+        .from(events)
+        .where(
+          or(
+            like(sql`LOWER(${events.category})`, searchTerm),
+            like(sql`LOWER(${events.description})`, searchTerm),
+            like(sql`LOWER(${events.location})`, searchTerm)
+          )
+        )
+        .limit(10);
+      
+      results.push(
+        ...eventResults.map(event => ({
+          id: event.id,
+          title: `${event.category} #${event.eventNumber}`,
+          description: event.description,
+          type: 'event',
+          date: event.eventDate?.toISOString(),
+          status: event.status,
+          category: event.category,
+          url: `/events/${event.id}`,
+          highlight: findHighlight(event.description),
+        }))
+      );
+    }
+    
+    // Search legislative activities if not filtering by type or type is 'activity'
+    if (!type || type === 'all' || type === 'activity') {
+      const activityResults = await db
+        .select()
+        .from(legislativeActivities)
+        .where(
+          or(
+            like(sql`LOWER(${legislativeActivities.activityType})`, searchTerm),
+            like(sql`LOWER(${legislativeActivities.description})`, searchTerm)
+          )
+        )
+        .limit(10);
+      
+      results.push(
+        ...activityResults.map(activity => ({
+          id: activity.id,
+          title: `${activity.activityType} #${activity.activityNumber}`,
+          description: activity.description,
+          type: 'activity',
+          date: activity.activityDate?.toISOString(),
+          status: activity.needsApproval ? 'pendente' : (activity.approved ? 'aprovado' : 'rejeitado'),
+          category: activity.activityType,
+          url: `/activities/${activity.id}`,
+          highlight: findHighlight(activity.description),
+        }))
+      );
+    }
+    
+    // Search documents if not filtering by type or type is 'document'
+    if (!type || type === 'all' || type === 'document') {
+      const documentResults = await db
+        .select()
+        .from(documents)
+        .where(
+          or(
+            like(sql`LOWER(${documents.title})`, searchTerm),
+            like(sql`LOWER(${documents.description})`, searchTerm),
+            like(sql`LOWER(${documents.content})`, searchTerm)
+          )
+        )
+        .limit(10);
+      
+      results.push(
+        ...documentResults.map(document => ({
+          id: document.id,
+          title: document.title,
+          description: document.description,
+          type: 'document',
+          date: document.createdAt?.toISOString(),
+          status: document.status,
+          url: `/documents/${document.id}`,
+          highlight: findHighlight(document.content) || findHighlight(document.description),
+        }))
+      );
+    }
+    
+    // Sort by relevance (prioritize title matches)
+    return results.sort((a, b) => {
+      const aTitleMatch = a.title.toLowerCase().includes(query.toLowerCase());
+      const bTitleMatch = b.title.toLowerCase().includes(query.toLowerCase());
+      
+      if (aTitleMatch && !bTitleMatch) return -1;
+      if (!aTitleMatch && bTitleMatch) return 1;
+      
+      // If both match or don't match in title, sort by date (newer first)
+      if (a.date && b.date) {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+      
+      return 0;
+    });
   }
 }
 

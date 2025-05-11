@@ -25,7 +25,6 @@ interface NavbarProps {
 
 export default function Navbar({ setSidebarOpen }: NavbarProps) {
   const { user, logout } = useAuth();
-  const [searchTerm, setSearchTerm] = useState("");
 
   const getInitials = (name: string) => {
     return name ? name.split(" ").map(part => part[0]).join("").toUpperCase() : "U";
@@ -49,22 +48,7 @@ export default function Navbar({ setSidebarOpen }: NavbarProps) {
       <div className="flex-1 px-4 flex justify-between">
         <div className="flex-1 flex items-center">
           <div className="w-full max-w-lg flex md:ml-0">
-            <label htmlFor="search" className="sr-only">
-              Pesquisar
-            </label>
-            <div className="relative w-full text-slate-400 focus-within:text-slate-600">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4" />
-              </div>
-              <Input
-                id="search"
-                className="block w-full pl-10 py-1.5 form-input-modern border-slate-200 bg-slate-50/80 text-sm"
-                placeholder="Pesquisar no sistema..."
-                type="search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+            <SearchButton />
           </div>
         </div>
         
