@@ -5,10 +5,13 @@ import { Building, Calendar, FileText, Files, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardStats, Event, LegislativeActivity } from "@shared/schema";
+import { useIsMobile } from "@/mobile/hooks/useIsMobile";
+import MobileDashboard from "@/mobile/screens/MobileDashboard";
 import { Link } from "wouter";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ["/api/dashboard/stats"],
@@ -21,6 +24,11 @@ export default function Dashboard() {
   const { data: recentActivities, isLoading: activitiesLoading } = useQuery<LegislativeActivity[]>({
     queryKey: ["/api/activities/recent"],
   });
+  
+  // Use the mobile dashboard on smaller screens
+  if (isMobile) {
+    return <MobileDashboard />;
+  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
