@@ -5,14 +5,20 @@ import {
   legislativeActivities,
   legislativeActivitiesAuthors,
   documents,
+  documentVotes,
+  eventAttendance,
+  activityTimeline,
   type User,
   type Legislature,
   type Event,
   type LegislativeActivity,
-  type Document
+  type Document,
+  type DocumentVote,
+  type EventAttendance,
+  type ActivityTimeline
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like } from "drizzle-orm";
+import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or } from "drizzle-orm";
 import crypto from "crypto";
 
 // Interface for storage operations

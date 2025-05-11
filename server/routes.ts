@@ -641,6 +641,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get event with all details (activities, attendance, etc)
+  app.get('/api/events/:id/details', requireAuth, async (req, res) => {
+    try {
+      const eventDetails = await storage.getEventWithDetails(Number(req.params.id));
+      
+      if (!eventDetails) {
+        return res.status(404).json({ message: "Evento não encontrado" });
+      }
+      
+      res.json(eventDetails);
+    } catch (error) {
+      console.error("Error fetching event details:", error);
+      res.status(500).json({ message: "Erro ao buscar detalhes do evento" });
+    }
+  });
+  
   // Create event (admin only)
   app.post('/api/events', requireAdmin, async (req, res) => {
     try {
