@@ -66,6 +66,36 @@ export interface IStorage {
     pendingActivityCount: number;
     documentCount: number;
   }>;
+  
+  // Event Attendance operations
+  getEventAttendance(id: number): Promise<EventAttendance | undefined>;
+  getEventAttendanceByEventId(eventId: number): Promise<EventAttendance[]>;
+  createEventAttendance(attendanceData: Partial<EventAttendance>): Promise<EventAttendance>;
+  updateEventAttendance(id: number, attendanceData: Partial<EventAttendance>): Promise<EventAttendance | undefined>;
+  deleteEventAttendance(id: number): Promise<boolean>;
+  
+  // Document Votes operations
+  getDocumentVote(id: number): Promise<DocumentVote | undefined>;
+  getDocumentVotesByDocumentId(documentId: number): Promise<DocumentVote[]>;
+  getDocumentVoteByUserAndDocument(userId: string, documentId: number): Promise<DocumentVote | undefined>;
+  createDocumentVote(voteData: Partial<DocumentVote>): Promise<DocumentVote>;
+  updateDocumentVote(id: number, voteData: Partial<DocumentVote>): Promise<DocumentVote | undefined>;
+  deleteDocumentVote(id: number): Promise<boolean>;
+  
+  // Activity Timeline operations
+  getActivityTimeline(id: number): Promise<ActivityTimeline | undefined>;
+  getActivityTimelineByActivityId(activityId: number): Promise<ActivityTimeline[]>;
+  createActivityTimeline(timelineData: Partial<ActivityTimeline>): Promise<ActivityTimeline>;
+  
+  // Extended Event operations
+  getEventWithDetails(id: number): Promise<Event & {
+    activities: LegislativeActivity[];
+    attendance: EventAttendance[];
+    legislature: Legislature;
+  } | undefined>;
+  
+  // Get all councilors
+  getCouncilors(): Promise<User[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -539,6 +569,231 @@ export class DatabaseStorage implements IStorage {
       pendingActivityCount,
       documentCount
     };
+  }
+
+  /**
+   * Event Attendance operations
+   */
+  async getEventAttendance(id: number): Promise<EventAttendance | undefined> {
+    const [attendance] = await db.select().from(eventAttendance).where(eq(eventAttendance.id, id));
+    return attendance;
+  }
+  
+  async getEventAttendanceByEventId(eventId: number): Promise<EventAttendance[]> {
+    const attendanceRecords = await db
+      .select({
+        attendance: eventAttendance,
+        user: users,
+      })
+      .from(eventAttendance)
+      .leftJoin(users, eq(eventAttendance.userId, users.id))
+      .where(eq(eventAttendance.eventId, eventId));
+      
+    return attendanceRecords.map(record => ({
+      ...record.attendance,
+      user: record.user,
+    })) as EventAttendance[];
+  }
+  
+  async createEventAttendance(attendanceData: Partial<EventAttendance>): Promise<EventAttendance> {
+    const [newAttendance] = await db.insert(eventAttendance).values(attendanceData).returning();
+    return newAttendance;
+  }
+  
+  async updateEventAttendance(id: number, attendanceData: Partial<EventAttendance>): Promise<EventAttendance | undefined> {
+    const [updatedAttendance] = await db
+      .update(eventAttendance)
+      .set({
+        ...attendanceData,
+        updatedAt: new Date(),
+      })
+      .where(eq(eventAttendance.id, id))
+      .returning();
+      
+    return updatedAttendance;
+  }
+  
+  async deleteEventAttendance(id: number): Promise<boolean> {
+    const result = await db.delete(eventAttendance).where(eq(eventAttendance.id, id));
+    return !!result;
+  }
+  
+  /**
+   * Document Votes operations
+   */
+  async getDocumentVote(id: number): Promise<DocumentVote | undefined> {
+    const [vote] = await db.select().from(documentVotes).where(eq(documentVotes.id, id));
+    return vote;
+  }
+  
+  async getDocumentVotesByDocumentId(documentId: number): Promise<DocumentVote[]> {
+    const votes = await db
+      .select({
+        vote: documentVotes,
+        user: users,
+      })
+      .from(documentVotes)
+      .leftJoin(users, eq(documentVotes.userId, users.id))
+      .where(eq(documentVotes.documentId, documentId));
+      
+    return votes.map(record => ({
+      ...record.vote,
+      user: record.user,
+    })) as DocumentVote[];
+  }
+  
+  async getDocumentVoteByUserAndDocument(userId: string, documentId: number): Promise<DocumentVote | undefined> {
+    const [vote] = await db
+      .select()
+      .from(documentVotes)
+      .where(
+        and(
+          eq(documentVotes.userId, userId),
+          eq(documentVotes.documentId, documentId)
+        )
+      );
+      
+    return vote;
+  }
+  
+  async createDocumentVote(voteData: Partial<DocumentVote>): Promise<DocumentVote> {
+    // Check if user already voted on this document
+    const existingVote = await this.getDocumentVoteByUserAndDocument(
+      voteData.userId as string, 
+      voteData.documentId as number
+    );
+    
+    if (existingVote) {
+      // Update existing vote instead of creating a new one
+      const [updatedVote] = await db
+        .update(documentVotes)
+        .set({
+          vote: voteData.vote,
+          comment: voteData.comment,
+          votedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(documentVotes.id, existingVote.id))
+        .returning();
+        
+      return updatedVote;
+    }
+    
+    // Create new vote
+    const [newVote] = await db.insert(documentVotes).values(voteData).returning();
+    return newVote;
+  }
+  
+  async updateDocumentVote(id: number, voteData: Partial<DocumentVote>): Promise<DocumentVote | undefined> {
+    const [updatedVote] = await db
+      .update(documentVotes)
+      .set({
+        ...voteData,
+        updatedAt: new Date(),
+      })
+      .where(eq(documentVotes.id, id))
+      .returning();
+      
+    return updatedVote;
+  }
+  
+  async deleteDocumentVote(id: number): Promise<boolean> {
+    const result = await db.delete(documentVotes).where(eq(documentVotes.id, id));
+    return !!result;
+  }
+  
+  /**
+   * Activity Timeline operations
+   */
+  async getActivityTimeline(id: number): Promise<ActivityTimeline | undefined> {
+    const [timelineEvent] = await db.select().from(activityTimeline).where(eq(activityTimeline.id, id));
+    return timelineEvent;
+  }
+  
+  async getActivityTimelineByActivityId(activityId: number): Promise<ActivityTimeline[]> {
+    const timeline = await db
+      .select({
+        timelineEvent: activityTimeline,
+        user: users,
+      })
+      .from(activityTimeline)
+      .leftJoin(users, eq(activityTimeline.createdBy, users.id))
+      .where(eq(activityTimeline.activityId, activityId))
+      .orderBy(desc(activityTimeline.eventDate));
+      
+    return timeline.map(record => ({
+      ...record.timelineEvent,
+      user: record.user,
+    })) as ActivityTimeline[];
+  }
+  
+  async createActivityTimeline(timelineData: Partial<ActivityTimeline>): Promise<ActivityTimeline> {
+    const [newTimelineEvent] = await db.insert(activityTimeline).values(timelineData).returning();
+    return newTimelineEvent;
+  }
+  
+  /**
+   * Extended Event operations
+   */
+  async getEventWithDetails(id: number): Promise<Event & {
+    activities: LegislativeActivity[];
+    attendance: EventAttendance[];
+    legislature: Legislature;
+  } | undefined> {
+    const [event] = await db.select().from(events).where(eq(events.id, id));
+    
+    if (!event) {
+      return undefined;
+    }
+    
+    // Get legislature
+    const [legislature] = await db.select().from(legislatures).where(eq(legislatures.id, event.legislatureId));
+    
+    // Get activities
+    const activitiesResult = await db
+      .select()
+      .from(legislativeActivities)
+      .where(eq(legislativeActivities.eventId, id));
+    
+    // Get attendance
+    const attendanceResult = await this.getEventAttendanceByEventId(id);
+    
+    // For each activity, get authors
+    const activitiesWithAuthors = await Promise.all(
+      activitiesResult.map(async (activity) => {
+        const authorsJunction = await db
+          .select()
+          .from(legislativeActivitiesAuthors)
+          .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
+          
+        const authorIds = authorsJunction.map(junction => junction.userId);
+        
+        const authorsData = await db
+          .select()
+          .from(users)
+          .where(inArray(users.id, authorIds));
+          
+        return {
+          ...activity,
+          authors: authorsData,
+        };
+      })
+    );
+    
+    return {
+      ...event,
+      legislature,
+      activities: activitiesWithAuthors,
+      attendance: attendanceResult,
+    };
+  }
+  
+  /**
+   * Get all councilors
+   */
+  async getCouncilors(): Promise<User[]> {
+    const councilors = await db.select().from(users).where(eq(users.role, "councilor"));
+    return councilors;
   }
 }
 
