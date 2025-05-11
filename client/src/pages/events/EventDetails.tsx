@@ -109,8 +109,9 @@ export default function EventDetails() {
   
   // Fetch event details
   const { data: eventDetails, isLoading, isError } = useQuery({
-    queryKey: ["/api/events", eventId, "details"],
+    queryKey: [`/api/events/${eventId}/details`],
     queryFn: async () => {
+      console.log(`Fetching event details for ID: ${eventId}`);
       return await apiRequest<any>(`/api/events/${eventId}/details`);
     },
     enabled: !!eventId
@@ -118,20 +119,24 @@ export default function EventDetails() {
   
   // Fetch user votes
   const { data: userVotes, refetch: refetchUserVotes } = useQuery({
-    queryKey: ["/api/documents", "votes", "user"],
+    queryKey: [`/api/events/${eventId}/document-votes`],
     queryFn: async () => {
       if (!eventDetails) return [];
       
-      const activities = eventDetails.activities || [];
-      const documentIds = activities
-        .flatMap((activity: any) => activity.relatedDocuments || [])
-        .filter((docId: number) => !!docId);
-        
+      // Get document IDs from event directly
+      const documents = eventDetails.documents || [];
+      const documentIds = documents.map((doc: any) => doc.id).filter((id: number) => !!id);
+      
+      console.log(`Found ${documentIds.length} documents for voting in event ${eventId}`);
+      
       if (!documentIds?.length) return [];
       
       const promises = documentIds.map((docId: number) => 
         apiRequest<any>(`/api/documents/${docId}/my-vote`)
-          .catch(() => null)
+          .catch((err) => {
+            console.error(`Error fetching vote for document ${docId}:`, err);
+            return null;
+          })
       );
       
       const results = await Promise.all(promises);
