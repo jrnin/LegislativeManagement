@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { 
-  Search, 
   Bell, 
   Menu,
   LogOut,
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import SearchButton from "@/components/search/SearchButton";
 
 interface NavbarProps {
   setSidebarOpen: (open: boolean) => void;
