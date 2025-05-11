@@ -102,6 +102,10 @@ export default function EventDetails() {
   const [isVoteDialogOpen, setIsVoteDialogOpen] = useState<boolean>(false);
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState<boolean>(false);
   const [currentDocumentId, setCurrentDocumentId] = useState<number | null>(null);
+  const [councilors, setCouncilors] = useState<any[]>([]);
+  const [isManagingAttendance, setIsManagingAttendance] = useState<boolean>(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [loadingCouncilors, setLoadingCouncilors] = useState<boolean>(false);
   
   // Fetch event details
   const { data: eventDetails, isLoading, isError } = useQuery({
@@ -136,6 +140,30 @@ export default function EventDetails() {
     enabled: !!eventDetails && isAuthenticated
   });
   
+  // Fetch councilors when managing attendance
+  useEffect(() => {
+    const fetchCouncilors = async () => {
+      if (isAuthenticated && isManagingAttendance) {
+        try {
+          setLoadingCouncilors(true);
+          const response = await apiRequest<any[]>('/api/councilors');
+          setCouncilors(response || []);
+        } catch (error) {
+          console.error('Error fetching councilors:', error);
+          toast({
+            title: "Erro",
+            description: "Não foi possível carregar a lista de vereadores",
+            variant: "destructive"
+          });
+        } finally {
+          setLoadingCouncilors(false);
+        }
+      }
+    };
+
+    fetchCouncilors();
+  }, [isAuthenticated, isManagingAttendance, toast]);
+
   // Check if user already registered attendance
   const { data: userAttendance, refetch: refetchUserAttendance } = useQuery({
     queryKey: ["/api/events", eventId, "attendance", "user"],
@@ -175,6 +203,37 @@ export default function EventDetails() {
     }
   };
   
+  const handleCouncilorAttendance = async (userId: string, status: string) => {
+    if (!isAuthenticated || !eventId) return;
+    
+    try {
+      await apiRequest(
+        `/api/events/${eventId}/attendance`,
+        "POST",
+        {
+          userId,
+          status,
+          notes: `Presença registrada por ${user?.name}`,
+          registeredBy: user?.id
+        }
+      );
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "attendance"] });
+      
+      toast({
+        title: "Presença registrada",
+        description: `Presença do vereador foi registrada como ${status}.`
+      });
+    } catch (error) {
+      console.error('Error registering attendance:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível registrar a presença do vereador.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleAttendanceSubmit = async () => {
     if (!eventId) return;
     
