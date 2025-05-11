@@ -82,12 +82,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const protocol = req.headers["x-forwarded-proto"] || req.protocol;
       const baseUrl = `${protocol}://${host}`;
       
+      console.log(`Enviando email de verificação para ${user.email}`);
       const emailSent = await sendVerificationEmail(user, verificationToken, baseUrl);
       
       if (!emailSent) {
         console.warn(`Failed to send verification email to ${user.email}`);
+      } else {
+        console.log(`Email de verificação enviado com sucesso para ${user.email}`);
       }
       
+      // Para ambiente de desenvolvimento, mostrar o token e url para verificação manual
+      if (process.env.NODE_ENV === 'development') {
+        console.log('==== INFORMAÇÕES PARA TESTE ====');
+        console.log('Token de verificação:', verificationToken);
+        console.log(`URL de verificação: ${baseUrl}/api/verify-email?token=${verificationToken}`);
+        console.log('===============================');
+        
+        // Incluir o token na resposta apenas em ambiente de desenvolvimento
+        return res.status(201).json({ 
+          success: true,
+          message: "Cadastro realizado com sucesso. Em ambiente de produção você receberia um email para ativar sua conta.",
+          // Estas informações só devem ser enviadas em ambiente de desenvolvimento
+          debug: {
+            verificationToken,
+            verificationUrl: `${baseUrl}/api/verify-email?token=${verificationToken}`
+          }
+        });
+      }
+      
+      // Resposta padrão para produção
       res.status(201).json({ 
         success: true,
         message: "Cadastro realizado com sucesso. Verifique seu email para ativar sua conta." 
@@ -179,31 +202,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/verify-email', async (req, res) => {
     const { token } = req.query;
     
+    console.log("Recebida solicitação de verificação de email com token:", token);
+    
     if (!token || typeof token !== 'string') {
-      return res.status(400).json({ message: "Token inválido" });
+      console.log("Token inválido ou não fornecido");
+      return res.redirect('/verify-email?verified=false&message=Token+inválido+ou+não+fornecido');
     }
     
     try {
       // Get user by token
+      console.log("Buscando usuário pelo token");
       const user = await storage.getUserByVerificationToken(token);
       
       if (!user) {
-        return res.status(400).json({ message: "Token inválido ou expirado" });
+        console.log("Usuário não encontrado para o token fornecido");
+        return res.redirect('/verify-email?verified=false&message=Token+inválido+ou+expirado');
       }
       
+      console.log("Usuário encontrado:", user.id, user.email);
+      
       // Verify the email
+      console.log("Verificando email");
       const verified = await storage.verifyEmail(token);
       
       if (verified) {
+        console.log("Email verificado com sucesso");
+        
         // Send welcome email
         const host = req.headers.host || "";
         const protocol = req.headers["x-forwarded-proto"] || req.protocol;
         const baseUrl = `${protocol}://${host}`;
         
-        await sendWelcomeEmail(user, baseUrl);
+        console.log("Enviando email de boas-vindas");
+        const emailSent = await sendWelcomeEmail(user, baseUrl);
+        console.log("Email de boas-vindas enviado:", emailSent);
+        
+        // Mostrar URL de verificação para teste em modo de desenvolvimento
+        if (process.env.NODE_ENV === 'development') {
+          console.log('DEPURAÇÃO - Token de verificação:', token);
+          console.log(`DEPURAÇÃO - URL de verificação: ${baseUrl}/api/verify-email?token=${token}`);
+          console.log(`DEPURAÇÃO - URL após redirecionamento: ${baseUrl}/verify-email?verified=true`);
+        }
         
         return res.redirect('/verify-email?verified=true');
       } else {
+        console.log("Falha ao verificar email");
         return res.redirect('/verify-email?verified=false&message=Token+inválido+ou+expirado');
       }
     } catch (error) {

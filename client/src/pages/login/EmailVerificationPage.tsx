@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, Mail } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 export default function EmailVerificationPage() {
   const [location, setLocation] = useLocation();
-  const [verificationStatus, setVerificationStatus] = useState<"verifying" | "success" | "error">("verifying");
+  const [verificationStatus, setVerificationStatus] = useState<"verifying" | "success" | "error" | "manual">("verifying");
   const [errorMessage, setErrorMessage] = useState("");
+  const [verificationToken, setVerificationToken] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Obtém o valor do parâmetro 'verified' da URL
@@ -20,10 +25,37 @@ export default function EmailVerificationPage() {
       setVerificationStatus("error");
       setErrorMessage(searchParams.get("message") || "Não foi possível verificar seu email. Por favor, tente novamente.");
     } else {
-      // Se não tiver o parâmetro, a página foi acessada diretamente, redireciona para a página de login
-      setLocation("/login");
+      // Acesso manual para verificação
+      setVerificationStatus("manual");
     }
   }, [setLocation]);
+  
+  // Função para verificar manualmente o e-mail com o token
+  const handleManualVerification = async () => {
+    if (!verificationToken || verificationToken.trim() === "") {
+      toast({
+        title: "Erro",
+        description: "Por favor, informe o token de verificação",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      // Redirecionamento para a API de verificação
+      window.location.href = `/api/verify-email?token=${verificationToken}`;
+    } catch (error) {
+      console.error("Erro na verificação manual:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível verificar o email. Tente novamente.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+    }
+  };
 
   const renderContent = () => {
     switch (verificationStatus) {
@@ -61,6 +93,49 @@ export default function EmailVerificationPage() {
               <Button asChild>
                 <a href="mailto:suporte@sistema-legislativo.com.br">Contatar suporte</a>
               </Button>
+            </div>
+          </div>
+        );
+        
+      case "manual":
+        return (
+          <div className="flex flex-col items-center py-8">
+            <Mail className="h-16 w-16 text-blue-600 mb-4" />
+            <h3 className="text-xl font-semibold">Verificação Manual de Email</h3>
+            <p className="text-gray-500 mt-2 text-center">
+              O SendGrid não está enviando emails. Para fins de teste, cole o token de verificação abaixo.
+            </p>
+            <div className="w-full mt-6 space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">
+                  O token pode ser encontrado no console do servidor após o registro.
+                </p>
+                <Input
+                  type="text"
+                  placeholder="Cole o token de verificação aqui"
+                  value={verificationToken}
+                  onChange={(e) => setVerificationToken(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div className="flex gap-4 justify-center">
+                <Button variant="outline" asChild>
+                  <Link href="/login">Voltar para login</Link>
+                </Button>
+                <Button 
+                  onClick={handleManualVerification}
+                  disabled={isSubmitting || !verificationToken}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Verificando...
+                    </>
+                  ) : (
+                    "Verificar Email"
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         );
