@@ -1,9 +1,9 @@
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { Loader2, Calendar, MapPin, User, FileText, Clock, Check, X, MessageSquare, Download } from "lucide-react";
+import { Loader2, Calendar, MapPin, User, FileText, Clock, Check, X, MessageSquare, Download, UserCheck, RefreshCw } from "lucide-react";
 
 import {
   Tabs,
