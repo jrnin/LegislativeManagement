@@ -27,7 +27,7 @@ const formSchema = z.object({
   category: z.enum(["Sessão Ordinária", "Sessão Extraordinária"], { 
     message: "Selecione uma categoria válida" 
   }),
-  legislatureId: z.string().min(1, { message: "Legislatura é obrigatória" }),
+  legislatureId: z.coerce.number().int().positive({ message: "Legislatura é obrigatória" }),
   description: z.string().min(3, { message: "Descrição é obrigatória" }),
   status: z.enum(["Aberto", "Andamento", "Concluido", "Cancelado"], { 
     message: "Selecione um status válido" 
@@ -62,7 +62,7 @@ export default function EventForm() {
       location: "",
       mapUrl: "",
       category: "Sessão Ordinária",
-      legislatureId: "",
+      legislatureId: undefined,
       description: "",
       status: "Aberto",
     }
@@ -77,7 +77,7 @@ export default function EventForm() {
         location: event.location || "",
         mapUrl: event.mapUrl || "",
         category: event.category as "Sessão Ordinária" | "Sessão Extraordinária",
-        legislatureId: event.legislatureId.toString(),
+        legislatureId: event.legislatureId,
         description: event.description || "",
         status: event.status as "Aberto" | "Andamento" | "Concluido" | "Cancelado",
       });
