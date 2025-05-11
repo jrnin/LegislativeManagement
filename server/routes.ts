@@ -3,11 +3,12 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { requireAdmin, handleFileUpload } from "./middlewares";
-import { sendVerificationEmail, sendAccountCreatedEmail, sendActivityApprovalRequest } from "./mailer";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from "./sendgrid";
 import { z } from "zod";
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
@@ -54,14 +55,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Generate a random ID if not provided by auth
+      // Generate a random ID
       const userId = crypto.randomUUID();
+      
+      // Hash the password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(validated.password, salt);
+      
+      // Generate verification token
+      const verificationToken = crypto.randomBytes(32).toString('hex');
       
       // Create user
       const user = await storage.createUser({
         id: userId,
-        ...validated,
+        name: validated.name,
+        email: validated.email,
+        password: hashedPassword,
+        verificationToken,
         emailVerified: false,
+        emailVerificationSentAt: new Date(),
+        role: "councilor", // Default role
       });
       
       // Send verification email
@@ -69,7 +82,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const protocol = req.headers["x-forwarded-proto"] || req.protocol;
       const baseUrl = `${protocol}://${host}`;
       
-      await sendVerificationEmail(user, user.verificationToken!, baseUrl);
+      const emailSent = await sendVerificationEmail(user, verificationToken, baseUrl);
+      
+      if (!emailSent) {
+        console.warn(`Failed to send verification email to ${user.email}`);
+      }
       
       res.status(201).json({ 
         success: true,
@@ -120,23 +137,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Verify password
-      // In a real application, you should use bcrypt to hash and compare passwords
-      if (user.password !== validated.password) {
+      // Verify password using bcrypt
+      const isPasswordValid = user.password && await bcrypt.compare(validated.password, user.password);
+      
+      if (!isPasswordValid) {
         return res.status(401).json({ 
           success: false,
           message: "Credenciais inválidas" 
         });
       }
       
-      // Create session (simplified for this example)
-      // In a real application, you would use proper session handling with JWT or session store
-      // Store user in session
+      // Create session
       (req.session as any).userId = user.id;
+      
+      // Return user data (excluding sensitive information)
+      const { password, verificationToken, ...userData } = user;
       
       res.json({ 
         success: true,
-        message: "Login realizado com sucesso" 
+        message: "Login realizado com sucesso",
+        user: userData
       });
     } catch (error) {
       console.error("Error during login:", error);
@@ -164,9 +184,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
+      // Get user by token
+      const user = await storage.getUserByVerificationToken(token);
+      
+      if (!user) {
+        return res.status(400).json({ message: "Token inválido ou expirado" });
+      }
+      
+      // Verify the email
       const verified = await storage.verifyEmail(token);
       
       if (verified) {
+        // Send welcome email
+        const host = req.headers.host || "";
+        const protocol = req.headers["x-forwarded-proto"] || req.protocol;
+        const baseUrl = `${protocol}://${host}`;
+        
+        await sendWelcomeEmail(user, baseUrl);
+        
         return res.redirect('/?verified=true');
       } else {
         return res.status(400).json({ message: "Token inválido ou expirado" });
