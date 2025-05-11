@@ -28,7 +28,7 @@ const formSchema = z.object({
   status: z.string().min(1, { message: "Situação é obrigatória" }),
   activityId: z.coerce.number().optional(),
   parentDocumentId: z.coerce.number().optional(),
-  file: z.instanceof(File).optional(),
+  file: z.any().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -96,7 +96,7 @@ export default function DocumentForm() {
       form.reset({
         documentNumber: document.documentNumber,
         documentType: document.documentType || "",
-        documentDate: document.documentDate ? document.documentDate.split('T')[0] : "",
+        documentDate: document.documentDate ? new Date(document.documentDate).toISOString().split('T')[0] : "",
         authorType: document.authorType || "",
         description: document.description || "",
         status: document.status || "",
@@ -120,10 +120,10 @@ export default function DocumentForm() {
       formData.append("status", data.status);
       
       // Append optional fields if present
-      if (data.activityId) {
+      if (data.activityId && data.activityId !== 0) {
         formData.append("activityId", data.activityId.toString());
       }
-      if (data.parentDocumentId) {
+      if (data.parentDocumentId && data.parentDocumentId !== 0) {
         formData.append("parentDocumentId", data.parentDocumentId.toString());
       }
       
@@ -175,10 +175,10 @@ export default function DocumentForm() {
       if (data.status) formData.append("status", data.status);
       
       // Append optional fields if present
-      if (data.activityId) {
+      if (data.activityId && data.activityId !== 0) {
         formData.append("activityId", data.activityId.toString());
       }
-      if (data.parentDocumentId) {
+      if (data.parentDocumentId && data.parentDocumentId !== 0) {
         formData.append("parentDocumentId", data.parentDocumentId.toString());
       }
       
@@ -314,7 +314,7 @@ export default function DocumentForm() {
                     <p className="text-sm text-muted-foreground mt-1">{historyDoc.description}</p>
                     <div className="flex justify-between mt-2">
                       <span className="text-xs text-muted-foreground">
-                        Criado em: {formatDate(historyDoc.createdAt)}
+                        Criado em: {historyDoc.createdAt ? formatDate(historyDoc.createdAt.toString()) : ""}
                       </span>
                       {historyDoc.fileName && (
                         <a 
@@ -445,7 +445,7 @@ export default function DocumentForm() {
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Situação</FormLabel>
+                      <FormLabel>Situação do Documento</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         defaultValue={field.value}
@@ -469,26 +469,28 @@ export default function DocumentForm() {
                 />
               </div>
               
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Descrição do documento" 
-                        className="min-h-[120px]" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div>
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descrição</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Descreva o documento brevemente" 
+                          className="h-24 resize-none"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
               <div className="space-y-2">
-                <h3 className="text-lg font-medium">Relacionamentos</h3>
+                <h3 className="text-lg font-medium">Relações</h3>
                 <Separator />
               </div>
               
@@ -498,9 +500,9 @@ export default function DocumentForm() {
                   name="activityId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Atividade Legislativa Relacionada</FormLabel>
+                      <FormLabel>Atividade Relacionada</FormLabel>
                       <Select 
-                        onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                        onValueChange={field.onChange} 
                         defaultValue={field.value?.toString()}
                       >
                         <FormControl>
@@ -512,13 +514,13 @@ export default function DocumentForm() {
                           <SelectItem value="0">Nenhuma</SelectItem>
                           {activities.map((activity) => (
                             <SelectItem key={activity.id} value={activity.id.toString()}>
-                              {activity.activityType} Nº {activity.activityNumber} - {formatDate(activity.activityDate)}
+                              {activity.activityType} Nº {activity.activityNumber} - {activity.activityDate ? formatDate(activity.activityDate.toString()) : ""}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                       <FormDescription>
-                        Vincular este documento a uma atividade legislativa (opcional)
+                        Atividade legislativa que está vinculada a este documento
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -532,7 +534,7 @@ export default function DocumentForm() {
                     <FormItem>
                       <FormLabel>Documento de Origem</FormLabel>
                       <Select 
-                        onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                        onValueChange={field.onChange} 
                         defaultValue={field.value?.toString()}
                       >
                         <FormControl>
@@ -544,13 +546,13 @@ export default function DocumentForm() {
                           <SelectItem value="0">Nenhum</SelectItem>
                           {documents.map((doc) => (
                             <SelectItem key={doc.id} value={doc.id.toString()}>
-                              {doc.documentType} Nº {doc.documentNumber} - {formatDate(doc.documentDate)}
+                              {doc.documentType} Nº {doc.documentNumber} - {doc.documentDate ? formatDate(doc.documentDate.toString()) : ""}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                       <FormDescription>
-                        Vincular este documento a um documento de origem (opcional)
+                        Documento que originou este (se for alteração ou resposta)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -563,83 +565,71 @@ export default function DocumentForm() {
                 <Separator />
               </div>
               
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <FormLabel htmlFor="file">Documento</FormLabel>
-                  <div className="mt-2">
-                    <div className="flex items-center justify-center w-full">
-                      <label 
-                        htmlFor="file-upload" 
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                      >
-                        {formFile ? (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <FileCheck className="w-8 h-8 mb-3 text-green-500" />
-                            <p className="mb-2 text-sm text-gray-500">
-                              <span className="font-semibold">{formFile.name}</span>
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {(formFile.size / 1024 / 1024).toFixed(2)} MB
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Upload className="w-8 h-8 mb-3 text-gray-400" />
-                            <p className="mb-2 text-sm text-gray-500">
-                              <span className="font-semibold">Clique para enviar</span> ou arraste e solte
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT (max. 10MB)
-                            </p>
-                          </div>
-                        )}
-                        <input 
-                          id="file-upload" 
-                          type="file" 
-                          className="hidden" 
-                          onChange={handleFileChange}
-                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-                        />
-                      </label>
+              <div className="space-y-2">
+                <div className="bg-gray-50 p-4 rounded-md border border-dashed border-gray-300">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="p-3 bg-primary-50 rounded-full">
+                      <Upload className="h-6 w-6 text-primary" />
                     </div>
-                  </div>
-                  {document && document.fileName && (
-                    <div className="mt-4">
-                      <p className="text-sm text-gray-500">Arquivo atual:</p>
-                      <div className="flex items-center mt-1">
-                        <File className="w-4 h-4 mr-2 text-gray-500" />
+                    <div className="space-y-1 text-center">
+                      <h4 className="text-sm font-medium">Anexar documento</h4>
+                      <p className="text-xs text-muted-foreground">
+                        PDF, DOC, DOCX ou TXT (máx. 5MB)
+                      </p>
+                    </div>
+                    
+                    <Input
+                      type="file"
+                      id="file"
+                      className="w-full max-w-xs"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={handleFileChange}
+                    />
+                    
+                    {formFile && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <FileCheck className="h-4 w-4 text-green-500" />
+                        <span>{formFile.name}</span>
+                      </div>
+                    )}
+                    
+                    {isEditing && document?.fileName && !formFile && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <File className="h-4 w-4 text-primary" />
                         <a 
-                          href={`/api/files/documents/${document.id}`} 
-                          className="text-sm text-primary hover:underline"
-                          target="_blank"
+                          href={`/api/files/documents/${documentId}`} 
+                          target="_blank" 
                           rel="noopener noreferrer"
+                          className="text-primary hover:underline"
                         >
                           {document.fileName}
                         </a>
+                        <span className="text-xs text-muted-foreground">(atual)</span>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
               
-              <div className="flex justify-end space-x-4">
-                <Button 
-                  variant="outline" 
-                  type="button" 
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => navigate("/documents")}
                 >
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={createMutation.isPending || updateMutation.isPending}
                 >
-                  {createMutation.isPending || updateMutation.isPending ? (
-                    <span className="flex items-center gap-1">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
-                      Salvando...
-                    </span>
-                  ) : isEditing ? "Atualizar" : "Criar"}
+                  {(createMutation.isPending || updateMutation.isPending) && (
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  )}
+                  {isEditing ? "Atualizar Documento" : "Criar Documento"}
                 </Button>
               </div>
             </form>
