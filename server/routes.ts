@@ -1259,6 +1259,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Erro ao buscar estatísticas do dashboard" });
     }
   });
+  
+  // SEARCH ROUTES
+  
+  // Global search across all entities
+  app.get('/api/search', requireAuth, async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      const type = req.query.type as string | undefined;
+      
+      if (!query || query.length < 3) {
+        return res.json([]);
+      }
+      
+      const results = await storage.searchGlobal(query, type);
+      res.json(results);
+    } catch (error) {
+      console.error('Error performing search:', error);
+      res.status(500).json({ message: 'Erro ao realizar busca' });
+    }
+  });
 
   // EVENT ATTENDANCE ROUTES
   

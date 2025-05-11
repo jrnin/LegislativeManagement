@@ -15,6 +15,19 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Tipo de resultado de busca
+export type SearchResult = {
+  id: string | number;
+  title: string;
+  description?: string;
+  type: 'user' | 'legislature' | 'event' | 'activity' | 'document';
+  date?: string;
+  status?: string;
+  category?: string;
+  url: string;
+  highlight?: string;
+};
+
 // Session storage table (mandatory for Replit Auth)
 export const sessions = pgTable(
   "sessions",
