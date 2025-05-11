@@ -68,9 +68,7 @@ const updateFormSchema = z.object({
   path: ["confirmPassword"],
 });
 
-type CreateFormData = z.infer<typeof createFormSchema>;
-type UpdateFormData = z.infer<typeof updateFormSchema>;
-type FormData = CreateFormData | UpdateFormData;
+type FormData = z.infer<typeof createFormSchema> & z.infer<typeof updateFormSchema>;
 
 export default function UserForm() {
   const [_, navigate] = useLocation();
@@ -178,10 +176,18 @@ export default function UserForm() {
   });
 
   const onSubmit = (data: FormData) => {
+    // Remove a senha se estiver vazia na edição (mantém a senha atual)
+    const submitData = { ...data };
+    
+    if (isEditing && !submitData.password) {
+      delete submitData.password;
+      delete submitData.confirmPassword;
+    }
+    
     if (isEditing) {
-      updateMutation.mutate(data);
+      updateMutation.mutate(submitData);
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(submitData);
     }
   };
 
