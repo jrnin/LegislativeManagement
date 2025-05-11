@@ -130,6 +130,9 @@ export default function DocumentForm() {
       if (data.activityId && data.activityId !== 0) {
         formData.append("activityId", data.activityId.toString());
       }
+      if (data.eventId && data.eventId !== 0) {
+        formData.append("eventId", data.eventId.toString());
+      }
       if (data.parentDocumentId && data.parentDocumentId !== 0) {
         formData.append("parentDocumentId", data.parentDocumentId.toString());
       }
@@ -182,6 +185,9 @@ export default function DocumentForm() {
       if (data.status) formData.append("status", data.status);
       
       // Append optional fields if present
+      if (data.eventId && data.eventId !== 0) {
+        formData.append("eventId", data.eventId.toString());
+      }
       if (data.activityId && data.activityId !== 0) {
         formData.append("activityId", data.activityId.toString());
       }
