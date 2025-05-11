@@ -1331,17 +1331,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const eventId = Number(req.params.eventId);
       
+      // Adicionar logs para depuração
+      console.log('Authentication debug:');
+      console.log('req.user:', req.user);
+      console.log('req.isAuthenticated:', req.isAuthenticated);
+      console.log('req.isAuthenticated():', req.isAuthenticated ? req.isAuthenticated() : 'Not a function');
+      console.log('session userId:', (req.session as any)?.userId);
+      console.log('Body:', req.body);
+      
       // Determinar o ID do usuário com base na fonte de autenticação
       let userId;
       let registeredBy;
       
-      if (req.user) {
+      // Utilizando o ID enviado no corpo da requisição como prioridade
+      if (req.body.userId) {
+        userId = req.body.userId;
+        registeredBy = req.body.registeredBy || req.body.userId;
+      } else if (req.user) {
         // Autenticação Replit
-        userId = req.body.userId || (req.user as any)?.claims?.sub;
+        userId = (req.user as any)?.claims?.sub;
         registeredBy = (req.user as any)?.claims?.sub;
-      } else {
-        // Autenticação personalizada
-        userId = req.body.userId || (req as any).userId;
+      } else if ((req.session as any)?.userId) {
+        // Autenticação via sessão
+        userId = (req.session as any).userId;
+        registeredBy = (req.session as any).userId;
+      } else if ((req as any).userId) {
+        // Valor anexado pelo middleware
+        userId = (req as any).userId;
         registeredBy = (req as any).userId;
       }
       

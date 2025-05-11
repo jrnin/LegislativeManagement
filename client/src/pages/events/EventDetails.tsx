@@ -235,16 +235,18 @@ export default function EventDetails() {
   };
 
   const handleAttendanceSubmit = async () => {
-    if (!eventId) return;
+    if (!eventId || !user?.id) return;
     
     try {
+      console.log("Tentando registrar presença para usuário:", user.id);
+      
       await apiRequest(
         "POST",
         `/api/events/${eventId}/attendance`,
         {
+          userId: user.id, // Enviar explicitamente o ID do usuário
           status: attendanceStatus,
           notes: attendanceNotes,
-          // Não precisamos enviar userId, pois será detectado pelo servidor
         }
       );
       
