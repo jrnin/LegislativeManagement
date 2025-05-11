@@ -31,7 +31,9 @@ export default function Layout({ children }: LayoutProps) {
                 <X className="h-6 w-6 text-white" />
               </button>
             </div>
-            <Sidebar />
+            <div className="h-full overflow-y-auto">
+              <Sidebar />
+            </div>
           </div>
           <div className="flex-shrink-0 w-14"></div>
         </div>
@@ -39,7 +41,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Static sidebar for desktop */}
       <div className="hidden md:flex md:flex-shrink-0">
-        <div className="flex flex-col w-64">
+        <div className="flex flex-col w-64 h-full">
           <div className="h-full bg-white shadow-lg rounded-r-xl overflow-hidden">
             <Sidebar />
           </div>

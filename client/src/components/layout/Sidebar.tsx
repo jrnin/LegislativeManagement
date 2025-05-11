@@ -37,7 +37,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="flex flex-col h-0 flex-1">
+    <div className="flex flex-col h-full">
       <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
         <div className="flex items-center justify-center flex-shrink-0 px-4 mb-5">
           <div className="flex items-center space-x-2">
@@ -54,7 +54,7 @@ export default function Sidebar() {
               <a
                 className={`
                   group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg
-                  transition-all duration-200
+                  transition-all duration-200 w-full
                   ${isActive(item.href)
                     ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
