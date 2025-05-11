@@ -755,8 +755,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Delete event (admin only)
-  app.delete('/api/events/:id', requireAdmin, async (req, res) => {
+  // Delete event
+  app.delete('/api/events/:id', requireAuth, async (req, res) => {
     try {
       const eventId = Number(req.params.id);
       
@@ -1339,8 +1339,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Update attendance (admin only)
-  app.put('/api/events/attendance/:id', requireAdmin, async (req, res) => {
+  // Update attendance
+  app.put('/api/events/attendance/:id', requireAuth, async (req, res) => {
     try {
       const attendanceId = Number(req.params.id);
       const updatedAttendance = await storage.updateEventAttendance(attendanceId, req.body);
@@ -1356,8 +1356,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete attendance (admin only)
-  app.delete('/api/events/attendance/:id', requireAdmin, async (req, res) => {
+  // Delete attendance
+  app.delete('/api/events/attendance/:id', requireAuth, async (req, res) => {
     try {
       const attendanceId = Number(req.params.id);
       const result = await storage.deleteEventAttendance(attendanceId);
