@@ -7,11 +7,36 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// Overload para GET request simples
+export async function apiRequest<T>(url: string): Promise<T>;
+// Overload para requests com método e dados
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
-): Promise<Response> {
+): Promise<Response>;
+// Implementação
+export async function apiRequest<T>(
+  methodOrUrl: string,
+  urlOrData?: string | unknown,
+  data?: unknown | undefined,
+): Promise<T | Response> {
+  // Caso 1: apiRequest<T>(url)
+  if (urlOrData === undefined) {
+    const url = methodOrUrl;
+    const res = await fetch(url, {
+      method: 'GET',
+      credentials: "include",
+    });
+
+    await throwIfResNotOk(res);
+    return await res.json();
+  }
+  
+  // Caso 2: apiRequest(method, url, data?)
+  const method = methodOrUrl;
+  const url = urlOrData as string;
+  
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},

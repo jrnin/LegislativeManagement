@@ -106,7 +106,9 @@ export default function EventDetails() {
   // Fetch event details
   const { data: eventDetails, isLoading, isError } = useQuery({
     queryKey: ["/api/events", eventId, "details"],
-    queryFn: () => apiRequest<any>(`/api/events/${eventId}/details`),
+    queryFn: async () => {
+      return await apiRequest<any>(`/api/events/${eventId}/details`);
+    },
     enabled: !!eventId
   });
   
@@ -114,8 +116,11 @@ export default function EventDetails() {
   const { data: userVotes, refetch: refetchUserVotes } = useQuery({
     queryKey: ["/api/documents", "votes", "user"],
     queryFn: async () => {
-      const documentIds = eventDetails?.activities
-        .flatMap((activity: any) => activity.relatedDocuments)
+      if (!eventDetails) return [];
+      
+      const activities = eventDetails.activities || [];
+      const documentIds = activities
+        .flatMap((activity: any) => activity.relatedDocuments || [])
         .filter((docId: number) => !!docId);
         
       if (!documentIds?.length) return [];
@@ -136,7 +141,7 @@ export default function EventDetails() {
     queryKey: ["/api/events", eventId, "attendance", "user"],
     queryFn: async () => {
       const attendanceList = await apiRequest<any[]>(`/api/events/${eventId}/attendance`);
-      return attendanceList.find((a: any) => a.userId === user?.id);
+      return (attendanceList || []).find((a: any) => a.userId === user?.id);
     },
     enabled: !!eventId && isAuthenticated
   });
@@ -145,13 +150,14 @@ export default function EventDetails() {
     if (!currentDocumentId || !voteValue) return;
     
     try {
-      await apiRequest(`/api/documents/${currentDocumentId}/vote`, {
-        method: "POST",
-        body: JSON.stringify({
+      await apiRequest(
+        "POST",
+        `/api/documents/${currentDocumentId}/vote`, 
+        {
           vote: voteValue,
           comment: voteComment
-        })
-      });
+        }
+      );
       
       toast({
         title: "Voto registrado",
@@ -173,13 +179,14 @@ export default function EventDetails() {
     if (!eventId) return;
     
     try {
-      await apiRequest(`/api/events/${eventId}/attendance`, {
-        method: "POST",
-        body: JSON.stringify({
+      await apiRequest(
+        "POST",
+        `/api/events/${eventId}/attendance`,
+        {
           status: attendanceStatus,
           notes: attendanceNotes
-        })
-      });
+        }
+      );
       
       toast({
         title: "Presença registrada",

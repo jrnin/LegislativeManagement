@@ -57,7 +57,8 @@ import {
   MoreHorizontal,
   Plus,
   Search,
-  Trash2, 
+  Trash2,
+  Eye 
 } from "lucide-react";
 import { formatDate } from "@/utils/formatters";
 
