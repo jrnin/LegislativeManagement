@@ -60,6 +60,13 @@ export const upload = multer({
  * Middleware to check if user is authenticated with custom session
  */
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  // Verificar primeiramente se o usuário está autenticado pelo Replit
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    next();
+    return;
+  }
+  
+  // Se não estiver autenticado pelo Replit, verificar autenticação pela sessão
   const userId = (req.session as any).userId;
   
   if (!userId) {

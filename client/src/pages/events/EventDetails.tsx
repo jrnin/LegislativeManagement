@@ -243,7 +243,8 @@ export default function EventDetails() {
         `/api/events/${eventId}/attendance`,
         {
           status: attendanceStatus,
-          notes: attendanceNotes
+          notes: attendanceNotes,
+          // Não precisamos enviar userId, pois será detectado pelo servidor
         }
       );
       
@@ -255,6 +256,7 @@ export default function EventDetails() {
       refetchUserAttendance();
       setIsAttendanceDialogOpen(false);
     } catch (error) {
+      console.error("Erro ao registrar presença:", error);
       toast({
         title: "Erro",
         description: "Erro ao registrar presença. Tente novamente.",

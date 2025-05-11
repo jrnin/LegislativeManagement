@@ -1330,14 +1330,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/events/:eventId/attendance', requireAuth, async (req, res) => {
     try {
       const eventId = Number(req.params.eventId);
-      const userId = (req.user as any).id;
+      
+      // Determinar o ID do usuário com base na fonte de autenticação
+      let userId;
+      let registeredBy;
+      
+      if (req.user) {
+        // Autenticação Replit
+        userId = req.body.userId || (req.user as any)?.claims?.sub;
+        registeredBy = (req.user as any)?.claims?.sub;
+      } else {
+        // Autenticação personalizada
+        userId = req.body.userId || (req as any).userId;
+        registeredBy = (req as any).userId;
+      }
+      
+      if (!userId) {
+        return res.status(400).json({ message: "ID do usuário não especificado" });
+      }
+      
+      console.log(`Registrando presença para usuário ID: ${userId}, evento ID: ${eventId}`);
       
       const attendanceData = {
         eventId,
         userId,
         status: req.body.status || "Presente",
         registeredAt: new Date(),
-        registeredBy: userId,
+        registeredBy: registeredBy || userId,
         notes: req.body.notes || null
       };
       
