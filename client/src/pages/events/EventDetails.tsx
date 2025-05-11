@@ -267,7 +267,7 @@ export default function EventDetails() {
   };
   
   return (
-    <div className="container py-8 space-y-8">
+    <div className="container px-4 sm:px-6 lg:px-8 mx-auto py-8 space-y-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
