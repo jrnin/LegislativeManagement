@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import session from "express-session";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { requireAdmin, handleFileUpload } from "./middlewares";
+import { setupAuth } from "./replitAuth";
+import { requireAuth, requireAdmin, handleFileUpload } from "./middlewares";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest } from "./sendgrid";
 import { z } from "zod";
 import crypto from "crypto";
@@ -11,6 +12,18 @@ import path from "path";
 import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configurar sessões do Express
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'legislative-system-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 1 semana
+    }
+  }));
+  
   // Set up authentication
   await setupAuth(app);
   
@@ -23,11 +36,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AUTH ROUTES
   
   // Get current authenticated user
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.session as any).userId;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
       const user = await storage.getUser(userId);
-      res.json(user);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove sensitive information
+      const { password, verificationToken, ...userData } = user;
+      res.json(userData);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Falha ao buscar usuário" });
@@ -258,7 +283,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // USER ROUTES
   
   // Get all users
-  app.get('/api/users', isAuthenticated, async (req, res) => {
+  app.get('/api/users', requireAuth, async (req, res) => {
     try {
       const users = await storage.getAllUsers();
       res.json(users);
@@ -269,7 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get single user
-  app.get('/api/users/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/users/:id', requireAuth, async (req, res) => {
     try {
       const user = await storage.getUser(req.params.id);
       
@@ -346,7 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update user
-  app.put('/api/users/:id', isAuthenticated, async (req: any, res) => {
+  app.put('/api/users/:id', requireAuth, async (req: any, res) => {
     try {
       const userId = req.params.id;
       const currentUserIsAdmin = (req.user.claims.sub && (await storage.getUser(req.user.claims.sub))?.role === "admin");
@@ -433,7 +458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // LEGISLATURE ROUTES
   
   // Get all legislatures
-  app.get('/api/legislatures', isAuthenticated, async (req, res) => {
+  app.get('/api/legislatures', requireAuth, async (req, res) => {
     try {
       const legislatures = await storage.getAllLegislatures();
       res.json(legislatures);
@@ -444,7 +469,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get single legislature
-  app.get('/api/legislatures/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/legislatures/:id', requireAuth, async (req, res) => {
     try {
       const legislature = await storage.getLegislature(Number(req.params.id));
       
@@ -550,7 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // EVENT ROUTES
   
   // Get all events
-  app.get('/api/events', isAuthenticated, async (req, res) => {
+  app.get('/api/events', requireAuth, async (req, res) => {
     try {
       const events = await storage.getAllEvents();
       res.json(events);
@@ -561,7 +586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get upcoming events
-  app.get('/api/events/upcoming', isAuthenticated, async (req, res) => {
+  app.get('/api/events/upcoming', requireAuth, async (req, res) => {
     try {
       const limit = req.query.limit ? Number(req.query.limit) : 3;
       const events = await storage.getUpcomingEvents(limit);
@@ -573,7 +598,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get single event
-  app.get('/api/events/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/events/:id', requireAuth, async (req, res) => {
     try {
       const event = await storage.getEvent(Number(req.params.id));
       
@@ -689,7 +714,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // LEGISLATIVE ACTIVITY ROUTES
   
   // Get all legislative activities
-  app.get('/api/activities', isAuthenticated, async (req, res) => {
+  app.get('/api/activities', requireAuth, async (req, res) => {
     try {
       const activities = await storage.getAllLegislativeActivities();
       res.json(activities);
@@ -700,7 +725,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get recent legislative activities
-  app.get('/api/activities/recent', isAuthenticated, async (req, res) => {
+  app.get('/api/activities/recent', requireAuth, async (req, res) => {
     try {
       const limit = req.query.limit ? Number(req.query.limit) : 3;
       const activities = await storage.getRecentLegislativeActivities(limit);
@@ -712,7 +737,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get single legislative activity
-  app.get('/api/activities/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/activities/:id', requireAuth, async (req, res) => {
     try {
       const activity = await storage.getLegislativeActivity(Number(req.params.id));
       
@@ -728,7 +753,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create legislative activity
-  app.post('/api/activities', isAuthenticated, handleFileUpload('file'), async (req: any, res) => {
+  app.post('/api/activities', requireAuth, handleFileUpload('file'), async (req: any, res) => {
     try {
       const schema = z.object({
         activityNumber: z.number().int().positive(),
@@ -802,7 +827,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update legislative activity
-  app.put('/api/activities/:id', isAuthenticated, handleFileUpload('file'), async (req: any, res) => {
+  app.put('/api/activities/:id', requireAuth, handleFileUpload('file'), async (req: any, res) => {
     try {
       const activityId = Number(req.params.id);
       
@@ -891,7 +916,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Delete legislative activity
-  app.delete('/api/activities/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/activities/:id', requireAuth, async (req: any, res) => {
     try {
       const activityId = Number(req.params.id);
       
@@ -929,7 +954,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DOCUMENT ROUTES
   
   // Get all documents
-  app.get('/api/documents', isAuthenticated, async (req, res) => {
+  app.get('/api/documents', requireAuth, async (req, res) => {
     try {
       const documents = await storage.getAllDocuments();
       res.json(documents);
@@ -940,7 +965,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get single document
-  app.get('/api/documents/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/documents/:id', requireAuth, async (req, res) => {
     try {
       const document = await storage.getDocument(Number(req.params.id));
       
@@ -956,7 +981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get document history
-  app.get('/api/documents/:id/history', isAuthenticated, async (req, res) => {
+  app.get('/api/documents/:id/history', requireAuth, async (req, res) => {
     try {
       const documents = await storage.getDocumentHistory(Number(req.params.id));
       res.json(documents);
@@ -967,7 +992,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create document
-  app.post('/api/documents', isAuthenticated, handleFileUpload('file'), async (req: any, res) => {
+  app.post('/api/documents', requireAuth, handleFileUpload('file'), async (req: any, res) => {
     try {
       const schema = z.object({
         documentNumber: z.number().int().positive(),
@@ -1021,7 +1046,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update document
-  app.put('/api/documents/:id', isAuthenticated, handleFileUpload('file'), async (req: any, res) => {
+  app.put('/api/documents/:id', requireAuth, handleFileUpload('file'), async (req: any, res) => {
     try {
       const documentId = Number(req.params.id);
       
@@ -1129,7 +1154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Download file
-  app.get('/api/files/:type/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/files/:type/:id', requireAuth, async (req, res) => {
     try {
       const type = req.params.type;
       const id = Number(req.params.id);
@@ -1181,7 +1206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DASHBOARD ROUTES
   
   // Get dashboard stats
-  app.get('/api/dashboard/stats', isAuthenticated, async (req, res) => {
+  app.get('/api/dashboard/stats', requireAuth, async (req, res) => {
     try {
       const stats = await storage.getDashboardStats();
       res.json(stats);
