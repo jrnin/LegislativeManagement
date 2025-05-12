@@ -126,7 +126,10 @@ export const legislativeActivities = pgTable("legislative_activities", {
   fileName: varchar("file_name"),
   fileType: varchar("file_type"),
   needsApproval: boolean("needs_approval").default(false),
-  approved: boolean("approved").default(false),
+  approved: boolean("approved"),
+  approvedBy: varchar("approved_by"),
+  approvedAt: timestamp("approved_at"),
+  approvalComment: text("approval_comment"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
