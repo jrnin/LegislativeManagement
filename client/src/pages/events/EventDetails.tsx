@@ -194,7 +194,8 @@ export default function EventDetails() {
       // Use correct property names from the database
       return activities.filter((activity: any) => {
         console.log("Activity:", activity);
-        return activity.needsApproval === true && activity.approved === null;
+        // Filtrar atividades que precisam de aprovação e não foram processadas ainda (approved === null ou approved === false)
+        return activity.needsApproval === true && (activity.approved === null || activity.approved === false);
       });
     },
     enabled: !!eventId && !!eventDetails
