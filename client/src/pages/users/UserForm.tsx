@@ -17,6 +17,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Legislature } from "@shared/schema";
 
+// Função de formatação de data
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return '';
+  
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj instanceof Date ? dateObj.toISOString().split('T')[0] : '';
+}
+
 const createFormSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter no mínimo 3 caracteres" }),
   email: z.string().email({ message: "Email inválido" }),
@@ -29,7 +37,7 @@ const createFormSchema = z.object({
   city: z.string().min(2, { message: "Cidade é obrigatória" }),
   state: z.string().length(2, { message: "Estado deve ter 2 caracteres" }),
   role: z.enum(["admin", "councilor"], { message: "Selecione um perfil válido" }),
-  legislatureId: z.coerce.number().optional(),
+  legislatureId: z.string().transform(val => val ? Number(val) : undefined).optional(),
   maritalStatus: z.string().optional(),
   occupation: z.string().optional(),
   education: z.string().optional(),
@@ -52,7 +60,7 @@ const updateFormSchema = z.object({
   city: z.string().min(2, { message: "Cidade é obrigatória" }),
   state: z.string().length(2, { message: "Estado deve ter 2 caracteres" }),
   role: z.enum(["admin", "councilor"], { message: "Selecione um perfil válido" }),
-  legislatureId: z.coerce.number().optional(),
+  legislatureId: z.string().transform(val => val ? Number(val) : undefined).optional(),
   maritalStatus: z.string().optional(),
   occupation: z.string().optional(),
   education: z.string().optional(),
@@ -571,7 +579,7 @@ export default function UserForm() {
                       <FormItem>
                         <FormLabel>Legislatura</FormLabel>
                         <Select 
-                          onValueChange={field.onChange} 
+                          onValueChange={(value) => field.onChange(Number(value))} 
                           defaultValue={field.value ? String(field.value) : undefined}
                         >
                           <FormControl>
@@ -581,8 +589,8 @@ export default function UserForm() {
                           </FormControl>
                           <SelectContent>
                             {legislatures.map((legislature) => (
-                              <SelectItem key={legislature.id} value={legislature.id}>
-                                {legislature.number}ª Legislatura ({typeof legislature.startDate === 'string' ? legislature.startDate.split('T')[0] : new Date(legislature.startDate).toISOString().split('T')[0]} - {typeof legislature.endDate === 'string' ? legislature.endDate.split('T')[0] : new Date(legislature.endDate).toISOString().split('T')[0]})
+                              <SelectItem key={legislature.id} value={String(legislature.id)}>
+                                {legislature.number}ª Legislatura ({formatDate(legislature.startDate)} - {formatDate(legislature.endDate)})
                               </SelectItem>
                             ))}
                           </SelectContent>

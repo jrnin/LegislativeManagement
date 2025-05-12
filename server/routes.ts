@@ -368,6 +368,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Já existe um usuário com este email" });
       }
       
+      // Se o CPF foi fornecido, verifica se já existe um usuário com este CPF
+      if (validated.cpf) {
+        const usersWithCpf = await storage.getAllUsers();
+        const existingUserWithCpf = usersWithCpf.find(user => user.cpf === validated.cpf);
+        
+        if (existingUserWithCpf) {
+          return res.status(400).json({ message: "Já existe um usuário com este CPF" });
+        }
+      }
+      
       // Generate a random ID if not provided by auth
       const userId = crypto.randomUUID();
       
