@@ -1601,7 +1601,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Aprovar ou rejeitar uma atividade legislativa
-  app.post('/api/activities/:activityId/approve', requireAuth, requireAdmin, async (req, res) => {
+  app.post('/api/activities/:activityId/approve', requireAuth, async (req, res) => {
     try {
       const activityId = Number(req.params.activityId);
       const { approved, comment } = req.body;
@@ -1616,6 +1616,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activity = await storage.getLegislativeActivity(activityId);
       if (!activity) {
         return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Verificar se o usuário é administrador
+      const user = await storage.getUser(userId);
+      if (!user || user.role !== 'admin') {
+        return res.status(403).json({ message: "Apenas administradores podem aprovar ou rejeitar atividades" });
       }
       
       // Atualizar o status de aprovação
