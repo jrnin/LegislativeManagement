@@ -143,6 +143,7 @@ export const legislativeActivitiesRelations = relations(legislativeActivities, (
   documents: many(documents, {
     relationName: "activity_documents",
   }),
+  votes: many(activityVotes),
 }));
 
 // Legislative Activities Authors (many-to-many)
@@ -285,6 +286,29 @@ export const activityTimelineRelations = relations(activityTimeline, ({ one }) =
   }),
 }));
 
+// Activity Votes table - Para rastrear votos de vereadores em atividades legislativas
+export const activityVotes = pgTable("activity_votes", {
+  id: serial("id").primaryKey(),
+  activityId: integer("activity_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  vote: varchar("vote").notNull(), // "Aprovado" ou "Reprovado"
+  votedAt: timestamp("voted_at").defaultNow(),
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const activityVotesRelations = relations(activityVotes, ({ one }) => ({
+  activity: one(legislativeActivities, {
+    fields: [activityVotes.activityId],
+    references: [legislativeActivities.id],
+  }),
+  user: one(users, {
+    fields: [activityVotes.userId],
+    references: [users.id],
+  }),
+}));
+
 // Dashboard Stats View (for quick dashboard data retrieval)
 export type DashboardStats = {
   legislatureCount: number;
@@ -397,3 +421,12 @@ export const insertActivityTimelineSchema = createInsertSchema(activityTimeline)
 });
 export type InsertActivityTimeline = z.infer<typeof insertActivityTimelineSchema>;
 export type ActivityTimeline = typeof activityTimeline.$inferSelect;
+
+export const insertActivityVoteSchema = createInsertSchema(activityVotes).pick({
+  activityId: true,
+  userId: true,
+  vote: true,
+  comment: true,
+});
+export type InsertActivityVote = z.infer<typeof insertActivityVoteSchema>;
+export type ActivityVote = typeof activityVotes.$inferSelect;

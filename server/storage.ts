@@ -100,6 +100,21 @@ export interface IStorage {
   updateDocumentVote(id: number, voteData: Partial<DocumentVote>): Promise<DocumentVote | undefined>;
   deleteDocumentVote(id: number): Promise<boolean>;
   
+  // Activity Votes operations
+  getActivityVote(id: number): Promise<ActivityVote | undefined>;
+  getActivityVotesByActivityId(activityId: number): Promise<(ActivityVote & { user: User })[]>;
+  getActivityVoteByUserAndActivity(userId: string, activityId: number): Promise<ActivityVote | undefined>;
+  createActivityVote(voteData: Partial<ActivityVote>): Promise<ActivityVote>;
+  updateActivityVote(id: number, voteData: Partial<ActivityVote>): Promise<ActivityVote | undefined>;
+  deleteActivityVote(id: number): Promise<boolean>;
+  getActivityVotesStats(activityId: number): Promise<{
+    totalVotes: number;
+    approveCount: number;
+    rejectCount: number;
+    approvePercentage: number;
+    rejectPercentage: number;
+  }>;
+  
   // Activity Timeline operations
   getActivityTimeline(id: number): Promise<ActivityTimeline | undefined>;
   getActivityTimelineByActivityId(activityId: number): Promise<ActivityTimeline[]>;
