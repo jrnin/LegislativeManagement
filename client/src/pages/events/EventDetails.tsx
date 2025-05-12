@@ -1000,6 +1000,90 @@ export default function EventDetails() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Diálogo de Aprovação de Atividade */}
+      <Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
+        <DialogContent className="sm:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Analisar Atividade Legislativa</DialogTitle>
+            <DialogDescription>
+              Revise o arquivo da atividade e aprove ou rejeite a solicitação.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            {selectedActivity && (
+              <>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">{selectedActivity.description}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Nº {selectedActivity.activityNumber} - {selectedActivity.activityType}
+                  </p>
+                  <p className="text-sm">
+                    Data: {new Date(selectedActivity.activityDate).toLocaleDateString('pt-BR')}
+                  </p>
+                  
+                  {selectedActivity.fileName && (
+                    <div className="border rounded-md p-2 mt-4">
+                      <h4 className="font-medium mb-2">Arquivo anexado:</h4>
+                      <iframe 
+                        ref={filePreviewRef}
+                        src={`/api/files/activities/${selectedActivity.id}?download=false`}
+                        className="w-full h-[400px] border rounded"
+                        title="Visualização do documento"
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="approvalComment">Comentário (opcional):</Label>
+                  <Textarea
+                    id="approvalComment"
+                    value={approvalComment}
+                    onChange={(e) => setApprovalComment(e.target.value)}
+                    placeholder="Digite um comentário sobre sua decisão..."
+                    className="resize-none"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                approveActivityMutation.mutate({
+                  activityId: selectedActivityId!,
+                  approved: false,
+                  comment: approvalComment
+                });
+              }}
+              disabled={approveActivityMutation.isPending}
+            >
+              <X className="mr-2 h-4 w-4" />
+              Rejeitar
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              onClick={() => {
+                approveActivityMutation.mutate({
+                  activityId: selectedActivityId!,
+                  approved: true,
+                  comment: approvalComment
+                });
+              }}
+              disabled={approveActivityMutation.isPending}
+            >
+              <Check className="mr-2 h-4 w-4" />
+              Aprovar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

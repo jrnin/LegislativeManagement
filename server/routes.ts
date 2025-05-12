@@ -1599,6 +1599,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Erro ao buscar vereadores" });
     }
   });
+  
+  // Aprovar ou rejeitar uma atividade legislativa
+  app.post('/api/activities/:activityId/approve', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      const { approved, comment } = req.body;
+      const userId = (req.user as any).id;
+      
+      // Validar dados
+      if (approved === undefined || approved === null) {
+        return res.status(400).json({ message: "O campo 'approved' é obrigatório" });
+      }
+      
+      // Buscar a atividade
+      const activity = await storage.getLegislativeActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Atualizar o status de aprovação
+      const updatedActivity = await storage.updateLegislativeActivity(activityId, {
+        approved: approved,
+        approvedBy: userId,
+        approvedAt: new Date(),
+        approvalComment: comment || null
+      });
+      
+      // Registrar no timeline da atividade
+      await storage.createActivityTimeline({
+        activityId,
+        description: approved ? "Atividade aprovada" : "Atividade rejeitada",
+        eventType: approved ? "approval" : "rejection",
+        createdBy: userId,
+        eventDate: new Date(),
+        metadata: {
+          comment: comment || null
+        }
+      });
+      
+      res.json(updatedActivity);
+    } catch (error) {
+      console.error("Error approving activity:", error);
+      res.status(500).json({ message: "Erro ao aprovar/rejeitar atividade" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
