@@ -148,7 +148,38 @@ export default function EventDetails() {
   // Fetch activities that require approval
   const [selectedActivityId, setSelectedActivityId] = useState<number | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState<boolean>(false);
+  const [approvalComment, setApprovalComment] = useState<string>("");
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const filePreviewRef = useRef<HTMLIFrameElement>(null);
+  
+  // Mutation for approving activity
+  const approveActivityMutation = useMutation({
+    mutationFn: async ({ activityId, approved, comment }: { activityId: number, approved: boolean, comment?: string }) => {
+      return await apiRequest(
+        "POST",
+        `/api/activities/${activityId}/approve`,
+        { approved, comment }
+      );
+    },
+    onSuccess: () => {
+      // Invalidate the activities query to refresh the data
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/details`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/approval-activities`] });
+      setIsApprovalDialogOpen(false);
+      toast({
+        title: "Atividade atualizada",
+        description: "O status de aprovação da atividade foi atualizado com sucesso."
+      });
+    },
+    onError: (error) => {
+      console.error("Error approving activity:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao atualizar o status de aprovação da atividade.",
+        variant: "destructive"
+      });
+    }
+  });
   
   const { data: activitiesRequiringApproval, isLoading: loadingApprovalActivities } = useQuery({
     queryKey: [`/api/events/${eventId}/approval-activities`],
@@ -157,7 +188,13 @@ export default function EventDetails() {
       
       // Get activities that require approval
       const activities = eventDetails.activities || [];
-      return activities.filter((activity: any) => activity.requiresApproval === true && activity.approved === null);
+      console.log("Activities in event:", activities);
+      
+      // Use correct property names from the database
+      return activities.filter((activity: any) => {
+        console.log("Activity:", activity);
+        return activity.needsApproval === true && activity.approved === null;
+      });
     },
     enabled: !!eventId && !!eventDetails
   });
@@ -849,7 +886,9 @@ export default function EventDetails() {
                             variant="outline" 
                             size="sm"
                             onClick={() => {
+                              setSelectedActivity(activity);
                               setSelectedActivityId(activity.id);
+                              setApprovalComment("");
                               setIsApprovalDialogOpen(true);
                             }}
                           >
