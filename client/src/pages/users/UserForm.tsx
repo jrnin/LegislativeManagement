@@ -109,7 +109,7 @@ export default function UserForm() {
       city: "",
       state: "",
       role: "councilor",
-      legislatureId: "",
+      legislatureId: undefined,
       maritalStatus: "",
       occupation: "",
       education: "",
@@ -132,7 +132,7 @@ export default function UserForm() {
         city: user.city || "",
         state: user.state || "",
         role: user.role as "admin" | "councilor",
-        legislatureId: user.legislatureId?.toString() || "",
+        legislatureId: user.legislatureId || undefined,
         maritalStatus: user.maritalStatus || "",
         occupation: user.occupation || "",
         education: user.education || "",
@@ -579,8 +579,8 @@ export default function UserForm() {
                       <FormItem>
                         <FormLabel>Legislatura</FormLabel>
                         <Select 
-                          onValueChange={(value) => field.onChange(Number(value))} 
-                          defaultValue={field.value ? String(field.value) : undefined}
+                          onValueChange={(value) => field.onChange(value ? Number(value) : undefined)} 
+                          value={field.value ? String(field.value) : undefined}
                         >
                           <FormControl>
                             <SelectTrigger>
