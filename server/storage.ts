@@ -8,6 +8,7 @@ import {
   documentVotes,
   eventAttendance,
   activityTimeline,
+  activityVotes,
   type User,
   type Legislature,
   type Event,
@@ -15,7 +16,8 @@ import {
   type Document,
   type DocumentVote,
   type EventAttendance,
-  type ActivityTimeline
+  type ActivityTimeline,
+  type ActivityVote
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or } from "drizzle-orm";

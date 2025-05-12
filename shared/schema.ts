@@ -291,7 +291,7 @@ export const activityVotes = pgTable("activity_votes", {
   id: serial("id").primaryKey(),
   activityId: integer("activity_id").notNull(),
   userId: varchar("user_id").notNull(),
-  vote: varchar("vote").notNull(), // "Aprovado" ou "Reprovado"
+  vote: boolean("vote").notNull(), // true para aprovação, false para reprovação
   votedAt: timestamp("voted_at").defaultNow(),
   comment: text("comment"),
   createdAt: timestamp("created_at").defaultNow(),
