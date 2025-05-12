@@ -152,6 +152,43 @@ export default function EventDetails() {
   const [approvalComment, setApprovalComment] = useState<string>("");
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const filePreviewRef = useRef<HTMLIFrameElement>(null);
+  const [activityVote, setActivityVote] = useState<boolean | null>(null);
+  
+  // Query para buscar os votos de uma atividade
+  const { data: activityVotesData, isLoading: loadingActivityVotes, refetch: refetchActivityVotes } = useQuery({
+    queryKey: ["/api/activities", selectedActivityId, "votes"],
+    queryFn: async () => {
+      if (!selectedActivityId) return null;
+      return await apiRequest<any>(`/api/activities/${selectedActivityId}/votes`);
+    },
+    enabled: !!selectedActivityId
+  });
+  
+  // Mutation para votar em uma atividade
+  const activityVoteMutation = useMutation({
+    mutationFn: async ({ activityId, vote }: { activityId: number, vote: boolean }) => {
+      return await apiRequest(
+        "POST",
+        `/api/activities/${activityId}/vote`,
+        { vote }
+      );
+    },
+    onSuccess: () => {
+      toast({
+        title: "Voto registrado",
+        description: "Seu voto foi registrado com sucesso."
+      });
+      refetchActivityVotes();
+    },
+    onError: (error) => {
+      console.error("Erro ao registrar voto:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível registrar seu voto.",
+        variant: "destructive"
+      });
+    }
+  });
   
   // Mutation for approving activity
   const approveActivityMutation = useMutation({
@@ -891,7 +928,19 @@ export default function EventDetails() {
                               setSelectedActivity(activity);
                               setSelectedActivityId(activity.id);
                               setApprovalComment("");
+                              setActivityVote(null); // Reset o estado do voto
                               setIsApprovalDialogOpen(true);
+                              
+                              // Buscar o voto do usuário para esta atividade se estiver autenticado
+                              if (isAuthenticated && user?.id) {
+                                apiRequest<any>(`/api/activities/${activity.id}/my-vote`)
+                                  .then(response => {
+                                    if (response) {
+                                      setActivityVote(response.vote);
+                                    }
+                                  })
+                                  .catch(err => console.error("Erro ao buscar voto do usuário:", err));
+                              }
                             }}
                           >
                             <Vote className="w-4 h-4 mr-1" />
@@ -1016,8 +1065,8 @@ export default function EventDetails() {
           <div className="py-4">
             {selectedActivity && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Coluna esquerda - Informações da atividade e comentário */}
-                <div className="space-y-4">
+                {/* Coluna esquerda - Informações da atividade e estatísticas de votação */}
+                <div className="space-y-6">
                   <div className="space-y-2">
                     <h3 className="text-lg font-medium">{selectedActivity.description}</h3>
                     <div className="flex items-center gap-2">
@@ -1030,16 +1079,124 @@ export default function EventDetails() {
                     </p>
                   </div>
                   
-                  <div className="space-y-2 mt-6">
-                    <Label htmlFor="approvalComment">Comentário (opcional):</Label>
-                    <Textarea
-                      id="approvalComment"
-                      value={approvalComment}
-                      onChange={(e) => setApprovalComment(e.target.value)}
-                      placeholder="Digite um comentário sobre sua decisão..."
-                      className="resize-none min-h-[150px]"
-                    />
+                  {/* Estatísticas de votação */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <h4 className="font-medium">Estatísticas de Votação</h4>
+                    
+                    {loadingActivityVotes ? (
+                      <div className="flex justify-center py-2">
+                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : activityVotesData ? (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-3 gap-3 text-center">
+                          <div className="bg-green-50 p-2 rounded-md">
+                            <p className="text-green-700 text-lg font-bold">{activityVotesData.approveCount}</p>
+                            <p className="text-sm text-green-600">Aprovações</p>
+                          </div>
+                          <div className="bg-red-50 p-2 rounded-md">
+                            <p className="text-red-700 text-lg font-bold">{activityVotesData.rejectCount}</p>
+                            <p className="text-sm text-red-600">Rejeições</p>
+                          </div>
+                          <div className="bg-gray-50 p-2 rounded-md">
+                            <p className="text-gray-700 text-lg font-bold">{activityVotesData.totalVotes}</p>
+                            <p className="text-sm text-gray-600">Total</p>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs">
+                            <span>Aprovações: {activityVotesData.approvePercentage}%</span>
+                            <span>Rejeições: {activityVotesData.rejectPercentage}%</span>
+                          </div>
+                          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-green-500 rounded-full" 
+                              style={{ width: `${activityVotesData.approvePercentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Nenhum voto registrado ainda.</p>
+                    )}
+                    
+                    {/* Lista dos últimos votos */}
+                    {activityVotesData?.votes?.length > 0 && (
+                      <div className="mt-4">
+                        <h5 className="text-sm font-medium mb-2">Últimos votos:</h5>
+                        <div className="space-y-2 max-h-[120px] overflow-y-auto pr-2">
+                          {activityVotesData.votes.map((vote: any) => (
+                            <div key={vote.id} className="flex items-center gap-2 text-sm">
+                              <Avatar className="w-6 h-6">
+                                <AvatarImage src={vote.user?.profileImageUrl || ''} />
+                                <AvatarFallback>{vote.user?.name?.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium">{vote.user?.name}</span>
+                              {vote.vote ? (
+                                <ThumbsUp className="w-4 h-4 text-green-500" />
+                              ) : (
+                                <ThumbsDown className="w-4 h-4 text-red-500" />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Seção de votação do usuário */}
+                    {user?.role === 'councilor' && (
+                      <div className="space-y-3 pt-4 border-t">
+                        <h4 className="font-medium">Seu voto</h4>
+                        <div className="flex justify-between gap-3">
+                          <Button
+                            variant={activityVote === true ? "default" : "outline"} 
+                            className={`flex-1 ${activityVote === true ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                            onClick={() => {
+                              setActivityVote(true);
+                              activityVoteMutation.mutate({
+                                activityId: selectedActivityId!,
+                                vote: true
+                              });
+                            }}
+                            disabled={activityVoteMutation.isPending}
+                          >
+                            <ThumbsUp className="mr-2 h-4 w-4" />
+                            Aprovar
+                          </Button>
+                          <Button
+                            variant={activityVote === false ? "default" : "outline"}
+                            className={`flex-1 ${activityVote === false ? 'bg-red-600 hover:bg-red-700' : ''}`}
+                            onClick={() => {
+                              setActivityVote(false);
+                              activityVoteMutation.mutate({
+                                activityId: selectedActivityId!,
+                                vote: false
+                              });
+                            }}
+                            disabled={activityVoteMutation.isPending}
+                          >
+                            <ThumbsDown className="mr-2 h-4 w-4" />
+                            Rejeitar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Seção de comentário (apenas para administradores) */}
+                  {user?.role === 'admin' && (
+                    <div className="space-y-2 mt-6 pt-4 border-t">
+                      <Label htmlFor="approvalComment">Comentário (opcional):</Label>
+                      <Textarea
+                        id="approvalComment"
+                        value={approvalComment}
+                        onChange={(e) => setApprovalComment(e.target.value)}
+                        placeholder="Digite um comentário sobre sua decisão..."
+                        className="resize-none min-h-[100px]"
+                      />
+                    </div>
+                  )}
                 </div>
                 
                 {/* Coluna direita - Visualização do arquivo */}
@@ -1071,35 +1228,46 @@ export default function EventDetails() {
           </div>
           
           <DialogFooter>
+            {user?.role === 'admin' && (
+              <>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => {
+                    approveActivityMutation.mutate({
+                      activityId: selectedActivityId!,
+                      approved: false,
+                      comment: approvalComment
+                    });
+                  }}
+                  disabled={approveActivityMutation.isPending}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Rejeitar Oficialmente
+                </Button>
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={() => {
+                    approveActivityMutation.mutate({
+                      activityId: selectedActivityId!,
+                      approved: true,
+                      comment: approvalComment
+                    });
+                  }}
+                  disabled={approveActivityMutation.isPending}
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  Aprovar Oficialmente
+                </Button>
+              </>
+            )}
             <Button
               type="button"
-              variant="destructive"
-              onClick={() => {
-                approveActivityMutation.mutate({
-                  activityId: selectedActivityId!,
-                  approved: false,
-                  comment: approvalComment
-                });
-              }}
-              disabled={approveActivityMutation.isPending}
+              variant="outline"
+              onClick={() => setIsApprovalDialogOpen(false)}
             >
-              <X className="mr-2 h-4 w-4" />
-              Rejeitar
-            </Button>
-            <Button
-              type="button"
-              variant="default"
-              onClick={() => {
-                approveActivityMutation.mutate({
-                  activityId: selectedActivityId!,
-                  approved: true,
-                  comment: approvalComment
-                });
-              }}
-              disabled={approveActivityMutation.isPending}
-            >
-              <Check className="mr-2 h-4 w-4" />
-              Aprovar
+              Fechar
             </Button>
           </DialogFooter>
         </DialogContent>
