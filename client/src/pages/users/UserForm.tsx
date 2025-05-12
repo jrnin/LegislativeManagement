@@ -37,7 +37,10 @@ const createFormSchema = z.object({
   city: z.string().min(2, { message: "Cidade é obrigatória" }),
   state: z.string().length(2, { message: "Estado deve ter 2 caracteres" }),
   role: z.enum(["admin", "councilor"], { message: "Selecione um perfil válido" }),
-  legislatureId: z.string().transform(val => val ? Number(val) : undefined).optional(),
+  legislatureId: z.preprocess(
+    val => val === "" || val === null ? undefined : typeof val === "string" ? Number(val) : val,
+    z.number().optional()
+  ),
   maritalStatus: z.string().optional(),
   occupation: z.string().optional(),
   education: z.string().optional(),
@@ -60,7 +63,10 @@ const updateFormSchema = z.object({
   city: z.string().min(2, { message: "Cidade é obrigatória" }),
   state: z.string().length(2, { message: "Estado deve ter 2 caracteres" }),
   role: z.enum(["admin", "councilor"], { message: "Selecione um perfil válido" }),
-  legislatureId: z.string().transform(val => val ? Number(val) : undefined).optional(),
+  legislatureId: z.preprocess(
+    val => val === "" || val === null ? undefined : typeof val === "string" ? Number(val) : val,
+    z.number().optional()
+  ),
   maritalStatus: z.string().optional(),
   occupation: z.string().optional(),
   education: z.string().optional(),
@@ -132,7 +138,7 @@ export default function UserForm() {
         city: user.city || "",
         state: user.state || "",
         role: user.role as "admin" | "councilor",
-        legislatureId: user.legislatureId || undefined,
+        legislatureId: user.legislatureId ? Number(user.legislatureId) : undefined,
         maritalStatus: user.maritalStatus || "",
         occupation: user.occupation || "",
         education: user.education || "",
@@ -184,8 +190,12 @@ export default function UserForm() {
   });
 
   const onSubmit = (data: FormData) => {
-    // Remove a senha se estiver vazia na edição (mantém a senha atual)
-    const submitData = { ...data };
+    // Preparar os dados para envio, garantindo tipos corretos
+    const submitData = { 
+      ...data,
+      // Garantir que legislatureId seja um número ou undefined
+      legislatureId: data.legislatureId ? Number(data.legislatureId) : undefined
+    };
     
     if (isEditing) {
       // Se a senha está vazia, não a inclua no payload de envio
