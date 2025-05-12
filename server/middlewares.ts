@@ -62,6 +62,7 @@ export const upload = multer({
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   // Verificar primeiramente se o usuário está autenticado pelo Replit
   if (req.isAuthenticated && req.isAuthenticated()) {
+    console.log("Usuário autenticado pelo Replit:", req.user);
     next();
     return;
   }
@@ -73,8 +74,10 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ message: "Você precisa estar autenticado para acessar este recurso." });
   }
   
-  // Attach the userId to the request
+  // Attach the userId and req.user to the request for compatibility
   (req as any).userId = userId;
+  (req as any).user = { id: userId };
+  console.log("Usuário autenticado pela sessão:", userId);
   next();
 }
 
