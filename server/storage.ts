@@ -918,6 +918,125 @@ export class DatabaseStorage implements IStorage {
   }
   
   /**
+   * Activity Votes operations
+   */
+  async getActivityVote(id: number): Promise<ActivityVote | undefined> {
+    const [vote] = await db.select().from(activityVotes).where(eq(activityVotes.id, id));
+    return vote;
+  }
+  
+  async getActivityVotesByActivityId(activityId: number): Promise<(ActivityVote & { user: User })[]> {
+    const votes = await db
+      .select({
+        vote: activityVotes,
+        user: users,
+      })
+      .from(activityVotes)
+      .innerJoin(users, eq(activityVotes.userId, users.id))
+      .where(eq(activityVotes.activityId, activityId))
+      .orderBy(desc(activityVotes.votedAt));
+      
+    return votes.map(record => ({
+      ...record.vote,
+      user: record.user,
+    }));
+  }
+  
+  async getActivityVoteByUserAndActivity(userId: string, activityId: number): Promise<ActivityVote | undefined> {
+    const [vote] = await db
+      .select()
+      .from(activityVotes)
+      .where(
+        and(
+          eq(activityVotes.userId, userId),
+          eq(activityVotes.activityId, activityId)
+        )
+      );
+      
+    return vote;
+  }
+  
+  async createActivityVote(voteData: Partial<ActivityVote>): Promise<ActivityVote> {
+    // Verificar se já existe um voto deste usuário para esta atividade
+    const existingVote = await this.getActivityVoteByUserAndActivity(
+      voteData.userId as string,
+      voteData.activityId as number
+    );
+    
+    if (existingVote) {
+      // Atualizar o voto existente em vez de criar um novo
+      const [updatedVote] = await db
+        .update(activityVotes)
+        .set({
+          vote: voteData.vote,
+          comment: voteData.comment,
+          votedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(activityVotes.id, existingVote.id))
+        .returning();
+        
+      return updatedVote;
+    }
+    
+    // Criar novo voto
+    const [newVote] = await db.insert(activityVotes).values({
+      ...voteData,
+      votedAt: new Date(),
+    }).returning();
+    
+    return newVote;
+  }
+  
+  async updateActivityVote(id: number, voteData: Partial<ActivityVote>): Promise<ActivityVote | undefined> {
+    const [updatedVote] = await db
+      .update(activityVotes)
+      .set({
+        ...voteData,
+        updatedAt: new Date(),
+      })
+      .where(eq(activityVotes.id, id))
+      .returning();
+      
+    return updatedVote;
+  }
+  
+  async deleteActivityVote(id: number): Promise<boolean> {
+    const result = await db.delete(activityVotes).where(eq(activityVotes.id, id));
+    return !!result;
+  }
+  
+  async getActivityVotesStats(activityId: number): Promise<{
+    totalVotes: number;
+    approveCount: number;
+    rejectCount: number;
+    approvePercentage: number;
+    rejectPercentage: number;
+  }> {
+    const votes = await db
+      .select({
+        vote: activityVotes.vote,
+      })
+      .from(activityVotes)
+      .where(eq(activityVotes.activityId, activityId));
+    
+    const totalVotes = votes.length;
+    const approveCount = votes.filter(v => v.vote === true).length;
+    const rejectCount = votes.filter(v => v.vote === false).length;
+    
+    const approvePercentage = totalVotes > 0 ? Math.round((approveCount / totalVotes) * 100) : 0;
+    const rejectPercentage = totalVotes > 0 ? Math.round((rejectCount / totalVotes) * 100) : 0;
+    
+    return {
+      totalVotes,
+      approveCount,
+      rejectCount,
+      approvePercentage,
+      rejectPercentage
+    };
+  }
+  
+  /**
    * Get all councilors
    */
   async getCouncilors(): Promise<User[]> {

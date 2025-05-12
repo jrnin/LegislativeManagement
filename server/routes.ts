@@ -1680,6 +1680,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  
+  // ROUTES FOR ACTIVITY VOTES
+  
+  // Get all votes for an activity
+  app.get('/api/activities/:activityId/votes', requireAuth, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      
+      // Verificar se a atividade existe
+      const activity = await storage.getLegislativeActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Buscar os votos
+      const votes = await storage.getActivityVotesByActivityId(activityId);
+      
+      // Buscar estatísticas de votação
+      const stats = await storage.getActivityVotesStats(activityId);
+      
+      // Retornar votos e estatísticas
+      res.json({
+        votes,
+        stats
+      });
+    } catch (error) {
+      console.error("Error fetching activity votes:", error);
+      res.status(500).json({ message: "Erro ao buscar votos da atividade" });
+    }
+  });
+  
+  // Submit vote for an activity
+  app.post('/api/activities/:activityId/votes', requireAuth, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      const { vote, comment } = req.body;
+      
+      // Verificar se o usuário está autenticado
+      if (!req.user && !(req as any).userId) {
+        return res.status(401).json({ message: "Usuário não autenticado" });
+      }
+      
+      // Obter o userId de req.user ou diretamente de req.userId
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || (req as any).userId;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "ID do usuário não disponível" });
+      }
+      
+      // Verificar se a atividade existe
+      const activity = await storage.getLegislativeActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Verificar se a atividade requer aprovação
+      if (!activity.needsApproval) {
+        return res.status(400).json({ message: "Esta atividade não requer votação" });
+      }
+      
+      // Verificar se o voto é válido
+      if (vote === undefined || vote === null) {
+        return res.status(400).json({ message: "O campo 'vote' é obrigatório" });
+      }
+      
+      // Registrar o voto
+      const savedVote = await storage.createActivityVote({
+        activityId,
+        userId,
+        vote,
+        comment: comment || null,
+        votedAt: new Date()
+      });
+      
+      // Registrar no timeline da atividade
+      await storage.createActivityTimeline({
+        activityId,
+        description: vote ? "Voto favorável registrado" : "Voto contrário registrado",
+        eventType: "vote",
+        createdBy: userId,
+        eventDate: new Date(),
+        metadata: {
+          voteId: savedVote.id,
+          vote,
+          comment: comment || null
+        }
+      });
+      
+      // Buscar estatísticas atualizadas
+      const stats = await storage.getActivityVotesStats(activityId);
+      
+      res.json({
+        message: "Voto registrado com sucesso",
+        vote: savedVote,
+        stats
+      });
+    } catch (error) {
+      console.error("Error submitting activity vote:", error);
+      res.status(500).json({ message: "Erro ao registrar voto" });
+    }
+  });
+  
+  // Get vote statistics for an activity
+  app.get('/api/activities/:activityId/votes/stats', requireAuth, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      
+      // Verificar se a atividade existe
+      const activity = await storage.getLegislativeActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Buscar estatísticas de votação
+      const stats = await storage.getActivityVotesStats(activityId);
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching vote statistics:", error);
+      res.status(500).json({ message: "Erro ao buscar estatísticas de votação" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
