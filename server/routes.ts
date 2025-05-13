@@ -1849,6 +1849,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Erro ao buscar voto do usuário" });
     }
   });
+  
+  // Obter o histórico de eventos da atividade (timeline)
+  app.get('/api/activities/:activityId/timeline', requireAuth, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "ID de atividade inválido" });
+      }
+      
+      // Verificar se a atividade existe
+      const activity = await storage.getLegislativeActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Buscar o histórico da timeline
+      const timeline = await storage.getActivityTimelineByActivityId(activityId);
+      
+      // Para cada item da timeline, buscar dados do usuário que criou
+      const timelineWithUsers = await Promise.all(timeline.map(async (item) => {
+        if (!item.createdBy) return item;
+        
+        try {
+          const user = await storage.getUser(item.createdBy);
+          return { ...item, user };
+        } catch (error) {
+          console.error(`Erro ao buscar usuário ${item.createdBy} para timeline:`, error);
+          return item;
+        }
+      }));
+      
+      // Retornar os eventos da timeline
+      res.json(timelineWithUsers);
+    } catch (error) {
+      console.error("Error fetching activity timeline:", error);
+      res.status(500).json({ message: "Erro ao buscar histórico da atividade" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
