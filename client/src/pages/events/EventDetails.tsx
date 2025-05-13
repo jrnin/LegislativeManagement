@@ -178,7 +178,14 @@ export default function EventDetails() {
         title: "Voto registrado",
         description: "Seu voto foi registrado com sucesso."
       });
-      refetchActivityVotes();
+      
+      // Invalidar todas as consultas relacionadas para garantir dados atualizados
+      queryClient.invalidateQueries({ queryKey: ["/api/activities", selectedActivityId, "votes"] });
+      
+      // Aguardar um momento e então forçar um refetch explícito
+      setTimeout(() => {
+        refetchActivityVotes();
+      }, 300);
     },
     onError: (error) => {
       console.error("Erro ao registrar voto:", error);
