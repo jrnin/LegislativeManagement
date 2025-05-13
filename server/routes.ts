@@ -177,13 +177,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Check if email is verified
+      // TEMPORÁRIO: Permitindo login sem verificação de email
+      // Foi solicitado para habilitar login sem verificação de email temporariamente
+      console.log("Login sem verificação de email HABILITADO temporariamente!");
+      
+      /* Código original comentado temporariamente:
       if (!user.emailVerified) {
         return res.status(403).json({ 
           success: false,
           message: "Email não verificado. Verifique sua caixa de entrada para ativar sua conta." 
         });
       }
+      */
       
       // Verify password using bcrypt
       const isPasswordValid = user.password && await bcrypt.compare(validated.password, user.password);
