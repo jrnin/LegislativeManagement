@@ -191,13 +191,19 @@ export default function ActivityList() {
         const activityDate = row.original.activityDate;
         const year = new Date(activityDate).getFullYear();
         
+        const id = row.original.id;
+        
         return (
           <div className="flex flex-col">
             <div className="flex items-center">
               <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">
+              <Button
+                variant="link"
+                className="h-auto p-0 font-medium"
+                onClick={() => navigate(`/activities/${id}`)}
+              >
                 {type} Nº {number}/{year}
-              </span>
+              </Button>
             </div>
             <Badge className={`mt-1 ${getActivityTypeBadge(type)}`}>
               {type}
@@ -224,8 +230,14 @@ export default function ActivityList() {
       header: "Descrição",
       cell: ({ row }) => {
         const description = row.getValue("description") as string;
+        const id = row.original.id;
+        
         return (
-          <div className="max-w-xs truncate" title={description}>
+          <div 
+            className="max-w-xs truncate cursor-pointer hover:text-primary" 
+            title={description}
+            onClick={() => navigate(`/activities/${id}`)}
+          >
             {description}
           </div>
         );
@@ -296,8 +308,13 @@ export default function ActivityList() {
                 </DropdownMenuItem>
               )}
               
+              <DropdownMenuItem onClick={() => navigate(`/activities/${activity.id}`)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Visualizar
+              </DropdownMenuItem>
+              
               {canEdit && (
-                <DropdownMenuItem onClick={() => navigate(`/activities/${activity.id}`)}>
+                <DropdownMenuItem onClick={() => navigate(`/activities/${activity.id}/edit`)}>
                   <Edit className="mr-2 h-4 w-4" />
                   Editar
                 </DropdownMenuItem>

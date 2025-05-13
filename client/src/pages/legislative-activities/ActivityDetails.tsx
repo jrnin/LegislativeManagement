@@ -233,7 +233,7 @@ export default function ActivityDetails() {
     
     // Autores podem editar
     if (activity.authors && Array.isArray(activity.authors)) {
-      return activity.authors.some(author => author.id === user.id);
+      return activity.authors.some((author: { id: string }) => author.id === user.id);
     }
     
     return false;
