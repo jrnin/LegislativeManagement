@@ -15,6 +15,7 @@ import EventForm from "@/pages/events/EventForm";
 import EventDetails from "@/pages/events/EventDetails";
 import ActivityList from "@/pages/legislative-activities/ActivityList";
 import ActivityForm from "@/pages/legislative-activities/ActivityForm";
+import ActivityDetails from "@/pages/legislative-activities/ActivityDetails";
 import DocumentList from "@/pages/documents/DocumentList";
 import DocumentForm from "@/pages/documents/DocumentForm";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,7 +37,8 @@ function AuthenticatedApp() {
         <Route path="/events/:id" component={EventDetails} />
         <Route path="/activities" component={ActivityList} />
         <Route path="/activities/new" component={ActivityForm} />
-        <Route path="/activities/:id" component={ActivityForm} />
+        <Route path="/activities/:id/edit" component={ActivityForm} />
+        <Route path="/activities/:id" component={ActivityDetails} />
         <Route path="/documents" component={DocumentList} />
         <Route path="/documents/new" component={DocumentForm} />
         <Route path="/documents/:id" component={DocumentForm} />

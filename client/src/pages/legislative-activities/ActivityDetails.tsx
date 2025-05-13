@@ -63,29 +63,89 @@ export default function ActivityDetails() {
   const [showVoteDialog, setShowVoteDialog] = useState(false);
   const fileViewerRef = useRef<HTMLIFrameElement>(null);
 
+  interface ActivityType {
+    id: number;
+    activityType: string;
+    activityNumber: number;
+    description: string;
+    activityDate: string;
+    status: string;
+    createdAt?: string;
+    filePath?: string;
+    fileName?: string;
+    eventId?: number;
+    approved?: boolean;
+    approvedBy?: string;
+    approvedAt?: string;
+    approvalComment?: string;
+    authors?: Array<{
+      id: string;
+      name: string;
+      profileImageUrl?: string;
+    }>;
+  }
+  
+  interface TimelineEvent {
+    id: number;
+    activityId: number;
+    eventType: string;
+    description: string;
+    eventDate: string;
+    createdAt: string;
+    createdBy?: string;
+    user?: {
+      id: string;
+      name: string;
+      profileImageUrl?: string;
+    };
+  }
+  
+  interface ActivityVote {
+    id: number;
+    activityId: number;
+    userId: string;
+    vote: boolean;
+    comment?: string;
+    votedAt?: string;
+    createdAt: string;
+    user?: {
+      id: string;
+      name: string;
+      profileImageUrl?: string;
+    };
+  }
+  
+  interface VoteStats {
+    totalVotes: number;
+    approveCount: number;
+    rejectCount: number;
+    approvePercentage: number;
+    rejectPercentage: number;
+  }
+
   // Buscar detalhes da atividade
   const { 
     data: activity, 
     isLoading: loadingActivity 
-  } = useQuery({
+  } = useQuery<ActivityType>({
     queryKey: [`/api/activities/${activityId}`],
     enabled: !isNaN(activityId)
   });
 
   // Buscar timeline da atividade
   const {
-    data: timeline = [],
+    data: timeline = [] as TimelineEvent[],
     isLoading: loadingTimeline
-  } = useQuery({
+  } = useQuery<TimelineEvent[]>({
     queryKey: [`/api/activities/${activityId}/timeline`],
     enabled: !isNaN(activityId) && !!activity
   });
 
   // Buscar votos da atividade
   const {
-    data: votes = [],
+    data: votes = [] as ActivityVote[],
     isLoading: loadingVotes
-  } = useQuery({
+  } = useQuery<ActivityVote[]>({
     queryKey: [`/api/activities/${activityId}/votes`],
     enabled: !isNaN(activityId) && !!activity
   });
@@ -94,7 +154,7 @@ export default function ActivityDetails() {
   const {
     data: votesStats,
     isLoading: loadingVotesStats
-  } = useQuery({
+  } = useQuery<VoteStats>({
     queryKey: [`/api/activities/${activityId}/votes/stats`],
     enabled: !isNaN(activityId) && !!activity
   });
@@ -104,7 +164,7 @@ export default function ActivityDetails() {
     data: userVote,
     isLoading: loadingUserVote,
     refetch: refetchUserVote
-  } = useQuery({
+  } = useQuery<ActivityVote>({
     queryKey: [`/api/activities/${activityId}/votes/my`],
     enabled: !isNaN(activityId) && isAuthenticated && !!activity
   });

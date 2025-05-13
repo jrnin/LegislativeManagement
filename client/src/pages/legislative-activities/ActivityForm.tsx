@@ -122,12 +122,12 @@ export default function ActivityForm() {
       
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Atividade criada",
         description: "A atividade legislativa foi criada com sucesso.",
       });
-      navigate("/activities");
+      navigate(`/activities/${data.id}`);
       queryClient.invalidateQueries({ queryKey: ["/api/activities"] });
     },
     onError: (error: Error) => {
@@ -174,12 +174,12 @@ export default function ActivityForm() {
       
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Atividade atualizada",
         description: "As informações da atividade foram atualizadas com sucesso.",
       });
-      navigate("/activities");
+      navigate(`/activities/${activityId}`);
       queryClient.invalidateQueries({ queryKey: ["/api/activities"] });
       queryClient.invalidateQueries({ queryKey: [`/api/activities/${activityId}`] });
     },
