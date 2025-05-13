@@ -1100,14 +1100,14 @@ export default function EventDetails() {
                           <div className="bg-green-50 p-2 rounded-md">
                             <p className="text-green-700 text-lg font-bold">
                               {activityVotesData.approveCount}
-                              <span className="ml-1 text-sm font-normal">({activityVotesData.approvePercentage}%)</span>
+                              <span className="ml-1 text-sm font-normal">({activityVotesData.approvePercentage.toFixed(1)}%)</span>
                             </p>
                             <p className="text-sm text-green-600">Aprovações</p>
                           </div>
                           <div className="bg-red-50 p-2 rounded-md">
                             <p className="text-red-700 text-lg font-bold">
                               {activityVotesData.rejectCount}
-                              <span className="ml-1 text-sm font-normal">({activityVotesData.rejectPercentage}%)</span>
+                              <span className="ml-1 text-sm font-normal">({activityVotesData.rejectPercentage.toFixed(1)}%)</span>
                             </p>
                             <p className="text-sm text-red-600">Rejeições</p>
                           </div>
@@ -1119,17 +1119,17 @@ export default function EventDetails() {
                         
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs font-medium">
-                            <span className="text-green-600">Aprovações: {activityVotesData.approvePercentage}%</span>
-                            <span className="text-red-600">Rejeições: {activityVotesData.rejectPercentage}%</span>
+                            <span className="text-green-600">Aprovações: {activityVotesData.approvePercentage.toFixed(1)}%</span>
+                            <span className="text-red-600">Rejeições: {activityVotesData.rejectPercentage.toFixed(1)}%</span>
                           </div>
                           <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden flex">
                             <div 
                               className="h-full bg-green-500 rounded-l-full" 
-                              style={{ width: `${activityVotesData.approvePercentage}%` }}
+                              style={{ width: `${activityVotesData.approvePercentage.toFixed(1)}%` }}
                             />
                             <div 
                               className="h-full bg-red-500 rounded-r-full" 
-                              style={{ width: `${activityVotesData.rejectPercentage}%` }}
+                              style={{ width: `${activityVotesData.rejectPercentage.toFixed(1)}%` }}
                             />
                           </div>
                         </div>
