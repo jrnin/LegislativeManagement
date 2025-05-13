@@ -548,11 +548,12 @@ export default function EventDetails() {
       </div>
       
       <Tabs defaultValue="activities" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="activities">Atividades</TabsTrigger>
           <TabsTrigger value="attendance">Lista de Presença</TabsTrigger>
           <TabsTrigger value="documents">Documentos</TabsTrigger>
           <TabsTrigger value="approvals">Votações</TabsTrigger>
+          <TabsTrigger value="timeline">Linha do Tempo</TabsTrigger>
         </TabsList>
         
         <TabsContent value="activities" className="pt-4">
