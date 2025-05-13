@@ -406,11 +406,12 @@ export default function EventDetails() {
     );
   }
   
-  const { event, legislature, activities, attendance } = {
+  const { event, legislature, activities, attendance, eventDocuments } = {
     event: eventDetails,
     legislature: eventDetails.legislature,
     activities: eventDetails.activities || [],
-    attendance: eventDetails.attendance || []
+    attendance: eventDetails.attendance || [],
+    eventDocuments: eventDetails.documents || []
   };
   
   const eventDate = new Date(event.eventDate);
@@ -961,6 +962,192 @@ export default function EventDetails() {
                 </Table>
               </div>
             )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="timeline" className="pt-4">
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold">Linha do Tempo do Evento</h2>
+            <div className="relative">
+              {/* Linha central vertical */}
+              <div className="absolute left-[25px] top-6 bottom-0 w-[2px] bg-gray-200"></div>
+              
+              {/* Início do evento */}
+              <div className="mb-12 relative">
+                <div className="absolute left-0 bg-blue-500 rounded-full w-[12px] h-[12px] mt-1.5 -ml-[5px] flex items-center justify-center border-4 border-white z-10">
+                </div>
+                <div className="ml-12">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500">{formattedDate} às {formattedTime}</span>
+                    <h3 className="text-lg font-semibold">Início do Evento</h3>
+                    <p className="text-muted-foreground">{event.description}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Atividades */}
+              {activities.length > 0 && (
+                <div className="mb-12">
+                  <h3 className="ml-12 text-md font-semibold text-gray-500 mb-4">Atividades Legislativas</h3>
+                  {activities
+                    .sort((a: any, b: any) => new Date(a.activityDate).getTime() - new Date(b.activityDate).getTime())
+                    .map((activity: any, index: number) => (
+                    <div key={activity.id} className="mb-8 relative">
+                      <div className="absolute left-0 bg-green-500 rounded-full w-[12px] h-[12px] mt-1.5 -ml-[5px] flex items-center justify-center border-4 border-white z-10">
+                      </div>
+                      <div className="ml-12">
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-500">
+                            {format(new Date(activity.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                          </span>
+                          <div className="flex gap-2 items-center">
+                            <Badge variant="outline" className="font-normal">
+                              #{activity.activityNumber}
+                            </Badge>
+                            <h3 className="text-lg font-semibold">{activity.activityType}</h3>
+                          </div>
+                          <p className="text-muted-foreground">{activity.description}</p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {activity.authors?.map((author: any) => (
+                              <div key={author.id} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs">
+                                <Avatar className="h-4 w-4">
+                                  <AvatarImage src={author.profileImageUrl || ""} />
+                                  <AvatarFallback>{author.name?.substring(0, 2)}</AvatarFallback>
+                                </Avatar>
+                                <span>{author.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                          {activity.status === 'Aprovado' && (
+                            <Badge className="mt-2 bg-green-100 text-green-800 hover:bg-green-100 w-fit">
+                              Aprovado
+                            </Badge>
+                          )}
+                          {activity.status === 'Rejeitado' && (
+                            <Badge className="mt-2 bg-red-100 text-red-800 hover:bg-red-100 w-fit">
+                              Rejeitado
+                            </Badge>
+                          )}
+                          {activity.status === 'Aguardando Votação' && (
+                            <Badge className="mt-2 bg-yellow-100 text-yellow-800 hover:bg-yellow-100 w-fit">
+                              Aguardando Votação
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Documentos */}
+              {eventDocuments && eventDocuments.length > 0 && (
+                <div className="mb-12">
+                  <h3 className="ml-12 text-md font-semibold text-gray-500 mb-4">Documentos</h3>
+                  {eventDocuments
+                    .sort((a: any, b: any) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime())
+                    .map((document: any) => (
+                    <div key={document.id} className="mb-8 relative">
+                      <div className="absolute left-0 bg-purple-500 rounded-full w-[12px] h-[12px] mt-1.5 -ml-[5px] flex items-center justify-center border-4 border-white z-10">
+                      </div>
+                      <div className="ml-12">
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-500">
+                            {format(new Date(document.documentDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                          </span>
+                          <div className="flex gap-2 items-center">
+                            <Badge variant="outline" className="font-normal">
+                              #{document.documentNumber}
+                            </Badge>
+                            <h3 className="text-lg font-semibold">{document.documentType}</h3>
+                          </div>
+                          <p className="text-muted-foreground">{document.description}</p>
+                          {document.filePath && (
+                            <a
+                              href={`/api/files/documents/${document.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center mt-2 px-3 py-1 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors text-sm w-fit"
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              Visualizar arquivo
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Votações */}
+              {activities.some((activity: any) => 
+                activity.status === 'Aprovado' || activity.status === 'Rejeitado' || 
+                (activity.votesStats && (activity.votesStats.approveCount > 0 || activity.votesStats.rejectCount > 0))
+              ) && (
+                <div className="mb-12">
+                  <h3 className="ml-12 text-md font-semibold text-gray-500 mb-4">Votações Realizadas</h3>
+                  {activities
+                    .filter((activity: any) => 
+                      activity.status === 'Aprovado' || activity.status === 'Rejeitado' || 
+                      (activity.votesStats && (activity.votesStats.approveCount > 0 || activity.votesStats.rejectCount > 0))
+                    )
+                    .map((activity: any) => (
+                    <div key={`vote-${activity.id}`} className="mb-8 relative">
+                      <div className="absolute left-0 bg-amber-500 rounded-full w-[12px] h-[12px] mt-1.5 -ml-[5px] flex items-center justify-center border-4 border-white z-10">
+                      </div>
+                      <div className="ml-12">
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-500">
+                            Votação sobre {activity.activityType} #{activity.activityNumber}
+                          </span>
+                          <h3 className="text-lg font-semibold">Resultado da Votação</h3>
+                          <div className="mt-2 grid grid-cols-2 gap-2 max-w-md">
+                            <div className="bg-green-50 p-2 rounded-md text-center">
+                              <div className="text-green-700 text-lg font-bold">
+                                {activity.votesStats?.approveCount || 0}
+                                <span className="ml-1 text-sm font-normal">
+                                  ({typeof activity.votesStats?.approvePercentage === 'number' 
+                                    ? activity.votesStats.approvePercentage.toFixed(1) 
+                                    : '0.0'}%)
+                                </span>
+                              </div>
+                              <p className="text-sm text-green-600">Aprovações</p>
+                            </div>
+                            <div className="bg-red-50 p-2 rounded-md text-center">
+                              <div className="text-red-700 text-lg font-bold">
+                                {activity.votesStats?.rejectCount || 0}
+                                <span className="ml-1 text-sm font-normal">
+                                  ({typeof activity.votesStats?.rejectPercentage === 'number' 
+                                    ? activity.votesStats.rejectPercentage.toFixed(1) 
+                                    : '0.0'}%)
+                                </span>
+                              </div>
+                              <p className="text-sm text-red-600">Rejeições</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Conclusão do evento */}
+              {event.status === 'Concluido' && (
+                <div className="relative">
+                  <div className="absolute left-0 bg-blue-500 rounded-full w-[12px] h-[12px] mt-1.5 -ml-[5px] flex items-center justify-center border-4 border-white z-10">
+                  </div>
+                  <div className="ml-12">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-500">Evento finalizado</span>
+                      <h3 className="text-lg font-semibold">Conclusão do Evento</h3>
+                      <p className="text-muted-foreground">O evento foi concluído com sucesso.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </TabsContent>
       </Tabs>
