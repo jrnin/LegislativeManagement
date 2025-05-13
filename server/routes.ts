@@ -1812,6 +1812,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Erro ao buscar estatísticas de votação" });
     }
   });
+  
+  // Get user's vote for an activity
+  app.get('/api/activities/:activityId/votes/my', requireAuth, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      
+      // Verificar se o usuário está autenticado
+      if (!req.user && !(req as any).userId) {
+        return res.status(401).json({ message: "Usuário não autenticado" });
+      }
+      
+      // Obter o userId de req.user ou diretamente de req.userId
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || (req as any).userId;
+      console.log("Usuário autenticado pela sessão:", userId);
+      
+      if (!userId) {
+        return res.status(401).json({ message: "ID do usuário não disponível" });
+      }
+      
+      // Buscar o voto do usuário
+      const vote = await storage.getActivityVoteByUserAndActivity(userId, activityId);
+      
+      if (!vote) {
+        return res.status(200).json(null);
+      }
+      
+      res.json(vote);
+    } catch (error) {
+      console.error("Error fetching user's vote:", error);
+      res.status(500).json({ message: "Erro ao buscar voto do usuário" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

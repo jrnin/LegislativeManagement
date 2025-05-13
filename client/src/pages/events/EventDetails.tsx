@@ -169,7 +169,7 @@ export default function EventDetails() {
     mutationFn: async ({ activityId, vote }: { activityId: number, vote: boolean }) => {
       return await apiRequest(
         "POST",
-        `/api/activities/${activityId}/vote`,
+        `/api/activities/${activityId}/votes`,
         { vote }
       );
     },
@@ -933,7 +933,7 @@ export default function EventDetails() {
                               
                               // Buscar o voto do usuário para esta atividade se estiver autenticado
                               if (isAuthenticated && user?.id) {
-                                apiRequest<any>(`/api/activities/${activity.id}/my-vote`)
+                                apiRequest<any>(`/api/activities/${activity.id}/votes/my`)
                                   .then(response => {
                                     if (response) {
                                       setActivityVote(response.vote);
