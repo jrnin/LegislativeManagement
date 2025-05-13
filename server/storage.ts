@@ -1026,8 +1026,21 @@ export class DatabaseStorage implements IStorage {
     const approveCount = votes.filter(v => v.vote === true).length;
     const rejectCount = votes.filter(v => v.vote === false).length;
     
-    const approvePercentage = totalVotes > 0 ? Math.round((approveCount / totalVotes) * 100) : 0;
-    const rejectPercentage = totalVotes > 0 ? Math.round((rejectCount / totalVotes) * 100) : 0;
+    // Garantir que os percentuais são calculados corretamente e somam 100%
+    let approvePercentage = 0;
+    let rejectPercentage = 0;
+    
+    if (totalVotes > 0) {
+      // Calcular percentuais exatos
+      approvePercentage = Number(((approveCount / totalVotes) * 100).toFixed(1));
+      
+      // Certificar que a soma é exatamente 100% para evitar inconsistências de arredondamento
+      if (approveCount + rejectCount === totalVotes) {
+        rejectPercentage = Number((100 - approvePercentage).toFixed(1));
+      } else {
+        rejectPercentage = Number(((rejectCount / totalVotes) * 100).toFixed(1));
+      }
+    }
     
     return {
       totalVotes,

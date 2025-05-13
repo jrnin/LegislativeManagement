@@ -1091,11 +1091,17 @@ export default function EventDetails() {
                       <div className="space-y-3">
                         <div className="grid grid-cols-3 gap-3 text-center">
                           <div className="bg-green-50 p-2 rounded-md">
-                            <p className="text-green-700 text-lg font-bold">{activityVotesData.approveCount}</p>
+                            <p className="text-green-700 text-lg font-bold">
+                              {activityVotesData.approveCount}
+                              <span className="ml-1 text-sm font-normal">({activityVotesData.approvePercentage}%)</span>
+                            </p>
                             <p className="text-sm text-green-600">Aprovações</p>
                           </div>
                           <div className="bg-red-50 p-2 rounded-md">
-                            <p className="text-red-700 text-lg font-bold">{activityVotesData.rejectCount}</p>
+                            <p className="text-red-700 text-lg font-bold">
+                              {activityVotesData.rejectCount}
+                              <span className="ml-1 text-sm font-normal">({activityVotesData.rejectPercentage}%)</span>
+                            </p>
                             <p className="text-sm text-red-600">Rejeições</p>
                           </div>
                           <div className="bg-gray-50 p-2 rounded-md">
@@ -1105,14 +1111,18 @@ export default function EventDetails() {
                         </div>
                         
                         <div className="space-y-2">
-                          <div className="flex justify-between text-xs">
-                            <span>Aprovações: {activityVotesData.approvePercentage}%</span>
-                            <span>Rejeições: {activityVotesData.rejectPercentage}%</span>
+                          <div className="flex justify-between text-xs font-medium">
+                            <span className="text-green-600">Aprovações: {activityVotesData.approvePercentage}%</span>
+                            <span className="text-red-600">Rejeições: {activityVotesData.rejectPercentage}%</span>
                           </div>
-                          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden flex">
                             <div 
-                              className="h-full bg-green-500 rounded-full" 
+                              className="h-full bg-green-500 rounded-l-full" 
                               style={{ width: `${activityVotesData.approvePercentage}%` }}
+                            />
+                            <div 
+                              className="h-full bg-red-500 rounded-r-full" 
+                              style={{ width: `${activityVotesData.rejectPercentage}%` }}
                             />
                           </div>
                         </div>
