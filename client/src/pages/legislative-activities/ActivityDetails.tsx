@@ -141,14 +141,22 @@ export default function ActivityDetails() {
     enabled: !isNaN(activityId) && !!activity
   });
 
+  // Interface para resposta de votos
+  interface VotesResponse {
+    votes: ActivityVote[];
+  }
+
   // Buscar votos da atividade
   const {
-    data: votes = [] as ActivityVote[],
+    data: votesData,
     isLoading: loadingVotes
-  } = useQuery<ActivityVote[]>({
+  } = useQuery<VotesResponse>({
     queryKey: [`/api/activities/${activityId}/votes`],
     enabled: !isNaN(activityId) && !!activity
   });
+  
+  // Extrair o array de votos
+  const votes = votesData?.votes || [];
 
   // Buscar estatísticas de votação
   const {

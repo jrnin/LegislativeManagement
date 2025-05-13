@@ -42,7 +42,12 @@ export default function ActivityForm() {
   const { toast } = useToast();
   const [formFile, setFormFile] = useState<File | null>(null);
 
-  const { data: activity, isLoading: activityLoading } = useQuery<LegislativeActivity>({
+  // Definir um tipo personalizado para a data da atividade que pode ser uma string
+  interface ActivityWithStringDate extends Omit<LegislativeActivity, 'activityDate'> {
+    activityDate: string;
+  }
+
+  const { data: activity, isLoading: activityLoading } = useQuery<ActivityWithStringDate>({
     queryKey: [`/api/activities/${activityId}`],
     enabled: !!activityId,
   });
@@ -76,11 +81,9 @@ export default function ActivityForm() {
     if (activity) {
       form.reset({
         activityNumber: activity.activityNumber,
-        activityDate: activity.activityDate ? 
-          (typeof activity.activityDate === 'string' 
-            ? activity.activityDate.split('T')[0] 
-            : new Date(activity.activityDate).toISOString().split('T')[0]
-          ) : "",
+        activityDate: activity.activityDate 
+          ? activity.activityDate.split('T')[0] 
+          : "",
         description: activity.description || "",
         eventId: activity.eventId,
         activityType: activity.activityType || "",
