@@ -29,7 +29,7 @@ const formSchema = z.object({
   activityType: z.string().min(1, { message: "Tipo de atividade é obrigatório" }),
   needsApproval: z.boolean().default(false),
   authorIds: z.array(z.string()).min(1, { message: "Pelo menos um autor deve ser selecionado" }),
-  file: z.instanceof(File).optional(),
+  file: z.any().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -76,7 +76,11 @@ export default function ActivityForm() {
     if (activity) {
       form.reset({
         activityNumber: activity.activityNumber,
-        activityDate: activity.activityDate ? activity.activityDate.split('T')[0] : "",
+        activityDate: activity.activityDate ? 
+          (typeof activity.activityDate === 'string' 
+            ? activity.activityDate.split('T')[0] 
+            : new Date(activity.activityDate).toISOString().split('T')[0]
+          ) : "",
         description: activity.description || "",
         eventId: activity.eventId,
         activityType: activity.activityType || "",
@@ -348,7 +352,7 @@ export default function ActivityForm() {
                         <SelectContent>
                           {events.map((event) => (
                             <SelectItem key={event.id} value={event.id.toString()}>
-                              {event.category} #{event.eventNumber} - {formatDate(event.eventDate)}
+                              {event.category} #{event.eventNumber} - {formatDate(event.eventDate.toString())}
                             </SelectItem>
                           ))}
                         </SelectContent>
