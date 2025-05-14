@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNotifications } from '@/context/NotificationContext';
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 const NotificationToast = () => {
   const { notifications } = useNotifications();
-  const { toast, dismissToast } = useToast();
+  const { toast } = useToast();
 
   // Monitorar novas notificações não lidas e convertê-las em toasts
   useEffect(() => {
@@ -21,12 +21,16 @@ const NotificationToast = () => {
       toast({
         title: getNotificationTitle(notification.type),
         description: notification.message,
-        action: notification.activity ? {
-          label: "Ver",
-          onClick: () => {
-            window.location.href = `/legislative-activities/${notification.activity?.id}`;
-          }
-        } : undefined
+        action: notification.activity ? (
+          <ToastAction 
+            altText="Ver"
+            onClick={() => {
+              window.location.href = `/legislative-activities/${notification.activity?.id}`;
+            }}
+          >
+            Ver
+          </ToastAction>
+        ) : undefined
       });
     });
   }, [notifications]);

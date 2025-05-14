@@ -18,6 +18,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import SearchButton from "@/components/search/SearchButton";
+import NotificationPanel from "@/components/ui/notifications/NotificationPanel";
 
 interface NavbarProps {
   setSidebarOpen: (open: boolean) => void;
@@ -61,44 +62,7 @@ export default function Navbar({ setSidebarOpen }: NavbarProps) {
           </button>
           
           {/* Notifications dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="relative p-1.5 rounded-full text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/30">
-                <span className="sr-only">Ver notificações</span>
-                <Bell className="h-5 w-5" />
-                <Badge className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-primary hover:bg-primary">2</Badge>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 p-4">
-              <DropdownMenuLabel className="text-lg font-bold">Notificações</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              
-              <div className="py-2">
-                <div className="mb-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer">
-                  <div className="flex justify-between items-start">
-                    <p className="font-medium text-sm">Nova atividade legislativa registrada</p>
-                    <Badge variant="outline" className="text-xs ml-2">Agora</Badge>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1">Uma nova atividade foi registrada e aguarda sua aprovação.</p>
-                </div>
-                
-                <div className="mb-1 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer">
-                  <div className="flex justify-between items-start">
-                    <p className="font-medium text-sm">Evento marcado para hoje</p>
-                    <Badge variant="outline" className="text-xs ml-2">2h atrás</Badge>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1">O evento "Sessão Ordinária" está agendado para hoje às 14:00.</p>
-                </div>
-              </div>
-              
-              <DropdownMenuSeparator />
-              <div className="text-center pt-2">
-                <button className="text-sm text-primary-600 hover:text-primary-800 font-medium">
-                  Ver todas as notificações
-                </button>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <NotificationPanel />
 
           {/* Profile dropdown */}
           <DropdownMenu>

@@ -19,6 +19,8 @@ import ActivityDetails from "@/pages/legislative-activities/ActivityDetails";
 import DocumentList from "@/pages/documents/DocumentList";
 import DocumentForm from "@/pages/documents/DocumentForm";
 import { useAuth } from "@/hooks/useAuth";
+import { NotificationProvider } from "@/context/NotificationContext";
+import NotificationToast from "@/components/ui/notifications/NotificationToast";
 
 function AuthenticatedApp() {
   return (
@@ -70,22 +72,38 @@ function App() {
   
   const { isLoading, isAuthenticated } = useAuth();
   
-  return (
-    <TooltipProvider>
-      <Toaster />
-      {isLoading ? (
+  // Renderizar o app com base no estado de autenticação
+  const renderApp = () => {
+    if (isLoading) {
+      return (
         <div className="h-screen flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
         </div>
-      ) : isAuthenticated ? (
-        <AuthenticatedApp />
-      ) : (
-        isVerifyEmailRoute || isLoginRoute ? (
-          <UnauthenticatedApp />
-        ) : (
-          <LoginPage />
-        )
-      )}
+      );
+    }
+    
+    // Se estiver autenticado, envolva com o NotificationProvider
+    if (isAuthenticated) {
+      return (
+        <NotificationProvider>
+          <AuthenticatedApp />
+          <NotificationToast />
+        </NotificationProvider>
+      );
+    }
+    
+    // Caso contrário, renderize o app não autenticado
+    return isVerifyEmailRoute || isLoginRoute ? (
+      <UnauthenticatedApp />
+    ) : (
+      <LoginPage />
+    );
+  };
+  
+  return (
+    <TooltipProvider>
+      <Toaster />
+      {renderApp()}
     </TooltipProvider>
   );
 }
