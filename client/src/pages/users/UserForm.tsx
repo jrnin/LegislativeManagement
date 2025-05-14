@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Legislature } from "@shared/schema";
+import { Loader2 } from "lucide-react";
 
 // Função de formatação de data
 function formatDate(date: Date | string | null | undefined): string {
@@ -91,6 +92,7 @@ export default function UserForm() {
   const isEditing = !!userId;
   const { toast } = useToast();
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: [`/api/users/${userId}`],
@@ -270,6 +272,65 @@ export default function UserForm() {
       lookupAddress(value);
     }
   };
+  
+  // Função para upload de avatar
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0 || !userId) {
+      return;
+    }
+    
+    const file = e.target.files[0];
+    // Validar o tamanho do arquivo (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao enviar imagem",
+        description: "A imagem deve ter no máximo 5MB.",
+      });
+      return;
+    }
+    
+    setIsUploadingAvatar(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const response = await fetch(`/api/users/${userId}/avatar`, {
+        method: 'POST',
+        body: formData,
+        // Não incluir Content-Type, ele será definido automaticamente com o boundary
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erro ao fazer upload de imagem');
+      }
+      
+      const data = await response.json();
+      
+      // Atualizar o cache do usuário com a nova URL de imagem
+      queryClient.setQueryData([`/api/users/${userId}`], (oldData: any) => {
+        return {
+          ...oldData,
+          profileImageUrl: data.profileImageUrl
+        };
+      });
+      
+      toast({
+        title: "Imagem atualizada",
+        description: "Sua foto de perfil foi atualizada com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao enviar imagem",
+        description: error.message || "Ocorreu um erro ao enviar a imagem. Tente novamente.",
+      });
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   if (userLoading) {
     return <div className="flex justify-center items-center h-96">Carregando...</div>;
@@ -299,18 +360,46 @@ export default function UserForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="flex items-center gap-4 mb-6">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage 
-                    src={user?.profileImageUrl || ""} 
-                    alt={user?.name || "Foto do usuário"} 
-                  />
-                  <AvatarFallback>
-                    {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative group">
+                  <Avatar className="h-20 w-20 border-2 border-gray-200">
+                    <AvatarImage 
+                      src={user?.profileImageUrl || ""} 
+                      alt={user?.name || "Foto do usuário"} 
+                    />
+                    <AvatarFallback>
+                      {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  {isEditing && isUploadingAvatar && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 text-white rounded-full">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                  )}
+                  
+                  {isEditing && !isUploadingAvatar && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100 rounded-full transition-opacity cursor-pointer">
+                      <label htmlFor="avatar-upload" className="cursor-pointer text-xs font-medium">
+                        Alterar foto
+                      </label>
+                      <input 
+                        id="avatar-upload" 
+                        type="file" 
+                        className="hidden" 
+                        accept="image/jpeg,image/png,image/gif,image/webp"
+                        onChange={handleAvatarUpload}
+                      />
+                    </div>
+                  )}
+                </div>
                 <div>
                   <h2 className="text-lg font-medium">{user?.name || "Novo Usuário"}</h2>
                   <p className="text-sm text-muted-foreground">{user?.email || "Adicione um email"}</p>
+                  {isEditing && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Passe o mouse sobre a imagem para alterar a foto
+                    </p>
+                  )}
                 </div>
               </div>
               
