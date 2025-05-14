@@ -1683,6 +1683,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
+      // Buscar informações sobre o usuário que aprovou/rejeitou
+      const approver = await storage.getUser(userId);
+      
+      // Buscar autores da atividade para notificá-los
+      const authorIds = activity.authors ? activity.authors.map((author: any) => author.id) : [];
+      
+      // Enviar notificação via WebSocket
+      if (typeof sendNotification === 'function') {
+        // Criar mensagem de notificação
+        const actionText = approved ? 'aprovou' : 'rejeitou';
+        const notificationMessage = `${approver ? approver.name : 'Um administrador'} ${actionText} a atividade ${activity.activityType} Nº ${activity.activityNumber}`;
+        
+        // Notificar autores da atividade
+        if (authorIds.length > 0) {
+          sendNotification(authorIds, {
+            type: 'activity_approval',
+            activityId,
+            activity: {
+              id: activityId,
+              title: `${activity.activityType} Nº ${activity.activityNumber}`,
+              description: activity.description
+            },
+            approver: {
+              id: userId,
+              name: approver ? approver.name : 'Administrador',
+              approved: approved
+            },
+            comment: comment || null,
+            message: notificationMessage,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
+        // Notificação para todos os usuários
+        sendNotification('all', {
+          type: 'activity_status_change',
+          activityId,
+          activity: {
+            id: activityId,
+            title: `${activity.activityType} Nº ${activity.activityNumber}`,
+            description: activity.description,
+            status: approved ? 'Aprovado' : 'Rejeitado'
+          },
+          message: notificationMessage,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
       res.json({ 
         message: "Atividade atualizada com sucesso", 
         approved: approved,
@@ -1786,6 +1834,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Buscar estatísticas atualizadas
       const stats = await storage.getActivityVotesStats(activityId);
+      
+      // Buscar informações sobre o usuário que votou
+      const voter = await storage.getUser(userId);
+      
+      // Buscar dados completos da atividade
+      const activityDetails = await storage.getLegislativeActivity(activityId);
+      
+      // Enviar notificação via WebSocket
+      if (typeof sendNotification === 'function') {
+        if (activityDetails) {
+          // Notificação para todos os usuários conectados
+          sendNotification('all', {
+            type: 'activity_vote',
+            activityId,
+            activity: {
+              id: activityId,
+              title: `${activityDetails.activityType} Nº ${activityDetails.activityNumber}`,
+              description: activityDetails.description
+            },
+            voter: {
+              id: userId,
+              name: voter ? voter.name : 'Usuário',
+              vote: vote
+            },
+            stats: stats,
+            message: `${voter ? voter.name : 'Um usuário'} ${vote ? 'aprovou' : 'rejeitou'} a atividade ${activityDetails.activityType} Nº ${activityDetails.activityNumber}`,
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          // Notificação simplificada caso não encontre os detalhes da atividade
+          sendNotification('all', {
+            type: 'activity_vote',
+            activityId,
+            voter: {
+              id: userId,
+              name: voter ? voter.name : 'Usuário',
+              vote: vote
+            },
+            stats: stats,
+            message: `${voter ? voter.name : 'Um usuário'} ${vote ? 'aprovou' : 'rejeitou'} uma atividade`,
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
       
       res.json({
         message: "Voto registrado com sucesso",
