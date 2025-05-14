@@ -10,6 +10,7 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
+import { WebSocketServer, WebSocket } from 'ws';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configurar sessões do Express
@@ -1889,6 +1890,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Criar o servidor HTTP
   const httpServer = createServer(app);
+  
+  // Configurar o servidor WebSocket
+  const wss = new WebSocketServer({ 
+    server: httpServer, 
+    path: '/ws'
+  });
+  
+  // Armazenar as conexões dos clientes
+  const clients = new Map<string, WebSocket>();
+  
+  // Evento de conexão WebSocket
+  wss.on('connection', (ws: WebSocket) => {
+    console.log('Nova conexão WebSocket estabelecida');
+    
+    // Gerar ID único para este cliente
+    const clientId = crypto.randomUUID();
+    clients.set(clientId, ws);
+    
+    // Enviar mensagem de confirmação de conexão
+    ws.send(JSON.stringify({
+      type: 'connection',
+      message: 'Conexão estabelecida com sucesso',
+      clientId
+    }));
+    
+    // Lidar com mensagens recebidas do cliente
+    ws.on('message', (message: string) => {
+      try {
+        const data = JSON.parse(message.toString());
+        console.log('Mensagem recebida:', data);
+        
+        // Identificar o tipo de mensagem (autenticação, inscrição em tópicos, etc.)
+        if (data.type === 'auth') {
+          // Autenticar o usuário
+          if (data.userId) {
+            // Associar usuário a esta conexão
+            clients.set(data.userId, ws);
+            console.log(`Usuário ${data.userId} autenticado via WebSocket`);
+          }
+        }
+        
+        // Outras ações conforme necessário
+      } catch (error) {
+        console.error('Erro ao processar mensagem WebSocket:', error);
+      }
+    });
+    
+    // Lidar com fechamento de conexão
+    ws.on('close', () => {
+      console.log('Conexão WebSocket fechada');
+      clients.delete(clientId);
+    });
+  });
+  
+  // Função para enviar notificações em tempo real
+  const sendNotification = (target: 'all' | string | string[], notification: any) => {
+    try {
+      const message = JSON.stringify(notification);
+      
+      if (target === 'all') {
+        // Enviar para todos os clientes conectados
+        clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+          }
+        });
+        console.log(`Notificação enviada para todos os clientes: ${message}`);
+      } else if (Array.isArray(target)) {
+        // Enviar para uma lista de usuários específicos
+        target.forEach(userId => {
+          const client = clients.get(userId);
+          if (client && client.readyState === WebSocket.OPEN) {
+            client.send(message);
+            console.log(`Notificação enviada para usuário ${userId}: ${message}`);
+          }
+        });
+      } else {
+        // Enviar para um único usuário
+        const client = clients.get(target);
+        if (client && client.readyState === WebSocket.OPEN) {
+          client.send(message);
+          console.log(`Notificação enviada para usuário ${target}: ${message}`);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao enviar notificação:', error);
+    }
+  };
+  
+  // Expor o servidor WebSocket e funções relacionadas globalmente para uso em outros módulos
+  (global as any).wss = wss;
+  (global as any).sendNotification = sendNotification;
+  
   return httpServer;
 }
