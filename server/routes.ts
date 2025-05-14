@@ -450,6 +450,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         message: "Avatar atualizado com sucesso",
+        profileImageUrl: updatedUser.profileImageUrl,
         user: updatedUser
       });
     } catch (error) {
