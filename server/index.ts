@@ -9,6 +9,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Servir arquivos estáticos dos diretórios de uploads
+app.use('/uploads', express.static('uploads'));
+
 /**
  * Configura um usuário root para administração do sistema
  */

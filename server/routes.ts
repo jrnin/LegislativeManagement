@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth } from "./replitAuth";
-import { requireAuth, requireAdmin, handleFileUpload } from "./middlewares";
+import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload } from "./middlewares";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest } from "./sendgrid";
 import { z } from "zod";
 import crypto from "crypto";
@@ -417,7 +417,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Update user
+  // Upload avatar for user
+  app.post('/api/users/:id/avatar', requireAuth, handleAvatarUpload('avatar'), async (req: any, res) => {
+    try {
+      const userId = req.params.id;
+      const currentUserId = req.userId;
+      const currentUser = await storage.getUser(currentUserId);
+      const currentUserIsAdmin = currentUser?.role === "admin";
+      
+      // Verificar permissões (apenas o próprio usuário ou administradores podem atualizar)
+      if (currentUserId !== userId && !currentUserIsAdmin) {
+        return res.status(403).json({ message: "Você não tem permissão para editar este usuário" });
+      }
+      
+      // Verificar se o arquivo foi enviado
+      if (!req.file) {
+        return res.status(400).json({ message: "Nenhuma imagem foi enviada" });
+      }
+      
+      // O middleware handleAvatarUpload já adicionou profileImageUrl ao req.body
+      const avatarUrl = req.body.profileImageUrl;
+      
+      // Atualizar o usuário com a nova URL do avatar
+      const updatedUser = await storage.updateUser(userId, { 
+        profileImageUrl: avatarUrl,
+        updatedAt: new Date()
+      });
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      res.json({
+        message: "Avatar atualizado com sucesso",
+        user: updatedUser
+      });
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      res.status(500).json({ message: "Erro ao fazer upload do avatar" });
+    }
+  });
+  
   app.put('/api/users/:id', requireAuth, async (req: any, res) => {
     try {
       const userId = req.params.id;
