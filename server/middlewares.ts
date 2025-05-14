@@ -24,8 +24,27 @@ const storage_config = multer.diskStorage({
   },
 });
 
-// Configure file filter
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+// Ensure avatar directory exists
+const avatarDir = path.join(process.cwd(), "uploads", "avatars");
+if (!fs.existsSync(avatarDir)) {
+  fs.mkdirSync(avatarDir, { recursive: true });
+}
+
+// Configure avatar storage
+const avatarStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, avatarDir);
+  },
+  filename: function (req, file, cb) {
+    // Generate unique filename with original extension
+    const uniqueSuffix = Date.now() + "-" + crypto.randomBytes(6).toString("hex");
+    const ext = path.extname(file.originalname);
+    cb(null, "avatar-" + uniqueSuffix + ext);
+  },
+});
+
+// Configure file filter for regular documents
+const documentFileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Accept common document formats
   const allowedTypes = [
     "application/pdf",
@@ -47,13 +66,39 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
   }
 };
 
-// Create multer upload instance
+// Configure file filter for avatars
+const avatarFileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  // Accept only image formats for avatars
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp"
+  ];
+  
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Formato de imagem não suportado. Use JPG, PNG, GIF ou WebP."));
+  }
+};
+
+// Create multer upload instances
 export const upload = multer({
   storage: storage_config,
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB max file size
   },
-  fileFilter,
+  fileFilter: documentFileFilter,
+});
+
+// Upload instance specifically for avatars
+export const uploadAvatar = multer({
+  storage: avatarStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max file size for avatars
+  },
+  fileFilter: avatarFileFilter,
 });
 
 /**
@@ -138,6 +183,28 @@ export const handleFileUpload = (fieldName: string) => {
       if (err) {
         return res.status(400).json({ message: err.message });
       }
+      next();
+    });
+  };
+};
+
+/**
+ * Middleware to handle avatar file uploads
+ */
+export const handleAvatarUpload = (fieldName: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    uploadAvatar.single(fieldName)(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+      
+      // Se o arquivo foi enviado, adicione o caminho ao objeto body para uso posterior
+      if (req.file) {
+        const basePath = '/uploads/avatars/';
+        const avatarPath = basePath + path.basename(req.file.path);
+        req.body.profileImageUrl = avatarPath;
+      }
+      
       next();
     });
   };
