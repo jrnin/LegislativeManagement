@@ -12,6 +12,9 @@ import path from "path";
 import bcrypt from "bcryptjs";
 import { WebSocketServer, WebSocket } from 'ws';
 
+// Declarar a função sendNotification que será inicializada no escopo global
+let sendNotification: (target: 'all' | string | string[], notification: any) => void;
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configurar sessões do Express
   app.use(session({
@@ -2038,8 +2041,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
-  // Função para enviar notificações em tempo real
-  const sendNotification = (target: 'all' | string | string[], notification: any) => {
+  // Inicializar a função para enviar notificações em tempo real
+  sendNotification = (target: 'all' | string | string[], notification: any) => {
     try {
       const message = JSON.stringify(notification);
       
@@ -2073,9 +2076,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
   
-  // Expor o servidor WebSocket e funções relacionadas globalmente para uso em outros módulos
+  // Expor apenas o servidor WebSocket globalmente para uso em outros módulos
   (global as any).wss = wss;
-  (global as any).sendNotification = sendNotification;
   
   return httpServer;
 }
