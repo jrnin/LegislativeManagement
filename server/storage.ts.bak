@@ -8,6 +8,9 @@ import {
   documentVotes,
   eventAttendance,
   activityTimeline,
+  activityVotes,
+  committees,
+  committeeMembers,
   type User,
   type Legislature,
   type Event,
@@ -15,7 +18,10 @@ import {
   type Document,
   type DocumentVote,
   type EventAttendance,
-  type ActivityTimeline
+  type ActivityTimeline,
+  type ActivityVote,
+  type Committee,
+  type CommitteeMember
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or } from "drizzle-orm";
@@ -26,7 +32,7 @@ export type SearchResult = {
   id: string | number;
   title: string;
   description?: string;
-  type: 'user' | 'legislature' | 'event' | 'activity' | 'document';
+  type: 'user' | 'legislature' | 'event' | 'activity' | 'document' | 'committee';
   date?: string;
   status?: string;
   category?: string;
@@ -52,6 +58,18 @@ export interface IStorage {
   createLegislature(legislatureData: Partial<Legislature>): Promise<Legislature>;
   updateLegislature(id: number, legislatureData: Partial<Legislature>): Promise<Legislature | undefined>;
   deleteLegislature(id: number): Promise<boolean>;
+  
+  // Committee operations
+  getCommittee(id: number): Promise<Committee | undefined>;
+  getAllCommittees(): Promise<Committee[]>;
+  getActiveCommittees(): Promise<Committee[]>;
+  getCommitteeMembers(committeeId: number): Promise<CommitteeMember[]>;
+  createCommittee(committeeData: Partial<Committee>): Promise<Committee>;
+  updateCommittee(id: number, committeeData: Partial<Committee>): Promise<Committee | undefined>;
+  deleteCommittee(id: number): Promise<boolean>;
+  addCommitteeMember(memberData: Partial<CommitteeMember>): Promise<CommitteeMember>;
+  updateCommitteeMember(committeeId: number, userId: string, memberData: Partial<CommitteeMember>): Promise<CommitteeMember | undefined>;
+  removeCommitteeMember(committeeId: number, userId: string): Promise<boolean>;
   
   // Event operations
   getEvent(id: number): Promise<Event | undefined>;
@@ -100,6 +118,21 @@ export interface IStorage {
   updateDocumentVote(id: number, voteData: Partial<DocumentVote>): Promise<DocumentVote | undefined>;
   deleteDocumentVote(id: number): Promise<boolean>;
   
+  // Activity Votes operations
+  getActivityVote(id: number): Promise<ActivityVote | undefined>;
+  getActivityVotesByActivityId(activityId: number): Promise<(ActivityVote & { user: User })[]>;
+  getActivityVoteByUserAndActivity(userId: string, activityId: number): Promise<ActivityVote | undefined>;
+  createActivityVote(voteData: Partial<ActivityVote>): Promise<ActivityVote>;
+  updateActivityVote(id: number, voteData: Partial<ActivityVote>): Promise<ActivityVote | undefined>;
+  deleteActivityVote(id: number): Promise<boolean>;
+  getActivityVotesStats(activityId: number): Promise<{
+    totalVotes: number;
+    approveCount: number;
+    rejectCount: number;
+    approvePercentage: number;
+    rejectPercentage: number;
+  }>;
+  
   // Activity Timeline operations
   getActivityTimeline(id: number): Promise<ActivityTimeline | undefined>;
   getActivityTimelineByActivityId(activityId: number): Promise<ActivityTimeline[]>;
@@ -115,6 +148,20 @@ export interface IStorage {
   
   // Get all councilors
   getCouncilors(): Promise<User[]>;
+  
+  // Committee operations
+  getCommittee(id: number): Promise<Committee | undefined>;
+  getAllCommittees(): Promise<Committee[]>;
+  getCommitteeWithMembers(id: number): Promise<(Committee & { members: (CommitteeMember & { user: User })[] }) | undefined>;
+  createCommittee(committeeData: Partial<Committee>, memberIds: string[]): Promise<Committee>;
+  updateCommittee(id: number, committeeData: Partial<Committee>, memberIds?: string[]): Promise<Committee | undefined>;
+  deleteCommittee(id: number): Promise<boolean>;
+  
+  // Committee Members operations
+  getCommitteeMembersByCommitteeId(committeeId: number): Promise<(CommitteeMember & { user: User })[]>;
+  addCommitteeMember(committeeId: number, userId: string, role?: string): Promise<CommitteeMember>;
+  updateCommitteeMemberRole(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined>;
+  removeCommitteeMember(committeeId: number, userId: string): Promise<boolean>;
   
   // Search operations
   searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
@@ -768,44 +815,58 @@ export class DatabaseStorage implements IStorage {
       
       // Abordagem com SQL bruto para garantir compatibilidade
       // Busca o evento
-      const eventQuery = `
-        SELECT e.*, l.id as legislature_id, l.number as legislature_number, 
-               l.start_date, l.end_date
-        FROM events e 
-        JOIN legislatures l ON e.legislature_id = l.id
-        WHERE e.id = $1
-      `;
+      const eventQuery = db.select({
+        id: events.id,
+        eventNumber: events.eventNumber,
+        eventDate: events.eventDate,
+        eventTime: events.eventTime,
+        location: events.location,
+        mapUrl: events.mapUrl,
+        category: events.category,
+        description: events.description,
+        status: events.status,
+        legislatureId: events.legislatureId,
+        createdAt: events.createdAt,
+        updatedAt: events.updatedAt,
+        legislature_id: legislatures.id,
+        legislature_number: legislatures.number,
+        start_date: legislatures.startDate,
+        end_date: legislatures.endDate
+      })
+      .from(events)
+      .innerJoin(legislatures, eq(events.legislatureId, legislatures.id))
+      .where(eq(events.id, id));
       
-      const eventResult = await db.execute(sql.raw(eventQuery, [id]));
-      console.log("Event query result:", eventResult.rows[0] ? "Found" : "Not found");
+      const eventResult = await eventQuery;
+      console.log("Event query result:", eventResult[0] ? "Found" : "Not found");
       
-      if (!eventResult.rows.length) {
+      if (!eventResult.length) {
         console.log("Event not found with ID:", id);
         return undefined;
       }
       
       // Extrair evento e legislature
-      const eventData = eventResult.rows[0];
+      const eventData = eventResult[0];
       const event = {
         id: eventData.id,
-        eventNumber: eventData.event_number,
-        eventDate: new Date(eventData.event_date),
-        eventTime: eventData.event_time,
+        eventNumber: eventData.eventNumber,
+        eventDate: eventData.eventDate,
+        eventTime: eventData.eventTime,
         location: eventData.location,
-        mapUrl: eventData.map_url,
+        mapUrl: eventData.mapUrl,
         category: eventData.category,
         description: eventData.description,
         status: eventData.status,
-        legislatureId: eventData.legislature_id,
-        createdAt: eventData.created_at,
-        updatedAt: eventData.updated_at
+        legislatureId: eventData.legislatureId,
+        createdAt: eventData.createdAt,
+        updatedAt: eventData.updatedAt
       };
       
       const legislature = {
         id: eventData.legislature_id,
         number: eventData.legislature_number,
-        startDate: new Date(eventData.start_date),
-        endDate: new Date(eventData.end_date),
+        startDate: eventData.start_date,
+        endDate: eventData.end_date,
         createdAt: null,
         updatedAt: null
       };
@@ -813,47 +874,25 @@ export class DatabaseStorage implements IStorage {
       console.log("Event data processed successfully");
       
       // Buscar atividades do evento
-      const activitiesQuery = `
-        SELECT * FROM legislative_activities
-        WHERE event_id = $1
-        ORDER BY activity_date DESC
-      `;
-      
-      const activitiesResult = await db.execute(sql.raw(activitiesQuery, [id]));
-      console.log(`Found ${activitiesResult.rows.length} activities for event`);
+      const activitiesResult = await db
+        .select()
+        .from(legislativeActivities)
+        .where(eq(legislativeActivities.eventId, id))
+        .orderBy(desc(legislativeActivities.activityDate));
+      console.log(`Found ${activitiesResult.length} activities for event`);
       
       // Buscar atendimentos do evento
       const attendanceResult = await this.getEventAttendanceByEventId(id);
       console.log(`Found ${attendanceResult.length} attendance records`);
       
       // Buscar documentos do evento
-      const documentsQuery = `
-        SELECT * FROM documents 
-        WHERE event_id = $1
-      `;
-      
       let documentsResult = [];
       try {
-        const documentsQueryResult = await db.execute(sql.raw(documentsQuery, [id]));
-        console.log(`Found ${documentsQueryResult.rows.length} documents`);
-        
-        documentsResult = documentsQueryResult.rows.map(doc => ({
-          id: doc.id,
-          documentNumber: doc.document_number,
-          documentType: doc.document_type,
-          documentDate: new Date(doc.document_date),
-          authorType: doc.author_type,
-          description: doc.description,
-          filePath: doc.file_path,
-          fileName: doc.file_name,
-          fileType: doc.file_type,
-          status: doc.status,
-          activityId: doc.activity_id,
-          eventId: doc.event_id,
-          parentDocumentId: doc.parent_document_id,
-          createdAt: doc.created_at,
-          updatedAt: doc.updated_at
-        }));
+        documentsResult = await db
+          .select()
+          .from(documents)
+          .where(eq(documents.eventId, id));
+        console.log(`Found ${documentsResult.length} documents`);
       } catch (error) {
         console.error("Error fetching documents:", error);
         documentsResult = [];
@@ -861,52 +900,34 @@ export class DatabaseStorage implements IStorage {
       
       // Processar atividades e autores
       const activitiesWithAuthors = await Promise.all(
-        activitiesResult.rows.map(async (activityRow) => {
-          const activity = {
-            id: activityRow.id,
-            activityNumber: activityRow.activity_number,
-            activityDate: new Date(activityRow.activity_date),
-            activityType: activityRow.activity_type,
-            description: activityRow.description,
-            status: activityRow.status,
-            category: activityRow.category,
-            priority: activityRow.priority,
-            eventId: activityRow.event_id,
-            filePath: activityRow.file_path,
-            fileName: activityRow.file_name,
-            fileType: activityRow.file_type,
-            approved: activityRow.approved,
-            createdAt: activityRow.created_at,
-            updatedAt: activityRow.updated_at,
-            authors: []
-          };
-          
+        activitiesResult.map(async (activity) => {
           try {
-            // Buscar autores
-            const authorQuery = `
-              SELECT u.* FROM users u
-              JOIN legislative_activities_authors laa ON u.id = laa.user_id
-              WHERE laa.activity_id = $1
-            `;
+            // Buscar autores usando Drizzle
+            const authorsResult = await db
+              .select({
+                id: users.id,
+                name: users.name,
+                email: users.email,
+                role: users.role,
+                profileImageUrl: users.profileImageUrl,
+                active: users.active,
+                createdAt: users.createdAt,
+                updatedAt: users.updatedAt
+              })
+              .from(users)
+              .innerJoin(
+                legislativeActivitiesAuthors,
+                eq(users.id, legislativeActivitiesAuthors.userId)
+              )
+              .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
             
-            const authorsResult = await db.execute(sql.raw(authorQuery, [activity.id]));
-            
-            if (authorsResult.rows.length > 0) {
-              activity.authors = authorsResult.rows.map(author => ({
-                id: author.id,
-                name: author.name,
-                email: author.email,
-                role: author.role,
-                profileImageUrl: author.profile_image_url,
-                active: author.active,
-                createdAt: author.created_at,
-                updatedAt: author.updated_at
-              }));
-            }
+            // Adiciona os autores à atividade
+            activity.authors = authorsResult;
             
             return activity;
           } catch (error) {
             console.error(`Error fetching authors for activity ${activity.id}:`, error);
+            activity.authors = [];
             return activity;
           }
         })
@@ -929,11 +950,486 @@ export class DatabaseStorage implements IStorage {
   }
   
   /**
+   * Activity Votes operations
+   */
+  async getActivityVote(id: number): Promise<ActivityVote | undefined> {
+    const [vote] = await db.select().from(activityVotes).where(eq(activityVotes.id, id));
+    return vote;
+  }
+  
+  async getActivityVotesByActivityId(activityId: number): Promise<(ActivityVote & { user: User })[]> {
+    const votes = await db
+      .select({
+        vote: activityVotes,
+        user: users,
+      })
+      .from(activityVotes)
+      .innerJoin(users, eq(activityVotes.userId, users.id))
+      .where(eq(activityVotes.activityId, activityId))
+      .orderBy(desc(activityVotes.votedAt));
+      
+    return votes.map(record => ({
+      ...record.vote,
+      user: record.user,
+    }));
+  }
+  
+  async getActivityVoteByUserAndActivity(userId: string, activityId: number): Promise<ActivityVote | undefined> {
+    const [vote] = await db
+      .select()
+      .from(activityVotes)
+      .where(
+        and(
+          eq(activityVotes.userId, userId),
+          eq(activityVotes.activityId, activityId)
+        )
+      );
+      
+    return vote;
+  }
+  
+  async createActivityVote(voteData: Partial<ActivityVote>): Promise<ActivityVote> {
+    // Verificar se já existe um voto deste usuário para esta atividade
+    const existingVote = await this.getActivityVoteByUserAndActivity(
+      voteData.userId as string,
+      voteData.activityId as number
+    );
+    
+    if (existingVote) {
+      // Atualizar o voto existente em vez de criar um novo
+      const [updatedVote] = await db
+        .update(activityVotes)
+        .set({
+          vote: voteData.vote,
+          comment: voteData.comment,
+          votedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(activityVotes.id, existingVote.id))
+        .returning();
+        
+      return updatedVote;
+    }
+    
+    // Criar novo voto
+    const [newVote] = await db.insert(activityVotes).values({
+      ...voteData,
+      votedAt: new Date(),
+    }).returning();
+    
+    return newVote;
+  }
+  
+  async updateActivityVote(id: number, voteData: Partial<ActivityVote>): Promise<ActivityVote | undefined> {
+    const [updatedVote] = await db
+      .update(activityVotes)
+      .set({
+        ...voteData,
+        updatedAt: new Date(),
+      })
+      .where(eq(activityVotes.id, id))
+      .returning();
+      
+    return updatedVote;
+  }
+  
+  async deleteActivityVote(id: number): Promise<boolean> {
+    const result = await db.delete(activityVotes).where(eq(activityVotes.id, id));
+    return !!result;
+  }
+  
+  async getActivityVotesStats(activityId: number): Promise<{
+    totalVotes: number;
+    approveCount: number;
+    rejectCount: number;
+    approvePercentage: number;
+    rejectPercentage: number;
+  }> {
+    const votes = await db
+      .select({
+        vote: activityVotes.vote,
+      })
+      .from(activityVotes)
+      .where(eq(activityVotes.activityId, activityId));
+    
+    const totalVotes = votes.length;
+    const approveCount = votes.filter(v => v.vote === true).length;
+    const rejectCount = votes.filter(v => v.vote === false).length;
+    
+    // Garantir que os percentuais são calculados corretamente e somam 100%
+    let approvePercentage = 0;
+    let rejectPercentage = 0;
+    
+    if (totalVotes > 0) {
+      // Calcular percentuais exatos
+      approvePercentage = Number(((approveCount / totalVotes) * 100).toFixed(1));
+      
+      // Certificar que a soma é exatamente 100% para evitar inconsistências de arredondamento
+      if (approveCount + rejectCount === totalVotes) {
+        rejectPercentage = Number((100 - approvePercentage).toFixed(1));
+      } else {
+        rejectPercentage = Number(((rejectCount / totalVotes) * 100).toFixed(1));
+      }
+    }
+    
+    return {
+      totalVotes,
+      approveCount,
+      rejectCount,
+      approvePercentage,
+      rejectPercentage
+    };
+  }
+  
+  /**
    * Get all councilors
    */
   async getCouncilors(): Promise<User[]> {
     const councilors = await db.select().from(users).where(eq(users.role, "councilor"));
     return councilors;
+  }
+  
+  /**
+   * Committee operations
+   */
+  async getCommittee(id: number): Promise<Committee | undefined> {
+    const [committee] = await db
+      .select()
+      .from(committees)
+      .where(eq(committees.id, id));
+    
+    if (committee) {
+      const members = await this.getCommitteeMembers(id);
+      return {
+        ...committee,
+        members
+      };
+    }
+    
+    return committee;
+  }
+  
+  async getAllCommittees(): Promise<Committee[]> {
+    const committeesList = await db
+      .select()
+      .from(committees)
+      .orderBy(desc(committees.startDate));
+    
+    return committeesList;
+  }
+  
+  async getActiveCommittees(): Promise<Committee[]> {
+    const committeesList = await db
+      .select()
+      .from(committees)
+      .where(eq(committees.active, true))
+      .orderBy(desc(committees.startDate));
+    
+    return committeesList;
+  }
+  
+  async getCommitteeMembers(committeeId: number): Promise<CommitteeMember[]> {
+    const members = await db
+      .select({
+        committeeId: committeeMembers.committeeId,
+        userId: committeeMembers.userId,
+        role: committeeMembers.role,
+        createdAt: committeeMembers.createdAt,
+        updatedAt: committeeMembers.updatedAt
+      })
+      .from(committeeMembers)
+      .where(eq(committeeMembers.committeeId, committeeId));
+    
+    // Carregar os dados completos dos usuários
+    const membersWithUser = await Promise.all(
+      members.map(async (member) => {
+        const user = await this.getUser(member.userId);
+        return {
+          ...member,
+          user
+        };
+      })
+    );
+    
+    return membersWithUser;
+  }
+  
+  async createCommittee(committeeData: Partial<Committee>): Promise<Committee> {
+    // Criar a comissão
+    const [committee] = await db
+      .insert(committees)
+      .values({
+        name: committeeData.name!,
+        description: committeeData.description!,
+        type: committeeData.type!, // "Permanente", "Temporária", ou "Extraordinária"
+        startDate: committeeData.startDate!,
+        endDate: committeeData.endDate!,
+        active: committeeData.active ?? true
+      })
+      .returning();
+    
+    return committee;
+  }
+  
+  async updateCommittee(id: number, committeeData: Partial<Committee>): Promise<Committee | undefined> {
+    // Verificar se a comissão existe
+    const committee = await db
+      .select()
+      .from(committees)
+      .where(eq(committees.id, id))
+      .then(rows => rows[0]);
+    
+    if (!committee) {
+      return undefined;
+    }
+    
+    // Atualizar a comissão
+    const [updatedCommittee] = await db
+      .update(committees)
+      .set({
+        ...committeeData,
+        updatedAt: new Date()
+      })
+      .where(eq(committees.id, id))
+      .returning();
+    
+    return updatedCommittee;
+  }
+  
+  async deleteCommittee(id: number): Promise<boolean> {
+    try {
+      // Primeiro excluir membros associados
+      await db
+        .delete(committeeMembers)
+        .where(eq(committeeMembers.committeeId, id));
+      
+      // Depois excluir a comissão
+      const result = await db
+        .delete(committees)
+        .where(eq(committees.id, id));
+      
+      return result.rowCount !== null && result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting committee:", error);
+      return false;
+    }
+  }
+  
+  async addCommitteeMember(memberData: Partial<CommitteeMember>): Promise<CommitteeMember> {
+    const [member] = await db
+      .insert(committeeMembers)
+      .values({
+        committeeId: memberData.committeeId!,
+        userId: memberData.userId!,
+        role: memberData.role || "Membro"
+      })
+      .returning();
+    
+    // Carregar informações do usuário
+    const user = await this.getUser(member.userId);
+    
+    return {
+      ...member,
+      user
+    };
+  }
+  
+  async updateCommitteeMember(committeeId: number, userId: string, memberData: Partial<CommitteeMember>): Promise<CommitteeMember | undefined> {
+    try {
+      // Verificar se o membro existe
+      const [existingMember] = await db
+        .select()
+        .from(committeeMembers)
+        .where(
+          and(
+            eq(committeeMembers.committeeId, committeeId),
+            eq(committeeMembers.userId, userId)
+          )
+        );
+      
+      if (!existingMember) {
+        return undefined;
+      }
+      
+      // Atualizar o membro
+      const [updatedMember] = await db
+        .update(committeeMembers)
+        .set({
+          role: memberData.role,
+          updatedAt: new Date()
+        })
+        .where(
+          and(
+            eq(committeeMembers.committeeId, committeeId),
+            eq(committeeMembers.userId, userId)
+          )
+        )
+        .returning();
+      
+      // Carregar informações do usuário
+      const user = await this.getUser(updatedMember.userId);
+      
+      return {
+        ...updatedMember,
+        user
+      };
+    } catch (error) {
+      console.error("Error updating committee member:", error);
+      return undefined;
+    }
+  }
+  
+  async removeCommitteeMember(committeeId: number, userId: string): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(committeeMembers)
+        .where(
+          and(
+            eq(committeeMembers.committeeId, committeeId),
+            eq(committeeMembers.userId, userId)
+          )
+        );
+      
+      return result.rowCount !== null && result.rowCount > 0;
+    } catch (error) {
+      console.error("Error removing committee member:", error);
+      return false;
+    }
+  }
+          .insert(committeeMembers)
+          .values(memberValues);
+      }
+    }
+    
+    return updatedCommittee;
+  }
+  
+  async deleteCommittee(id: number): Promise<boolean> {
+    // Verificar se a comissão existe
+    const committee = await this.getCommittee(id);
+    
+    if (!committee) {
+      return false;
+    }
+    
+    // Remover membros da comissão
+    await db
+      .delete(committeeMembers)
+      .where(eq(committeeMembers.committeeId, id));
+    
+    // Remover a comissão
+    const result = await db
+      .delete(committees)
+      .where(eq(committees.id, id));
+    
+    return result.rowCount > 0;
+  }
+  
+  /**
+   * Committee Members operations
+   */
+  async getCommitteeMembersByCommitteeId(committeeId: number): Promise<(CommitteeMember & { user: User })[]> {
+    return await db
+      .select({
+        committeeId: committeeMembers.committeeId,
+        userId: committeeMembers.userId,
+        role: committeeMembers.role,
+        addedAt: committeeMembers.addedAt,
+        user: users
+      })
+      .from(committeeMembers)
+      .innerJoin(users, eq(committeeMembers.userId, users.id))
+      .where(eq(committeeMembers.committeeId, committeeId));
+  }
+  
+  async addCommitteeMember(committeeId: number, userId: string, role: string = "member"): Promise<CommitteeMember> {
+    // Verificar se o membro já existe
+    const [existingMember] = await db
+      .select()
+      .from(committeeMembers)
+      .where(
+        and(
+          eq(committeeMembers.committeeId, committeeId),
+          eq(committeeMembers.userId, userId)
+        )
+      );
+    
+    if (existingMember) {
+      // Atualizar o papel se já existir
+      const [updatedMember] = await db
+        .update(committeeMembers)
+        .set({
+          role
+        })
+        .where(
+          and(
+            eq(committeeMembers.committeeId, committeeId),
+            eq(committeeMembers.userId, userId)
+          )
+        )
+        .returning();
+      
+      return updatedMember;
+    }
+    
+    // Adicionar novo membro
+    const [member] = await db
+      .insert(committeeMembers)
+      .values({
+        committeeId,
+        userId,
+        role,
+        addedAt: new Date()
+      })
+      .returning();
+    
+    return member;
+  }
+  
+  async updateCommitteeMemberRole(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined> {
+    // Verificar se o membro existe
+    const [existingMember] = await db
+      .select()
+      .from(committeeMembers)
+      .where(
+        and(
+          eq(committeeMembers.committeeId, committeeId),
+          eq(committeeMembers.userId, userId)
+        )
+      );
+    
+    if (!existingMember) {
+      return undefined;
+    }
+    
+    // Atualizar o papel
+    const [updatedMember] = await db
+      .update(committeeMembers)
+      .set({
+        role
+      })
+      .where(
+        and(
+          eq(committeeMembers.committeeId, committeeId),
+          eq(committeeMembers.userId, userId)
+        )
+      )
+      .returning();
+    
+    return updatedMember;
+  }
+  
+  async removeCommitteeMember(committeeId: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(committeeMembers)
+      .where(
+        and(
+          eq(committeeMembers.committeeId, committeeId),
+          eq(committeeMembers.userId, userId)
+        )
+      );
+    
+    return result.rowCount > 0;
   }
   
   /**

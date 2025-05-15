@@ -26,6 +26,7 @@ import {
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or } from "drizzle-orm";
 import crypto from "crypto";
+import * as committeeImpl from "./committee-impl";
 
 // Interface for storage operations
 export type SearchResult = {
@@ -58,6 +59,18 @@ export interface IStorage {
   createLegislature(legislatureData: Partial<Legislature>): Promise<Legislature>;
   updateLegislature(id: number, legislatureData: Partial<Legislature>): Promise<Legislature | undefined>;
   deleteLegislature(id: number): Promise<boolean>;
+  
+  // Committee operations
+  getCommittee(id: number): Promise<Committee | undefined>;
+  getAllCommittees(): Promise<Committee[]>;
+  getActiveCommittees(): Promise<Committee[]>;
+  getCommitteeMembers(committeeId: number): Promise<CommitteeMember[]>;
+  createCommittee(committeeData: Partial<Committee>): Promise<Committee>;
+  updateCommittee(id: number, committeeData: Partial<Committee>): Promise<Committee | undefined>;
+  deleteCommittee(id: number): Promise<boolean>;
+  addCommitteeMember(committeeId: number, userId: string, role?: string): Promise<CommitteeMember>;
+  updateCommitteeMember(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined>;
+  removeCommitteeMember(committeeId: number, userId: string): Promise<boolean>;
   
   // Event operations
   getEvent(id: number): Promise<Event | undefined>;
@@ -137,25 +150,11 @@ export interface IStorage {
   // Get all councilors
   getCouncilors(): Promise<User[]>;
   
-  // Committee operations
-  getCommittee(id: number): Promise<Committee | undefined>;
-  getAllCommittees(): Promise<Committee[]>;
-  getCommitteeWithMembers(id: number): Promise<(Committee & { members: (CommitteeMember & { user: User })[] }) | undefined>;
-  createCommittee(committeeData: Partial<Committee>, memberIds: string[]): Promise<Committee>;
-  updateCommittee(id: number, committeeData: Partial<Committee>, memberIds?: string[]): Promise<Committee | undefined>;
-  deleteCommittee(id: number): Promise<boolean>;
-  
-  // Committee Members operations
-  getCommitteeMembersByCommitteeId(committeeId: number): Promise<(CommitteeMember & { user: User })[]>;
-  addCommitteeMember(committeeId: number, userId: string, role?: string): Promise<CommitteeMember>;
-  updateCommitteeMemberRole(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined>;
-  removeCommitteeMember(committeeId: number, userId: string): Promise<boolean>;
-  
   // Search operations
   searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
 }
 
-export class DatabaseStorage implements IStorage {
+class DatabaseStorage implements IStorage {
   /**
    * User operations
    */
@@ -179,9 +178,9 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createUser(userData: Partial<User>): Promise<User> {
-    // Generate a verification token if needed
-    if (!userData.emailVerified) {
-      userData.verificationToken = crypto.randomBytes(32).toString('hex');
+    // Generate verification token if not provided
+    if (!userData.verificationToken) {
+      userData.verificationToken = crypto.randomBytes(32).toString("hex");
       userData.emailVerificationSentAt = new Date();
     }
     
@@ -207,49 +206,30 @@ export class DatabaseStorage implements IStorage {
       .delete(users)
       .where(eq(users.id, id));
     
-    return true;
+    return result.rowCount !== null && result.rowCount > 0;
   }
   
   async upsertUser(userData: Partial<User>): Promise<User> {
-    // If user doesn't exist, create
-    if (!userData.id) {
-      return this.createUser(userData);
-    }
+    // Check if user exists
+    const existingUser = await this.getUser(userData.id!);
     
-    const existingUser = await this.getUser(userData.id);
-    
-    if (!existingUser) {
-      // Create new user
-      return this.createUser({
-        ...userData,
-        emailVerified: true, // Users from OAuth are already verified
-      });
-    } else {
+    if (existingUser) {
       // Update existing user
-      const [user] = await db
-        .update(users)
-        .set({
-          ...userData,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, userData.id))
-        .returning();
-      
-      return user;
+      return this.updateUser(userData.id!, userData) as Promise<User>;
+    } else {
+      // Create new user
+      return this.createUser(userData);
     }
   }
   
   async verifyEmail(token: string): Promise<boolean> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.verificationToken, token));
+    const user = await this.getUserByVerificationToken(token);
     
     if (!user) {
       return false;
     }
     
-    // Update user to verified status
+    // Mark email as verified and clear verification token
     await db
       .update(users)
       .set({
@@ -297,7 +277,50 @@ export class DatabaseStorage implements IStorage {
       .delete(legislatures)
       .where(eq(legislatures.id, id));
     
-    return true;
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+  
+  /**
+   * Committee operations
+   */
+  async getCommittee(id: number): Promise<Committee | undefined> {
+    return committeeImpl.getCommittee(id);
+  }
+  
+  async getAllCommittees(): Promise<Committee[]> {
+    return committeeImpl.getAllCommittees();
+  }
+  
+  async getActiveCommittees(): Promise<Committee[]> {
+    return committeeImpl.getActiveCommittees();
+  }
+  
+  async getCommitteeMembers(committeeId: number): Promise<CommitteeMember[]> {
+    return committeeImpl.getCommitteeMembers(committeeId);
+  }
+  
+  async createCommittee(committeeData: Partial<Committee>): Promise<Committee> {
+    return committeeImpl.createCommittee(committeeData);
+  }
+  
+  async updateCommittee(id: number, committeeData: Partial<Committee>): Promise<Committee | undefined> {
+    return committeeImpl.updateCommittee(id, committeeData);
+  }
+  
+  async deleteCommittee(id: number): Promise<boolean> {
+    return committeeImpl.deleteCommittee(id);
+  }
+  
+  async addCommitteeMember(committeeId: number, userId: string, role: string = "Membro"): Promise<CommitteeMember> {
+    return committeeImpl.addCommitteeMember(committeeId, userId, role);
+  }
+  
+  async updateCommitteeMember(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined> {
+    return committeeImpl.updateCommitteeMember(committeeId, userId, role);
+  }
+  
+  async removeCommitteeMember(committeeId: number, userId: string): Promise<boolean> {
+    return committeeImpl.removeCommitteeMember(committeeId, userId);
   }
   
   /**
@@ -313,14 +336,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getUpcomingEvents(limit: number = 3): Promise<Event[]> {
-    // Get events with date >= today, ordered by date, limited
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
     return await db
       .select()
       .from(events)
-      .where(gte(events.eventDate, today))
+      .where(gte(events.eventDate, new Date()))
       .orderBy(events.eventDate)
       .limit(limit);
   }
@@ -344,11 +363,25 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteEvent(id: number): Promise<boolean> {
+    // Remove related records first
+    await db
+      .delete(eventAttendance)
+      .where(eq(eventAttendance.eventId, id));
+    
+    await db
+      .delete(legislativeActivities)
+      .where(eq(legislativeActivities.eventId, id));
+    
+    await db
+      .delete(documents)
+      .where(eq(documents.eventId, id));
+    
+    // Then delete the event
     const result = await db
       .delete(events)
       .where(eq(events.id, id));
     
-    return true;
+    return result.rowCount !== null && result.rowCount > 0;
   }
   
   /**
@@ -357,110 +390,141 @@ export class DatabaseStorage implements IStorage {
   async getLegislativeActivity(id: number): Promise<LegislativeActivity | undefined> {
     const [activity] = await db.select().from(legislativeActivities).where(eq(legislativeActivities.id, id));
     
-    if (!activity) {
-      return undefined;
+    if (activity) {
+      // Get authors
+      const authorsData = await db
+        .select({
+          user: users,
+        })
+        .from(legislativeActivitiesAuthors)
+        .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
+        .where(eq(legislativeActivitiesAuthors.activityId, id));
+      
+      return {
+        ...activity,
+        authors: authorsData.map(a => a.user),
+      };
     }
     
-    // Get authors
-    const authors = await db
-      .select({
-        user: users
-      })
-      .from(legislativeActivitiesAuthors)
-      .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
-      .where(eq(legislativeActivitiesAuthors.activityId, id));
-    
-    // Return activity with authors
-    return {
-      ...activity,
-      authors: authors.map(a => a.user)
-    };
+    return activity;
   }
   
   async getAllLegislativeActivities(): Promise<LegislativeActivity[]> {
     const activities = await db.select().from(legislativeActivities).orderBy(desc(legislativeActivities.activityDate));
     
-    // For each activity, get the authors
-    const result: LegislativeActivity[] = [];
+    // Get all activity authors in one query
+    const allActivityIds = activities.map(a => a.id);
     
-    for (const activity of activities) {
-      const authors = await db
-        .select({
-          user: users
-        })
-        .from(legislativeActivitiesAuthors)
-        .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
-        .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
+    const authorsData = await db
+      .select({
+        activityId: legislativeActivitiesAuthors.activityId,
+        user: users,
+      })
+      .from(legislativeActivitiesAuthors)
+      .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
+      .where(inArray(legislativeActivitiesAuthors.activityId, allActivityIds));
+    
+    // Group authors by activity ID
+    const authorsByActivity = new Map<number, User[]>();
+    
+    for (const authorData of authorsData) {
+      if (!authorsByActivity.has(authorData.activityId)) {
+        authorsByActivity.set(authorData.activityId, []);
+      }
       
-      result.push({
-        ...activity,
-        authors: authors.map(a => a.user)
-      });
+      authorsByActivity.get(authorData.activityId)!.push(authorData.user);
     }
     
-    return result;
+    // Merge activities with their authors
+    return activities.map(activity => ({
+      ...activity,
+      authors: authorsByActivity.get(activity.id) || [],
+    }));
   }
   
   async getRecentLegislativeActivities(limit: number = 3): Promise<LegislativeActivity[]> {
     const activities = await db
       .select()
       .from(legislativeActivities)
-      .orderBy(desc(legislativeActivities.createdAt))
+      .orderBy(desc(legislativeActivities.activityDate))
       .limit(limit);
     
-    // For each activity, get the authors
-    const result: LegislativeActivity[] = [];
+    // Get activity authors
+    const allActivityIds = activities.map(a => a.id);
     
-    for (const activity of activities) {
-      const authors = await db
-        .select({
-          user: users
-        })
-        .from(legislativeActivitiesAuthors)
-        .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
-        .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
+    const authorsData = await db
+      .select({
+        activityId: legislativeActivitiesAuthors.activityId,
+        user: users,
+      })
+      .from(legislativeActivitiesAuthors)
+      .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
+      .where(inArray(legislativeActivitiesAuthors.activityId, allActivityIds));
+    
+    // Group authors by activity ID
+    const authorsByActivity = new Map<number, User[]>();
+    
+    for (const authorData of authorsData) {
+      if (!authorsByActivity.has(authorData.activityId)) {
+        authorsByActivity.set(authorData.activityId, []);
+      }
       
-      result.push({
-        ...activity,
-        authors: authors.map(a => a.user)
-      });
+      authorsByActivity.get(authorData.activityId)!.push(authorData.user);
     }
     
-    return result;
+    // Merge activities with their authors
+    return activities.map(activity => ({
+      ...activity,
+      authors: authorsByActivity.get(activity.id) || [],
+    }));
   }
   
   async createLegislativeActivity(activityData: Partial<LegislativeActivity>, authorIds: string[]): Promise<LegislativeActivity> {
-    // First, create the activity
+    // Create the activity
     const [activity] = await db.insert(legislativeActivities).values(activityData).returning();
     
-    // Then, add authors
-    if (authorIds && authorIds.length > 0) {
-      const authorEntries = authorIds.map(userId => ({
+    // Create author relationships
+    if (authorIds.length > 0) {
+      const authorRelationships = authorIds.map(userId => ({
         activityId: activity.id,
         userId,
       }));
       
-      await db.insert(legislativeActivitiesAuthors).values(authorEntries);
+      await db.insert(legislativeActivitiesAuthors).values(authorRelationships);
     }
     
-    // Get authors to return complete activity
+    // Create a timeline entry for creation
+    await this.createActivityTimeline({
+      activityId: activity.id,
+      eventType: "Criação",
+      description: "Atividade legislativa criada",
+      createdBy: authorIds[0] || "system",
+    });
+    
+    // Return the activity with authors
     const authors = await db
       .select({
-        user: users
+        user: users,
       })
-      .from(legislativeActivitiesAuthors)
-      .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
-      .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
+      .from(users)
+      .where(inArray(users.id, authorIds));
     
     return {
       ...activity,
-      authors: authors.map(a => a.user)
+      authors: authors.map(a => a.user),
     };
   }
   
   async updateLegislativeActivity(id: number, activityData: Partial<LegislativeActivity>, authorIds?: string[]): Promise<LegislativeActivity | undefined> {
-    // First, update the activity
-    const [activity] = await db
+    // Check if activity exists
+    const activity = await this.getLegislativeActivity(id);
+    
+    if (!activity) {
+      return undefined;
+    }
+    
+    // Update activity data
+    const [updatedActivity] = await db
       .update(legislativeActivities)
       .set({
         ...activityData,
@@ -469,50 +533,45 @@ export class DatabaseStorage implements IStorage {
       .where(eq(legislativeActivities.id, id))
       .returning();
     
-    if (!activity) {
-      return undefined;
-    }
-    
-    // If authorIds are provided, update the authors
-    if (authorIds !== undefined) {
-      // Remove existing authors
-      await db
-        .delete(legislativeActivitiesAuthors)
-        .where(eq(legislativeActivitiesAuthors.activityId, id));
+    // Update authors if provided
+    if (authorIds) {
+      // Delete existing author relationships
+      await db.delete(legislativeActivitiesAuthors).where(eq(legislativeActivitiesAuthors.activityId, id));
       
-      // Add new authors
+      // Create new author relationships
       if (authorIds.length > 0) {
-        const authorEntries = authorIds.map(userId => ({
+        const authorRelationships = authorIds.map(userId => ({
           activityId: id,
           userId,
         }));
         
-        await db.insert(legislativeActivitiesAuthors).values(authorEntries);
+        await db.insert(legislativeActivitiesAuthors).values(authorRelationships);
       }
     }
     
-    // Get updated authors
-    const authors = await db
-      .select({
-        user: users
-      })
-      .from(legislativeActivitiesAuthors)
-      .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
-      .where(eq(legislativeActivitiesAuthors.activityId, id));
+    // Create a timeline entry for update
+    await this.createActivityTimeline({
+      activityId: id,
+      eventType: "Atualização",
+      description: "Atividade legislativa atualizada",
+      createdBy: authorIds?.[0] || activity.authors?.[0]?.id || "system",
+    });
     
-    return {
-      ...activity,
-      authors: authors.map(a => a.user)
-    };
+    // Return the updated activity with authors
+    return this.getLegislativeActivity(id);
   }
   
   async deleteLegislativeActivity(id: number): Promise<boolean> {
-    // First, remove authors
-    await db
-      .delete(legislativeActivitiesAuthors)
-      .where(eq(legislativeActivitiesAuthors.activityId, id));
+    // Delete author relationships first
+    await db.delete(legislativeActivitiesAuthors).where(eq(legislativeActivitiesAuthors.activityId, id));
     
-    // Then, remove activity
+    // Delete activity timeline
+    await db.delete(activityTimeline).where(eq(activityTimeline.activityId, id));
+    
+    // Delete activity votes
+    await db.delete(activityVotes).where(eq(activityVotes.activityId, id));
+    
+    // Delete the activity
     await db
       .delete(legislativeActivities)
       .where(eq(legislativeActivities.id, id));
@@ -548,7 +607,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(documents)
       .where(
-        sql`${documents.id} = ${rootDocId} OR ${documents.parentDocumentId} = ${rootDocId}`
+        or(
+          eq(documents.id, rootDocId), 
+          eq(documents.parentDocumentId, rootDocId)
+        )
       )
       .orderBy(documents.createdAt);
   }
@@ -572,11 +634,15 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteDocument(id: number): Promise<boolean> {
+    // Delete related document votes first
+    await db.delete(documentVotes).where(eq(documentVotes.documentId, id));
+    
+    // Delete the document
     const result = await db
       .delete(documents)
       .where(eq(documents.id, id));
     
-    return true;
+    return result.rowCount !== null && result.rowCount > 0;
   }
   
   /**
@@ -611,7 +677,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(legislativeActivities.needsApproval, true),
-          eq(legislativeActivities.approved, false)
+          isNull(legislativeActivities.approved)
         )
       );
     
@@ -658,7 +724,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async updateEventAttendance(id: number, attendanceData: Partial<EventAttendance>): Promise<EventAttendance | undefined> {
-    const [updatedAttendance] = await db
+    const [attendance] = await db
       .update(eventAttendance)
       .set({
         ...attendanceData,
@@ -666,13 +732,16 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(eventAttendance.id, id))
       .returning();
-      
-    return updatedAttendance;
+    
+    return attendance;
   }
   
   async deleteEventAttendance(id: number): Promise<boolean> {
-    const result = await db.delete(eventAttendance).where(eq(eventAttendance.id, id));
-    return !!result;
+    const result = await db
+      .delete(eventAttendance)
+      .where(eq(eventAttendance.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
   }
   
   /**
@@ -684,19 +753,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getDocumentVotesByDocumentId(documentId: number): Promise<DocumentVote[]> {
-    const votes = await db
-      .select({
-        vote: documentVotes,
-        user: users,
-      })
+    return await db
+      .select()
       .from(documentVotes)
-      .leftJoin(users, eq(documentVotes.userId, users.id))
       .where(eq(documentVotes.documentId, documentId));
-      
-    return votes.map(record => ({
-      ...record.vote,
-      user: record.user,
-    })) as DocumentVote[];
   }
   
   async getDocumentVoteByUserAndDocument(userId: string, documentId: number): Promise<DocumentVote | undefined> {
@@ -709,232 +769,93 @@ export class DatabaseStorage implements IStorage {
           eq(documentVotes.documentId, documentId)
         )
       );
-      
+    
     return vote;
   }
   
   async createDocumentVote(voteData: Partial<DocumentVote>): Promise<DocumentVote> {
-    // Check if user already voted on this document
+    // Check if vote already exists
     const existingVote = await this.getDocumentVoteByUserAndDocument(
-      voteData.userId as string, 
-      voteData.documentId as number
+      voteData.userId!,
+      voteData.documentId!
     );
     
     if (existingVote) {
-      // Update existing vote instead of creating a new one
+      // Update existing vote
       const [updatedVote] = await db
         .update(documentVotes)
         .set({
-          vote: voteData.vote,
+          vote: voteData.vote!,
           comment: voteData.comment,
           votedAt: new Date(),
           updatedAt: new Date(),
         })
         .where(eq(documentVotes.id, existingVote.id))
         .returning();
-        
+      
       return updatedVote;
+    } else {
+      // Create new vote
+      const [newVote] = await db
+        .insert(documentVotes)
+        .values({
+          ...voteData,
+          votedAt: new Date(),
+        })
+        .returning();
+      
+      return newVote;
     }
-    
-    // Create new vote
-    const [newVote] = await db.insert(documentVotes).values(voteData).returning();
-    return newVote;
   }
   
   async updateDocumentVote(id: number, voteData: Partial<DocumentVote>): Promise<DocumentVote | undefined> {
-    const [updatedVote] = await db
+    const [vote] = await db
       .update(documentVotes)
       .set({
         ...voteData,
+        votedAt: new Date(),
         updatedAt: new Date(),
       })
       .where(eq(documentVotes.id, id))
       .returning();
-      
-    return updatedVote;
+    
+    return vote;
   }
   
   async deleteDocumentVote(id: number): Promise<boolean> {
-    const result = await db.delete(documentVotes).where(eq(documentVotes.id, id));
-    return !!result;
+    const result = await db
+      .delete(documentVotes)
+      .where(eq(documentVotes.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
   }
   
   /**
    * Activity Timeline operations
    */
   async getActivityTimeline(id: number): Promise<ActivityTimeline | undefined> {
-    const [timelineEvent] = await db.select().from(activityTimeline).where(eq(activityTimeline.id, id));
-    return timelineEvent;
+    const [timeline] = await db.select().from(activityTimeline).where(eq(activityTimeline.id, id));
+    return timeline;
   }
   
   async getActivityTimelineByActivityId(activityId: number): Promise<ActivityTimeline[]> {
-    const timeline = await db
-      .select({
-        timelineEvent: activityTimeline,
-        user: users,
-      })
+    return await db
+      .select()
       .from(activityTimeline)
-      .leftJoin(users, eq(activityTimeline.createdBy, users.id))
       .where(eq(activityTimeline.activityId, activityId))
       .orderBy(desc(activityTimeline.eventDate));
-      
-    return timeline.map(record => ({
-      ...record.timelineEvent,
-      user: record.user,
-    })) as ActivityTimeline[];
   }
   
   async createActivityTimeline(timelineData: Partial<ActivityTimeline>): Promise<ActivityTimeline> {
-    const [newTimelineEvent] = await db.insert(activityTimeline).values(timelineData).returning();
-    return newTimelineEvent;
-  }
-  
-  /**
-   * Extended Event operations
-   */
-  async getEventWithDetails(id: number): Promise<Event & {
-    activities: LegislativeActivity[];
-    attendance: EventAttendance[];
-    documents: Document[];
-    legislature: Legislature;
-  } | undefined> {
-    try {
-      console.log("Getting event details for ID:", id);
-      
-      // Abordagem com SQL bruto para garantir compatibilidade
-      // Busca o evento
-      const eventQuery = db.select({
-        id: events.id,
-        eventNumber: events.eventNumber,
-        eventDate: events.eventDate,
-        eventTime: events.eventTime,
-        location: events.location,
-        mapUrl: events.mapUrl,
-        category: events.category,
-        description: events.description,
-        status: events.status,
-        legislatureId: events.legislatureId,
-        createdAt: events.createdAt,
-        updatedAt: events.updatedAt,
-        legislature_id: legislatures.id,
-        legislature_number: legislatures.number,
-        start_date: legislatures.startDate,
-        end_date: legislatures.endDate
+    const [timeline] = await db
+      .insert(activityTimeline)
+      .values({
+        ...timelineData,
+        eventDate: timelineData.eventDate || new Date(),
       })
-      .from(events)
-      .innerJoin(legislatures, eq(events.legislatureId, legislatures.id))
-      .where(eq(events.id, id));
-      
-      const eventResult = await eventQuery;
-      console.log("Event query result:", eventResult[0] ? "Found" : "Not found");
-      
-      if (!eventResult.length) {
-        console.log("Event not found with ID:", id);
-        return undefined;
-      }
-      
-      // Extrair evento e legislature
-      const eventData = eventResult[0];
-      const event = {
-        id: eventData.id,
-        eventNumber: eventData.eventNumber,
-        eventDate: eventData.eventDate,
-        eventTime: eventData.eventTime,
-        location: eventData.location,
-        mapUrl: eventData.mapUrl,
-        category: eventData.category,
-        description: eventData.description,
-        status: eventData.status,
-        legislatureId: eventData.legislatureId,
-        createdAt: eventData.createdAt,
-        updatedAt: eventData.updatedAt
-      };
-      
-      const legislature = {
-        id: eventData.legislature_id,
-        number: eventData.legislature_number,
-        startDate: eventData.start_date,
-        endDate: eventData.end_date,
-        createdAt: null,
-        updatedAt: null
-      };
-      
-      console.log("Event data processed successfully");
-      
-      // Buscar atividades do evento
-      const activitiesResult = await db
-        .select()
-        .from(legislativeActivities)
-        .where(eq(legislativeActivities.eventId, id))
-        .orderBy(desc(legislativeActivities.activityDate));
-      console.log(`Found ${activitiesResult.length} activities for event`);
-      
-      // Buscar atendimentos do evento
-      const attendanceResult = await this.getEventAttendanceByEventId(id);
-      console.log(`Found ${attendanceResult.length} attendance records`);
-      
-      // Buscar documentos do evento
-      let documentsResult = [];
-      try {
-        documentsResult = await db
-          .select()
-          .from(documents)
-          .where(eq(documents.eventId, id));
-        console.log(`Found ${documentsResult.length} documents`);
-      } catch (error) {
-        console.error("Error fetching documents:", error);
-        documentsResult = [];
-      }
-      
-      // Processar atividades e autores
-      const activitiesWithAuthors = await Promise.all(
-        activitiesResult.map(async (activity) => {
-          try {
-            // Buscar autores usando Drizzle
-            const authorsResult = await db
-              .select({
-                id: users.id,
-                name: users.name,
-                email: users.email,
-                role: users.role,
-                profileImageUrl: users.profileImageUrl,
-                active: users.active,
-                createdAt: users.createdAt,
-                updatedAt: users.updatedAt
-              })
-              .from(users)
-              .innerJoin(
-                legislativeActivitiesAuthors,
-                eq(users.id, legislativeActivitiesAuthors.userId)
-              )
-              .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
-            
-            // Adiciona os autores à atividade
-            activity.authors = authorsResult;
-            
-            return activity;
-          } catch (error) {
-            console.error(`Error fetching authors for activity ${activity.id}:`, error);
-            activity.authors = [];
-            return activity;
-          }
-        })
-      );
-      
-      console.log("Successfully processed event details");
-      
-      // Construir e retornar o resultado completo
-      return {
-        ...event,
-        legislature,
-        activities: activitiesWithAuthors,
-        attendance: attendanceResult,
-        documents: documentsResult,
-      };
-    } catch (error) {
-      console.error("Error in getEventWithDetails:", error);
-      throw error;
-    }
+      .returning();
+    
+    return timeline;
   }
   
   /**
@@ -953,12 +874,11 @@ export class DatabaseStorage implements IStorage {
       })
       .from(activityVotes)
       .innerJoin(users, eq(activityVotes.userId, users.id))
-      .where(eq(activityVotes.activityId, activityId))
-      .orderBy(desc(activityVotes.votedAt));
-      
-    return votes.map(record => ({
-      ...record.vote,
-      user: record.user,
+      .where(eq(activityVotes.activityId, activityId));
+    
+    return votes.map(v => ({
+      ...v.vote,
+      user: v.user,
     }));
   }
   
@@ -972,44 +892,59 @@ export class DatabaseStorage implements IStorage {
           eq(activityVotes.activityId, activityId)
         )
       );
-      
+    
     return vote;
   }
   
   async createActivityVote(voteData: Partial<ActivityVote>): Promise<ActivityVote> {
-    // Verificar se já existe um voto deste usuário para esta atividade
+    // Check if vote already exists
     const existingVote = await this.getActivityVoteByUserAndActivity(
-      voteData.userId as string,
-      voteData.activityId as number
+      voteData.userId!,
+      voteData.activityId!
     );
     
     if (existingVote) {
-      // Atualizar o voto existente em vez de criar um novo
+      // Update existing vote
       const [updatedVote] = await db
         .update(activityVotes)
         .set({
           vote: voteData.vote,
           comment: voteData.comment,
-          votedAt: new Date(),
           updatedAt: new Date(),
         })
         .where(eq(activityVotes.id, existingVote.id))
         .returning();
-        
+      
+      // Add timeline entry for vote update
+      await this.createActivityTimeline({
+        activityId: voteData.activityId!,
+        eventType: "Votação",
+        description: `Voto atualizado: ${voteData.vote ? "Aprovado" : "Reprovado"}`,
+        createdBy: voteData.userId!,
+      });
+      
       return updatedVote;
+    } else {
+      // Create new vote
+      const [newVote] = await db
+        .insert(activityVotes)
+        .values(voteData)
+        .returning();
+      
+      // Add timeline entry for new vote
+      await this.createActivityTimeline({
+        activityId: voteData.activityId!,
+        eventType: "Votação",
+        description: `Novo voto: ${voteData.vote ? "Aprovado" : "Reprovado"}`,
+        createdBy: voteData.userId!,
+      });
+      
+      return newVote;
     }
-    
-    // Criar novo voto
-    const [newVote] = await db.insert(activityVotes).values({
-      ...voteData,
-      votedAt: new Date(),
-    }).returning();
-    
-    return newVote;
   }
   
   async updateActivityVote(id: number, voteData: Partial<ActivityVote>): Promise<ActivityVote | undefined> {
-    const [updatedVote] = await db
+    const [vote] = await db
       .update(activityVotes)
       .set({
         ...voteData,
@@ -1017,13 +952,39 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(activityVotes.id, id))
       .returning();
-      
-    return updatedVote;
+    
+    if (vote) {
+      // Add timeline entry for vote update
+      await this.createActivityTimeline({
+        activityId: vote.activityId,
+        eventType: "Votação",
+        description: `Voto atualizado: ${vote.vote ? "Aprovado" : "Reprovado"}`,
+        createdBy: vote.userId,
+      });
+    }
+    
+    return vote;
   }
   
   async deleteActivityVote(id: number): Promise<boolean> {
-    const result = await db.delete(activityVotes).where(eq(activityVotes.id, id));
-    return !!result;
+    // Get vote info before deletion
+    const vote = await this.getActivityVote(id);
+    
+    if (vote) {
+      // Add timeline entry for vote deletion
+      await this.createActivityTimeline({
+        activityId: vote.activityId,
+        eventType: "Votação",
+        description: "Voto removido",
+        createdBy: vote.userId,
+      });
+    }
+    
+    const result = await db
+      .delete(activityVotes)
+      .where(eq(activityVotes.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
   }
   
   async getActivityVotesStats(activityId: number): Promise<{
@@ -1035,6 +996,7 @@ export class DatabaseStorage implements IStorage {
   }> {
     const votes = await db
       .select({
+        userId: activityVotes.userId,
         vote: activityVotes.vote,
       })
       .from(activityVotes)
@@ -1078,280 +1040,113 @@ export class DatabaseStorage implements IStorage {
   }
   
   /**
-   * Committee operations
+   * Extended Event operations
    */
-  async getCommittee(id: number): Promise<Committee | undefined> {
-    const [committee] = await db
-      .select()
-      .from(committees)
-      .where(eq(committees.id, id));
+  async getEventWithDetails(id: number): Promise<Event & {
+    activities: LegislativeActivity[];
+    attendance: EventAttendance[];
+    documents: Document[];
+    legislature: Legislature;
+  } | undefined> {
+    // Get the event
+    const event = await this.getEvent(id);
     
-    return committee;
-  }
-  
-  async getAllCommittees(): Promise<Committee[]> {
-    return await db
-      .select()
-      .from(committees)
-      .orderBy(desc(committees.startDate));
-  }
-  
-  async getCommitteeWithMembers(id: number): Promise<(Committee & { members: (CommitteeMember & { user: User })[] }) | undefined> {
-    const [committee] = await db
-      .select()
-      .from(committees)
-      .where(eq(committees.id, id));
-    
-    if (!committee) {
+    if (!event) {
       return undefined;
     }
     
-    const committeeMembers = await db
-      .select({
-        committeeId: committeeMembers.committeeId,
-        userId: committeeMembers.userId,
-        role: committeeMembers.role,
-        addedAt: committeeMembers.addedAt,
-        user: users
-      })
-      .from(committeeMembers)
-      .innerJoin(users, eq(committeeMembers.userId, users.id))
-      .where(eq(committeeMembers.committeeId, id));
+    // Get related legislature
+    const legislature = await this.getLegislature(event.legislatureId);
     
+    if (!legislature) {
+      throw new Error(`Legislature not found for event ${id}`);
+    }
+    
+    // Get related activities
+    const activities = await db
+      .select()
+      .from(legislativeActivities)
+      .where(eq(legislativeActivities.eventId, id));
+    
+    // Get activity authors
+    const activityIds = activities.map(a => a.id);
+    
+    let authorsByActivity = new Map<number, User[]>();
+    
+    if (activityIds.length > 0) {
+      const authorsData = await db
+        .select({
+          activityId: legislativeActivitiesAuthors.activityId,
+          author: users,
+        })
+        .from(legislativeActivitiesAuthors)
+        .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
+        .where(inArray(legislativeActivitiesAuthors.activityId, activityIds));
+      
+      // Group authors by activity ID
+      authorsByActivity = authorsData.reduce((map, item) => {
+        if (!map.has(item.activityId)) {
+          map.set(item.activityId, []);
+        }
+        map.get(item.activityId)!.push(item.author);
+        return map;
+      }, new Map<number, User[]>());
+    }
+    
+    // Add authors to activities
+    const activitiesWithAuthors = activities.map(activity => ({
+      ...activity,
+      authors: authorsByActivity.get(activity.id) || [],
+    }));
+    
+    // Get attendance records
+    const attendance = await this.getEventAttendanceByEventId(id);
+    
+    // Get related documents
+    const documents = await db
+      .select()
+      .from(documents)
+      .where(eq(documents.eventId, id));
+    
+    // Return the event with all related details
     return {
-      ...committee,
-      members: committeeMembers
+      ...event,
+      activities: activitiesWithAuthors,
+      attendance,
+      documents,
+      legislature,
     };
   }
   
-  async createCommittee(committeeData: Partial<Committee>, memberIds: string[]): Promise<Committee> {
-    // Criar a comissão
-    const [committee] = await db
-      .insert(committees)
-      .values({
-        name: committeeData.name!,
-        startDate: committeeData.startDate!,
-        endDate: committeeData.endDate!,
-        description: committeeData.description!,
-        type: committeeData.type!,
-        updatedAt: new Date()
-      })
-      .returning();
-    
-    // Adicionar membros à comissão
-    if (memberIds.length > 0) {
-      const memberValues = memberIds.map(userId => ({
-        committeeId: committee.id,
-        userId,
-        role: "member", // Default role
-        addedAt: new Date()
-      }));
-      
-      await db
-        .insert(committeeMembers)
-        .values(memberValues);
-    }
-    
-    return committee;
-  }
-  
-  async updateCommittee(id: number, committeeData: Partial<Committee>, memberIds?: string[]): Promise<Committee | undefined> {
-    // Verificar se a comissão existe
-    const committee = await this.getCommittee(id);
-    
-    if (!committee) {
-      return undefined;
-    }
-    
-    // Atualizar a comissão
-    const [updatedCommittee] = await db
-      .update(committees)
-      .set({
-        ...committeeData,
-        updatedAt: new Date()
-      })
-      .where(eq(committees.id, id))
-      .returning();
-    
-    // Atualizar membros se fornecidos
-    if (memberIds) {
-      // Remover todos os membros atuais
-      await db
-        .delete(committeeMembers)
-        .where(eq(committeeMembers.committeeId, id));
-      
-      // Adicionar novos membros
-      if (memberIds.length > 0) {
-        const memberValues = memberIds.map(userId => ({
-          committeeId: id,
-          userId,
-          role: "member", // Default role
-          addedAt: new Date()
-        }));
-        
-        await db
-          .insert(committeeMembers)
-          .values(memberValues);
-      }
-    }
-    
-    return updatedCommittee;
-  }
-  
-  async deleteCommittee(id: number): Promise<boolean> {
-    // Verificar se a comissão existe
-    const committee = await this.getCommittee(id);
-    
-    if (!committee) {
-      return false;
-    }
-    
-    // Remover membros da comissão
-    await db
-      .delete(committeeMembers)
-      .where(eq(committeeMembers.committeeId, id));
-    
-    // Remover a comissão
-    const result = await db
-      .delete(committees)
-      .where(eq(committees.id, id));
-    
-    return result.rowCount > 0;
-  }
-  
   /**
-   * Committee Members operations
-   */
-  async getCommitteeMembersByCommitteeId(committeeId: number): Promise<(CommitteeMember & { user: User })[]> {
-    return await db
-      .select({
-        committeeId: committeeMembers.committeeId,
-        userId: committeeMembers.userId,
-        role: committeeMembers.role,
-        addedAt: committeeMembers.addedAt,
-        user: users
-      })
-      .from(committeeMembers)
-      .innerJoin(users, eq(committeeMembers.userId, users.id))
-      .where(eq(committeeMembers.committeeId, committeeId));
-  }
-  
-  async addCommitteeMember(committeeId: number, userId: string, role: string = "member"): Promise<CommitteeMember> {
-    // Verificar se o membro já existe
-    const [existingMember] = await db
-      .select()
-      .from(committeeMembers)
-      .where(
-        and(
-          eq(committeeMembers.committeeId, committeeId),
-          eq(committeeMembers.userId, userId)
-        )
-      );
-    
-    if (existingMember) {
-      // Atualizar o papel se já existir
-      const [updatedMember] = await db
-        .update(committeeMembers)
-        .set({
-          role
-        })
-        .where(
-          and(
-            eq(committeeMembers.committeeId, committeeId),
-            eq(committeeMembers.userId, userId)
-          )
-        )
-        .returning();
-      
-      return updatedMember;
-    }
-    
-    // Adicionar novo membro
-    const [member] = await db
-      .insert(committeeMembers)
-      .values({
-        committeeId,
-        userId,
-        role,
-        addedAt: new Date()
-      })
-      .returning();
-    
-    return member;
-  }
-  
-  async updateCommitteeMemberRole(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined> {
-    // Verificar se o membro existe
-    const [existingMember] = await db
-      .select()
-      .from(committeeMembers)
-      .where(
-        and(
-          eq(committeeMembers.committeeId, committeeId),
-          eq(committeeMembers.userId, userId)
-        )
-      );
-    
-    if (!existingMember) {
-      return undefined;
-    }
-    
-    // Atualizar o papel
-    const [updatedMember] = await db
-      .update(committeeMembers)
-      .set({
-        role
-      })
-      .where(
-        and(
-          eq(committeeMembers.committeeId, committeeId),
-          eq(committeeMembers.userId, userId)
-        )
-      )
-      .returning();
-    
-    return updatedMember;
-  }
-  
-  async removeCommitteeMember(committeeId: number, userId: string): Promise<boolean> {
-    const result = await db
-      .delete(committeeMembers)
-      .where(
-        and(
-          eq(committeeMembers.committeeId, committeeId),
-          eq(committeeMembers.userId, userId)
-        )
-      );
-    
-    return result.rowCount > 0;
-  }
-  
-  /**
-   * Search across all entities
+   * Search operations
    */
   async searchGlobal(query: string, type?: string): Promise<SearchResult[]> {
     if (!query || query.length < 3) {
       return [];
     }
     
-    // Prepare search term for LIKE queries
     const searchTerm = `%${query.toLowerCase()}%`;
     const results: SearchResult[] = [];
     
-    // Function to find matches and highlight them
-    const findHighlight = (text: string | null) => {
+    // Helper function to find highlighted text for search results
+    const findHighlight = (text?: string): string | undefined => {
       if (!text) return undefined;
       
       const lowerText = text.toLowerCase();
       const lowerQuery = query.toLowerCase();
-      const index = lowerText.indexOf(lowerQuery);
+      const position = lowerText.indexOf(lowerQuery);
       
-      if (index === -1) return undefined;
+      if (position === -1) return undefined;
       
-      // Get a slice of text around the match
-      const start = Math.max(0, index - 20);
-      const end = Math.min(text.length, index + query.length + 20);
-      return text.slice(start, end);
+      const start = Math.max(0, position - 30);
+      const end = Math.min(text.length, position + query.length + 30);
+      let highlight = text.substring(start, end);
+      
+      if (start > 0) highlight = `...${highlight}`;
+      if (end < text.length) highlight = `${highlight}...`;
+      
+      return highlight;
     };
     
     // Search users if not filtering by type or type is 'user'
@@ -1373,9 +1168,7 @@ export class DatabaseStorage implements IStorage {
           title: user.name,
           description: user.email,
           type: 'user',
-          status: user.active ? 'ativo' : 'inativo',
           url: `/users/${user.id}`,
-          highlight: findHighlight(user.name),
         }))
       );
     }
@@ -1385,25 +1178,16 @@ export class DatabaseStorage implements IStorage {
       const legislatureResults = await db
         .select()
         .from(legislatures)
-        .where(
-          or(
-            like(sql`LOWER(${legislatures.name})`, searchTerm),
-            like(sql`LOWER(${legislatures.description})`, searchTerm)
-          )
-        )
+        .where(like(sql`CAST(${legislatures.number} AS TEXT)`, searchTerm))
         .limit(10);
       
       results.push(
         ...legislatureResults.map(legislature => ({
           id: legislature.id,
-          title: legislature.name,
-          description: legislature.description,
+          title: `Legislatura ${legislature.number}`,
+          description: `${new Date(legislature.startDate).toLocaleDateString()} - ${new Date(legislature.endDate).toLocaleDateString()}`,
           type: 'legislature',
-          date: legislature.startDate?.toISOString(),
-          status: new Date() >= new Date(legislature.startDate) && 
-                 new Date() <= new Date(legislature.endDate) ? 'ativo' : 'inativo',
           url: `/legislatures/${legislature.id}`,
-          highlight: findHighlight(legislature.description),
         }))
       );
     }
@@ -1415,9 +1199,9 @@ export class DatabaseStorage implements IStorage {
         .from(events)
         .where(
           or(
-            like(sql`LOWER(${events.category})`, searchTerm),
             like(sql`LOWER(${events.description})`, searchTerm),
-            like(sql`LOWER(${events.location})`, searchTerm)
+            like(sql`LOWER(${events.location})`, searchTerm),
+            like(sql`LOWER(${events.category})`, searchTerm)
           )
         )
         .limit(10);
@@ -1425,10 +1209,10 @@ export class DatabaseStorage implements IStorage {
       results.push(
         ...eventResults.map(event => ({
           id: event.id,
-          title: `${event.category} #${event.eventNumber}`,
+          title: `${event.category} - ${new Date(event.eventDate).toLocaleDateString()}`,
           description: event.description,
           type: 'event',
-          date: event.eventDate?.toISOString(),
+          date: event.eventDate.toISOString(),
           status: event.status,
           category: event.category,
           url: `/events/${event.id}`,
@@ -1444,8 +1228,8 @@ export class DatabaseStorage implements IStorage {
         .from(legislativeActivities)
         .where(
           or(
-            like(sql`LOWER(${legislativeActivities.activityType})`, searchTerm),
-            like(sql`LOWER(${legislativeActivities.description})`, searchTerm)
+            like(sql`LOWER(${legislativeActivities.description})`, searchTerm),
+            like(sql`LOWER(${legislativeActivities.activityType})`, searchTerm)
           )
         )
         .limit(10);
@@ -1453,42 +1237,46 @@ export class DatabaseStorage implements IStorage {
       results.push(
         ...activityResults.map(activity => ({
           id: activity.id,
-          title: `${activity.activityType} #${activity.activityNumber}`,
+          title: `${activity.activityType} - ${activity.activityNumber}`,
           description: activity.description,
           type: 'activity',
-          date: activity.activityDate?.toISOString(),
-          status: activity.needsApproval ? 'pendente' : (activity.approved ? 'aprovado' : 'rejeitado'),
+          date: activity.activityDate.toISOString(),
+          status: activity.approved === true 
+            ? "Aprovado" 
+            : activity.approved === false 
+              ? "Reprovado" 
+              : "Pendente",
           category: activity.activityType,
-          url: `/activities/${activity.id}`,
+          url: `/legislative-activities/${activity.id}`,
           highlight: findHighlight(activity.description),
         }))
       );
     }
     
-    // Search documents if not filtering by type or type is 'document'
-    if (!type || type === 'all' || type === 'document') {
-      const documentResults = await db
+    // Search committees if not filtering by type or type is 'committee'
+    if (!type || type === 'all' || type === 'committee') {
+      const committeeResults = await db
         .select()
-        .from(documents)
+        .from(committees)
         .where(
           or(
-            like(sql`LOWER(${documents.title})`, searchTerm),
-            like(sql`LOWER(${documents.description})`, searchTerm),
-            like(sql`LOWER(${documents.content})`, searchTerm)
+            like(sql`LOWER(${committees.name})`, searchTerm),
+            like(sql`LOWER(${committees.description})`, searchTerm),
+            like(sql`LOWER(${committees.type})`, searchTerm)
           )
         )
         .limit(10);
       
       results.push(
-        ...documentResults.map(document => ({
-          id: document.id,
-          title: document.title,
-          description: document.description,
-          type: 'document',
-          date: document.createdAt?.toISOString(),
-          status: document.status,
-          url: `/documents/${document.id}`,
-          highlight: findHighlight(document.content) || findHighlight(document.description),
+        ...committeeResults.map(committee => ({
+          id: committee.id,
+          title: committee.name,
+          description: committee.description,
+          type: 'committee' as const,
+          status: committee.active ? "Ativa" : "Inativa",
+          category: committee.type,
+          url: `/committees/${committee.id}`,
+          highlight: findHighlight(committee.description),
         }))
       );
     }
