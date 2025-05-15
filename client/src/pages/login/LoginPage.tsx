@@ -66,7 +66,8 @@ export default function LoginPage() {
   };
 
   // Importar o hook useAuth
-  const { login } = useAuth();
+  const auth = useAuth();
+  const login = auth.login;
 
   // Função de login com email/senha
   const handleLogin = async (values: LoginFormValues) => {
