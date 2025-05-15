@@ -2347,6 +2347,251 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
   
+  // COMMITTEE ROUTES
+  
+  // Get all committees
+  app.get('/api/committees', requireAuth, async (req, res) => {
+    try {
+      const committees = await storage.getAllCommittees();
+      res.json(committees);
+    } catch (error) {
+      console.error("Error fetching committees:", error);
+      res.status(500).json({ message: "Erro ao buscar comissões" });
+    }
+  });
+  
+  // Get active committees
+  app.get('/api/committees/active', requireAuth, async (req, res) => {
+    try {
+      const committees = await storage.getActiveCommittees();
+      res.json(committees);
+    } catch (error) {
+      console.error("Error fetching active committees:", error);
+      res.status(500).json({ message: "Erro ao buscar comissões ativas" });
+    }
+  });
+  
+  // Get single committee
+  app.get('/api/committees/:id', requireAuth, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      const committee = await storage.getCommittee(committeeId);
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Get members with user details
+      const members = await storage.getCommitteeMembers(committeeId);
+      
+      res.json({
+        ...committee,
+        members
+      });
+    } catch (error) {
+      console.error("Error fetching committee:", error);
+      res.status(500).json({ message: "Erro ao buscar comissão" });
+    }
+  });
+  
+  // Create new committee
+  app.post('/api/committees', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const { name, description, type, startDate, endDate, active, memberIds } = req.body;
+      
+      // Validate required fields
+      if (!name || !description || !type || !startDate || !endDate) {
+        return res.status(400).json({ 
+          message: "Campos obrigatórios: nome, descrição, tipo, data de início e data de término" 
+        });
+      }
+      
+      // Create committee
+      const committee = await storage.createCommittee({
+        name,
+        description,
+        type,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        active: active !== undefined ? active : true
+      });
+      
+      // Add members if provided
+      if (memberIds && Array.isArray(memberIds) && memberIds.length > 0) {
+        for (const member of memberIds) {
+          const { userId, role } = member;
+          if (userId) {
+            await storage.addCommitteeMember(committee.id, userId, role || "Membro");
+          }
+        }
+      }
+      
+      // Get updated committee with members
+      const updatedCommittee = await storage.getCommittee(committee.id);
+      
+      res.status(201).json(updatedCommittee);
+    } catch (error) {
+      console.error("Error creating committee:", error);
+      res.status(500).json({ message: "Erro ao criar comissão" });
+    }
+  });
+  
+  // Update committee
+  app.put('/api/committees/:id', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      const { name, description, type, startDate, endDate, active } = req.body;
+      
+      // Check if committee exists
+      const existingCommittee = await storage.getCommittee(committeeId);
+      if (!existingCommittee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Update committee
+      const updatedCommittee = await storage.updateCommittee(committeeId, {
+        name,
+        description,
+        type,
+        startDate: startDate ? new Date(startDate) : undefined,
+        endDate: endDate ? new Date(endDate) : undefined,
+        active
+      });
+      
+      res.json(updatedCommittee);
+    } catch (error) {
+      console.error("Error updating committee:", error);
+      res.status(500).json({ message: "Erro ao atualizar comissão" });
+    }
+  });
+  
+  // Delete committee
+  app.delete('/api/committees/:id', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      
+      // Check if committee exists
+      const existingCommittee = await storage.getCommittee(committeeId);
+      if (!existingCommittee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Delete committee
+      const success = await storage.deleteCommittee(committeeId);
+      
+      if (success) {
+        res.json({ message: "Comissão excluída com sucesso" });
+      } else {
+        res.status(500).json({ message: "Erro ao excluir comissão" });
+      }
+    } catch (error) {
+      console.error("Error deleting committee:", error);
+      res.status(500).json({ message: "Erro ao excluir comissão" });
+    }
+  });
+  
+  // COMMITTEE MEMBERS ROUTES
+  
+  // Get committee members
+  app.get('/api/committees/:id/members', requireAuth, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      
+      // Check if committee exists
+      const existingCommittee = await storage.getCommittee(committeeId);
+      if (!existingCommittee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Get members
+      const members = await storage.getCommitteeMembers(committeeId);
+      
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching committee members:", error);
+      res.status(500).json({ message: "Erro ao buscar membros da comissão" });
+    }
+  });
+  
+  // Add member to committee
+  app.post('/api/committees/:id/members', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      const { userId, role } = req.body;
+      
+      // Validate required fields
+      if (!userId) {
+        return res.status(400).json({ message: "ID do usuário é obrigatório" });
+      }
+      
+      // Check if committee exists
+      const existingCommittee = await storage.getCommittee(committeeId);
+      if (!existingCommittee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Check if user exists
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      // Add member
+      const member = await storage.addCommitteeMember(committeeId, userId, role || "Membro");
+      
+      res.status(201).json(member);
+    } catch (error) {
+      console.error("Error adding committee member:", error);
+      res.status(500).json({ message: "Erro ao adicionar membro à comissão" });
+    }
+  });
+  
+  // Update committee member role
+  app.put('/api/committees/:committeeId/members/:userId', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.committeeId);
+      const userId = req.params.userId;
+      const { role } = req.body;
+      
+      // Validate required fields
+      if (!role) {
+        return res.status(400).json({ message: "Função do membro é obrigatória" });
+      }
+      
+      // Update member
+      const updatedMember = await storage.updateCommitteeMember(committeeId, userId, role);
+      
+      if (!updatedMember) {
+        return res.status(404).json({ message: "Membro da comissão não encontrado" });
+      }
+      
+      res.json(updatedMember);
+    } catch (error) {
+      console.error("Error updating committee member:", error);
+      res.status(500).json({ message: "Erro ao atualizar membro da comissão" });
+    }
+  });
+  
+  // Remove member from committee
+  app.delete('/api/committees/:committeeId/members/:userId', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.committeeId);
+      const userId = req.params.userId;
+      
+      // Remove member
+      const success = await storage.removeCommitteeMember(committeeId, userId);
+      
+      if (success) {
+        res.json({ message: "Membro removido da comissão com sucesso" });
+      } else {
+        res.status(404).json({ message: "Membro da comissão não encontrado" });
+      }
+    } catch (error) {
+      console.error("Error removing committee member:", error);
+      res.status(500).json({ message: "Erro ao remover membro da comissão" });
+    }
+  });
+
   // Expor apenas o servidor WebSocket globalmente para uso em outros módulos
   (global as any).wss = wss;
   

@@ -1,280 +1,169 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
-import { PlusIcon, Search, UsersRound, Pencil, Trash2, Info } from "lucide-react";
+import { useNavigate } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AlertCircle, Plus, Users, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 import { Spinner } from "@/components/ui/spinner";
-import { queryClient } from "@/lib/queryClient";
+
+// Definição de tipos
+type CommitteeType = "Permanente" | "Temporária" | "Extraordinária";
+
+interface CommitteeMember {
+  userId: string;
+  role: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    profileImageUrl?: string;
+  };
+}
 
 interface Committee {
   id: number;
   name: string;
   description: string;
-  createdAt: string;
-  updatedAt: string;
+  type: CommitteeType;
+  startDate: string | Date;
+  endDate: string | Date;
   active: boolean;
-  memberCount: number;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  members?: CommitteeMember[];
 }
 
-export default function CommitteeList() {
-  const [, navigate] = useLocation();
-  const { toast } = useToast();
+export function CommitteeList() {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
-  const [searchTerm, setSearchTerm] = useState("");
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [committeeToDelete, setCommitteeToDelete] = useState<Committee | null>(null);
-
-  // Buscar a lista de comissões
-  const {
-    data: committees = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["/api/committees"],
+  const { data: committees, isLoading, error } = useQuery({
+    queryKey: ['/api/committees'],
   });
-
-  // Filtragem por busca
-  const filteredCommittees = committees.filter((committee: Committee) =>
-    committee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    committee.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Confirmar exclusão
-  const confirmDelete = (committee: Committee) => {
-    setCommitteeToDelete(committee);
-    setDeleteDialogOpen(true);
-  };
-
-  // Deletar comissão
-  const handleDelete = async () => {
-    if (!committeeToDelete) return;
-
-    try {
-      const response = await fetch(`/api/committees/${committeeToDelete.id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Comissão excluída",
-          description: `A comissão "${committeeToDelete.name}" foi excluída com sucesso.`,
-        });
-        
-        // Invalidar a query para recarregar dados
-        queryClient.invalidateQueries({ queryKey: ["/api/committees"] });
-      } else {
-        const error = await response.json();
-        throw new Error(error.message || "Erro ao excluir comissão");
-      }
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message || "Ocorreu um erro ao excluir a comissão",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteDialogOpen(false);
-      setCommitteeToDelete(null);
+  
+  const isAdmin = user?.role === 'admin';
+  
+  const getBadgeColor = (type: CommitteeType) => {
+    switch (type) {
+      case "Permanente":
+        return "bg-blue-500 hover:bg-blue-600";
+      case "Temporária":
+        return "bg-amber-500 hover:bg-amber-600";
+      case "Extraordinária":
+        return "bg-purple-500 hover:bg-purple-600";
+      default:
+        return "bg-gray-500 hover:bg-gray-600";
     }
   };
-
+  
+  // Renderiza estado de carregamento
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="flex justify-center items-center h-64">
+          <Spinner size="lg" />
+        </div>
+      </div>
+    );
+  }
+  
+  // Renderiza mensagem de erro
+  if (error) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="flex flex-col items-center justify-center h-64 text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+          <h3 className="text-lg font-semibold">Erro ao carregar comissões</h3>
+          <p className="text-muted-foreground">Ocorreu um erro ao buscar as comissões. Tente novamente mais tarde.</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Comissões</h1>
           <p className="text-muted-foreground">
-            Gerencie as comissões do sistema legislativo
+            Gerencie as comissões legislativas e seus membros
           </p>
         </div>
-        <Button onClick={() => navigate("/committees/new")}>
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Nova Comissão
-        </Button>
+        
+        {isAdmin && (
+          <Button onClick={() => navigate("/committees/new")}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Comissão
+          </Button>
+        )}
       </div>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <CardTitle>Comissões Cadastradas</CardTitle>
-            <div className="relative w-64">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Buscar comissões..."
-                className="pl-8 w-full"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <CardDescription>
-            {filteredCommittees.length} comissão(ões) encontrada(s)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex justify-center items-center h-48">
-              <Spinner size="lg" />
-            </div>
-          ) : isError ? (
-            <div className="flex justify-center items-center h-48">
-              <div className="text-center">
-                <p className="text-destructive mb-2">Erro ao carregar comissões</p>
-                <Button variant="outline" onClick={() => refetch()}>
-                  Tentar novamente
-                </Button>
-              </div>
-            </div>
-          ) : filteredCommittees.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-48 text-center">
-              <UsersRound className="h-12 w-12 text-muted-foreground mb-4 opacity-40" />
-              <h3 className="font-medium text-lg mb-1">Nenhuma comissão encontrada</h3>
-              <p className="text-muted-foreground mb-4">
-                {searchTerm
-                  ? "Nenhuma comissão corresponde à sua busca"
-                  : "Comece criando sua primeira comissão"}
-              </p>
-              {!searchTerm && (
-                <Button onClick={() => navigate("/committees/new")}>
-                  <PlusIcon className="mr-2 h-4 w-4" />
-                  Nova Comissão
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Membros</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Data de Criação</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCommittees.map((committee: Committee) => (
-                    <TableRow key={committee.id}>
-                      <TableCell className="font-medium">
-                        <Link 
-                          href={`/committees/${committee.id}`}
-                          className="hover:text-primary hover:underline"
-                        >
-                          {committee.name}
-                        </Link>
-                        <p className="text-sm text-muted-foreground truncate max-w-[300px]">
-                          {committee.description}
-                        </p>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-primary/5">
-                          {committee.memberCount || 0} membro(s)
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {committee.active ? (
-                          <Badge variant="default" className="bg-green-500 hover:bg-green-600">
-                            Ativa
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="bg-gray-200 text-gray-700 hover:bg-gray-300">
-                            Inativa
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>{formatDate(committee.createdAt)}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => navigate(`/committees/${committee.id}`)}
-                            title="Detalhes"
-                          >
-                            <Info className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => navigate(`/committees/edit/${committee.id}`)}
-                            title="Editar"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => confirmDelete(committee)}
-                            title="Excluir"
-                            className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+      
+      {committees?.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center">
+          <Users className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold">Nenhuma comissão encontrada</h3>
+          <p className="text-muted-foreground">Não existem comissões cadastradas no sistema.</p>
+          {isAdmin && (
+            <Button className="mt-4" onClick={() => navigate("/committees/new")}>
+              <Plus className="mr-2 h-4 w-4" />
+              Criar primeira comissão
+            </Button>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Diálogo de confirmação de exclusão */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta ação não pode ser desfeita. A comissão{" "}
-              <span className="font-semibold">{committeeToDelete?.name}</span> será
-              permanentemente excluída.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {committees?.map((committee: Committee) => (
+            <Card key={committee.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <Badge 
+                    className={`${getBadgeColor(committee.type as CommitteeType)} text-white`}
+                  >
+                    {committee.type}
+                  </Badge>
+                  
+                  <Badge variant={committee.active ? "success" : "destructive"}>
+                    {committee.active ? "Ativa" : "Inativa"}
+                  </Badge>
+                </div>
+                <CardTitle className="text-xl mt-2">{committee.name}</CardTitle>
+                <CardDescription className="line-clamp-2">
+                  {committee.description}
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span className="text-muted-foreground">
+                      {formatDate(committee.startDate)} - {formatDate(committee.endDate)}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span className="text-muted-foreground">
+                      {committee.members?.length || 0} membro{committee.members?.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+              
+              <CardFooter className="pt-3 flex justify-end border-t">
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate(`/committees/${committee.id}`)}
+                >
+                  Ver detalhes
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
