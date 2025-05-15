@@ -67,14 +67,6 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-  legislature: one(legislatures, {
-    fields: [users.legislatureId],
-    references: [legislatures.id],
-  }),
-  authoredActivities: many(legislativeActivitiesAuthors),
-}));
-
 // Legislature table
 export const legislatures = pgTable("legislatures", {
   id: serial("id").primaryKey(),
@@ -84,11 +76,6 @@ export const legislatures = pgTable("legislatures", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
-export const legislaturesRelations = relations(legislatures, ({ many }) => ({
-  users: many(users),
-  events: many(events),
-}));
 
 // Events table
 export const events = pgTable("events", {
@@ -105,15 +92,6 @@ export const events = pgTable("events", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
-export const eventsRelations = relations(events, ({ one, many }) => ({
-  legislature: one(legislatures, {
-    fields: [events.legislatureId],
-    references: [legislatures.id],
-  }),
-  activities: many(legislativeActivities),
-  documents: many(documents, { relationName: "event_documents" }),
-}));
 
 // Legislative Activities table
 export const legislativeActivities = pgTable("legislative_activities", {
@@ -135,18 +113,6 @@ export const legislativeActivities = pgTable("legislative_activities", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const legislativeActivitiesRelations = relations(legislativeActivities, ({ one, many }) => ({
-  event: one(events, {
-    fields: [legislativeActivities.eventId],
-    references: [events.id],
-  }),
-  authors: many(legislativeActivitiesAuthors),
-  documents: many(documents, {
-    relationName: "activity_documents",
-  }),
-  votes: many(activityVotes),
-}));
-
 // Legislative Activities Authors (many-to-many)
 export const legislativeActivitiesAuthors = pgTable(
   "legislative_activities_authors",
@@ -156,20 +122,6 @@ export const legislativeActivitiesAuthors = pgTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.activityId, table.userId] }),
-  }),
-);
-
-export const legislativeActivitiesAuthorsRelations = relations(
-  legislativeActivitiesAuthors,
-  ({ one }) => ({
-    activity: one(legislativeActivities, {
-      fields: [legislativeActivitiesAuthors.activityId],
-      references: [legislativeActivities.id],
-    }),
-    user: one(users, {
-      fields: [legislativeActivitiesAuthors.userId],
-      references: [users.id],
-    }),
   }),
 );
 
@@ -192,6 +144,133 @@ export const documents = pgTable("documents", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Document Votes table - For councilors to vote on documents
+export const documentVotes = pgTable("document_votes", {
+  id: serial("id").primaryKey(),
+  documentId: integer("document_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  vote: varchar("vote").notNull(), // "Aprovado" or "Reprovado"
+  votedAt: timestamp("voted_at").defaultNow(),
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Event Attendance table - To track councilor attendance at events
+export const eventAttendance = pgTable("event_attendance", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  status: varchar("status").notNull(), // "Presente" or "Ausente"
+  registeredAt: timestamp("registered_at").defaultNow(),
+  registeredBy: varchar("registered_by").notNull(), // Admin user who registered attendance
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Activity Timeline table - To track activity changes and status updates
+export const activityTimeline = pgTable("activity_timeline", {
+  id: serial("id").primaryKey(),
+  activityId: integer("activity_id").notNull(),
+  eventType: varchar("event_type").notNull(), // "Criação", "Atualização", "Votação", "Aprovação", "Reprovação"
+  description: text("description").notNull(),
+  createdBy: varchar("created_by").notNull(),
+  eventDate: timestamp("event_date").defaultNow(),
+  metadata: json("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Activity Votes table - Para rastrear votos de vereadores em atividades legislativas
+export const activityVotes = pgTable("activity_votes", {
+  id: serial("id").primaryKey(),
+  activityId: integer("activity_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  vote: boolean("vote").notNull(), // true para aprovação, false para reprovação
+  votedAt: timestamp("voted_at").defaultNow(),
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Committees table
+export const committees = pgTable("committees", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description").notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // "Permanente", "Temporária", "Extraordinária"
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Committee Members table
+export const committeeMembers = pgTable(
+  "committee_members",
+  {
+    committeeId: integer("committee_id").notNull(),
+    userId: varchar("user_id").notNull(),
+    role: varchar("role").notNull(), // "Presidente", "Vice-Presidente", "Secretário", "Membro", "Consultor"
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.committeeId, table.userId] }),
+  }),
+);
+
+// Relations
+export const usersRelations = relations(users, ({ one, many }) => ({
+  legislature: one(legislatures, {
+    fields: [users.legislatureId],
+    references: [legislatures.id],
+  }),
+  authoredActivities: many(legislativeActivitiesAuthors),
+  committees: many(committeeMembers),
+}));
+
+export const legislaturesRelations = relations(legislatures, ({ many }) => ({
+  users: many(users),
+  events: many(events),
+}));
+
+export const eventsRelations = relations(events, ({ one, many }) => ({
+  legislature: one(legislatures, {
+    fields: [events.legislatureId],
+    references: [legislatures.id],
+  }),
+  activities: many(legislativeActivities),
+  documents: many(documents, { relationName: "event_documents" }),
+}));
+
+export const legislativeActivitiesRelations = relations(legislativeActivities, ({ one, many }) => ({
+  event: one(events, {
+    fields: [legislativeActivities.eventId],
+    references: [events.id],
+  }),
+  authors: many(legislativeActivitiesAuthors),
+  documents: many(documents, {
+    relationName: "activity_documents",
+  }),
+  votes: many(activityVotes),
+}));
+
+export const legislativeActivitiesAuthorsRelations = relations(
+  legislativeActivitiesAuthors,
+  ({ one }) => ({
+    activity: one(legislativeActivities, {
+      fields: [legislativeActivitiesAuthors.activityId],
+      references: [legislativeActivities.id],
+    }),
+    user: one(users, {
+      fields: [legislativeActivitiesAuthors.userId],
+      references: [users.id],
+    }),
+  }),
+);
+
 export const documentsRelations = relations(documents, ({ one, many }) => ({
   activity: one(legislativeActivities, {
     fields: [documents.activityId],
@@ -213,18 +292,6 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
   votes: many(documentVotes),
 }));
 
-// Document Votes table - For councilors to vote on documents
-export const documentVotes = pgTable("document_votes", {
-  id: serial("id").primaryKey(),
-  documentId: integer("document_id").notNull(),
-  userId: varchar("user_id").notNull(),
-  vote: varchar("vote").notNull(), // "Aprovado" or "Reprovado"
-  votedAt: timestamp("voted_at").defaultNow(),
-  comment: text("comment"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
 export const documentVotesRelations = relations(documentVotes, ({ one }) => ({
   document: one(documents, {
     fields: [documentVotes.documentId],
@@ -235,19 +302,6 @@ export const documentVotesRelations = relations(documentVotes, ({ one }) => ({
     references: [users.id],
   }),
 }));
-
-// Event Attendance table - To track councilor attendance at events
-export const eventAttendance = pgTable("event_attendance", {
-  id: serial("id").primaryKey(),
-  eventId: integer("event_id").notNull(),
-  userId: varchar("user_id").notNull(),
-  status: varchar("status").notNull(), // "Presente" or "Ausente"
-  registeredAt: timestamp("registered_at").defaultNow(),
-  registeredBy: varchar("registered_by").notNull(), // Admin user who registered attendance
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
 
 export const eventAttendanceRelations = relations(eventAttendance, ({ one }) => ({
   event: one(events, {
@@ -264,18 +318,6 @@ export const eventAttendanceRelations = relations(eventAttendance, ({ one }) => 
   }),
 }));
 
-// Activity Timeline table - To track activity changes and status updates
-export const activityTimeline = pgTable("activity_timeline", {
-  id: serial("id").primaryKey(),
-  activityId: integer("activity_id").notNull(),
-  eventType: varchar("event_type").notNull(), // "Criação", "Atualização", "Votação", "Aprovação", "Reprovação"
-  description: text("description").notNull(),
-  createdBy: varchar("created_by").notNull(),
-  eventDate: timestamp("event_date").defaultNow(),
-  metadata: json("metadata"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
 export const activityTimelineRelations = relations(activityTimeline, ({ one }) => ({
   activity: one(legislativeActivities, {
     fields: [activityTimeline.activityId],
@@ -286,18 +328,6 @@ export const activityTimelineRelations = relations(activityTimeline, ({ one }) =
     references: [users.id],
   }),
 }));
-
-// Activity Votes table - Para rastrear votos de vereadores em atividades legislativas
-export const activityVotes = pgTable("activity_votes", {
-  id: serial("id").primaryKey(),
-  activityId: integer("activity_id").notNull(),
-  userId: varchar("user_id").notNull(),
-  vote: boolean("vote").notNull(), // true para aprovação, false para reprovação
-  votedAt: timestamp("voted_at").defaultNow(),
-  comment: text("comment"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
 
 export const activityVotesRelations = relations(activityVotes, ({ one }) => ({
   activity: one(legislativeActivities, {
@@ -310,12 +340,28 @@ export const activityVotesRelations = relations(activityVotes, ({ one }) => ({
   }),
 }));
 
+export const committeesRelations = relations(committees, ({ many }) => ({
+  members: many(committeeMembers),
+}));
+
+export const committeeMembersRelations = relations(committeeMembers, ({ one }) => ({
+  committee: one(committees, {
+    fields: [committeeMembers.committeeId],
+    references: [committees.id],
+  }),
+  user: one(users, {
+    fields: [committeeMembers.userId],
+    references: [users.id],
+  }),
+}));
+
 // Dashboard Stats View (for quick dashboard data retrieval)
 export type DashboardStats = {
   legislatureCount: number;
   activeEventCount: number;
   pendingActivityCount: number;
   documentCount: number;
+  committeeCount: number;
 };
 
 // Insert schemas
@@ -376,6 +422,51 @@ export const insertDocumentSchema = createInsertSchema(documents).pick({
   parentDocumentId: true,
 });
 
+export const insertDocumentVoteSchema = createInsertSchema(documentVotes).pick({
+  documentId: true,
+  userId: true,
+  vote: true,
+  comment: true,
+});
+
+export const insertEventAttendanceSchema = createInsertSchema(eventAttendance).pick({
+  eventId: true,
+  userId: true,
+  status: true,
+  registeredBy: true,
+  notes: true,
+});
+
+export const insertActivityTimelineSchema = createInsertSchema(activityTimeline).pick({
+  activityId: true,
+  eventType: true,
+  description: true,
+  createdBy: true,
+  metadata: true,
+});
+
+export const insertActivityVoteSchema = createInsertSchema(activityVotes).pick({
+  activityId: true,
+  userId: true,
+  vote: true,
+  comment: true,
+});
+
+export const insertCommitteeSchema = createInsertSchema(committees).pick({
+  name: true,
+  description: true,
+  type: true,
+  startDate: true,
+  endDate: true,
+  active: true,
+});
+
+export const insertCommitteeMemberSchema = createInsertSchema(committeeMembers).pick({
+  committeeId: true,
+  userId: true,
+  role: true,
+});
+
 // Type definitions
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -394,110 +485,24 @@ export type LegislativeActivity = typeof legislativeActivities.$inferSelect & {
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type Document = typeof documents.$inferSelect;
 
-export const insertDocumentVoteSchema = createInsertSchema(documentVotes).pick({
-  documentId: true,
-  userId: true,
-  vote: true,
-  comment: true,
-});
 export type InsertDocumentVote = z.infer<typeof insertDocumentVoteSchema>;
 export type DocumentVote = typeof documentVotes.$inferSelect;
 
-export const insertEventAttendanceSchema = createInsertSchema(eventAttendance).pick({
-  eventId: true,
-  userId: true,
-  status: true,
-  registeredBy: true,
-  notes: true,
-});
 export type InsertEventAttendance = z.infer<typeof insertEventAttendanceSchema>;
 export type EventAttendance = typeof eventAttendance.$inferSelect;
 
-export const insertActivityTimelineSchema = createInsertSchema(activityTimeline).pick({
-  activityId: true,
-  eventType: true,
-  description: true,
-  createdBy: true,
-  metadata: true,
-});
 export type InsertActivityTimeline = z.infer<typeof insertActivityTimelineSchema>;
 export type ActivityTimeline = typeof activityTimeline.$inferSelect;
 
-export const insertActivityVoteSchema = createInsertSchema(activityVotes).pick({
-  activityId: true,
-  userId: true,
-  vote: true,
-  comment: true,
-});
 export type InsertActivityVote = z.infer<typeof insertActivityVoteSchema>;
 export type ActivityVote = typeof activityVotes.$inferSelect;
 
-// Committees (Comissões)
-export const committees = pgTable("committees", {
-  id: serial("id").primaryKey(),
-  name: varchar("name").notNull(),
-  startDate: date("start_date").notNull(),
-  endDate: date("end_date").notNull(),
-  description: text("description").notNull(),
-  type: varchar("type").notNull(), // "Extraordinária", "Temporária", "Permanente"
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Committee Members (Membros das Comissões) - many-to-many
-export const committeeMembers = pgTable(
-  "committee_members",
-  {
-    committeeId: integer("committee_id").notNull(),
-    userId: varchar("user_id").notNull(),
-    role: varchar("role").default("member"), // "presidente", "secretário", "member"
-    addedAt: timestamp("added_at").defaultNow(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.committeeId, table.userId] }),
-  }),
-);
-
-// Relations for committees
-export const committeesRelations = relations(committees, ({ many }) => ({
-  members: many(committeeMembers),
-}));
-
-// Relations for committee members
-export const committeeMembersRelations = relations(committeeMembers, ({ one }) => ({
-  committee: one(committees, {
-    fields: [committeeMembers.committeeId],
-    references: [committees.id],
-  }),
-  user: one(users, {
-    fields: [committeeMembers.userId],
-    references: [users.id],
-  }),
-}));
-
-// Add relation to user for committees
-export const usersCommitteesRelation = relations(users, ({ many }) => ({
-  committees: many(committeeMembers),
-}));
-
-// Insert schema for committees
-export const insertCommitteeSchema = createInsertSchema(committees).pick({
-  name: true,
-  startDate: true,
-  endDate: true,
-  description: true,
-  type: true,
-});
-
 export type InsertCommittee = z.infer<typeof insertCommitteeSchema>;
-export type Committee = typeof committees.$inferSelect;
-
-// Insert schema for committee members
-export const insertCommitteeMemberSchema = createInsertSchema(committeeMembers).pick({
-  committeeId: true,
-  userId: true,
-  role: true,
-});
+export type Committee = typeof committees.$inferSelect & {
+  members?: CommitteeMember[];
+};
 
 export type InsertCommitteeMember = z.infer<typeof insertCommitteeMemberSchema>;
-export type CommitteeMember = typeof committeeMembers.$inferSelect;
+export type CommitteeMember = typeof committeeMembers.$inferSelect & {
+  user?: User;
+};
