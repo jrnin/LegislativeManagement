@@ -682,6 +682,236 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // COMMITTEE ROUTES
+  
+  // Get all committees
+  app.get('/api/committees', requireAuth, async (req, res) => {
+    try {
+      const committees = await storage.getAllCommittees();
+      res.json(committees);
+    } catch (error) {
+      console.error("Error fetching committees:", error);
+      res.status(500).json({ message: "Erro ao buscar comissões" });
+    }
+  });
+  
+  // Get committee by ID with members
+  app.get('/api/committees/:id', requireAuth, async (req, res) => {
+    try {
+      const committee = await storage.getCommitteeWithMembers(Number(req.params.id));
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      res.json(committee);
+    } catch (error) {
+      console.error("Error fetching committee:", error);
+      res.status(500).json({ message: "Erro ao buscar comissão" });
+    }
+  });
+  
+  // Create committee
+  app.post('/api/committees', requireAdmin, async (req, res) => {
+    try {
+      // Validar dados da requisição
+      const committeeSchema = z.object({
+        name: z.string().min(1, "Nome é obrigatório"),
+        startDate: z.string().refine(val => !isNaN(Date.parse(val)), "Data de início inválida"),
+        endDate: z.string().refine(val => !isNaN(Date.parse(val)), "Data de término inválida"),
+        description: z.string().min(1, "Descrição é obrigatória"),
+        type: z.string().min(1, "Tipo é obrigatório"),
+        memberIds: z.array(z.string()).optional().default([])
+      });
+      
+      const validated = committeeSchema.parse(req.body);
+      
+      // Criar comissão
+      const committee = await storage.createCommittee({
+        name: validated.name,
+        startDate: new Date(validated.startDate),
+        endDate: new Date(validated.endDate),
+        description: validated.description,
+        type: validated.type
+      }, validated.memberIds);
+      
+      res.status(201).json(committee);
+    } catch (error) {
+      console.error("Error creating committee:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Dados inválidos", errors: error.errors });
+      }
+      res.status(500).json({ message: "Erro ao criar comissão" });
+    }
+  });
+  
+  // Update committee
+  app.put('/api/committees/:id', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      
+      // Validar dados da requisição
+      const committeeSchema = z.object({
+        name: z.string().min(1, "Nome é obrigatório").optional(),
+        startDate: z.string().refine(val => !isNaN(Date.parse(val)), "Data de início inválida").optional(),
+        endDate: z.string().refine(val => !isNaN(Date.parse(val)), "Data de término inválida").optional(),
+        description: z.string().min(1, "Descrição é obrigatória").optional(),
+        type: z.string().min(1, "Tipo é obrigatório").optional(),
+        memberIds: z.array(z.string()).optional()
+      });
+      
+      const validated = committeeSchema.parse(req.body);
+      
+      // Preparar dados para atualização
+      const updateData: any = {};
+      
+      if (validated.name) updateData.name = validated.name;
+      if (validated.description) updateData.description = validated.description;
+      if (validated.type) updateData.type = validated.type;
+      if (validated.startDate) updateData.startDate = new Date(validated.startDate);
+      if (validated.endDate) updateData.endDate = new Date(validated.endDate);
+      
+      // Atualizar comissão
+      const updatedCommittee = await storage.updateCommittee(
+        committeeId, 
+        updateData, 
+        validated.memberIds
+      );
+      
+      if (!updatedCommittee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      res.json(updatedCommittee);
+    } catch (error) {
+      console.error("Error updating committee:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Dados inválidos", errors: error.errors });
+      }
+      res.status(500).json({ message: "Erro ao atualizar comissão" });
+    }
+  });
+  
+  // Delete committee
+  app.delete('/api/committees/:id', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      
+      // Verificar se a comissão existe
+      const committee = await storage.getCommittee(committeeId);
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Excluir comissão
+      await storage.deleteCommittee(committeeId);
+      
+      res.json({ message: "Comissão excluída com sucesso" });
+    } catch (error) {
+      console.error("Error deleting committee:", error);
+      res.status(500).json({ message: "Erro ao excluir comissão" });
+    }
+  });
+  
+  // Adicionar membro à comissão
+  app.post('/api/committees/:id/members', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      
+      // Validar dados da requisição
+      const memberSchema = z.object({
+        userId: z.string().min(1, "ID do usuário é obrigatório"),
+        role: z.string().min(1, "Função é obrigatória").default("member")
+      });
+      
+      const validated = memberSchema.parse(req.body);
+      
+      // Verificar se a comissão existe
+      const committee = await storage.getCommittee(committeeId);
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Verificar se o usuário existe
+      const user = await storage.getUser(validated.userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      // Adicionar membro
+      const committeeMember = await storage.addCommitteeMember(
+        committeeId,
+        validated.userId,
+        validated.role
+      );
+      
+      res.status(201).json(committeeMember);
+    } catch (error) {
+      console.error("Error adding committee member:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Dados inválidos", errors: error.errors });
+      }
+      res.status(500).json({ message: "Erro ao adicionar membro à comissão" });
+    }
+  });
+  
+  // Atualizar função do membro na comissão
+  app.put('/api/committees/:id/members/:userId', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      const userId = req.params.userId;
+      
+      // Validar dados da requisição
+      const roleSchema = z.object({
+        role: z.string().min(1, "Função é obrigatória")
+      });
+      
+      const validated = roleSchema.parse(req.body);
+      
+      // Atualizar função do membro
+      const updatedMember = await storage.updateCommitteeMemberRole(
+        committeeId,
+        userId,
+        validated.role
+      );
+      
+      if (!updatedMember) {
+        return res.status(404).json({ message: "Membro da comissão não encontrado" });
+      }
+      
+      res.json(updatedMember);
+    } catch (error) {
+      console.error("Error updating committee member role:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Dados inválidos", errors: error.errors });
+      }
+      res.status(500).json({ message: "Erro ao atualizar função do membro" });
+    }
+  });
+  
+  // Remover membro da comissão
+  app.delete('/api/committees/:id/members/:userId', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = Number(req.params.id);
+      const userId = req.params.userId;
+      
+      // Remover membro
+      const success = await storage.removeCommitteeMember(committeeId, userId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Membro da comissão não encontrado" });
+      }
+      
+      res.json({ message: "Membro removido com sucesso" });
+    } catch (error) {
+      console.error("Error removing committee member:", error);
+      res.status(500).json({ message: "Erro ao remover membro da comissão" });
+    }
+  });
+  
   // EVENT ROUTES
   
   // Get all events
