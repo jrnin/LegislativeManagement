@@ -3,7 +3,12 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 
+// Configuração do WebSocket do Neon
 neonConfig.webSocketConstructor = ws;
+// Desativar keepalive
+neonConfig.wsProxy = true;
+// Conexões HTTP não têm problema de timeout
+neonConfig.useHttpPipelining = true;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,5 +16,12 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Adicionar opções para melhorar estabilidade da conexão
+export const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  max: 5,  // Limitar número máximo de conexões
+  idleTimeoutMillis: 30000,  // 30 segundos em vez do padrão 10s
+  maxUses: 100  // Reconectar após 100 usos
+});
+
 export const db = drizzle({ client: pool, schema });
