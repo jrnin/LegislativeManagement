@@ -10,6 +10,7 @@ import {
   jsonb,
   primaryKey,
   index,
+  date,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -20,7 +21,7 @@ export type SearchResult = {
   id: string | number;
   title: string;
   description?: string;
-  type: 'user' | 'legislature' | 'event' | 'activity' | 'document';
+  type: 'user' | 'legislature' | 'event' | 'activity' | 'document' | 'committee';
   date?: string;
   status?: string;
   category?: string;
@@ -430,3 +431,73 @@ export const insertActivityVoteSchema = createInsertSchema(activityVotes).pick({
 });
 export type InsertActivityVote = z.infer<typeof insertActivityVoteSchema>;
 export type ActivityVote = typeof activityVotes.$inferSelect;
+
+// Committees (Comissões)
+export const committees = pgTable("committees", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  description: text("description").notNull(),
+  type: varchar("type").notNull(), // "Extraordinária", "Temporária", "Permanente"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Committee Members (Membros das Comissões) - many-to-many
+export const committeeMembers = pgTable(
+  "committee_members",
+  {
+    committeeId: integer("committee_id").notNull(),
+    userId: varchar("user_id").notNull(),
+    role: varchar("role").default("member"), // "presidente", "secretário", "member"
+    addedAt: timestamp("added_at").defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.committeeId, table.userId] }),
+  }),
+);
+
+// Relations for committees
+export const committeesRelations = relations(committees, ({ many }) => ({
+  members: many(committeeMembers),
+}));
+
+// Relations for committee members
+export const committeeMembersRelations = relations(committeeMembers, ({ one }) => ({
+  committee: one(committees, {
+    fields: [committeeMembers.committeeId],
+    references: [committees.id],
+  }),
+  user: one(users, {
+    fields: [committeeMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+// Add relation to user for committees
+export const usersCommitteesRelation = relations(users, ({ many }) => ({
+  committees: many(committeeMembers),
+}));
+
+// Insert schema for committees
+export const insertCommitteeSchema = createInsertSchema(committees).pick({
+  name: true,
+  startDate: true,
+  endDate: true,
+  description: true,
+  type: true,
+});
+
+export type InsertCommittee = z.infer<typeof insertCommitteeSchema>;
+export type Committee = typeof committees.$inferSelect;
+
+// Insert schema for committee members
+export const insertCommitteeMemberSchema = createInsertSchema(committeeMembers).pick({
+  committeeId: true,
+  userId: true,
+  role: true,
+});
+
+export type InsertCommitteeMember = z.infer<typeof insertCommitteeMemberSchema>;
+export type CommitteeMember = typeof committeeMembers.$inferSelect;

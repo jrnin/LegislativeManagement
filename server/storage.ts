@@ -9,6 +9,8 @@ import {
   eventAttendance,
   activityTimeline,
   activityVotes,
+  committees,
+  committeeMembers,
   type User,
   type Legislature,
   type Event,
@@ -17,7 +19,9 @@ import {
   type DocumentVote,
   type EventAttendance,
   type ActivityTimeline,
-  type ActivityVote
+  type ActivityVote,
+  type Committee,
+  type CommitteeMember
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or } from "drizzle-orm";
@@ -28,7 +32,7 @@ export type SearchResult = {
   id: string | number;
   title: string;
   description?: string;
-  type: 'user' | 'legislature' | 'event' | 'activity' | 'document';
+  type: 'user' | 'legislature' | 'event' | 'activity' | 'document' | 'committee';
   date?: string;
   status?: string;
   category?: string;
@@ -132,6 +136,20 @@ export interface IStorage {
   
   // Get all councilors
   getCouncilors(): Promise<User[]>;
+  
+  // Committee operations
+  getCommittee(id: number): Promise<Committee | undefined>;
+  getAllCommittees(): Promise<Committee[]>;
+  getCommitteeWithMembers(id: number): Promise<(Committee & { members: (CommitteeMember & { user: User })[] }) | undefined>;
+  createCommittee(committeeData: Partial<Committee>, memberIds: string[]): Promise<Committee>;
+  updateCommittee(id: number, committeeData: Partial<Committee>, memberIds?: string[]): Promise<Committee | undefined>;
+  deleteCommittee(id: number): Promise<boolean>;
+  
+  // Committee Members operations
+  getCommitteeMembersByCommitteeId(committeeId: number): Promise<(CommitteeMember & { user: User })[]>;
+  addCommitteeMember(committeeId: number, userId: string, role?: string): Promise<CommitteeMember>;
+  updateCommitteeMemberRole(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined>;
+  removeCommitteeMember(committeeId: number, userId: string): Promise<boolean>;
   
   // Search operations
   searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
