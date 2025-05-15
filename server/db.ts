@@ -5,10 +5,6 @@ import * as schema from "@shared/schema";
 
 // Configuração do WebSocket do Neon
 neonConfig.webSocketConstructor = ws;
-// Desativar keepalive
-neonConfig.wsProxy = true;
-// Conexões HTTP não têm problema de timeout
-neonConfig.useHttpPipelining = true;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(

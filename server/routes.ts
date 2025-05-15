@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
@@ -11,6 +11,7 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
 import { WebSocketServer, WebSocket } from 'ws';
+import { db } from './db';
 
 // Declarar a função sendNotification que será inicializada no escopo global
 let sendNotification: (target: 'all' | string | string[], notification: any) => void;
@@ -2594,6 +2595,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Expor apenas o servidor WebSocket globalmente para uso em outros módulos
   (global as any).wss = wss;
+
+  // Página de diagnóstico
+  app.get('/debug', (req, res) => {
+    res.sendFile(path.resolve('./client/index-debug.html'));
+  });
+
+  // Endpoint de verificação de saúde da API
+  app.get('/api/health', (req, res) => {
+    res.json({
+      status: 'ok',
+      message: 'API está funcionando normalmente',
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Endpoint de teste de banco de dados
+  app.get('/api/db-test', async (req, res) => {
+    try {
+      // Tenta executar uma consulta simples para testar a conexão
+      const result = await db.execute('SELECT NOW() as time');
+      
+      res.json({
+        success: true,
+        message: 'Conexão com o banco de dados estabelecida com sucesso',
+        result: result[0]
+      });
+    } catch (error) {
+      console.error('Erro ao conectar ao banco de dados:', error);
+      
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao conectar ao banco de dados',
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
   
   return httpServer;
 }
