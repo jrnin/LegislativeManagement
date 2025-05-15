@@ -1078,6 +1078,255 @@ export class DatabaseStorage implements IStorage {
   }
   
   /**
+   * Committee operations
+   */
+  async getCommittee(id: number): Promise<Committee | undefined> {
+    const [committee] = await db
+      .select()
+      .from(committees)
+      .where(eq(committees.id, id));
+    
+    return committee;
+  }
+  
+  async getAllCommittees(): Promise<Committee[]> {
+    return await db
+      .select()
+      .from(committees)
+      .orderBy(desc(committees.startDate));
+  }
+  
+  async getCommitteeWithMembers(id: number): Promise<(Committee & { members: (CommitteeMember & { user: User })[] }) | undefined> {
+    const [committee] = await db
+      .select()
+      .from(committees)
+      .where(eq(committees.id, id));
+    
+    if (!committee) {
+      return undefined;
+    }
+    
+    const committeeMembers = await db
+      .select({
+        committeeId: committeeMembers.committeeId,
+        userId: committeeMembers.userId,
+        role: committeeMembers.role,
+        addedAt: committeeMembers.addedAt,
+        user: users
+      })
+      .from(committeeMembers)
+      .innerJoin(users, eq(committeeMembers.userId, users.id))
+      .where(eq(committeeMembers.committeeId, id));
+    
+    return {
+      ...committee,
+      members: committeeMembers
+    };
+  }
+  
+  async createCommittee(committeeData: Partial<Committee>, memberIds: string[]): Promise<Committee> {
+    // Criar a comissão
+    const [committee] = await db
+      .insert(committees)
+      .values({
+        name: committeeData.name!,
+        startDate: committeeData.startDate!,
+        endDate: committeeData.endDate!,
+        description: committeeData.description!,
+        type: committeeData.type!,
+        updatedAt: new Date()
+      })
+      .returning();
+    
+    // Adicionar membros à comissão
+    if (memberIds.length > 0) {
+      const memberValues = memberIds.map(userId => ({
+        committeeId: committee.id,
+        userId,
+        role: "member", // Default role
+        addedAt: new Date()
+      }));
+      
+      await db
+        .insert(committeeMembers)
+        .values(memberValues);
+    }
+    
+    return committee;
+  }
+  
+  async updateCommittee(id: number, committeeData: Partial<Committee>, memberIds?: string[]): Promise<Committee | undefined> {
+    // Verificar se a comissão existe
+    const committee = await this.getCommittee(id);
+    
+    if (!committee) {
+      return undefined;
+    }
+    
+    // Atualizar a comissão
+    const [updatedCommittee] = await db
+      .update(committees)
+      .set({
+        ...committeeData,
+        updatedAt: new Date()
+      })
+      .where(eq(committees.id, id))
+      .returning();
+    
+    // Atualizar membros se fornecidos
+    if (memberIds) {
+      // Remover todos os membros atuais
+      await db
+        .delete(committeeMembers)
+        .where(eq(committeeMembers.committeeId, id));
+      
+      // Adicionar novos membros
+      if (memberIds.length > 0) {
+        const memberValues = memberIds.map(userId => ({
+          committeeId: id,
+          userId,
+          role: "member", // Default role
+          addedAt: new Date()
+        }));
+        
+        await db
+          .insert(committeeMembers)
+          .values(memberValues);
+      }
+    }
+    
+    return updatedCommittee;
+  }
+  
+  async deleteCommittee(id: number): Promise<boolean> {
+    // Verificar se a comissão existe
+    const committee = await this.getCommittee(id);
+    
+    if (!committee) {
+      return false;
+    }
+    
+    // Remover membros da comissão
+    await db
+      .delete(committeeMembers)
+      .where(eq(committeeMembers.committeeId, id));
+    
+    // Remover a comissão
+    const result = await db
+      .delete(committees)
+      .where(eq(committees.id, id));
+    
+    return result.rowCount > 0;
+  }
+  
+  /**
+   * Committee Members operations
+   */
+  async getCommitteeMembersByCommitteeId(committeeId: number): Promise<(CommitteeMember & { user: User })[]> {
+    return await db
+      .select({
+        committeeId: committeeMembers.committeeId,
+        userId: committeeMembers.userId,
+        role: committeeMembers.role,
+        addedAt: committeeMembers.addedAt,
+        user: users
+      })
+      .from(committeeMembers)
+      .innerJoin(users, eq(committeeMembers.userId, users.id))
+      .where(eq(committeeMembers.committeeId, committeeId));
+  }
+  
+  async addCommitteeMember(committeeId: number, userId: string, role: string = "member"): Promise<CommitteeMember> {
+    // Verificar se o membro já existe
+    const [existingMember] = await db
+      .select()
+      .from(committeeMembers)
+      .where(
+        and(
+          eq(committeeMembers.committeeId, committeeId),
+          eq(committeeMembers.userId, userId)
+        )
+      );
+    
+    if (existingMember) {
+      // Atualizar o papel se já existir
+      const [updatedMember] = await db
+        .update(committeeMembers)
+        .set({
+          role
+        })
+        .where(
+          and(
+            eq(committeeMembers.committeeId, committeeId),
+            eq(committeeMembers.userId, userId)
+          )
+        )
+        .returning();
+      
+      return updatedMember;
+    }
+    
+    // Adicionar novo membro
+    const [member] = await db
+      .insert(committeeMembers)
+      .values({
+        committeeId,
+        userId,
+        role,
+        addedAt: new Date()
+      })
+      .returning();
+    
+    return member;
+  }
+  
+  async updateCommitteeMemberRole(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined> {
+    // Verificar se o membro existe
+    const [existingMember] = await db
+      .select()
+      .from(committeeMembers)
+      .where(
+        and(
+          eq(committeeMembers.committeeId, committeeId),
+          eq(committeeMembers.userId, userId)
+        )
+      );
+    
+    if (!existingMember) {
+      return undefined;
+    }
+    
+    // Atualizar o papel
+    const [updatedMember] = await db
+      .update(committeeMembers)
+      .set({
+        role
+      })
+      .where(
+        and(
+          eq(committeeMembers.committeeId, committeeId),
+          eq(committeeMembers.userId, userId)
+        )
+      )
+      .returning();
+    
+    return updatedMember;
+  }
+  
+  async removeCommitteeMember(committeeId: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(committeeMembers)
+      .where(
+        and(
+          eq(committeeMembers.committeeId, committeeId),
+          eq(committeeMembers.userId, userId)
+        )
+      );
+    
+    return result.rowCount > 0;
+  }
+  
+  /**
    * Search across all entities
    */
   async searchGlobal(query: string, type?: string): Promise<SearchResult[]> {
