@@ -8,15 +8,24 @@ export async function getCommittee(id: number): Promise<Committee | undefined> {
     .from(committees)
     .where(eq(committees.id, id));
   
+  return committee;
+}
+
+export async function getCommitteeWithMembers(id: number): Promise<(Committee & { members: CommitteeMember[] }) | undefined> {
+  const [committee] = await db
+    .select()
+    .from(committees)
+    .where(eq(committees.id, id));
+  
   if (committee) {
-    const members = await getCommitteeMembers(id);
+    const members = await getCommitteeMembersWithUsers(id);
     return {
       ...committee,
       members
     };
   }
   
-  return committee;
+  return undefined;
 }
 
 export async function getAllCommittees(): Promise<Committee[]> {

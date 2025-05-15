@@ -62,6 +62,7 @@ export interface IStorage {
   
   // Committee operations
   getCommittee(id: number): Promise<Committee | undefined>;
+  getCommitteeWithMembers(id: number): Promise<(Committee & { members: CommitteeMember[] }) | undefined>;
   getAllCommittees(): Promise<Committee[]>;
   getActiveCommittees(): Promise<Committee[]>;
   getCommitteeMembers(committeeId: number): Promise<CommitteeMember[]>;
@@ -285,6 +286,10 @@ class DatabaseStorage implements IStorage {
    */
   async getCommittee(id: number): Promise<Committee | undefined> {
     return committeeImpl.getCommittee(id);
+  }
+  
+  async getCommitteeWithMembers(id: number): Promise<(Committee & { members: CommitteeMember[] }) | undefined> {
+    return committeeImpl.getCommitteeWithMembers(id);
   }
   
   async getAllCommittees(): Promise<Committee[]> {
