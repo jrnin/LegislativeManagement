@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
@@ -84,7 +84,6 @@ interface Committee {
 
 export function CommitteeForm() {
   const [location] = useLocation();
-  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -148,7 +147,7 @@ export function CommitteeForm() {
         description: "A comissão foi criada com sucesso.",
         variant: "success",
       });
-      navigate(`/committees/${data.id}`);
+      window.location.href = `/committees/${data.id}`;
     },
     onError: (error: any) => {
       toast({
@@ -175,7 +174,7 @@ export function CommitteeForm() {
         description: "A comissão foi atualizada com sucesso.",
         variant: "success",
       });
-      navigate(`/committees/${committeeId}`);
+      window.location.href = `/committees/${committeeId}`;
     },
     onError: (error: any) => {
       toast({
@@ -235,7 +234,7 @@ export function CommitteeForm() {
           <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
           <h3 className="text-lg font-semibold">Erro ao carregar comissão</h3>
           <p className="text-muted-foreground">Ocorreu um erro ao buscar os detalhes da comissão para edição.</p>
-          <Button className="mt-4" onClick={() => navigate("/committees")}>
+          <Button className="mt-4" onClick={() => window.location.href = "/committees"}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar para comissões
           </Button>
@@ -246,14 +245,14 @@ export function CommitteeForm() {
   
   // Se não for admin, redireciona para a lista de comissões
   if (!isAdmin) {
-    navigate("/committees");
+    window.location.href = "/committees";
     return null;
   }
   
   return (
     <div className="container mx-auto p-4">
       <div className="flex items-center mb-6">
-        <Button variant="ghost" onClick={() => navigate('/committees')} className="mr-2">
+        <Button variant="ghost" onClick={() => window.location.href = '/committees'} className="mr-2">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <h1 className="text-3xl font-bold tracking-tight">
@@ -458,7 +457,7 @@ export function CommitteeForm() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate('/committees')}
+                  onClick={() => window.location.href = '/committees'}
                 >
                   Cancelar
                 </Button>
