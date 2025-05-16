@@ -110,10 +110,7 @@ export default function CommitteeForm() {
       };
 
       if (isEditing) {
-        await apiRequest(`/api/committees/${id}`, {
-          method: "PUT",
-          data: payload,
-        });
+        await apiRequest("PUT", `/api/committees/${id}`, payload);
 
         toast({
           title: "Comissão atualizada",
@@ -121,10 +118,7 @@ export default function CommitteeForm() {
           variant: "success",
         });
       } else {
-        await apiRequest("/api/committees", {
-          method: "POST",
-          data: payload,
-        });
+        await apiRequest("POST", "/api/committees", payload);
 
         toast({
           title: "Comissão criada",
