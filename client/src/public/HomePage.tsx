@@ -1038,34 +1038,7 @@ export default function HomePage() {
               </Carousel>
             </div>
 
-            {/* Próximos eventos */}
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold flex items-center">
-                  <Calendar className="mr-2 text-blue-600" />
-                  Agenda
-                </h2>
-                <Link href="/public/eventos">
-                  <a className="text-blue-600 hover:underline flex items-center">
-                    Ver todos <ChevronRight size={16} />
-                  </a>
-                </Link>
-              </div>
-
-              <div className="space-y-4">
-                {events.map((event) => (
-                  <EventCard
-                    key={event.id}
-                    id={event.id}
-                    title={event.title}
-                    date={event.date}
-                    time={event.time}
-                    location={event.location}
-                    type={event.type}
-                  />
-                ))}
-              </div>
-            </div>
+            {/* Seção de Agenda foi removida conforme solicitado */}
           </div>
         </div>
       </section>
