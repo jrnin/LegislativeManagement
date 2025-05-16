@@ -501,331 +501,154 @@ export default function HomePage() {
               </a>
             </Link>
           </div>
-
-          <Tabs defaultValue="Todas">
-            <TabsList className="mb-6 bg-transparent border-b pb-2 w-full overflow-x-auto flex-no-wrap whitespace-nowrap justify-start">
+          
+          {/* Abas de categorias de notícias */}
+          <Tabs defaultValue="Todas" className="mt-4">
+            <TabsList className="bg-white p-1 rounded-lg shadow-sm mb-6 overflow-x-auto flex flex-nowrap w-full">
               {newsCategories.map((category) => (
                 <TabsTrigger 
-                  key={category} 
+                  key={category}
                   value={category}
-                  className="rounded-full px-4 py-1 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+                  className="px-4 py-2 rounded-md data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 whitespace-nowrap"
                 >
                   {category}
                 </TabsTrigger>
               ))}
             </TabsList>
+            
+            {/* Conteúdo da aba "Todas" */}
             <TabsContent value="Todas" className="mt-0">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
-                <div className="lg:col-span-2 space-y-6">
-                  <h3 className="text-lg font-semibold mb-4 text-blue-800">Destaques</h3>
-                  
-                  {/* Carrossel de notícias em destaque com overlay */}
-                  <Carousel
-                    opts={{
-                      align: "start",
-                      loop: true,
-                    }}
-                    className="w-full rounded-lg shadow-md overflow-hidden"
-                  >
-                    <CarouselContent>
-                      {news.slice(0, 4).map((item) => (
-                        <CarouselItem key={item.id}>
-                          <Link href={`/public/noticias/${item.id}`}>
-                            <a className="block relative">
-                              <div className="aspect-[16/9] overflow-hidden">
-                                <img 
+                <div className="lg:col-span-2">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                    <div className="p-6">
+                      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Notícias da Câmara</h2>
+                      
+                      {/* Destaque principal com carrossel */}
+                      <Carousel
+                        opts={{ loop: true }}
+                        className="w-full mb-8"
+                      >
+                        <CarouselContent>
+                          {news.slice(0, 3).map((item) => (
+                            <CarouselItem key={item.id}>
+                              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
+                                <img
                                   src={item.imageUrl} 
-                                  alt={item.title} 
-                                  className="w-full h-full object-cover"
+                                  alt={item.title}
+                                  className="h-full w-full object-cover"
                                 />
-                                {/* Overlay gradiente */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                              </div>
-                              
-                              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                                <div className="flex items-center justify-between mb-2">
-                                  <Badge className="bg-blue-600 hover:bg-blue-700 text-white">
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+                                  <Badge className="self-start mb-2 bg-blue-600 hover:bg-blue-700">
                                     {item.category}
                                   </Badge>
-                                  <span className="text-sm text-blue-100">{formatDate(item.date)}</span>
+                                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                                  <p className="text-white/90 line-clamp-2 mb-3">{item.excerpt}</p>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-white/70 text-sm">{item.date}</span>
+                                    <Link href={`/public/noticias/${item.id}`}>
+                                      <a className="text-white hover:text-blue-200 text-sm flex items-center transition-colors">
+                                        Ler matéria <ArrowRight size={14} className="ml-1" />
+                                      </a>
+                                    </Link>
+                                  </div>
                                 </div>
-                                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white">
+                              </div>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        <div className="flex justify-center mt-4 gap-2">
+                          <CarouselPrevious />
+                          <CarouselNext />
+                        </div>
+                      </Carousel>
+                      
+                      {/* Grid de notícias secundárias */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {news.map((item) => (
+                          <div key={item.id} className="border-b pb-4 last:border-0">
+                            <div className="flex justify-between items-start mb-2">
+                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600">
+                                {item.category}
+                              </Badge>
+                              <span className="text-xs text-gray-500">{item.date}</span>
+                            </div>
+                            <Link href={`/public/noticias/${item.id}`}>
+                              <a className="block mb-2">
+                                <h4 className="font-medium hover:text-blue-600 transition-colors">
                                   {item.title}
-                                </h3>
-                                <p className="text-gray-200 mb-3 line-clamp-2 sm:line-clamp-3">{item.excerpt}</p>
-                                <div className="inline-flex items-center text-blue-200 hover:text-blue-100 transition-colors">
-                                  Leia mais <ArrowRight size={14} className="ml-1" />
-                                </div>
-                              </div>
-                            </a>
-                          </Link>
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    <div className="absolute z-10 flex justify-between w-full top-1/2 -translate-y-1/2">
-                      <CarouselPrevious className="left-2 bg-white/40 hover:bg-white/80 border-none text-white" />
-                      <CarouselNext className="right-2 bg-white/40 hover:bg-white/80 border-none text-white" />
-                    </div>
-                  </Carousel>
-                  
-                  {/* Demais notícias em grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-6">
-                    {news.slice(4, 10).map((item) => (
-                      <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                        <Link href={`/public/noticias/${item.id}`}>
-                          <a className="block">
-                            <div className="aspect-[3/2] overflow-hidden relative">
-                              <img 
-                                src={item.imageUrl} 
-                                alt={item.title} 
-                                className="w-full h-full object-cover transition-transform hover:scale-105"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
-                            </div>
-                            <div className="p-3">
-                              <div className="flex justify-between items-center mb-1 text-xs">
-                                <Badge variant="outline" className="text-xs px-2 py-0 h-5 bg-blue-50 text-blue-700 hover:bg-blue-100">
-                                  {item.category}
-                                </Badge>
-                                <span className="text-gray-500">{formatDate(item.date)}</span>
-                              </div>
-                              <h3 className="font-semibold line-clamp-2 text-sm hover:text-blue-600 transition-colors">
-                                {item.title}
-                              </h3>
-                            </div>
-                          </a>
-                        </Link>
+                                </h4>
+                              </a>
+                            </Link>
+                            <p className="text-sm text-gray-600 line-clamp-2 mb-3">{item.excerpt}</p>
+                            <Link href={`/public/noticias/${item.id}`}>
+                              <a className="text-sm text-blue-600 hover:underline flex items-center">
+                                Ler mais <ChevronRight size={14} className="ml-1" />
+                              </a>
+                            </Link>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                  
-                  {/* Instagram Feed da Câmara de Jaíba */}
-                  <div className="mt-10 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-6">
-                    <div className="flex justify-between items-center mb-6">
-                      <div className="flex items-center">
-                        <div className="text-2xl font-bold text-blue-900 flex items-center">
-                          <span className="text-blue-600">#insta</span>
-                          <span className="ml-2">@camaradejaiba</span>
-                        </div>
-                      </div>
-                      <a 
-                        href="https://instagram.com/camaradejaiba" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="flex items-center text-blue-600 font-medium"
-                      >
-                        Seguir <ChevronRight size={16} />
-                      </a>
-                    </div>
-                    
-                    {/* Grid de 6 imagens do Instagram */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                      <a 
-                        href="https://instagram.com/camaradejaiba" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
-                      >
-                        <div className="relative w-full h-full">
-                          <img 
-                            src="https://images.unsplash.com/photo-1464692805480-a69dfaafdb0d?w=500&auto=format&fit=crop&q=60" 
-                            alt="Sessão extraordinária na Câmara Municipal de Jaíba" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                            <div className="p-3 text-white text-xs">
-                              <div className="flex items-center mb-1">
-                                <Instagram size={14} className="inline mr-1" />
-                                <span className="mr-2">@camaradejaiba</span>
-                              </div>
-                              <p className="line-clamp-2">Sessão extraordinária na Câmara Municipal de Jaíba</p>
-                            </div>
-                          </div>
-                        </div>
-                      </a>
-                      
-                      <a 
-                        href="https://instagram.com/camaradejaiba" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
-                      >
-                        <div className="relative w-full h-full">
-                          <img 
-                            src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&auto=format&fit=crop&q=60" 
-                            alt="Reunião da comissão especial" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                            <div className="p-3 text-white text-xs">
-                              <div className="flex items-center mb-1">
-                                <Instagram size={14} className="inline mr-1" />
-                                <span className="mr-2">@camaradejaiba</span>
-                              </div>
-                              <p className="line-clamp-2">Reunião da comissão especial para análise do orçamento</p>
-                            </div>
-                          </div>
-                        </div>
-                      </a>
-                      
-                      <a 
-                        href="https://instagram.com/camaradejaiba" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
-                      >
-                        <div className="relative w-full h-full">
-                          <img 
-                            src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500&auto=format&fit=crop&q=60" 
-                            alt="Audiência pública" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                            <div className="p-3 text-white text-xs">
-                              <div className="flex items-center mb-1">
-                                <Instagram size={14} className="inline mr-1" />
-                                <span className="mr-2">@camaradejaiba</span>
-                              </div>
-                              <p className="line-clamp-2">Audiência pública sobre melhorias na infraestrutura</p>
-                            </div>
-                          </div>
-                        </div>
-                      </a>
-                      
-                      <a 
-                        href="https://instagram.com/camaradejaiba" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
-                      >
-                        <div className="relative w-full h-full">
-                          <img 
-                            src="https://images.unsplash.com/photo-1507137903531-34be734e5b1b?w=500&auto=format&fit=crop&q=60" 
-                            alt="Homenagem aos servidores públicos" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                            <div className="p-3 text-white text-xs">
-                              <div className="flex items-center mb-1">
-                                <Instagram size={14} className="inline mr-1" />
-                                <span className="mr-2">@camaradejaiba</span>
-                              </div>
-                              <p className="line-clamp-2">Homenagem aos servidores públicos municipais</p>
-                            </div>
-                          </div>
-                        </div>
-                      </a>
-                      
-                      <a 
-                        href="https://instagram.com/camaradejaiba" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
-                      >
-                        <div className="relative w-full h-full">
-                          <img 
-                            src="https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?w=500&auto=format&fit=crop&q=60" 
-                            alt="Cerimônia de premiação" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                            <div className="p-3 text-white text-xs">
-                              <div className="flex items-center mb-1">
-                                <Instagram size={14} className="inline mr-1" />
-                                <span className="mr-2">@camaradejaiba</span>
-                              </div>
-                              <p className="line-clamp-2">Cerimônia de premiação dos alunos da rede municipal</p>
-                            </div>
-                          </div>
-                        </div>
-                      </a>
-                      
-                      <a 
-                        href="https://instagram.com/camaradejaiba" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
-                      >
-                        <div className="relative w-full h-full">
-                          <img 
-                            src="https://images.unsplash.com/photo-1561489396-2da385eccd49?w=500&auto=format&fit=crop&q=60" 
-                            alt="Participação na conferência" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                            <div className="p-3 text-white text-xs">
-                              <div className="flex items-center mb-1">
-                                <Instagram size={14} className="inline mr-1" />
-                                <span className="mr-2">@camaradejaiba</span>
-                              </div>
-                              <p className="line-clamp-2">Participação na conferência de legislativos municipais</p>
-                            </div>
-                          </div>
-                        </div>
-                      </a>
                     </div>
                   </div>
                 </div>
                 
                 {/* Coluna da direita (menor, sem imagens) - ocupa 1/3 do espaço */}
-                <div className="space-y-6">
-                  {/* Previsão do tempo semanal */}
-                  <div className="bg-white rounded-lg shadow-md p-4">
+                <div>
+                  {/* Widget do clima */}
+                  <div className="bg-white rounded-lg shadow-md p-4 mb-6">
                     <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800 flex items-center">
                       <CloudSun className="mr-2 text-blue-600" size={20} />
-                      Previsão do Tempo
+                      Clima na Cidade
                     </h3>
                     
-                    <div className="space-y-3">
-                      {/* Clima atual */}
-                      <div className="flex items-center justify-between mb-4 bg-gradient-to-r from-blue-50 to-sky-50 p-3 rounded-lg">
-                        <div>
-                          <div className="text-gray-600 text-sm">Hoje</div>
-                          <div className="text-lg font-semibold">Jaíba, MG</div>
-                          <div className="flex items-center">
-                            <Thermometer size={14} className="text-red-500 mr-1" /> 
-                            <span className="text-2xl font-bold">27°</span>
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <div className="text-gray-500 text-sm">Hoje</div>
+                        <div className="text-2xl font-bold text-gray-800">25°C</div>
+                        <div className="text-gray-500 text-sm">Sensação 27°C</div>
+                      </div>
+                      <div className="text-5xl text-blue-500">
+                        <CloudSun />
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600 mb-4">
+                      Parcialmente nublado hoje com possibilidade de chuvas isoladas à tarde.
+                    </p>
+                    
+                    <div className="flex justify-between mb-4">
+                      {[
+                        { day: 'Seg', temp: '27°', icon: Sun, desc: 'Ensolarado' },
+                        { day: 'Ter', temp: '25°', icon: CloudSun, desc: 'Parcialmente nublado' },
+                        { day: 'Qua', temp: '26°', icon: Cloud, desc: 'Nublado' },
+                        { day: 'Qui', temp: '24°', icon: CloudRain, desc: 'Chuva' },
+                      ].map((item, index) => (
+                        <div key={index} className="text-center p-2 bg-gray-50 rounded">
+                          <div className="text-xs font-medium mb-1">{item.day}</div>
+                          <div className="text-blue-600">
+                            {React.createElement(item.icon, { size: 24 })}
                           </div>
+                          <div className="text-sm font-semibold mt-1">{item.temp}</div>
                         </div>
-                        <div className="text-blue-500">
-                          <CloudSun size={48} />
+                      ))}
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { label: 'Umidade', value: '75%', icon: Umbrella },
+                        { label: 'Vento', value: '12 km/h', icon: CloudSun },
+                        { label: 'Chuva', value: '10%', icon: CloudRain },
+                      ].map((item, index) => (
+                        <div key={index} className="text-center border border-gray-100 rounded py-2">
+                          <div className="text-blue-600 mb-1">
+                            {React.createElement(item.icon, { size: 16 })}
+                          </div>
+                          <div className="text-xs text-gray-600">{item.label}</div>
+                          <div className="text-sm font-medium">{item.value}</div>
                         </div>
-                      </div>
-                      
-                      {/* Previsão por dias da semana */}
-                      <div className="grid grid-cols-4 gap-2 mb-3">
-                        {[
-                          { day: 'Seg', temp: '27°', icon: Sun, desc: 'Ensolarado' },
-                          { day: 'Ter', temp: '25°', icon: CloudSun, desc: 'Parcialmente nublado' },
-                          { day: 'Qua', temp: '26°', icon: Cloud, desc: 'Nublado' },
-                          { day: 'Qui', temp: '24°', icon: CloudRain, desc: 'Chuva' },
-                        ].map((item, index) => (
-                          <div key={index} className="text-center p-2 bg-gray-50 rounded">
-                            <div className="text-xs font-medium mb-1">{item.day}</div>
-                            <div className="text-blue-600">
-                              {React.createElement(item.icon, { size: 24 })}
-                            </div>
-                            <div className="text-sm font-semibold mt-1">{item.temp}</div>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-3">
-                        {[
-                          { label: 'Umidade', value: '75%', icon: Umbrella },
-                          { label: 'Vento', value: '12 km/h', icon: CloudSun },
-                          { label: 'Chuva', value: '10%', icon: CloudRain },
-                        ].map((item, index) => (
-                          <div key={index} className="text-center border border-gray-100 rounded py-2">
-                            <div className="text-blue-600 mb-1">
-                              {React.createElement(item.icon, { size: 16 })}
-                            </div>
-                            <div className="text-xs text-gray-600">{item.label}</div>
-                            <div className="text-sm font-medium">{item.value}</div>
-                          </div>
-                        ))}
-                      </div>
+                      ))}
                     </div>
                   </div>
                   
@@ -941,7 +764,7 @@ export default function HomePage() {
       </section>
 
       {/* Nova seção de vereadores em cards */}
-      <section className="py-10 px-4 bg-gray-50">
+      <section className="py-10 px-4 bg-white">
         <div className="container mx-auto">
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center">
@@ -1038,62 +861,170 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
-      {/* Seção de eventos próximos */}
-      <section className="py-10 px-4">
+
+      {/* Seção de cards de documentos, atividades e calendário */}
+      <section className="py-12 px-4 bg-gray-50">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Conteúdo de eventos */}
-            <div className="lg:col-span-2">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold flex items-center">
-                  <Users className="mr-2 text-blue-600" />
-                  Vereadores
-                </h2>
-                <Link href="/public/vereadores">
-                  <a className="text-blue-600 hover:underline flex items-center">
-                    Ver todos <ChevronRight size={16} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card de Últimos Documentos */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                    <FileText className="text-blue-600" size={20} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800">Últimos Documentos</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {[
+                    { title: "Lei Complementar nº 043/2023", date: "15/05/2023", type: "Lei Complementar" },
+                    { title: "Decreto Legislativo nº 12/2023", date: "10/05/2023", type: "Decreto" },
+                    { title: "Resolução nº 007/2023", date: "05/05/2023", type: "Resolução" },
+                    { title: "Portaria nº 133/2023", date: "28/04/2023", type: "Portaria" },
+                  ].map((doc, index) => (
+                    <div key={index} className="border-b pb-3 last:border-0 last:pb-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">
+                          {doc.type}
+                        </Badge>
+                        <span className="text-xs text-gray-500">{doc.date}</span>
+                      </div>
+                      <Link href={`/public/documentos/${index}`}>
+                        <a className="text-sm font-medium hover:text-blue-600 transition-colors line-clamp-1">
+                          {doc.title}
+                        </a>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+                
+                <Link href="/public/documentos">
+                  <a className="mt-4 text-blue-600 hover:underline text-sm flex items-center justify-center pt-3 border-t">
+                    Ver todos os documentos <ChevronRight size={16} className="ml-1"/>
                   </a>
                 </Link>
               </div>
-
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                className="w-full"
-              >
-                <CarouselContent>
-                  {councilors.map((councilor) => (
-                    <CarouselItem key={councilor.id} className="md:basis-1/2 lg:basis-1/3">
-                      <div className="p-1">
-                        <CouncilorCard
-                          id={councilor.id}
-                          name={councilor.name}
-                          role={councilor.role}
-                          party={councilor.party}
-                          imageUrl={councilor.imageUrl}
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <div className="flex justify-center mt-4">
-                  <CarouselPrevious />
-                  <CarouselNext />
-                </div>
-              </Carousel>
             </div>
-
-            {/* Seção de Agenda foi removida conforme solicitado */}
+            
+            {/* Card de Atividades Legislativas */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                    <Gavel className="text-green-600" size={20} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800">Atividades Legislativas</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {[
+                    { title: "Projeto de Lei nº 076/2023 - Reforma do Parque Municipal", date: "18/05/2023", type: "Projeto de Lei" },
+                    { title: "Moção de Aplausos aos Professores da Rede Municipal", date: "12/05/2023", type: "Moção" },
+                    { title: "Indicação nº 134/2023 - Melhorias no Trânsito", date: "08/05/2023", type: "Indicação" },
+                    { title: "Requerimento nº 045/2023 - Informações sobre Obras", date: "02/05/2023", type: "Requerimento" },
+                  ].map((activity, index) => (
+                    <div key={index} className="border-b pb-3 last:border-0 last:pb-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                          {activity.type}
+                        </Badge>
+                        <span className="text-xs text-gray-500">{activity.date}</span>
+                      </div>
+                      <Link href={`/public/atividades/${index}`}>
+                        <a className="text-sm font-medium hover:text-green-600 transition-colors line-clamp-1">
+                          {activity.title}
+                        </a>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+                
+                <Link href="/public/atividades">
+                  <a className="mt-4 text-green-600 hover:underline text-sm flex items-center justify-center pt-3 border-t">
+                    Ver todas as atividades <ChevronRight size={16} className="ml-1"/>
+                  </a>
+                </Link>
+              </div>
+            </div>
+            
+            {/* Card de Calendário de Eventos */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                    <Calendar className="text-purple-600" size={20} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800">Calendário de Eventos</h3>
+                </div>
+                
+                <div className="mb-4">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="flex justify-between items-center mb-3">
+                      <button className="p-1 text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                      </button>
+                      <h4 className="font-medium">Maio 2023</h4>
+                      <button className="p-1 text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9 18l6-6-6-6" />
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-7 text-center gap-1">
+                      {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((day, i) => (
+                        <div key={i} className="text-xs font-medium text-gray-500 py-1">
+                          {day}
+                        </div>
+                      ))}
+                      
+                      {Array(31).fill(0).map((_, i) => {
+                        const day = i + 1;
+                        const hasEvent = [3, 10, 15, 22, 24].includes(day);
+                        return (
+                          <div 
+                            key={i} 
+                            className={`
+                              text-xs py-1 rounded-full
+                              ${hasEvent ? 'bg-purple-100 text-purple-700 font-medium' : 'text-gray-700'}
+                            `}
+                          >
+                            {day}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="border-l-4 border-purple-500 pl-3 py-1">
+                    <p className="text-xs text-gray-500">03/05 - 14:00</p>
+                    <p className="text-sm font-medium">Sessão Ordinária</p>
+                  </div>
+                  <div className="border-l-4 border-purple-500 pl-3 py-1">
+                    <p className="text-xs text-gray-500">10/05 - 10:00</p>
+                    <p className="text-sm font-medium">Reunião de Comissão</p>
+                  </div>
+                  <div className="border-l-4 border-purple-500 pl-3 py-1">
+                    <p className="text-xs text-gray-500">15/05 - 19:00</p>
+                    <p className="text-sm font-medium">Audiência Pública</p>
+                  </div>
+                </div>
+                
+                <Link href="/public/eventos">
+                  <a className="mt-4 text-purple-600 hover:underline text-sm flex items-center justify-center pt-3 border-t">
+                    Ver todos os eventos <ChevronRight size={16} className="ml-1"/>
+                  </a>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-
-      
-
-     
     </>
   );
 }
