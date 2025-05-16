@@ -46,6 +46,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByVerificationToken(token: string): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
+  getUsersByRole(role: string): Promise<User[]>;
   createUser(userData: Partial<User>): Promise<User>;
   updateUser(id: string, userData: Partial<User>): Promise<User | undefined>;
   deleteUser(id: string): Promise<boolean>;
