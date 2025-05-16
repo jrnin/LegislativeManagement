@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { Helmet } from 'react-helmet';
@@ -14,7 +14,9 @@ import {
   Building,
   PieChart,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { 
   Card, 
@@ -37,31 +39,58 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getInitials } from '@/lib/utils';
 
-// Componente de banner de destaque com serviços integrados
-const HeroBanner = () => (
-  <div className="relative">
-    <div className="relative bg-gradient-to-r from-blue-400 to-indigo-700 text-white">    
-      <div className="container mx-auto px-8 py-16 md:py-24 relative z-10">
-        <div className="max-w-3xl">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            Câmara Municipal - Portal Transparente
-          </h1>
-          <p className="text-lg md:text-xl opacity-90 mb-8">
-            Acompanhe as atividades legislativas, conheça os vereadores e tenha acesso a todos os documentos públicos de forma rápida e transparente.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
-              Sessões ao Vivo
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-600">
-              Ouvidoria
-            </Button>
+// Componente de banner de destaque com vídeo do YouTube como background
+const HeroBanner = () => {
+  const [isMuted, setIsMuted] = React.useState(true);
+  
+  return (
+    <div className="relative">
+      {/* Container de vídeo */}
+      <div className="relative h-[500px] overflow-hidden">
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
+          <div className="relative w-full h-full">
+            <iframe
+              src={`https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1&playlist=l7VAs92qEXA`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              className="absolute w-[300%] h-[300%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              title="Background Video"
+            ></iframe>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70"></div>
+            
+            {/* Conteúdo do banner */}
+            <div className="container mx-auto px-8 py-16 md:py-24 relative z-10 h-full flex flex-col justify-center">
+              <div className="max-w-3xl text-white">
+                <h1 className="text-3xl md:text-5xl font-bold mb-4">
+                  Câmara Municipal - Portal Transparente
+                </h1>
+                <p className="text-lg md:text-xl opacity-90 mb-8">
+                  Acompanhe as atividades legislativas, conheça os vereadores e tenha acesso a todos os documentos públicos de forma rápida e transparente.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
+                    Sessões ao Vivo
+                  </Button>
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-600">
+                    Ouvidoria
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Botão para controlar áudio */}
+            <button 
+              onClick={() => setIsMuted(!isMuted)}
+              className="absolute bottom-4 right-4 z-20 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white"
+              aria-label={isMuted ? "Ativar som" : "Desativar som"}
+            >
+              {isMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
+            </button>
           </div>
-        </div>      
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Componente de card para serviço rápido
 interface QuickServiceCardProps {
