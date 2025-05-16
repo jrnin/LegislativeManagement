@@ -479,7 +479,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de notícias */}
+      {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
@@ -507,27 +507,46 @@ export default function HomePage() {
               ))}
             </TabsList>
             <TabsContent value="Todas" className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {news.map((item) => (
-                  <NewsCard
-                    key={item.id}
-                    id={item.id}
-                    title={item.title}
-                    excerpt={item.excerpt}
-                    date={formatDate(item.date)}
-                    imageUrl={item.imageUrl}
-                    category={item.category}
-                  />
-                ))}
-              </div>
-            </TabsContent>
-            {/* Renderizar abas filtradas para outras categorias */}
-            {newsCategories.slice(1).map((category) => (
-              <TabsContent key={category} value={category} className="mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {news
-                    .filter(item => item.category === category)
-                    .map((item) => (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
+                <div className="lg:col-span-2 space-y-6">
+                  <h3 className="text-lg font-semibold mb-4 text-blue-800">Destaques</h3>
+                  
+                  {/* Notícia principal em destaque */}
+                  <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="aspect-video w-full overflow-hidden">
+                      <img 
+                        src={news[0].imageUrl} 
+                        alt={news[0].title} 
+                        className="w-full h-full object-cover transition-transform hover:scale-105"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">
+                          {news[0].category}
+                        </Badge>
+                        <span className="text-sm text-gray-500">{formatDate(news[0].date)}</span>
+                      </div>
+                      <Link href={`/public/noticias/${news[0].id}`}>
+                        <a className="block">
+                          <h3 className="text-xl font-bold mb-2 hover:text-blue-600 transition-colors">
+                            {news[0].title}
+                          </h3>
+                        </a>
+                      </Link>
+                      <p className="text-gray-600 mb-3">{news[0].excerpt}</p>
+                      <Link href={`/public/noticias/${news[0].id}`}>
+                        <a className="inline-flex items-center text-blue-600 hover:underline">
+                          Leia mais <ArrowRight size={14} className="ml-1" />
+                        </a>
+                      </Link>
+                    </div>
+                  </div>
+                  
+                  {/* Demais notícias em grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+                    {news.slice(1, 5).map((item) => (
                       <NewsCard
                         key={item.id}
                         id={item.id}
@@ -538,6 +557,91 @@ export default function HomePage() {
                         category={item.category}
                       />
                     ))}
+                  </div>
+                </div>
+                
+                {/* Coluna da direita (menor, sem imagens) - ocupa 1/3 do espaço */}
+                <div className="bg-white rounded-lg shadow-md p-4">
+                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800">Últimas Notícias</h3>
+                  
+                  <div className="space-y-4">
+                    {news.slice(0, 6).map((item) => (
+                      <div key={item.id} className="border-b pb-4 last:border-0 last:pb-0">
+                        <div className="flex justify-between items-start mb-1">
+                          <Badge variant="outline" className="text-xs">
+                            {item.category}
+                          </Badge>
+                          <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
+                        </div>
+                        <Link href={`/public/noticias/${item.id}`}>
+                          <a className="block">
+                            <h4 className="font-medium text-sm hover:text-blue-600 transition-colors leading-tight">
+                              {item.title}
+                            </h4>
+                          </a>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <Button variant="ghost" size="sm" className="w-full mt-4 text-blue-600 hover:text-blue-800">
+                    Ver mais notícias
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+            
+            {/* Renderizar abas filtradas para outras categorias */}
+            {newsCategories.slice(1).map((category) => (
+              <TabsContent key={category} value={category} className="mt-0">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Coluna da esquerda (maior, com imagens) */}
+                  <div className="lg:col-span-2 space-y-6">
+                    <h3 className="text-lg font-semibold mb-4 text-blue-800">Destaques de {category}</h3>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {news
+                        .filter(item => item.category === category)
+                        .slice(0, 4)
+                        .map((item) => (
+                          <NewsCard
+                            key={item.id}
+                            id={item.id}
+                            title={item.title}
+                            excerpt={item.excerpt}
+                            date={formatDate(item.date)}
+                            imageUrl={item.imageUrl}
+                            category={item.category}
+                          />
+                        ))}
+                    </div>
+                  </div>
+                  
+                  {/* Coluna da direita (menor, sem imagens) */}
+                  <div className="bg-white rounded-lg shadow-md p-4">
+                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800">Mais em {category}</h3>
+                    
+                    <div className="space-y-4">
+                      {news
+                        .filter(item => item.category === category)
+                        .slice(0, 5)
+                        .map((item) => (
+                          <div key={item.id} className="border-b pb-4 last:border-0 last:pb-0">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="text-xs text-blue-600">{category}</span>
+                              <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
+                            </div>
+                            <Link href={`/public/noticias/${item.id}`}>
+                              <a className="block">
+                                <h4 className="font-medium text-sm hover:text-blue-600 transition-colors leading-tight">
+                                  {item.title}
+                                </h4>
+                              </a>
+                            </Link>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             ))}
