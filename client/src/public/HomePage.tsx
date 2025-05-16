@@ -622,36 +622,43 @@ export default function HomePage() {
                       <div className="flex-shrink-0 md:w-1/4">
                         <div className="relative w-full max-w-[180px] mx-auto">
                           <div className="relative z-10">
-                            <img 
-                              src="https://cdn3d.iconscout.com/3d/premium/thumb/smartphone-5806313-4863347.png" 
-                              alt="Smartphone" 
-                              className="w-full"
-                            />
+                            {/* Smartphone mockup simples em vez de imagem externa */}
+                            <div className="w-full h-[320px] bg-gradient-to-b from-gray-800 to-gray-900 rounded-[24px] border-[8px] border-gray-700 shadow-lg relative">
+                              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[16px] bg-gray-900 rounded-b-xl"></div>
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-[4px] bg-gray-600 rounded-full"></div>
+                            </div>
                           </div>
-                          <div className="absolute top-[12%] left-[9%] right-[9%] bottom-[12%] overflow-hidden rounded-[10%] bg-black">
-                            <iframe
-                              src="https://www.instagram.com/camaradejaiba/embed/?cr=1&v=14&rd=https%3A%2F%2Fcamaradejaiba.mg.gov.br&rp=%2F"
-                              width="100%"
-                              height="100%"
-                              frameBorder="0"
-                              scrolling="no"
-                              title="Instagram Feed @camaradejaiba"
-                            ></iframe>
+                          <div className="absolute top-[40px] left-[18px] right-[18px] bottom-[40px] overflow-hidden bg-black">
+                            {/* Conteúdo alternativo no lugar do iframe */}
+                            <div className="w-full h-full bg-gradient-to-r from-blue-900 to-indigo-900 p-3 flex flex-col justify-center items-center text-white">
+                              <Instagram size={32} className="mb-2" />
+                              <div className="text-xs text-center">
+                                <p className="font-bold">@camaradejaiba</p>
+                                <p className="text-blue-200 mt-1">Siga-nos no Instagram</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                       
                       {/* Grid de posts */}
                       <div className="flex-grow grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mt-4 md:mt-0">
-                        {Array.from({ length: 5 }).map((_, index) => (
+                        {/* Mockup de imagens do Instagram com exemplos de conteúdo */}
+                        {[
+                          { bg: 'bg-blue-100', icon: <Gavel size={32} className="text-blue-600" /> },
+                          { bg: 'bg-indigo-100', icon: <Users size={32} className="text-indigo-600" /> },
+                          { bg: 'bg-purple-100', icon: <Calendar size={32} className="text-purple-600" /> },
+                          { bg: 'bg-sky-100', icon: <FileText size={32} className="text-sky-600" /> },
+                          { bg: 'bg-cyan-100', icon: <Building size={32} className="text-cyan-600" /> }
+                        ].map((item, index) => (
                           <a 
                             key={index} 
                             href="https://instagram.com/camaradejaiba" 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="bg-gray-200 overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity"
+                            className={`${item.bg} overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity flex items-center justify-center`}
                           >
-                            <div className="w-full h-full bg-gray-300 animate-pulse"></div>
+                            {item.icon}
                           </a>
                         ))}
                       </div>
