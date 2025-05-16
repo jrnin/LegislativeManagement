@@ -597,6 +597,66 @@ export default function HomePage() {
                       </div>
                     ))}
                   </div>
+                  
+                  {/* Instagram Feed da Câmara de Jaíba */}
+                  <div className="mt-10 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <div className="flex items-center">
+                        <div className="text-2xl font-bold text-blue-900 flex items-center">
+                          <span className="text-blue-600">#insta</span>
+                          <span className="ml-2">@camaradejaiba</span>
+                        </div>
+                      </div>
+                      <a 
+                        href="https://instagram.com/camaradejaiba" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center text-blue-600 font-medium"
+                      >
+                        Seguir <ChevronRight size={16} />
+                      </a>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row items-stretch gap-5">
+                      {/* Smartphone com preview */}
+                      <div className="flex-shrink-0 md:w-1/4">
+                        <div className="relative w-full max-w-[180px] mx-auto">
+                          <div className="relative z-10">
+                            <img 
+                              src="https://cdn3d.iconscout.com/3d/premium/thumb/smartphone-5806313-4863347.png" 
+                              alt="Smartphone" 
+                              className="w-full"
+                            />
+                          </div>
+                          <div className="absolute top-[12%] left-[9%] right-[9%] bottom-[12%] overflow-hidden rounded-[10%] bg-black">
+                            <iframe
+                              src="https://www.instagram.com/camaradejaiba/embed/?cr=1&v=14&rd=https%3A%2F%2Fcamaradejaiba.mg.gov.br&rp=%2F"
+                              width="100%"
+                              height="100%"
+                              frameBorder="0"
+                              scrolling="no"
+                              title="Instagram Feed @camaradejaiba"
+                            ></iframe>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Grid de posts */}
+                      <div className="flex-grow grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mt-4 md:mt-0">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <a 
+                            key={index} 
+                            href="https://instagram.com/camaradejaiba" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="bg-gray-200 overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity"
+                          >
+                            <div className="w-full h-full bg-gray-300 animate-pulse"></div>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 {/* Coluna da direita (menor, sem imagens) - ocupa 1/3 do espaço */}
