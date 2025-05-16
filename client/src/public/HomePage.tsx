@@ -48,8 +48,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getInitials } from '@/lib/utils';
-// Microinterações de animação
-import { CouncilorCard as AnimatedCouncilorCard } from '@/components/animations/councilor-card';
+// Componentes animados para microinterações
+import { AnimatedCouncilorCard } from '@/components/ui/animated-councilor-card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { HoverCard3D } from '@/components/ui/hover-card-3d';
 
 // Componente de banner de destaque com vídeo do YouTube como background
 const HeroBanner = () => {

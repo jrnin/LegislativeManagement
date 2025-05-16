@@ -1,99 +1,52 @@
-import React, { useState, useRef } from 'react';
-import { animations } from '@/lib/animations';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface AnimatedCardProps {
   children: React.ReactNode;
   className?: string;
-  tiltEffect?: boolean;
-  hoverLift?: boolean;
-  popEffect?: boolean;
-  glowEffect?: boolean;
-  glowColor?: string;
+  hoverEffect?: 'lift' | 'glow' | 'scale' | 'border' | 'none';
+  clickEffect?: 'press' | 'pulse' | 'none';
 }
 
-const AnimatedCard = ({
+export function AnimatedCard({
   children,
   className,
-  tiltEffect = false,
-  hoverLift = true,
-  popEffect = false,
-  glowEffect = false,
-  glowColor = 'rgba(59, 130, 246, 0.5)'
-}: AnimatedCardProps) => {
+  hoverEffect = 'lift',
+  clickEffect = 'press'
+}: AnimatedCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [isPressed, setIsPressed] = useState(false);
   
-  // Calcular a transformação para o efeito tilt
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!tiltEffect || !cardRef.current) return;
-    
-    const card = cardRef.current;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const rotateX = (y - centerY) / 10;
-    const rotateY = (centerX - x) / 10;
-    
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  // Define hover effects styles
+  const hoverStyles = {
+    lift: 'hover:shadow-lg hover:-translate-y-1',
+    glow: 'hover:shadow-lg hover:shadow-blue-100',
+    scale: 'hover:scale-[1.02]',
+    border: 'hover:border-blue-400',
+    none: ''
   };
   
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    
-    if (glowEffect && cardRef.current) {
-      cardRef.current.style.boxShadow = `0 0 20px ${glowColor}`;
-    }
+  // Define click effects styles
+  const clickStyles = {
+    press: 'active:scale-[0.98]',
+    pulse: 'active:animate-pulse',
+    none: ''
   };
-  
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    
-    if (tiltEffect && cardRef.current) {
-      cardRef.current.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-    }
-    
-    if (glowEffect && cardRef.current) {
-      cardRef.current.style.boxShadow = '';
-    }
-  };
-  
-  // Montar classes CSS baseadas nas props
-  const cardClasses = cn(
-    'transition-all duration-300',
-    hoverLift && animations.hoverLift,
-    popEffect && animations.cardPop,
-    className
-  );
   
   return (
     <div
-      ref={cardRef}
-      className={cardClasses}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{ transformStyle: 'preserve-3d' }}
+      className={cn(
+        'bg-white rounded-lg border border-gray-200 transition-all duration-300 ease-out',
+        hoverStyles[hoverEffect],
+        clickStyles[clickEffect],
+        className
+      )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
     >
       {children}
     </div>
   );
-};
-
-// Submódulo para separar o conteúdo do card da animação
-AnimatedCard.Content = ({ children, className }: { children: React.ReactNode, className?: string }) => {
-  return (
-    <div 
-      className={cn("w-full h-full", className)}
-      style={{ transform: 'translateZ(20px)' }}
-    >
-      {children}
-    </div>
-  );
-};
-
-export { AnimatedCard };
+}

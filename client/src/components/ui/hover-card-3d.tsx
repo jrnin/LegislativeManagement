@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface HoverCard3DProps {
@@ -9,14 +9,15 @@ interface HoverCard3DProps {
   border?: boolean;
 }
 
-const HoverCard3D = ({
+export function HoverCard3D({
   children,
   className,
-  intensity = 10,
-  glowColor = 'rgba(59, 130, 246, 0.5)', 
-  border = false,
-}: HoverCard3DProps) => {
-  const [style, setStyle] = useState<React.CSSProperties>({});
+  intensity = 15,
+  glowColor = 'rgba(103, 232, 249, 0.3)',
+  border = true
+}: HoverCard3DProps) {
+  const [transform, setTransform] = useState('');
+  const [boxShadow, setBoxShadow] = useState('');
   const cardRef = useRef<HTMLDivElement>(null);
   
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -25,51 +26,49 @@ const HoverCard3D = ({
     const card = cardRef.current;
     const rect = card.getBoundingClientRect();
     
-    // Posição relativa do mouse dentro do elemento
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Calculate the mouse position relative to the center of the card
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
     
-    // Calcular rotação baseada na posição do mouse
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    // Calculate rotation based on mouse position
+    const rotateX = (-y / rect.height * intensity).toFixed(2);
+    const rotateY = (x / rect.width * intensity).toFixed(2);
     
-    const rotateY = ((x - centerX) / centerX) * intensity;
-    const rotateX = ((centerY - y) / centerY) * intensity;
+    // Apply the transformation
+    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
     
-    // Aplicar transformação
-    setStyle({
-      transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-      transition: 'transform 0.1s ease',
-      boxShadow: `0 10px 30px -10px ${glowColor}`,
-      border: border ? `1px solid ${glowColor}` : 'none'
-    });
+    // Calculate glow strength
+    const distance = Math.sqrt(x*x + y*y);
+    const maxDistance = Math.sqrt(Math.pow(rect.width/2, 2) + Math.pow(rect.height/2, 2));
+    const glowStrength = 1 - distance / maxDistance;
+    
+    // Apply glow effect
+    setBoxShadow(`0 10px 30px -10px ${glowColor}`);
   };
   
   const handleMouseLeave = () => {
-    setStyle({
-      transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
-      transition: 'transform 0.5s ease, box-shadow 0.5s ease',
-      boxShadow: 'none',
-      border: 'none'
-    });
+    // Reset the card when mouse leaves
+    setTransform('perspective(1000px) rotateX(0deg) rotateY(0deg)');
+    setBoxShadow('none');
   };
   
   return (
-    <div 
+    <div
       ref={cardRef}
-      className={cn('transition-all duration-300', className)}
+      className={cn(
+        'bg-white rounded-lg overflow-hidden transition-all duration-200 ease-out',
+        border && 'border border-blue-100',
+        className
+      )}
+      style={{
+        transform,
+        boxShadow,
+        transition: 'transform 0.2s ease-out, box-shadow 0.2s ease-out'
+      }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{
-        ...style,
-        transformStyle: 'preserve-3d',
-      }}
     >
-      <div style={{ transform: 'translateZ(20px)' }}>
-        {children}
-      </div>
+      {children}
     </div>
   );
-};
-
-export { HoverCard3D };
+}
