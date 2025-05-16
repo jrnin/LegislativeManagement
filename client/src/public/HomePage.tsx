@@ -619,38 +619,149 @@ export default function HomePage() {
                     
                     {/* Grid de 6 imagens do Instagram */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                      {/* Imagens do feed do Instagram @camaradejaiba */}
-                      {React.useMemo(() => {
-                        // Importando os dados do feed
-                        const { instagramFeed } = require('@/data/instagramFeed');
-                        
-                        return instagramFeed.map((post, index) => (
-                          <a 
-                            key={post.id} 
-                            href="https://instagram.com/camaradejaiba" 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
-                          >
-                            <div className="relative w-full h-full">
-                              <img 
-                                src={post.imageUrl} 
-                                alt={post.caption} 
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                                <div className="p-3 text-white text-xs">
-                                  <div className="flex items-center mb-1">
-                                    <Instagram size={14} className="inline mr-1" />
-                                    <span className="mr-2">@camaradejaiba</span>
-                                  </div>
-                                  <p className="line-clamp-2">{post.caption}</p>
-                                </div>
+                      <a 
+                        href="https://instagram.com/camaradejaiba" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
+                      >
+                        <div className="relative w-full h-full">
+                          <img 
+                            src="https://images.unsplash.com/photo-1464692805480-a69dfaafdb0d?w=500&auto=format&fit=crop&q=60" 
+                            alt="Sessão extraordinária na Câmara Municipal de Jaíba" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <div className="p-3 text-white text-xs">
+                              <div className="flex items-center mb-1">
+                                <Instagram size={14} className="inline mr-1" />
+                                <span className="mr-2">@camaradejaiba</span>
                               </div>
+                              <p className="line-clamp-2">Sessão extraordinária na Câmara Municipal de Jaíba</p>
                             </div>
-                          </a>
-                        ));
-                      }, [])}
+                          </div>
+                        </div>
+                      </a>
+                      
+                      <a 
+                        href="https://instagram.com/camaradejaiba" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
+                      >
+                        <div className="relative w-full h-full">
+                          <img 
+                            src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&auto=format&fit=crop&q=60" 
+                            alt="Reunião da comissão especial" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <div className="p-3 text-white text-xs">
+                              <div className="flex items-center mb-1">
+                                <Instagram size={14} className="inline mr-1" />
+                                <span className="mr-2">@camaradejaiba</span>
+                              </div>
+                              <p className="line-clamp-2">Reunião da comissão especial para análise do orçamento</p>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                      
+                      <a 
+                        href="https://instagram.com/camaradejaiba" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
+                      >
+                        <div className="relative w-full h-full">
+                          <img 
+                            src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500&auto=format&fit=crop&q=60" 
+                            alt="Audiência pública" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <div className="p-3 text-white text-xs">
+                              <div className="flex items-center mb-1">
+                                <Instagram size={14} className="inline mr-1" />
+                                <span className="mr-2">@camaradejaiba</span>
+                              </div>
+                              <p className="line-clamp-2">Audiência pública sobre melhorias na infraestrutura</p>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                      
+                      <a 
+                        href="https://instagram.com/camaradejaiba" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
+                      >
+                        <div className="relative w-full h-full">
+                          <img 
+                            src="https://images.unsplash.com/photo-1507137903531-34be734e5b1b?w=500&auto=format&fit=crop&q=60" 
+                            alt="Homenagem aos servidores públicos" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <div className="p-3 text-white text-xs">
+                              <div className="flex items-center mb-1">
+                                <Instagram size={14} className="inline mr-1" />
+                                <span className="mr-2">@camaradejaiba</span>
+                              </div>
+                              <p className="line-clamp-2">Homenagem aos servidores públicos municipais</p>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                      
+                      <a 
+                        href="https://instagram.com/camaradejaiba" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
+                      >
+                        <div className="relative w-full h-full">
+                          <img 
+                            src="https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?w=500&auto=format&fit=crop&q=60" 
+                            alt="Cerimônia de premiação" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <div className="p-3 text-white text-xs">
+                              <div className="flex items-center mb-1">
+                                <Instagram size={14} className="inline mr-1" />
+                                <span className="mr-2">@camaradejaiba</span>
+                              </div>
+                              <p className="line-clamp-2">Cerimônia de premiação dos alunos da rede municipal</p>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                      
+                      <a 
+                        href="https://instagram.com/camaradejaiba" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
+                      >
+                        <div className="relative w-full h-full">
+                          <img 
+                            src="https://images.unsplash.com/photo-1561489396-2da385eccd49?w=500&auto=format&fit=crop&q=60" 
+                            alt="Participação na conferência" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <div className="p-3 text-white text-xs">
+                              <div className="flex items-center mb-1">
+                                <Instagram size={14} className="inline mr-1" />
+                                <span className="mr-2">@camaradejaiba</span>
+                              </div>
+                              <p className="line-clamp-2">Participação na conferência de legislativos municipais</p>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
                     </div>
                   </div>
                 </div>
