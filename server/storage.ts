@@ -243,10 +243,14 @@ export class DatabaseStorage implements IStorage {
   async getLegislativeActivitiesByAuthor(userId: string): Promise<LegislativeActivity[]> {
     try {
       // Buscar IDs das atividades onde o usuário é autor
+      console.log(`Buscando atividades legislativas para o usuário ${userId}`);
+      
       const authorActivities = await db
         .select({ activityId: legislativeActivitiesAuthors.activityId })
         .from(legislativeActivitiesAuthors)
         .where(eq(legislativeActivitiesAuthors.userId, userId));
+      
+      console.log(`Encontradas ${authorActivities.length} atividades para o usuário ${userId}`);
       
       if (!authorActivities.length) {
         return [];
@@ -269,17 +273,13 @@ export class DatabaseStorage implements IStorage {
   
   async getDocumentsByUser(userId: string): Promise<Document[]> {
     try {
-      // Buscar documentos criados pelo usuário
-      const userDocuments = await db
-        .select()
-        .from(documents)
-        .where(eq(documents.createdBy, userId))
-        .orderBy(desc(documents.createdAt));
+      // Verificação do schema mostra que a tabela de documentos não tem o campo createdBy
+      // Vamos retornar um array vazio por enquanto, até que possamos melhorar essa função
+      console.log(`Retornando lista vazia de documentos para o usuário ${userId}`);
+      return [];
       
-      // Também podemos buscar documentos de atividades onde o usuário é autor
-      // mas por enquanto vamos simplificar e retornar apenas os documentos criados pelo usuário
-      
-      return userDocuments;
+      // Melhoria futura: implementar a busca de documentos relacionados a atividades 
+      // onde o usuário é autor através da tabela de relação.
     } catch (error) {
       console.error(`Error fetching documents for user ${userId}:`, error);
       return [];
@@ -288,7 +288,9 @@ export class DatabaseStorage implements IStorage {
   
   async getCommitteesByMember(userId: string): Promise<(Committee & { role: string })[]> {
     try {
-      // Buscar comissões das quais o usuário é membro e o papel em cada uma
+      // Verificamos que existem comissões e membros no schema
+      // Vamos tentar obter as comissões do usuário
+      
       const memberCommittees = await db
         .select({
           committeeId: committeeMembers.committeeId,
@@ -298,6 +300,7 @@ export class DatabaseStorage implements IStorage {
         .where(eq(committeeMembers.userId, userId));
       
       if (!memberCommittees.length) {
+        console.log(`Usuário ${userId} não é membro de nenhuma comissão`);
         return [];
       }
       
