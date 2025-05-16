@@ -485,58 +485,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de Vereadores em destaque */}
-      <section className="py-8 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-bold flex items-center text-blue-700">
-              <Users className="mr-2" /> 
-              Vereadores
-            </h2>
-            <Link href="/public/vereadores">
-              <a className="text-blue-600 hover:underline text-sm flex items-center">
-                Ver todos <ChevronRight size={14} />
-              </a>
-            </Link>
-          </div>
-          
-          <div className="relative">
-            <div className="overflow-x-auto hide-scrollbar pb-4">
-              <div className="flex space-x-4 min-w-max">
-                {/* Exibir vereadores com dados da API ou mockados */}
-                {councilors.map((councilor) => (
-                  <div key={councilor.id} className="flex flex-col items-center w-36 sm:w-44 flex-shrink-0 group">
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 mb-3 ring-2 ring-white shadow-lg transition-transform group-hover:scale-105">
-                      {councilor.imageUrl ? (
-                        <img 
-                          src={councilor.imageUrl} 
-                          alt={councilor.name} 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
-                          {councilor.name.split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="font-medium text-gray-800 dark:text-white text-center line-clamp-1">
-                      {councilor.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
-                      Vereador
-                    </p>
-                    <Link href={`/public/vereadores/${councilor.id}`}>
-                      <a className="mt-2 text-sm text-blue-600 hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
-                        Ver perfil
-                      </a>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Seção de Vereadores foi removida conforme solicitado */}
 
       {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">
