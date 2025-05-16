@@ -622,27 +622,27 @@ export default function HomePage() {
                       {/* Imagens reais do Instagram */}
                       {[
                         { 
-                          url: "https://i.pinimg.com/736x/53/7a/05/537a05b6659e52d2f3c906a6d5ade4c0.jpg", 
+                          url: "https://images.unsplash.com/photo-1598386651573-9232cc0c2d6c?w=500&auto=format&fit=crop&q=60", 
                           alt: "Sessão Câmara Municipal" 
                         },
                         { 
-                          url: "https://i.pinimg.com/originals/9e/1b/40/9e1b40b61319b7e5a2044e353e684eab.jpg", 
+                          url: "https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?w=500&auto=format&fit=crop&q=60", 
                           alt: "Reunião vereadores" 
                         },
                         { 
-                          url: "https://i.pinimg.com/736x/77/1a/02/771a02a26a9f5f7589cae735ab4b1b1c.jpg", 
+                          url: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500&auto=format&fit=crop&q=60", 
                           alt: "Evento Câmara" 
                         },
                         { 
-                          url: "https://i.pinimg.com/736x/bd/9a/37/bd9a3752c3acd734e85b239e7e3f3e5d.jpg", 
+                          url: "https://images.unsplash.com/photo-1561489396-2da385eccd49?w=500&auto=format&fit=crop&q=60", 
                           alt: "Sessão plenária" 
                         },
                         { 
-                          url: "https://i.pinimg.com/736x/be/7e/77/be7e77c2a3deeed95ca49492c02e8e17.jpg", 
+                          url: "https://images.unsplash.com/photo-1574515529318-272baa74c25e?w=500&auto=format&fit=crop&q=60", 
                           alt: "Audiência pública" 
                         },
                         { 
-                          url: "https://i.pinimg.com/736x/2e/f8/f7/2ef8f77333adeef0d9cf865654c6050a.jpg", 
+                          url: "https://images.unsplash.com/photo-1507137903531-34be734e5b1b?w=500&auto=format&fit=crop&q=60", 
                           alt: "Cerimônia oficial" 
                         }
                       ].map((image, index) => (
