@@ -518,50 +518,83 @@ export default function HomePage() {
                 <div className="lg:col-span-2 space-y-6">
                   <h3 className="text-lg font-semibold mb-4 text-blue-800">Destaques</h3>
                   
-                  {/* Notícia principal em destaque */}
-                  <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div className="aspect-video w-full overflow-hidden">
-                      <img 
-                        src={news[0].imageUrl} 
-                        alt={news[0].title} 
-                        className="w-full h-full object-cover transition-transform hover:scale-105"
-                      />
+                  {/* Carrossel de notícias em destaque com overlay */}
+                  <Carousel
+                    opts={{
+                      align: "start",
+                      loop: true,
+                    }}
+                    className="w-full rounded-lg shadow-md overflow-hidden"
+                  >
+                    <CarouselContent>
+                      {news.slice(0, 4).map((item) => (
+                        <CarouselItem key={item.id}>
+                          <Link href={`/public/noticias/${item.id}`}>
+                            <a className="block relative">
+                              <div className="aspect-[16/9] overflow-hidden">
+                                <img 
+                                  src={item.imageUrl} 
+                                  alt={item.title} 
+                                  className="w-full h-full object-cover"
+                                />
+                                {/* Overlay gradiente */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                              </div>
+                              
+                              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                <div className="flex items-center justify-between mb-2">
+                                  <Badge className="bg-blue-600 hover:bg-blue-700 text-white">
+                                    {item.category}
+                                  </Badge>
+                                  <span className="text-sm text-blue-100">{formatDate(item.date)}</span>
+                                </div>
+                                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white">
+                                  {item.title}
+                                </h3>
+                                <p className="text-gray-200 mb-3 line-clamp-2 sm:line-clamp-3">{item.excerpt}</p>
+                                <div className="inline-flex items-center text-blue-200 hover:text-blue-100 transition-colors">
+                                  Leia mais <ArrowRight size={14} className="ml-1" />
+                                </div>
+                              </div>
+                            </a>
+                          </Link>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <div className="absolute z-10 flex justify-between w-full top-1/2 -translate-y-1/2">
+                      <CarouselPrevious className="left-2 bg-white/40 hover:bg-white/80 border-none text-white" />
+                      <CarouselNext className="right-2 bg-white/40 hover:bg-white/80 border-none text-white" />
                     </div>
-                    <div className="p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">
-                          {news[0].category}
-                        </Badge>
-                        <span className="text-sm text-gray-500">{formatDate(news[0].date)}</span>
-                      </div>
-                      <Link href={`/public/noticias/${news[0].id}`}>
-                        <a className="block">
-                          <h3 className="text-xl font-bold mb-2 hover:text-blue-600 transition-colors">
-                            {news[0].title}
-                          </h3>
-                        </a>
-                      </Link>
-                      <p className="text-gray-600 mb-3">{news[0].excerpt}</p>
-                      <Link href={`/public/noticias/${news[0].id}`}>
-                        <a className="inline-flex items-center text-blue-600 hover:underline">
-                          Leia mais <ArrowRight size={14} className="ml-1" />
-                        </a>
-                      </Link>
-                    </div>
-                  </div>
+                  </Carousel>
                   
                   {/* Demais notícias em grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-                    {news.slice(1, 5).map((item) => (
-                      <NewsCard
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        excerpt={item.excerpt}
-                        date={formatDate(item.date)}
-                        imageUrl={item.imageUrl}
-                        category={item.category}
-                      />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-6">
+                    {news.slice(4, 10).map((item) => (
+                      <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                        <Link href={`/public/noticias/${item.id}`}>
+                          <a className="block">
+                            <div className="aspect-[3/2] overflow-hidden relative">
+                              <img 
+                                src={item.imageUrl} 
+                                alt={item.title} 
+                                className="w-full h-full object-cover transition-transform hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
+                            </div>
+                            <div className="p-3">
+                              <div className="flex justify-between items-center mb-1 text-xs">
+                                <Badge variant="outline" className="text-xs px-2 py-0 h-5 bg-blue-50 text-blue-700 hover:bg-blue-100">
+                                  {item.category}
+                                </Badge>
+                                <span className="text-gray-500">{formatDate(item.date)}</span>
+                              </div>
+                              <h3 className="font-semibold line-clamp-2 text-sm hover:text-blue-600 transition-colors">
+                                {item.title}
+                              </h3>
+                            </div>
+                          </a>
+                        </Link>
+                      </div>
                     ))}
                   </div>
                 </div>
