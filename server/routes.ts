@@ -1373,6 +1373,406 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // COMMITTEE ROUTES
+  
+  // Get all committees
+  app.get('/api/committees', requireAuth, async (req, res) => {
+    try {
+      const committees = await storage.getAllCommittees();
+      res.json(committees);
+    } catch (error) {
+      console.error("Error fetching committees:", error);
+      res.status(500).json({ message: "Erro ao buscar comissões" });
+    }
+  });
+  
+  // Get single committee with members
+  app.get('/api/committees/:id', requireAuth, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.id);
+      
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+      
+      const committee = await storage.getCommitteeWithMembers(committeeId);
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      res.json(committee);
+    } catch (error) {
+      console.error("Error fetching committee:", error);
+      res.status(500).json({ message: "Erro ao buscar comissão" });
+    }
+  });
+  
+  // Create new committee (admin only)
+  app.post('/api/committees', requireAdmin, async (req, res) => {
+    try {
+      const schema = z.object({
+        name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
+        startDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+          message: "Data de início inválida"
+        }),
+        endDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+          message: "Data de término inválida"
+        }),
+        description: z.string().min(5, "Descrição deve ter pelo menos 5 caracteres"),
+        type: z.string().min(3, "Tipo deve ter pelo menos 3 caracteres"),
+        members: z.array(z.string()).optional(),
+      });
+      
+      const validated = schema.parse(req.body);
+      
+      const committeeData = {
+        name: validated.name,
+        startDate: new Date(validated.startDate),
+        endDate: new Date(validated.endDate),
+        description: validated.description,
+        type: validated.type,
+      };
+      
+      const memberIds = validated.members || [];
+      
+      const committee = await storage.createCommittee(committeeData, memberIds);
+      
+      // Notificar usuários sobre a criação da nova comissão
+      sendNotification("all", {
+        type: "committee_created",
+        title: "Nova Comissão Criada",
+        message: `A comissão "${committee.name}" foi criada.`,
+        data: {
+          committeeId: committee.id,
+          committeeName: committee.name,
+        },
+        createdAt: new Date(),
+      });
+      
+      res.status(201).json(committee);
+    } catch (error) {
+      console.error("Error creating committee:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      
+      res.status(500).json({ message: "Erro ao criar comissão" });
+    }
+  });
+  
+  // Update committee (admin only)
+  app.put('/api/committees/:id', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.id);
+      
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+      
+      const schema = z.object({
+        name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").optional(),
+        startDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+          message: "Data de início inválida"
+        }).optional(),
+        endDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+          message: "Data de término inválida"
+        }).optional(),
+        description: z.string().min(5, "Descrição deve ter pelo menos 5 caracteres").optional(),
+        type: z.string().min(3, "Tipo deve ter pelo menos 3 caracteres").optional(),
+        members: z.array(z.string()).optional(),
+      });
+      
+      const validated = schema.parse(req.body);
+      
+      const committeeData: any = {};
+      
+      if (validated.name) committeeData.name = validated.name;
+      if (validated.startDate) committeeData.startDate = new Date(validated.startDate);
+      if (validated.endDate) committeeData.endDate = new Date(validated.endDate);
+      if (validated.description) committeeData.description = validated.description;
+      if (validated.type) committeeData.type = validated.type;
+      
+      const updatedCommittee = await storage.updateCommittee(
+        committeeId, 
+        committeeData, 
+        validated.members
+      );
+      
+      if (!updatedCommittee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Notificar usuários sobre a atualização da comissão
+      sendNotification("all", {
+        type: "committee_updated",
+        title: "Comissão Atualizada",
+        message: `A comissão "${updatedCommittee.name}" foi atualizada.`,
+        data: {
+          committeeId: updatedCommittee.id,
+          committeeName: updatedCommittee.name,
+        },
+        createdAt: new Date(),
+      });
+      
+      res.json(updatedCommittee);
+    } catch (error) {
+      console.error("Error updating committee:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      
+      res.status(500).json({ message: "Erro ao atualizar comissão" });
+    }
+  });
+  
+  // Delete committee (admin only)
+  app.delete('/api/committees/:id', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.id);
+      
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+      
+      // Get committee details before deletion for notification
+      const committee = await storage.getCommittee(committeeId);
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      const deleted = await storage.deleteCommittee(committeeId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Notificar usuários sobre a remoção da comissão
+      sendNotification("all", {
+        type: "committee_deleted",
+        title: "Comissão Removida",
+        message: `A comissão "${committee.name}" foi removida.`,
+        data: {
+          committeeId: committee.id,
+          committeeName: committee.name,
+        },
+        createdAt: new Date(),
+      });
+      
+      res.json({ success: true, message: "Comissão removida com sucesso" });
+    } catch (error) {
+      console.error("Error deleting committee:", error);
+      res.status(500).json({ message: "Erro ao remover comissão" });
+    }
+  });
+  
+  // Get committee members
+  app.get('/api/committees/:id/members', requireAuth, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.id);
+      
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+      
+      const members = await storage.getCommitteeMembersByCommitteeId(committeeId);
+      
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching committee members:", error);
+      res.status(500).json({ message: "Erro ao buscar membros da comissão" });
+    }
+  });
+  
+  // Add member to committee (admin only)
+  app.post('/api/committees/:id/members', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.id);
+      
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+      
+      const schema = z.object({
+        userId: z.string(),
+        role: z.string().optional(),
+      });
+      
+      const validated = schema.parse(req.body);
+      
+      // Verificar se o comitê existe
+      const committee = await storage.getCommittee(committeeId);
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Verificar se o usuário existe
+      const user = await storage.getUser(validated.userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      const member = await storage.addCommitteeMember(
+        committeeId,
+        validated.userId,
+        validated.role
+      );
+      
+      // Notificar o usuário adicionado à comissão
+      sendNotification(validated.userId, {
+        type: "committee_member_added",
+        title: "Adicionado à Comissão",
+        message: `Você foi adicionado à comissão "${committee.name}" como ${validated.role || 'membro'}.`,
+        data: {
+          committeeId: committee.id,
+          committeeName: committee.name,
+          role: validated.role || 'membro',
+        },
+        createdAt: new Date(),
+      });
+      
+      res.status(201).json(member);
+    } catch (error) {
+      console.error("Error adding committee member:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      
+      res.status(500).json({ message: "Erro ao adicionar membro à comissão" });
+    }
+  });
+  
+  // Update committee member role (admin only)
+  app.put('/api/committees/:committeeId/members/:userId', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.committeeId);
+      const userId = req.params.userId;
+      
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+      
+      const schema = z.object({
+        role: z.string().min(1, "Papel/função é obrigatório"),
+      });
+      
+      const validated = schema.parse(req.body);
+      
+      // Verificar se o comitê existe
+      const committee = await storage.getCommittee(committeeId);
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Verificar se o usuário existe
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      const updatedMember = await storage.updateCommitteeMemberRole(
+        committeeId,
+        userId,
+        validated.role
+      );
+      
+      if (!updatedMember) {
+        return res.status(404).json({ message: "Membro não encontrado nesta comissão" });
+      }
+      
+      // Notificar o usuário sobre a alteração de papel na comissão
+      sendNotification(userId, {
+        type: "committee_role_updated",
+        title: "Função Atualizada em Comissão",
+        message: `Sua função na comissão "${committee.name}" foi atualizada para ${validated.role}.`,
+        data: {
+          committeeId: committee.id,
+          committeeName: committee.name,
+          role: validated.role,
+        },
+        createdAt: new Date(),
+      });
+      
+      res.json(updatedMember);
+    } catch (error) {
+      console.error("Error updating committee member role:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      
+      res.status(500).json({ message: "Erro ao atualizar papel do membro na comissão" });
+    }
+  });
+  
+  // Remove member from committee (admin only)
+  app.delete('/api/committees/:committeeId/members/:userId', requireAdmin, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.committeeId);
+      const userId = req.params.userId;
+      
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+      
+      // Verificar se o comitê existe
+      const committee = await storage.getCommittee(committeeId);
+      
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+      
+      // Verificar se o usuário existe
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      const removed = await storage.removeCommitteeMember(committeeId, userId);
+      
+      if (!removed) {
+        return res.status(404).json({ message: "Membro não encontrado nesta comissão" });
+      }
+      
+      // Notificar o usuário sobre a remoção da comissão
+      sendNotification(userId, {
+        type: "committee_member_removed",
+        title: "Removido da Comissão",
+        message: `Você foi removido da comissão "${committee.name}".`,
+        data: {
+          committeeId: committee.id,
+          committeeName: committee.name,
+        },
+        createdAt: new Date(),
+      });
+      
+      res.json({ success: true, message: "Membro removido da comissão com sucesso" });
+    } catch (error) {
+      console.error("Error removing committee member:", error);
+      res.status(500).json({ message: "Erro ao remover membro da comissão" });
+    }
+  });
+  
+  // Get all councilors for committee selection
+  app.get('/api/councilors', requireAuth, async (req, res) => {
+    try {
+      const councilors = await storage.getCouncilors();
+      res.json(councilors);
+    } catch (error) {
+      console.error("Error fetching councilors:", error);
+      res.status(500).json({ message: "Erro ao buscar vereadores" });
+    }
+  });
+  
   // SEARCH ROUTES
   
   // Global search across all entities
