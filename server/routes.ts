@@ -2725,6 +2725,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Erro ao buscar vereadores" });
     }
   });
+  
+  // Rota pública para obter vereadores (sem autenticação)
+  app.get('/api/public/councilors', async (req, res) => {
+    try {
+      const councilors = await storage.getUsersByRole('councilor');
+      res.json(councilors);
+    } catch (error) {
+      console.error("Erro ao buscar vereadores para exibição pública:", error);
+      res.status(500).json({ message: "Erro ao buscar vereadores" });
+    }
+  });
 
   // Criar o servidor HTTP
   const httpServer = createServer(app);
