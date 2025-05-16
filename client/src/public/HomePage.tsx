@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { Helmet } from 'react-helmet';
@@ -48,6 +48,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getInitials } from '@/lib/utils';
+import { AnimatedCouncilorCard } from '@/components/ui/animated-councilor-card';
+import { animations, useIsVisible } from '@/lib/animations';
 
 // Componente de banner de destaque com vídeo do YouTube como background
 const HeroBanner = () => {
@@ -779,85 +781,46 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {/* Card Ana Silva */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="flex flex-col items-center pt-6 pb-4">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
-                  <img 
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=60" 
-                    alt="Ana Silva" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-semibold text-lg text-gray-800">Ana Silva</h3>
-                <p className="text-blue-600 text-sm mb-1">Partido A</p>
-                <Badge variant="outline" className="bg-blue-50">Presidente</Badge>
-              </div>
-            </div>
+            {/* Usando o componente AnimatedCouncilorCard para todos os vereadores */}
+            <AnimatedCouncilorCard
+              id="1"
+              name="Ana Silva"
+              party="Partido A"
+              role="Presidente"
+              imageUrl="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=60"
+            />
             
-            {/* Card Carlos Santos */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="flex flex-col items-center pt-6 pb-4">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
-                  <img 
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=60" 
-                    alt="Carlos Santos" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-semibold text-lg text-gray-800">Carlos Santos</h3>
-                <p className="text-blue-600 text-sm mb-1">Partido B</p>
-                <Badge variant="outline" className="bg-blue-50">Vice-Presidente</Badge>
-              </div>
-            </div>
+            <AnimatedCouncilorCard
+              id="2"
+              name="Carlos Santos"
+              party="Partido B"
+              role="Vice-Presidente"
+              imageUrl="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=60"
+            />
             
-            {/* Card Mariana Oliveira */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="flex flex-col items-center pt-6 pb-4">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
-                  <img 
-                    src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=60" 
-                    alt="Mariana Oliveira" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-semibold text-lg text-gray-800">Mariana Oliveira</h3>
-                <p className="text-blue-600 text-sm mb-1">Partido C</p>
-                <Badge variant="outline" className="bg-blue-50">Secretária</Badge>
-              </div>
-            </div>
+            <AnimatedCouncilorCard
+              id="3"
+              name="Mariana Oliveira"
+              party="Partido C"
+              role="Secretária"
+              imageUrl="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=60"
+            />
             
-            {/* Card Ricardo Almeida */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="flex flex-col items-center pt-6 pb-4">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
-                  <img 
-                    src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=60" 
-                    alt="Ricardo Almeida" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-semibold text-lg text-gray-800">Ricardo Almeida</h3>
-                <p className="text-blue-600 text-sm mb-1">Partido B</p>
-                <Badge variant="outline" className="bg-blue-50">Vereador</Badge>
-              </div>
-            </div>
+            <AnimatedCouncilorCard
+              id="4"
+              name="Ricardo Almeida"
+              party="Partido B"
+              role="Vereador"
+              imageUrl="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=60"
+            />
             
-            {/* Card Paulo Ferreira */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="flex flex-col items-center pt-6 pb-4">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
-                  <img 
-                    src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=60" 
-                    alt="Paulo Ferreira" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-semibold text-lg text-gray-800">Paulo Ferreira</h3>
-                <p className="text-blue-600 text-sm mb-1">Partido A</p>
-                <Badge variant="outline" className="bg-blue-50">Vereador</Badge>
-              </div>
-            </div>
+            <AnimatedCouncilorCard
+              id="5"
+              name="Paulo Ferreira"
+              party="Partido A"
+              role="Vereador"
+              imageUrl="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=60"
+            />
           </div>
         </div>
       </section>
