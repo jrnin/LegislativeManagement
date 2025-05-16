@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Helmet } from 'react-helmet';
 import { 
@@ -15,7 +15,9 @@ import {
   Zap,
   Cloud,
   CloudRain,
-  CloudSun
+  CloudSun,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,6 +47,26 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     condition: 'Parcialmente nublado',
     icon: CloudSun
   });
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  
+  // Detectar quando o usuário rola a página para aplicar o efeito do menu fixo
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    // Limpar o event listener quando o componente for desmontado
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Opções para configurações de acessibilidade
   const toggleDarkMode = () => {
@@ -162,128 +184,187 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         </div>
       </div>
 
-      {/* Header principal */}
-      <header className={`w-full py-4 px-4 ${isDarkMode ? 'bg-slate-800' : 'bg-white shadow'}`}>
-        <div className="container mx-auto">
-          <div className="flex justify-between items-center">
-            {/* Logo */}
-            <Link href="/public">
-              <a className="flex items-center space-x-2">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xl">
-                  SL
-                </div>
-                <div className="hidden sm:block">
-                  <h1 className="text-xl font-bold">
-                    <span className="text-blue-600">Sistema</span>
-                    <span className={isDarkMode ? "text-gray-300" : "text-slate-700"}>Legislativo</span>
-                  </h1>
-                  <p className="text-xs text-gray-500">Portal Público</p>
-                </div>
-              </a>
-            </Link>
-
-            {/* Barra de pesquisa - visível apenas em telas médias ou maiores */}
-            <div className="hidden md:flex flex-1 max-w-md mx-6">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Pesquisar no site..."
-                  className="pl-9 pr-4 rounded-full border-gray-300"
-                />
-              </div>
-            </div>
-
-            {/* Menu para desktop */}
-            <nav className="hidden lg:flex items-center space-x-1">
-              {mainMenuLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <a className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location === link.href 
-                      ? 'bg-blue-600 text-white' 
-                      : isDarkMode 
-                        ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
-                        : 'text-gray-700 hover:bg-gray-100'
-                  }`}>
-                    {link.name}
-                  </a>
-                </Link>
-              ))}
-              
-              <Link href="/login">
-                <a className="ml-2">
-                  <Button variant="outline" size="sm">Área Restrita</Button>
-                </a>
-              </Link>
-            </nav>
-
-            {/* Menu para dispositivos móveis */}
-            <div className="lg:hidden flex items-center">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Menu">
-                    <Menu />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className={isDarkMode ? "bg-slate-800 text-white" : ""}>
-                  <div className="flex flex-col h-full">
-                    <div className="flex justify-between items-center pb-4 border-b">
-                      <div className="text-xl font-bold">Menu</div>
-                      <SheetClose asChild>
-                        <Button variant="ghost" size="icon">
-                          <X />
-                        </Button>
-                      </SheetClose>
-                    </div>
-                    
-                    {/* Barra de pesquisa para mobile */}
-                    <div className="py-4">
-                      <div className="relative w-full">
-                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          type="search"
-                          placeholder="Pesquisar no site..."
-                          className="pl-9 pr-4 rounded-full border-gray-300"
-                        />
-                      </div>
-                    </div>
-                    
-                    <nav className="flex flex-col space-y-1 py-4">
-                      {mainMenuLinks.map((link) => (
-                        <Link key={link.href} href={link.href}>
-                          <SheetClose asChild>
-                            <a className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                              location === link.href 
-                                ? 'bg-blue-600 text-white' 
-                                : isDarkMode 
-                                  ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
-                                  : 'text-gray-700 hover:bg-gray-100'
-                            }`}>
-                              {link.name}
-                            </a>
-                          </SheetClose>
-                        </Link>
-                      ))}
-                    </nav>
-                    
-                    <div className="mt-auto pt-4 border-t">
-                      <Link href="/login">
-                        <SheetClose asChild>
-                          <a className="block">
-                            <Button variant="default" size="sm" className="w-full">
-                              Área Restrita
-                            </Button>
-                          </a>
-                        </SheetClose>
-                      </Link>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
+      {/* Header principal com vídeo de background */}
+      <div className="relative">
+        {/* Container de vídeo */}
+        {location === '/public' && (
+          <div className="absolute inset-0 w-full h-[500px] overflow-hidden z-0">
+            <div className="relative w-full h-full">
+              <iframe
+                src={`https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1&playlist=l7VAs92qEXA`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                className="absolute w-[300%] h-[300%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                title="Background Video"
+              ></iframe>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70 z-10"></div>
+              <button 
+                onClick={() => setIsMuted(!isMuted)}
+                className="absolute bottom-4 right-4 z-20 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white"
+                aria-label={isMuted ? "Ativar som" : "Desativar som"}
+              >
+                {isMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
+              </button>
             </div>
           </div>
-        </div>
-      </header>
+        )}
+
+        {/* Header/Navbar com efeito glass */}
+        <header 
+          className={`w-full py-4 px-4 z-30 ${
+            isScrolled 
+              ? 'fixed top-0 left-0 right-0 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 shadow-lg transition-all duration-300 ease-in-out' 
+              : location === '/public' 
+                ? 'absolute top-0 left-0 right-0 backdrop-blur-md bg-transparent'
+                : `relative ${isDarkMode ? 'bg-slate-800' : 'bg-white shadow'}`
+          }`}
+        >
+          <div className="container mx-auto">
+            <div className="flex justify-between items-center">
+              {/* Logo */}
+              <Link href="/public">
+                <div className="flex items-center space-x-2">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xl">
+                    SL
+                  </div>
+                  <div className="hidden sm:block">
+                    <h1 className="text-xl font-bold">
+                      <span className="text-blue-600">Sistema</span>
+                      <span className={`${
+                        location === '/public' && !isScrolled
+                          ? 'text-white' 
+                          : isDarkMode 
+                            ? 'text-gray-300' 
+                            : 'text-slate-700'
+                      }`}>Legislativo</span>
+                    </h1>
+                    <p className={`text-xs ${
+                      location === '/public' && !isScrolled 
+                        ? 'text-blue-100' 
+                        : 'text-gray-500'
+                    }`}>Portal Público</p>
+                  </div>
+                </div>
+              </Link>
+
+              {/* Barra de pesquisa - visível apenas em telas médias ou maiores */}
+              <div className="hidden md:flex flex-1 max-w-md mx-6">
+                <div className="relative w-full">
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Pesquisar no site..."
+                    className={`pl-9 pr-4 rounded-full ${
+                      location === '/public' && !isScrolled
+                        ? 'bg-white/20 border-white/30 placeholder:text-white/70 text-white'
+                        : 'border-gray-300'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Menu para desktop */}
+              <nav className="hidden lg:flex items-center space-x-1">
+                {mainMenuLinks.map((link) => (
+                  <Link key={link.href} href={link.href}>
+                    <div className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                      location === link.href 
+                        ? 'bg-blue-600 text-white' 
+                        : location === '/public' && !isScrolled
+                          ? 'text-white hover:bg-white/20'
+                          : isDarkMode 
+                            ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                            : 'text-gray-700 hover:bg-gray-100'
+                    }`}>
+                      {link.name}
+                    </div>
+                  </Link>
+                ))}
+                
+                <div className="ml-2">
+                  <Button 
+                    variant={location === '/public' && !isScrolled ? "secondary" : "outline"} 
+                    size="sm"
+                    onClick={() => window.location.href = "/login"}
+                  >
+                    Área Restrita
+                  </Button>
+                </div>
+              </nav>
+
+              {/* Menu para dispositivos móveis */}
+              <div className="lg:hidden flex items-center">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      aria-label="Menu"
+                      className={location === '/public' && !isScrolled ? "text-white hover:bg-white/20" : ""}
+                    >
+                      <Menu />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className={isDarkMode ? "bg-slate-800 text-white" : ""}>
+                    <div className="flex flex-col h-full">
+                      <div className="flex justify-between items-center pb-4 border-b">
+                        <div className="text-xl font-bold">Menu</div>
+                        <SheetClose asChild>
+                          <Button variant="ghost" size="icon">
+                            <X />
+                          </Button>
+                        </SheetClose>
+                      </div>
+                      
+                      {/* Barra de pesquisa para mobile */}
+                      <div className="py-4">
+                        <div className="relative w-full">
+                          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            type="search"
+                            placeholder="Pesquisar no site..."
+                            className="pl-9 pr-4 rounded-full border-gray-300"
+                          />
+                        </div>
+                      </div>
+                      
+                      <nav className="flex flex-col space-y-1 py-4">
+                        {mainMenuLinks.map((link) => (
+                          <Link key={link.href} href={link.href}>
+                            <SheetClose asChild>
+                              <div className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                                location === link.href 
+                                  ? 'bg-blue-600 text-white' 
+                                  : isDarkMode 
+                                    ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                                    : 'text-gray-700 hover:bg-gray-100'
+                              }`}>
+                                {link.name}
+                              </div>
+                            </SheetClose>
+                          </Link>
+                        ))}
+                      </nav>
+                      
+                      <div className="mt-auto pt-4 border-t">
+                        <SheetClose asChild>
+                          <Button 
+                            variant="default" 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => window.location.href = "/login"}
+                          >
+                            Área Restrita
+                          </Button>
+                        </SheetClose>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
+          </div>
+        </header>
+      </div>
 
       {/* Conteúdo principal */}
       <main className="flex-1">
