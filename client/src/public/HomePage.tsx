@@ -48,8 +48,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getInitials } from '@/lib/utils';
-import { AnimatedCouncilorCard } from '@/components/ui/animated-councilor-card';
-import { animations, useIsVisible } from '@/lib/animations';
+// Microinterações de animação
+import { CouncilorCard as AnimatedCouncilorCard } from '@/components/animations/councilor-card';
 
 // Componente de banner de destaque com vídeo do YouTube como background
 const HeroBanner = () => {
@@ -178,36 +178,7 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
   </Link>
 );
 
-// Componente para card de vereador
-interface CouncilorCardProps {
-  id: string;
-  name: string;
-  role: string;
-  party: string;
-  imageUrl?: string;
-}
-
-const CouncilorCard = ({ id, name, role, party, imageUrl }: CouncilorCardProps) => (
-  <Link href={`/public/vereadores/${id}`}>
-    <a className="block">
-      <Card className="text-center hover:shadow-md transition-all">
-        <CardHeader className="pb-2 pt-6">
-          <div className="flex justify-center mb-4">
-            <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-              <AvatarImage src={imageUrl} />
-              <AvatarFallback className="bg-blue-700 text-white text-lg">{getInitials(name)}</AvatarFallback>
-            </Avatar>
-          </div>
-          <CardTitle className="text-lg">{name}</CardTitle>
-          <CardDescription>{party}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Badge variant="outline" className="mx-auto">{role}</Badge>
-        </CardContent>
-      </Card>
-    </a>
-  </Link>
-);
+// O componente CouncilorCard foi substituído pelo componente AnimatedCouncilorCard importado
 
 // Componente para card de evento
 interface EventCardProps {
