@@ -135,8 +135,16 @@ export interface IStorage {
     legislature: Legislature;
   } | undefined>;
   
-  // Get all councilors
+  // Councilor operations
   getCouncilors(): Promise<User[]>;
+  getCouncilorWithDetails(id: string): Promise<User & {
+    activities: LegislativeActivity[];
+    documents: Document[];
+    committees: (Committee & { role: string })[];
+  } | undefined>;
+  getLegislativeActivitiesByAuthor(userId: string): Promise<LegislativeActivity[]>;
+  getDocumentsByUser(userId: string): Promise<Document[]>;
+  getCommitteesByMember(userId: string): Promise<(Committee & { role: string })[]>;
   
   // Committee operations
   getCommittee(id: number): Promise<Committee | undefined>;
@@ -198,6 +206,121 @@ export class DatabaseStorage implements IStorage {
       return await this.getUsersByRole('councilor');
     } catch (error) {
       console.error("Error fetching councilors:", error);
+      return [];
+    }
+  }
+  
+  async getCouncilorWithDetails(id: string): Promise<(User & {
+    activities: LegislativeActivity[];
+    documents: Document[];
+    committees: (Committee & { role: string })[];
+  }) | undefined> {
+    try {
+      // Buscar o vereador
+      const user = await this.getUser(id);
+      if (!user) {
+        return undefined;
+      }
+      
+      // Buscar atividades, documentos e comissões relacionadas
+      const activities = await this.getLegislativeActivitiesByAuthor(id);
+      const documents = await this.getDocumentsByUser(id);
+      const committees = await this.getCommitteesByMember(id);
+      
+      // Retornar o vereador com os dados relacionados
+      return {
+        ...user,
+        activities,
+        documents,
+        committees
+      };
+    } catch (error) {
+      console.error(`Error fetching councilor details for ${id}:`, error);
+      return undefined;
+    }
+  }
+  
+  async getLegislativeActivitiesByAuthor(userId: string): Promise<LegislativeActivity[]> {
+    try {
+      // Buscar IDs das atividades onde o usuário é autor
+      const authorActivities = await db
+        .select({ activityId: legislativeActivitiesAuthors.activityId })
+        .from(legislativeActivitiesAuthors)
+        .where(eq(legislativeActivitiesAuthors.userId, userId));
+      
+      if (!authorActivities.length) {
+        return [];
+      }
+      
+      // Buscar detalhes completos das atividades
+      const activityIds = authorActivities.map(a => a.activityId);
+      const activities = await db
+        .select()
+        .from(legislativeActivities)
+        .where(inArray(legislativeActivities.id, activityIds))
+        .orderBy(desc(legislativeActivities.activityDate));
+      
+      return activities;
+    } catch (error) {
+      console.error(`Error fetching activities for author ${userId}:`, error);
+      return [];
+    }
+  }
+  
+  async getDocumentsByUser(userId: string): Promise<Document[]> {
+    try {
+      // Buscar documentos criados pelo usuário
+      const userDocuments = await db
+        .select()
+        .from(documents)
+        .where(eq(documents.createdBy, userId))
+        .orderBy(desc(documents.createdAt));
+      
+      // Também podemos buscar documentos de atividades onde o usuário é autor
+      // mas por enquanto vamos simplificar e retornar apenas os documentos criados pelo usuário
+      
+      return userDocuments;
+    } catch (error) {
+      console.error(`Error fetching documents for user ${userId}:`, error);
+      return [];
+    }
+  }
+  
+  async getCommitteesByMember(userId: string): Promise<(Committee & { role: string })[]> {
+    try {
+      // Buscar comissões das quais o usuário é membro e o papel em cada uma
+      const memberCommittees = await db
+        .select({
+          committeeId: committeeMembers.committeeId,
+          role: committeeMembers.role
+        })
+        .from(committeeMembers)
+        .where(eq(committeeMembers.userId, userId));
+      
+      if (!memberCommittees.length) {
+        return [];
+      }
+      
+      // Buscar dados completos das comissões
+      const result: (Committee & { role: string })[] = [];
+      
+      for (const membership of memberCommittees) {
+        const [committee] = await db
+          .select()
+          .from(committees)
+          .where(eq(committees.id, membership.committeeId));
+        
+        if (committee) {
+          result.push({
+            ...committee,
+            role: membership.role
+          });
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error(`Error fetching committees for member ${userId}:`, error);
       return [];
     }
   }

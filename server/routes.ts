@@ -11,6 +11,14 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
 import { WebSocketServer, WebSocket } from 'ws';
+import { 
+  committees,
+  committeeMembers, 
+  documents as documentsTable,
+  legislativeActivities,
+  activityAuthors
+} from "@shared/schema";
+import { eq, and, inArray } from 'drizzle-orm';
 
 // Declarar a função sendNotification que será inicializada no escopo global
 let sendNotification: (target: 'all' | string | string[], notification: any) => void;
@@ -2057,6 +2065,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching councilors:", error);
       res.status(500).json({ message: "Erro ao buscar vereadores" });
+    }
+  });
+  
+  // Obter atividades legislativas de um vereador específico
+  app.get('/api/users/:id/activities', requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      
+      // Verificar se o usuário existe
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Buscar atividades relacionadas ao vereador através da tabela de autores
+      const activities = await storage.getLegislativeActivitiesByAuthor(userId);
+      
+      res.json(activities);
+    } catch (error) {
+      console.error("Error fetching councilor activities:", error);
+      res.status(500).json({ message: "Erro ao buscar atividades do vereador" });
+    }
+  });
+  
+  // Obter documentos relacionados a um vereador específico
+  app.get('/api/users/:id/documents', requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      
+      // Verificar se o usuário existe
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Buscar documentos onde o usuário é o criador
+      // Obs: precisamos usar outro nome para a tabela selecionada pois "documents" é o nome da variável
+      const userDocuments = await db
+        .select()
+        .from(documents)
+        .where(eq(documents.createdBy, userId));
+      
+      // Também poderia buscar documentos relacionados às atividades do vereador
+      // Mas para simplificar, vamos retornar apenas os criados por ele
+      
+      res.json(documents);
+    } catch (error) {
+      console.error("Error fetching councilor documents:", error);
+      res.status(500).json({ message: "Erro ao buscar documentos do vereador" });
+    }
+  });
+  
+  // Obter comissões das quais um vereador participa
+  app.get('/api/users/:id/committees', requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      
+      // Verificar se o usuário existe
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Buscar comissões onde o usuário é membro
+      const committeesData = await db
+        .select({
+          id: committees.id,
+          name: committees.name,
+          type: committees.type,
+          startDate: committees.startDate,
+          endDate: committees.endDate,
+          description: committees.description,
+          role: committeeMembers.role
+        })
+        .from(committeeMembers)
+        .innerJoin(committees, eq(committees.id, committeeMembers.committeeId))
+        .where(eq(committeeMembers.userId, userId));
+      
+      res.json(committeesData);
+    } catch (error) {
+      console.error("Error fetching councilor committees:", error);
+      res.status(500).json({ message: "Erro ao buscar comissões do vereador" });
     }
   });
   
