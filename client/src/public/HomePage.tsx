@@ -16,7 +16,11 @@ import {
   ChevronRight,
   ArrowRight,
   Volume2,
-  VolumeX
+  VolumeX,
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube
 } from 'lucide-react';
 import { 
   Card, 
@@ -654,22 +658,22 @@ export default function HomePage() {
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
                className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center 
                          hover:bg-blue-700 transition-colors">
-              <Facebook size={24} />
+              {React.createElement(Facebook, { size: 24 })}
             </a>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" 
                className="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center 
                          hover:bg-sky-600 transition-colors">
-              <Twitter size={24} />
+              {React.createElement(Twitter, { size: 24 })}
             </a>
             <a href="https://instagram.com/camaradejaiba" target="_blank" rel="noopener noreferrer" 
                className="w-12 h-12 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 
                          text-white rounded-full flex items-center justify-center hover:opacity-90 transition-opacity">
-              <Instagram size={24} />
+              {React.createElement(Instagram, { size: 24 })}
             </a>
             <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" 
                className="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center 
                          hover:bg-red-700 transition-colors">
-              <Youtube size={24} />
+              {React.createElement(Youtube, { size: 24 })}
             </a>
           </div>
           
@@ -678,7 +682,7 @@ export default function HomePage() {
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 
                               rounded-full flex items-center justify-center text-white mr-3">
-                <Instagram size={20} />
+                {React.createElement(Instagram, { size: 20 })}
               </div>
               <div>
                 <h3 className="font-bold">@camaradejaiba</h3>

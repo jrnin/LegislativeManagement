@@ -222,7 +222,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             <div className="flex justify-between items-center">
               {/* Logo */}
               <Link href="/public">
-                <div className="flex items-center space-x-2">
+                <button className="flex items-center space-x-2">
                   <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xl">
                     SL
                   </div>
@@ -243,7 +243,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                         : 'text-gray-500'
                     }`}>Portal Público</p>
                   </div>
-                </div>
+                </button>
               </Link>
 
               {/* Barra de pesquisa - visível apenas em telas médias ou maiores */}
@@ -266,7 +266,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               <nav className="hidden lg:flex items-center space-x-1">
                 {mainMenuLinks.map((link) => (
                   <Link key={link.href} href={link.href}>
-                    <div className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                    <button className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                       location === link.href 
                         ? 'bg-blue-600 text-white' 
                         : location === '/public' && !isScrolled
@@ -276,7 +276,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                             : 'text-gray-700 hover:bg-gray-100'
                     }`}>
                       {link.name}
-                    </div>
+                    </button>
                   </Link>
                 ))}
                 
@@ -331,7 +331,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                         {mainMenuLinks.map((link) => (
                           <Link key={link.href} href={link.href}>
                             <SheetClose asChild>
-                              <div className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                              <button className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                                 location === link.href 
                                   ? 'bg-blue-600 text-white' 
                                   : isDarkMode 
@@ -339,7 +339,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                                     : 'text-gray-700 hover:bg-gray-100'
                               }`}>
                                 {link.name}
-                              </div>
+                              </button>
                             </SheetClose>
                           </Link>
                         ))}
