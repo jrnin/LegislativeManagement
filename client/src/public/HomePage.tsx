@@ -619,55 +619,38 @@ export default function HomePage() {
                     
                     {/* Grid de 6 imagens do Instagram */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                      {/* Imagens reais do Instagram */}
-                      {[
-                        { 
-                          url: "https://images.unsplash.com/photo-1598386651573-9232cc0c2d6c?w=500&auto=format&fit=crop&q=60", 
-                          alt: "Sessão Câmara Municipal" 
-                        },
-                        { 
-                          url: "https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?w=500&auto=format&fit=crop&q=60", 
-                          alt: "Reunião vereadores" 
-                        },
-                        { 
-                          url: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500&auto=format&fit=crop&q=60", 
-                          alt: "Evento Câmara" 
-                        },
-                        { 
-                          url: "https://images.unsplash.com/photo-1561489396-2da385eccd49?w=500&auto=format&fit=crop&q=60", 
-                          alt: "Sessão plenária" 
-                        },
-                        { 
-                          url: "https://images.unsplash.com/photo-1574515529318-272baa74c25e?w=500&auto=format&fit=crop&q=60", 
-                          alt: "Audiência pública" 
-                        },
-                        { 
-                          url: "https://images.unsplash.com/photo-1507137903531-34be734e5b1b?w=500&auto=format&fit=crop&q=60", 
-                          alt: "Cerimônia oficial" 
-                        }
-                      ].map((image, index) => (
-                        <a 
-                          key={index} 
-                          href="https://instagram.com/camaradejaiba" 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
-                        >
-                          <div className="relative w-full h-full">
-                            <img 
-                              src={image.url} 
-                              alt={image.alt} 
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                              <div className="p-2 text-white text-xs">
-                                <Instagram size={16} className="inline mr-1" />
-                                Ver mais
+                      {/* Imagens do feed do Instagram @camaradejaiba */}
+                      {React.useMemo(() => {
+                        // Importando os dados do feed
+                        const { instagramFeed } = require('@/data/instagramFeed');
+                        
+                        return instagramFeed.map((post, index) => (
+                          <a 
+                            key={post.id} 
+                            href="https://instagram.com/camaradejaiba" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
+                          >
+                            <div className="relative w-full h-full">
+                              <img 
+                                src={post.imageUrl} 
+                                alt={post.caption} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                                <div className="p-3 text-white text-xs">
+                                  <div className="flex items-center mb-1">
+                                    <Instagram size={14} className="inline mr-1" />
+                                    <span className="mr-2">@camaradejaiba</span>
+                                  </div>
+                                  <p className="line-clamp-2">{post.caption}</p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </a>
-                      ))}
+                          </a>
+                        ));
+                      }, [])}
                     </div>
                   </div>
                 </div>
