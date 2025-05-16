@@ -485,10 +485,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de Vereadores em carrossel com 5 vereadores */}
+      {/* Seção de Vereadores em destaque */}
       <section className="py-8 bg-white">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-5">
             <h2 className="text-xl font-bold flex items-center text-blue-700">
               <Users className="mr-2" /> 
               Vereadores
@@ -501,99 +501,39 @@ export default function HomePage() {
           </div>
           
           <div className="relative">
-            <button className="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow-md z-10 p-2 text-blue-600 hover:text-blue-800">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {/* Card Vereador 1 */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                <div className="p-6 flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
-                    <img 
-                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=60" 
-                      alt="Ana Silva" 
-                      className="w-full h-full object-cover"
-                    />
+            <div className="overflow-x-auto hide-scrollbar pb-4">
+              <div className="flex space-x-4 min-w-max">
+                {/* Exibir vereadores com dados da API ou mockados */}
+                {councilors.map((councilor) => (
+                  <div key={councilor.id} className="flex flex-col items-center w-36 sm:w-44 flex-shrink-0 group">
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 mb-3 ring-2 ring-white shadow-lg transition-transform group-hover:scale-105">
+                      {councilor.imageUrl ? (
+                        <img 
+                          src={councilor.imageUrl} 
+                          alt={councilor.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+                          {councilor.name.split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="font-medium text-gray-800 dark:text-white text-center line-clamp-1">
+                      {councilor.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
+                      Vereador
+                    </p>
+                    <Link href={`/public/vereadores/${councilor.id}`}>
+                      <a className="mt-2 text-sm text-blue-600 hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
+                        Ver perfil
+                      </a>
+                    </Link>
                   </div>
-                  <h3 className="font-semibold text-center">Ana Silva</h3>
-                  <p className="text-sm text-gray-500 text-center">Partido A</p>
-                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Presidente</p>
-                </div>
-              </div>
-              
-              {/* Card Vereador 2 */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                <div className="p-6 flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
-                    <img 
-                      src="https://images.unsplash.com/photo-1548449112-96a38a643324?w=500&auto=format&fit=crop&q=60" 
-                      alt="Carlos Santos" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-center">Carlos Santos</h3>
-                  <p className="text-sm text-gray-500 text-center">Partido B</p>
-                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Vice-Presidente</p>
-                </div>
-              </div>
-              
-              {/* Card Vereador 3 */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                <div className="p-6 flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
-                    <img 
-                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=60" 
-                      alt="Mariana Oliveira" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-center">Mariana Oliveira</h3>
-                  <p className="text-sm text-gray-500 text-center">Partido C</p>
-                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Secretária</p>
-                </div>
-              </div>
-              
-              {/* Card Vereador 4 */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                <div className="p-6 flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
-                    <img 
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=60" 
-                      alt="Ricardo Almeida" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-center">Ricardo Almeida</h3>
-                  <p className="text-sm text-gray-500 text-center">Partido B</p>
-                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Vereador</p>
-                </div>
-              </div>
-              
-              {/* Card Vereador 5 */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                <div className="p-6 flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
-                    <img 
-                      src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&auto=format&fit=crop&q=60" 
-                      alt="Juliana Costa" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-center">Juliana Costa</h3>
-                  <p className="text-sm text-gray-500 text-center">Partido A</p>
-                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Vereadora</p>
-                </div>
+                ))}
               </div>
             </div>
-            
-            <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow-md z-10 p-2 text-blue-600 hover:text-blue-800">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
           </div>
         </div>
       </section>
