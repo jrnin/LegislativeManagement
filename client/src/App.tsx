@@ -18,6 +18,9 @@ import ActivityForm from "@/pages/legislative-activities/ActivityForm";
 import ActivityDetails from "@/pages/legislative-activities/ActivityDetails";
 import DocumentList from "@/pages/documents/DocumentList";
 import DocumentForm from "@/pages/documents/DocumentForm";
+import CommitteeList from "@/pages/committees/CommitteeList";
+import CommitteeForm from "@/pages/committees/CommitteeForm";
+import CommitteeDetails from "@/pages/committees/CommitteeDetails";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationProvider } from "@/context/NotificationContext";
 import NotificationToast from "@/components/ui/notifications/NotificationToast";
@@ -44,6 +47,10 @@ function AuthenticatedApp() {
         <Route path="/documents" component={DocumentList} />
         <Route path="/documents/new" component={DocumentForm} />
         <Route path="/documents/:id" component={DocumentForm} />
+        <Route path="/committees" component={CommitteeList} />
+        <Route path="/committees/new" component={CommitteeForm} />
+        <Route path="/committees/edit/:id" component={CommitteeForm} />
+        <Route path="/committees/:id" component={CommitteeDetails} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
