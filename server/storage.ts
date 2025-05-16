@@ -179,6 +179,20 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(users).orderBy(users.name);
   }
   
+  async getUsersByRole(role: string): Promise<User[]> {
+    try {
+      const usersByRole = await db
+        .select()
+        .from(users)
+        .where(eq(users.role, role))
+        .orderBy(users.name);
+      return usersByRole;
+    } catch (error) {
+      console.error(`Error fetching users with role ${role}:`, error);
+      return [];
+    }
+  }
+  
   async createUser(userData: Partial<User>): Promise<User> {
     // Generate a verification token if needed
     if (!userData.emailVerified) {
