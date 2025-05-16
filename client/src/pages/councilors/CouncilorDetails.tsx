@@ -1,383 +1,431 @@
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, Link } from "wouter";
-import { 
-  Calendar, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  File, 
-  ClipboardList, 
-  UserRound, 
-  ChevronLeft,
-  Users,
-  Building2
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useParams, useLocation } from "wouter";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Helmet } from 'react-helmet';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, Users, Activity, ClipboardList } from "lucide-react";
+import { getInitials } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { User, Document, LegislativeActivity } from "@shared/schema";
-import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
+
+interface Activity {
+  id: number;
+  activityNumber: number;
+  activityDate: string;
+  description: string;
+  activityType: string;
+  status?: string;
+}
+
+interface Committee {
+  id: number;
+  name: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  role: string;
+}
+
+interface Document {
+  id: number;
+  description: string;
+  documentNumber: number;
+  documentType: string;
+  documentDate: string;
+  status?: string;
+}
 
 export default function CouncilorDetails() {
   const { id } = useParams();
-  const { user: currentUser } = useAuth();
-  const isAdmin = currentUser?.role === "admin";
+  const [_, setLocation] = useLocation();
 
-  // Carregar dados do vereador
-  const { data: councilor, isLoading: isLoadingCouncilor } = useQuery<User>({
+  // Buscar dados do vereador
+  const { data: councilor, isLoading: isCouncilorLoading } = useQuery({
     queryKey: [`/api/users/${id}`],
+    enabled: !!id,
   });
 
-  // Carregar atividades legislativas associadas ao vereador
-  const { data: activities, isLoading: isLoadingActivities } = useQuery<LegislativeActivity[]>({
+  // Buscar atividades legislativas do vereador
+  const { data: activities, isLoading: isActivitiesLoading } = useQuery({
     queryKey: [`/api/users/${id}/activities`],
     enabled: !!id,
   });
 
-  // Carregar documentos associados ao vereador
-  const { data: documents, isLoading: isLoadingDocuments } = useQuery<Document[]>({
+  // Buscar documentos do vereador
+  const { data: documents, isLoading: isDocumentsLoading } = useQuery({
     queryKey: [`/api/users/${id}/documents`],
     enabled: !!id,
   });
 
-  // Carregar comissões associadas ao vereador 
-  const { data: committees, isLoading: isLoadingCommittees } = useQuery<any[]>({
+  // Buscar comissões do vereador
+  const { data: committees, isLoading: isCommitteesLoading } = useQuery({
     queryKey: [`/api/users/${id}/committees`],
     enabled: !!id,
   });
 
-  const getInitials = (name: string) => {
-    return name
-      ?.split(" ")
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase() || "V";
+  const handleBack = () => {
+    setLocation("/councilors");
   };
 
-  const formatDate = (date: Date | string | null | undefined) => {
-    if (!date) return "";
-    return new Date(date).toLocaleDateString("pt-BR");
+  // Formatar telefone para exibição
+  const formatPhone = (phone: string) => {
+    if (!phone) return "Não informado";
+    
+    // Se for um número de telefone com 11 dígitos (celular com DDD)
+    if (phone.length === 11) {
+      return `(${phone.slice(0, 2)}) ${phone.slice(2, 7)}-${phone.slice(7)}`;
+    } 
+    // Se for um número com 10 dígitos (fixo com DDD)
+    else if (phone.length === 10) {
+      return `(${phone.slice(0, 2)}) ${phone.slice(2, 6)}-${phone.slice(6)}`;
+    }
+    
+    return phone;
   };
 
-  if (isLoadingCouncilor) {
-    return (
-      <div className="container py-6 max-w-7xl">
-        <div className="flex flex-col space-y-8">
-          <div className="flex items-center space-x-4">
-            <Skeleton className="h-16 w-16 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-[250px]" />
-              <Skeleton className="h-4 w-[150px]" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Skeleton className="h-[200px] rounded-lg" />
-            <Skeleton className="h-[200px] rounded-lg" />
-            <Skeleton className="h-[200px] rounded-lg" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Formatador de datas
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "Não informada";
+    try {
+      const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
+      return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+    } catch (error) {
+      return "Data inválida";
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "aprovado":
+      case "aprovada":
+      case "ativo":
+      case "ativa":
+        return "bg-green-500";
+      case "em análise":
+      case "pendente":
+        return "bg-yellow-500";
+      case "rejeitado":
+      case "rejeitada":
+      case "inativo":
+      case "inativa":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
+  const isLoading = isCouncilorLoading || isActivitiesLoading || isDocumentsLoading || isCommitteesLoading;
 
   return (
-    <div className="container py-6 max-w-7xl">
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/councilors">
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Voltar
-            </Link>
+    <>
+      <Helmet>
+        <title>{councilor?.name ? `${councilor.name} | Vereadores` : 'Detalhes do Vereador'} | Sistema Legislativo</title>
+        <meta name="description" content="Detalhes do vereador, incluindo informações de contato, atividades legislativas e comissões." />
+      </Helmet>
+
+      <div className="p-6 space-y-6">
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4" />
           </Button>
-          {isAdmin && (
-            <Button size="sm" variant="outline" asChild>
-              <Link href={`/users/${id}`}>
-                Editar Vereador
-              </Link>
-            </Button>
-          )}
+          <h1 className="text-3xl font-bold tracking-tight">Detalhes do Vereador</h1>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Hero section com informações do vereador */}
-          <div className="w-full md:w-1/3">
-            <Card className="overflow-hidden">
-              <div className="h-28 bg-gradient-to-r from-blue-500 to-indigo-600" />
-              <CardContent className="-mt-14 relative">
-                <Avatar className="h-24 w-24 border-4 border-white shadow-lg absolute">
-                  <AvatarImage
-                    src={councilor?.profileImageUrl || ""}
-                    alt={councilor?.name || "Vereador"}
-                  />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xl">
-                    {getInitials(councilor?.name || "")}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="pt-14 pb-4">
-                  <h1 className="text-2xl font-bold">{councilor?.name}</h1>
-                  <p className="text-muted-foreground">Vereador</p>
-                  
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <Badge className="bg-blue-100 hover:bg-blue-200 text-blue-800 border-none">
-                      Eleito
-                    </Badge>
-                    <Badge variant="outline">
-                      Desde {formatDate(councilor?.createdAt)}
-                    </Badge>
-                  </div>
-                  
-                  <div className="mt-6 space-y-3">
-                    <div className="flex items-center text-sm">
-                      <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span>{councilor?.email}</span>
-                    </div>
-                    {councilor?.phone && (
-                      <div className="flex items-center text-sm">
-                        <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{councilor?.phone}</span>
-                      </div>
-                    )}
-                    {councilor?.address && (
-                      <div className="flex items-center text-sm">
-                        <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{councilor?.address}</span>
-                      </div>
-                    )}
-                    {councilor?.birthDate && (
-                      <div className="flex items-center text-sm">
-                        <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>Nascimento: {formatDate(councilor?.birthDate)}</span>
-                      </div>
-                    )}
+        {isLoading ? (
+          // Esqueleto de carregamento
+          <div className="space-y-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-24 w-24 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-[300px]" />
+                    <Skeleton className="h-4 w-[200px]" />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Comissões */}
-            <Card className="mt-4">
-              <CardHeader>
-                <div className="flex items-center">
-                  <Users className="h-5 w-5 mr-2 text-blue-600" />
-                  <CardTitle>Comissões</CardTitle>
-                </div>
-                <CardDescription>
-                  Comissões legislativas das quais o vereador participa
-                </CardDescription>
               </CardHeader>
               <CardContent>
-                {isLoadingCommittees ? (
-                  <div className="space-y-3">
-                    <Skeleton className="h-14 w-full" />
-                    <Skeleton className="h-14 w-full" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-[200px]" />
+              </CardHeader>
+              <CardContent>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="mb-4">
+                    <Skeleton className="h-6 w-full mb-2" />
+                    <Skeleton className="h-4 w-[70%]" />
                   </div>
-                ) : committees && committees.length > 0 ? (
-                  <div className="space-y-3">
-                    {committees.map((committee) => (
-                      <Link key={committee.id} href={`/committees/${committee.id}`}>
-                        <div className="p-3 border rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-medium">{committee.name}</h4>
-                              <p className="text-sm text-muted-foreground">{committee.type}</p>
-                            </div>
-                            <Badge>{committee.role || "Membro"}</Badge>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <Users className="h-10 w-10 mx-auto text-muted-foreground/60" />
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      Este vereador não participa de nenhuma comissão
-                    </p>
-                  </div>
-                )}
+                ))}
               </CardContent>
             </Card>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Informações pessoais */}
+            <Card className="lg:col-span-1">
+              <CardHeader className="pb-2">
+                <div className="flex flex-col items-center text-center">
+                  <Avatar className="h-24 w-24 mb-4">
+                    <AvatarImage src={councilor?.profileImageUrl || undefined} alt={councilor?.name} />
+                    <AvatarFallback className="text-2xl">{councilor?.name ? getInitials(councilor.name) : "VR"}</AvatarFallback>
+                  </Avatar>
+                  <CardTitle className="text-2xl">{councilor?.name}</CardTitle>
+                  <Badge 
+                    variant={councilor?.active ? "default" : "secondary"}
+                    className={cn(
+                      councilor?.active ? "bg-green-500" : "bg-gray-500",
+                      "mt-2"
+                    )}
+                  >
+                    {councilor?.active ? "Ativo" : "Inativo"}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4 mt-4">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span>{councilor?.email}</span>
+                  </div>
+                  
+                  {councilor?.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{formatPhone(councilor.phone)}</span>
+                    </div>
+                  )}
+                  
+                  {councilor?.address && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{councilor.address}</span>
+                    </div>
+                  )}
+                  
+                  {councilor?.birthDate && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span>Nascimento: {formatDate(councilor.birthDate.toString())}</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-          <div className="w-full md:w-2/3">
-            <Tabs defaultValue="activities">
-              <TabsList className="mb-4">
-                <TabsTrigger value="activities" className="flex items-center">
-                  <ClipboardList className="h-4 w-4 mr-2" />
-                  Atividades Legislativas
-                </TabsTrigger>
-                <TabsTrigger value="documents" className="flex items-center">
-                  <File className="h-4 w-4 mr-2" />
-                  Documentos
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="activities">
-                <Card>
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <ClipboardList className="h-5 w-5 mr-2 text-blue-600" />
-                        <CardTitle>Atividades Legislativas</CardTitle>
-                      </div>
-                      {activities && activities.length > 0 && (
-                        <Badge variant="outline" className="ml-2">
-                          {activities.length} {activities.length === 1 ? "atividade" : "atividades"}
-                        </Badge>
-                      )}
-                    </div>
-                    <CardDescription>
-                      Atividades legislativas apresentadas ou coautoradas pelo vereador
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoadingActivities ? (
-                      <div className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                          <div key={i} className="space-y-2">
-                            <Skeleton className="h-6 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
-                            <Skeleton className="h-4 w-1/4" />
-                          </div>
-                        ))}
-                      </div>
-                    ) : activities && activities.length > 0 ? (
-                      <div className="space-y-4">
-                        {activities.map((activity) => (
-                          <Link key={activity.id} href={`/activities/${activity.id}`}>
-                            <div className="p-4 border rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                              <div className="flex justify-between">
-                                <h3 className="font-medium">{activity.description}</h3>
-                                <Badge 
-                                  className={
-                                    activity.status === "approved" 
-                                      ? "bg-green-100 text-green-800 hover:bg-green-200" 
-                                      : activity.status === "rejected"
-                                      ? "bg-red-100 text-red-800 hover:bg-red-200"
-                                      : "bg-amber-100 text-amber-800 hover:bg-amber-200"
-                                  }
-                                >
-                                  {activity.status === "approved" 
-                                    ? "Aprovada" 
-                                    : activity.status === "rejected"
-                                    ? "Rejeitada"
-                                    : "Pendente"
-                                  }
-                                </Badge>
-                              </div>
-                              <div className="flex items-center mt-2 text-sm text-muted-foreground">
-                                <Building2 className="h-3.5 w-3.5 mr-1" />
-                                <span>Nº {activity.activityNumber}</span>
-                                <span className="mx-2">•</span>
-                                <Calendar className="h-3.5 w-3.5 mr-1" />
-                                <span>{formatDate(activity.activityDate)}</span>
-                                <span className="mx-2">•</span>
-                                <span>{activity.activityType}</span>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
+            {/* Conteúdo em abas */}
+            <Card className="lg:col-span-2">
+              <Tabs defaultValue="activities">
+                <CardHeader className="pb-0">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="activities" className="flex gap-1 items-center">
+                      <Activity className="h-4 w-4" />
+                      <span>Atividades</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="documents" className="flex gap-1 items-center">
+                      <FileText className="h-4 w-4" />
+                      <span>Documentos</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="committees" className="flex gap-1 items-center">
+                      <Users className="h-4 w-4" />
+                      <span>Comissões</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </CardHeader>
+
+                <CardContent className="pt-4">
+                  {/* Aba de Atividades */}
+                  <TabsContent value="activities" className="mt-0">
+                    <h3 className="font-semibold text-lg mb-4">Atividades Legislativas</h3>
+                    
+                    {!activities || activities.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-6">
+                        Nenhuma atividade legislativa encontrada para este vereador.
+                      </p>
                     ) : (
-                      <div className="text-center py-10">
-                        <ClipboardList className="h-12 w-12 mx-auto text-muted-foreground/60" />
-                        <h3 className="mt-4 text-lg font-semibold">Nenhuma atividade encontrada</h3>
-                        <p className="text-muted-foreground mt-2">
-                          Este vereador ainda não apresentou nenhuma atividade legislativa.
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="documents">
-                <Card>
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <File className="h-5 w-5 mr-2 text-blue-600" />
-                        <CardTitle>Documentos</CardTitle>
-                      </div>
-                      {documents && documents.length > 0 && (
-                        <Badge variant="outline" className="ml-2">
-                          {documents.length} {documents.length === 1 ? "documento" : "documentos"}
-                        </Badge>
-                      )}
-                    </div>
-                    <CardDescription>
-                      Documentos apresentados ou relacionados ao vereador
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoadingDocuments ? (
-                      <div className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                          <div key={i} className="space-y-2">
-                            <Skeleton className="h-6 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
-                            <Skeleton className="h-4 w-1/4" />
-                          </div>
-                        ))}
-                      </div>
-                    ) : documents && documents.length > 0 ? (
-                      <div className="space-y-4">
-                        {documents.map((document) => (
-                          <Link key={document.id} href={`/documents/${document.id}`}>
-                            <div className="p-4 border rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                              <div className="flex justify-between">
-                                <h3 className="font-medium">{document.description}</h3>
-                                <Badge 
-                                  className={
-                                    document.status === "approved" 
-                                      ? "bg-green-100 text-green-800 hover:bg-green-200" 
-                                      : document.status === "rejected"
-                                      ? "bg-red-100 text-red-800 hover:bg-red-200"
-                                      : "bg-amber-100 text-amber-800 hover:bg-amber-200"
-                                  }
+                      <ScrollArea className="h-[400px] pr-4">
+                        <div className="space-y-4">
+                          {activities.map((activity: Activity) => (
+                            <Card key={activity.id} className="overflow-hidden">
+                              <div className={cn(
+                                "h-1",
+                                activity.status ? getStatusColor(activity.status) : "bg-blue-500"
+                              )} />
+                              <CardHeader className="pb-2">
+                                <div className="flex items-center justify-between">
+                                  <CardTitle className="text-base">
+                                    {activity.activityType} Nº {activity.activityNumber}
+                                  </CardTitle>
+                                  {activity.status && (
+                                    <Badge className={getStatusColor(activity.status)}>
+                                      {activity.status}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <CardDescription>{formatDate(activity.activityDate)}</CardDescription>
+                              </CardHeader>
+                              <CardContent className="pb-2">
+                                <p className="text-sm">{activity.description}</p>
+                              </CardContent>
+                              <CardFooter>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="w-full"
+                                  onClick={() => setLocation(`/activities/${activity.id}`)}
                                 >
-                                  {document.status === "approved" 
-                                    ? "Aprovado" 
-                                    : document.status === "rejected"
-                                    ? "Rejeitado"
-                                    : "Pendente"
-                                  }
-                                </Badge>
-                              </div>
-                              <div className="flex items-center mt-2 text-sm text-muted-foreground">
-                                <span>Documento Nº {document.documentNumber}</span>
-                                <span className="mx-2">•</span>
-                                <Calendar className="h-3.5 w-3.5 mr-1" />
-                                <span>{formatDate(document.createdAt)}</span>
-                                <span className="mx-2">•</span>
-                                <span>{document.documentType}</span>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-10">
-                        <File className="h-12 w-12 mx-auto text-muted-foreground/60" />
-                        <h3 className="mt-4 text-lg font-semibold">Nenhum documento encontrado</h3>
-                        <p className="text-muted-foreground mt-2">
-                          Este vereador ainda não possui documentos vinculados.
-                        </p>
-                      </div>
+                                  Ver detalhes
+                                </Button>
+                              </CardFooter>
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
                     )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+                  </TabsContent>
+
+                  {/* Aba de Documentos */}
+                  <TabsContent value="documents" className="mt-0">
+                    <h3 className="font-semibold text-lg mb-4">Documentos</h3>
+                    
+                    {!documents || documents.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-6">
+                        Nenhum documento encontrado para este vereador.
+                      </p>
+                    ) : (
+                      <ScrollArea className="h-[400px] pr-4">
+                        <div className="space-y-4">
+                          {documents.map((doc: Document) => (
+                            <Card key={doc.id} className="overflow-hidden">
+                              <div className={cn(
+                                "h-1",
+                                doc.status ? getStatusColor(doc.status) : "bg-blue-500"
+                              )} />
+                              <CardHeader className="pb-2">
+                                <div className="flex items-center justify-between">
+                                  <CardTitle className="text-base">
+                                    {doc.documentType} Nº {doc.documentNumber}
+                                  </CardTitle>
+                                  {doc.status && (
+                                    <Badge className={getStatusColor(doc.status)}>
+                                      {doc.status}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <CardDescription>
+                                  {doc.documentDate ? formatDate(doc.documentDate) : "Data não informada"}
+                                </CardDescription>
+                              </CardHeader>
+                              <CardContent className="pb-2">
+                                <p className="text-sm">{doc.description}</p>
+                              </CardContent>
+                              <CardFooter>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="w-full"
+                                  onClick={() => setLocation(`/documents/${doc.id}`)}
+                                >
+                                  Ver documento
+                                </Button>
+                              </CardFooter>
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    )}
+                  </TabsContent>
+
+                  {/* Aba de Comissões */}
+                  <TabsContent value="committees" className="mt-0">
+                    <h3 className="font-semibold text-lg mb-4">Participação em Comissões</h3>
+                    
+                    {!committees || committees.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-6">
+                        Este vereador não participa de nenhuma comissão.
+                      </p>
+                    ) : (
+                      <ScrollArea className="h-[400px] pr-4">
+                        <div className="space-y-4">
+                          {committees.map((committee: Committee) => {
+                            const isActive = new Date(committee.endDate) > new Date();
+                            return (
+                              <Card key={committee.id} className="overflow-hidden">
+                                <div className={cn(
+                                  "h-1",
+                                  isActive ? "bg-green-500" : "bg-gray-500"
+                                )} />
+                                <CardHeader className="pb-2">
+                                  <div className="flex items-center justify-between">
+                                    <CardTitle className="text-base">
+                                      {committee.name}
+                                    </CardTitle>
+                                    <Badge className={cn(
+                                      isActive ? "bg-green-500" : "bg-gray-500"
+                                    )}>
+                                      {isActive ? "Ativa" : "Encerrada"}
+                                    </Badge>
+                                  </div>
+                                  <CardDescription>{committee.type}</CardDescription>
+                                </CardHeader>
+                                <CardContent className="pb-2">
+                                  <div className="flex justify-between items-center mb-1">
+                                    <span className="text-sm font-medium">Função:</span>
+                                    <Badge variant="outline" className="font-semibold">
+                                      {committee.role === 'president' ? 'Presidente' : 
+                                       committee.role === 'vice_president' ? 'Vice-Presidente' : 'Membro'}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex flex-col text-sm space-y-1">
+                                    <div className="flex justify-between">
+                                      <span className="text-muted-foreground">Início:</span>
+                                      <span>{formatDate(committee.startDate)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-muted-foreground">Término:</span>
+                                      <span>{formatDate(committee.endDate)}</span>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                                <CardFooter>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="w-full"
+                                    onClick={() => setLocation(`/committees/${committee.id}`)}
+                                  >
+                                    Ver comissão
+                                  </Button>
+                                </CardFooter>
+                              </Card>
+                            );
+                          })}
+                        </div>
+                      </ScrollArea>
+                    )}
+                  </TabsContent>
+                </CardContent>
+              </Tabs>
+            </Card>
           </div>
-        </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }

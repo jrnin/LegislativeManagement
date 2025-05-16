@@ -347,7 +347,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Usuário não encontrado" });
       }
       
-      res.json(user);
+      // Remover senha e outros campos sensíveis antes de retornar
+      const { password, verificationToken, resetToken, resetTokenExpiry, ...userWithoutSensitiveInfo } = user;
+      
+      res.json(userWithoutSensitiveInfo);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Erro ao buscar usuário" });
@@ -2100,17 +2103,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Vereador não encontrado" });
       }
       
-      // Buscar documentos onde o usuário é o criador
-      // Obs: precisamos usar outro nome para a tabela selecionada pois "documents" é o nome da variável
-      const userDocuments = await db
-        .select()
-        .from(documents)
-        .where(eq(documents.createdBy, userId));
+      // Buscar documentos relacionados ao vereador usando o método do storage
+      const userDocuments = await storage.getDocumentsByUser(userId);
       
-      // Também poderia buscar documentos relacionados às atividades do vereador
-      // Mas para simplificar, vamos retornar apenas os criados por ele
-      
-      res.json(documents);
+      res.json(userDocuments);
     } catch (error) {
       console.error("Error fetching councilor documents:", error);
       res.status(500).json({ message: "Erro ao buscar documentos do vereador" });
@@ -2128,20 +2124,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Vereador não encontrado" });
       }
       
-      // Buscar comissões onde o usuário é membro
-      const committeesData = await db
-        .select({
-          id: committees.id,
-          name: committees.name,
-          type: committees.type,
-          startDate: committees.startDate,
-          endDate: committees.endDate,
-          description: committees.description,
-          role: committeeMembers.role
-        })
-        .from(committeeMembers)
-        .innerJoin(committees, eq(committees.id, committeeMembers.committeeId))
-        .where(eq(committeeMembers.userId, userId));
+      // Buscar comissões onde o usuário é membro usando o método do storage
+      const committeesData = await storage.getCommitteesByMember(userId);
       
       res.json(committeesData);
     } catch (error) {
