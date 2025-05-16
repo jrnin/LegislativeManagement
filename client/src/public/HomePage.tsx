@@ -485,7 +485,118 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de Vereadores foi removida conforme solicitado */}
+      {/* Seção de Vereadores em carrossel com 5 vereadores */}
+      <section className="py-8 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold flex items-center text-blue-700">
+              <Users className="mr-2" /> 
+              Vereadores
+            </h2>
+            <Link href="/public/vereadores">
+              <a className="text-blue-600 hover:underline text-sm flex items-center">
+                Ver todos <ChevronRight size={14} />
+              </a>
+            </Link>
+          </div>
+          
+          <div className="relative">
+            <button className="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow-md z-10 p-2 text-blue-600 hover:text-blue-800">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {/* Card Vereador 1 */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                <div className="p-6 flex flex-col items-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+                    <img 
+                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=60" 
+                      alt="Ana Silva" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="font-semibold text-center">Ana Silva</h3>
+                  <p className="text-sm text-gray-500 text-center">Partido A</p>
+                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Presidente</p>
+                </div>
+              </div>
+              
+              {/* Card Vereador 2 */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                <div className="p-6 flex flex-col items-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+                    <img 
+                      src="https://images.unsplash.com/photo-1548449112-96a38a643324?w=500&auto=format&fit=crop&q=60" 
+                      alt="Carlos Santos" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="font-semibold text-center">Carlos Santos</h3>
+                  <p className="text-sm text-gray-500 text-center">Partido B</p>
+                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Vice-Presidente</p>
+                </div>
+              </div>
+              
+              {/* Card Vereador 3 */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                <div className="p-6 flex flex-col items-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+                    <img 
+                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=60" 
+                      alt="Mariana Oliveira" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="font-semibold text-center">Mariana Oliveira</h3>
+                  <p className="text-sm text-gray-500 text-center">Partido C</p>
+                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Secretária</p>
+                </div>
+              </div>
+              
+              {/* Card Vereador 4 */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                <div className="p-6 flex flex-col items-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+                    <img 
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=60" 
+                      alt="Ricardo Almeida" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="font-semibold text-center">Ricardo Almeida</h3>
+                  <p className="text-sm text-gray-500 text-center">Partido B</p>
+                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Vereador</p>
+                </div>
+              </div>
+              
+              {/* Card Vereador 5 */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                <div className="p-6 flex flex-col items-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+                    <img 
+                      src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&auto=format&fit=crop&q=60" 
+                      alt="Juliana Costa" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="font-semibold text-center">Juliana Costa</h3>
+                  <p className="text-sm text-gray-500 text-center">Partido A</p>
+                  <p className="text-sm font-medium text-blue-600 text-center mt-1">Vereadora</p>
+                </div>
+              </div>
+            </div>
+            
+            <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow-md z-10 p-2 text-blue-600 hover:text-blue-800">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">
