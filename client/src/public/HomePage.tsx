@@ -1,0 +1,605 @@
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'wouter';
+import { Helmet } from 'react-helmet';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { 
+  Calendar, 
+  FileText, 
+  Users, 
+  Zap,
+  Gavel,
+  FileSearch,
+  Building,
+  PieChart,
+  ChevronRight,
+  ArrowRight
+} from 'lucide-react';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getInitials } from '@/lib/utils';
+
+// Componente de banner de destaque
+const HeroBanner = () => (
+  <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+    <div className="absolute inset-0 bg-[url('/hero-pattern.svg')] opacity-10"></div>
+    <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
+      <div className="max-w-3xl">
+        <h1 className="text-3xl md:text-5xl font-bold mb-4">
+          Câmara Municipal - Portal Transparente
+        </h1>
+        <p className="text-lg md:text-xl opacity-90 mb-8">
+          Acompanhe as atividades legislativas, conheça os vereadores e tenha acesso a todos os documentos públicos de forma rápida e transparente.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
+            Sessões ao Vivo
+          </Button>
+          <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-600">
+            Ouvidoria
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Componente de card para serviço rápido
+interface QuickServiceCardProps {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  href: string;
+}
+
+const QuickServiceCard = ({ title, description, icon: Icon, href }: QuickServiceCardProps) => (
+  <Link href={href}>
+    <a className="block h-full">
+      <Card className="h-full transition-all hover:shadow-md hover:border-blue-200">
+        <CardHeader className="pb-2">
+          <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-2">
+            <Icon size={24} />
+          </div>
+          <CardTitle className="text-lg">{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-500">{description}</p>
+        </CardContent>
+        <CardFooter>
+          <div className="text-sm text-blue-600 flex items-center">
+            Acessar <ChevronRight size={16} className="ml-1" />
+          </div>
+        </CardFooter>
+      </Card>
+    </a>
+  </Link>
+);
+
+// Componente de card para notícia
+interface NewsCardProps {
+  id: number;
+  title: string;
+  excerpt: string;
+  date: string;
+  imageUrl?: string;
+  category: string;
+}
+
+const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProps) => (
+  <Link href={`/public/noticias/${id}`}>
+    <a className="block h-full">
+      <Card className="h-full overflow-hidden hover:shadow-md transition-all">
+        {imageUrl && (
+          <div className="aspect-video w-full overflow-hidden">
+            <img 
+              src={imageUrl} 
+              alt={title} 
+              className="w-full h-full object-cover transition-transform hover:scale-105"
+            />
+          </div>
+        )}
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-center mb-2">
+            <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200">{category}</Badge>
+            <span className="text-xs text-gray-500">{date}</span>
+          </div>
+          <CardTitle className="text-lg leading-tight">{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-600 line-clamp-3">{excerpt}</p>
+        </CardContent>
+        <CardFooter>
+          <div className="text-sm text-blue-600 flex items-center">
+            Ler mais <ArrowRight size={14} className="ml-1" />
+          </div>
+        </CardFooter>
+      </Card>
+    </a>
+  </Link>
+);
+
+// Componente para card de vereador
+interface CouncilorCardProps {
+  id: string;
+  name: string;
+  role: string;
+  party: string;
+  imageUrl?: string;
+}
+
+const CouncilorCard = ({ id, name, role, party, imageUrl }: CouncilorCardProps) => (
+  <Link href={`/public/vereadores/${id}`}>
+    <a className="block">
+      <Card className="text-center hover:shadow-md transition-all">
+        <CardHeader className="pb-2 pt-6">
+          <div className="flex justify-center mb-4">
+            <Avatar className="h-24 w-24 border-4 border-white shadow-md">
+              <AvatarImage src={imageUrl} />
+              <AvatarFallback className="bg-blue-700 text-white text-lg">{getInitials(name)}</AvatarFallback>
+            </Avatar>
+          </div>
+          <CardTitle className="text-lg">{name}</CardTitle>
+          <CardDescription>{party}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Badge variant="outline" className="mx-auto">{role}</Badge>
+        </CardContent>
+      </Card>
+    </a>
+  </Link>
+);
+
+// Componente para card de evento
+interface EventCardProps {
+  id: number;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  type: string;
+}
+
+const EventCard = ({ id, title, date, time, location, type }: EventCardProps) => (
+  <Link href={`/public/eventos/${id}`}>
+    <a className="block">
+      <Card className="hover:shadow-md transition-all">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-700 h-2" />
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-base">{title}</CardTitle>
+              <CardDescription className="text-xs">{type}</CardDescription>
+            </div>
+            <Badge variant="secondary" className="bg-blue-100 text-blue-700 flex items-center">
+              <Calendar size={12} className="mr-1" /> {date}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="pb-0">
+          <div className="flex flex-col text-sm space-y-1">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Horário:</span>
+              <span>{time}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Local:</span>
+              <span>{location}</span>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="pt-4">
+          <Button variant="ghost" className="w-full text-blue-700">Ver detalhes</Button>
+        </CardFooter>
+      </Card>
+    </a>
+  </Link>
+);
+
+// Serviços rápidos
+const quickServices = [
+  {
+    title: "Sessões",
+    description: "Acompanhe as sessões da Câmara, calendário e pautas de reuniões",
+    icon: Zap,
+    href: "/public/sessoes"
+  },
+  {
+    title: "Atas e Documentos",
+    description: "Acesse documentos oficiais, atas de reuniões e registros públicos",
+    icon: FileText,
+    href: "/public/documentos"
+  },
+  {
+    title: "Legislação",
+    description: "Consulte leis, decretos, portarias e toda a legislação municipal",
+    icon: Gavel,
+    href: "/public/legislacao"
+  },
+  {
+    title: "Licitações",
+    description: "Informações sobre processos licitatórios, contratos e convênios",
+    icon: FileSearch,
+    href: "/public/licitacoes"
+  },
+  {
+    title: "Transparência",
+    description: "Dados orçamentários, despesas, receitas e relatórios fiscais",
+    icon: PieChart,
+    href: "/public/transparencia"
+  },
+  {
+    title: "Audiências",
+    description: "Calendário de audiências públicas, consultas e participação cidadã",
+    icon: Building,
+    href: "/public/audiencias"
+  }
+];
+
+// Notícias mockadas
+const mockNews = [
+  {
+    id: 1,
+    title: "Câmara aprova projeto que incentiva a reciclagem no município",
+    excerpt: "O projeto de lei que incentiva a reciclagem de resíduos sólidos foi aprovado por unanimidade na sessão de ontem. A nova legislação prevê benefícios fiscais para empresas que adotarem práticas sustentáveis.",
+    date: "10 de Maio de 2023",
+    imageUrl: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    category: "Meio Ambiente"
+  },
+  {
+    id: 2,
+    title: "Audiência pública discutirá mobilidade urbana na próxima semana",
+    excerpt: "Uma audiência pública para discutir o plano de mobilidade urbana será realizada na próxima semana. A população poderá enviar sugestões e participar ativamente das discussões sobre transporte público.",
+    date: "08 de Maio de 2023",
+    imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    category: "Urbanismo"
+  },
+  {
+    id: 3,
+    title: "Nova comissão para fiscalizar obras públicas é formada na Câmara",
+    excerpt: "Os vereadores formaram uma nova comissão especial para fiscalizar as obras públicas em andamento no município. O objetivo é garantir a qualidade dos serviços e a aplicação correta dos recursos.",
+    date: "05 de Maio de 2023",
+    imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    category: "Fiscalização"
+  },
+  {
+    id: 4,
+    title: "Programa de inclusão digital é aprovado e beneficiará escolas públicas",
+    excerpt: "O programa de inclusão digital que beneficiará escolas públicas do município foi aprovado. A iniciativa prevê a instalação de laboratórios de informática e acesso à internet de alta velocidade.",
+    date: "03 de Maio de 2023",
+    imageUrl: "https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    category: "Educação"
+  }
+];
+
+// Vereadores mockados
+const mockCouncilors = [
+  {
+    id: "1",
+    name: "Ana Silva",
+    role: "Presidente",
+    party: "Partido A",
+    imageUrl: "https://randomuser.me/api/portraits/women/32.jpg"
+  },
+  {
+    id: "2",
+    name: "Carlos Santos",
+    role: "Vice-Presidente",
+    party: "Partido B",
+    imageUrl: "https://randomuser.me/api/portraits/men/41.jpg"
+  },
+  {
+    id: "3",
+    name: "Mariana Oliveira",
+    role: "Secretária",
+    party: "Partido C",
+    imageUrl: "https://randomuser.me/api/portraits/women/45.jpg"
+  },
+  {
+    id: "4",
+    name: "Ricardo Almeida",
+    role: "Vereador",
+    party: "Partido A",
+    imageUrl: "https://randomuser.me/api/portraits/men/22.jpg"
+  },
+  {
+    id: "5",
+    name: "Juliana Costa",
+    role: "Vereadora",
+    party: "Partido D",
+    imageUrl: "https://randomuser.me/api/portraits/women/23.jpg"
+  },
+  {
+    id: "6",
+    name: "Paulo Ferreira",
+    role: "Vereador",
+    party: "Partido B",
+    imageUrl: "https://randomuser.me/api/portraits/men/35.jpg"
+  }
+];
+
+// Eventos mockados
+const mockEvents = [
+  {
+    id: 1,
+    title: "Sessão Ordinária",
+    date: "22/05/2023",
+    time: "14:00",
+    location: "Plenário Principal",
+    type: "Sessão Plenária"
+  },
+  {
+    id: 2,
+    title: "Audiência Pública - Plano Diretor",
+    date: "24/05/2023",
+    time: "19:00",
+    location: "Auditório Municipal",
+    type: "Audiência Pública"
+  },
+  {
+    id: 3,
+    title: "Reunião da Comissão de Educação",
+    date: "25/05/2023",
+    time: "10:00",
+    location: "Sala de Comissões",
+    type: "Reunião de Comissão"
+  },
+  {
+    id: 4,
+    title: "Sessão Extraordinária",
+    date: "26/05/2023",
+    time: "15:00",
+    location: "Plenário Principal",
+    type: "Sessão Plenária"
+  }
+];
+
+// Categorias de notícias
+const newsCategories = [
+  "Todas", "Institucional", "Meio Ambiente", "Urbanismo", "Educação", "Saúde", "Fiscalização"
+];
+
+export default function HomePage() {
+  // Simulando consultas à API para obter dados
+  const { data: events = mockEvents } = useQuery({
+    queryKey: ['/api/public/events'],
+    enabled: false,
+    initialData: mockEvents
+  });
+
+  const { data: councilors = mockCouncilors } = useQuery({
+    queryKey: ['/api/public/councilors'],
+    enabled: false,
+    initialData: mockCouncilors
+  });
+
+  const { data: news = mockNews } = useQuery({
+    queryKey: ['/api/public/news'],
+    enabled: false,
+    initialData: mockNews
+  });
+
+  // Formatador de datas
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+    } catch (error) {
+      return dateString; // Se já for uma string formatada, retorna como está
+    }
+  };
+
+  return (
+    <>
+      <Helmet>
+        <title>Sistema Legislativo - Portal Público</title>
+        <meta name="description" content="Portal público do Sistema Legislativo Municipal. Acesse informações sobre vereadores, documentos, atividades legislativas e mais." />
+      </Helmet>
+
+      {/* Banner de destaque */}
+      <HeroBanner />
+
+      {/* Seção de serviços rápidos */}
+      <section className="py-10 px-4">
+        <div className="container mx-auto">
+          <h2 className="text-2xl font-bold mb-6 flex items-center">
+            <Zap className="mr-2 text-blue-600" /> 
+            Serviços ao Cidadão
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {quickServices.map((service, index) => (
+              <QuickServiceCard
+                key={index}
+                title={service.title}
+                description={service.description}
+                icon={service.icon}
+                href={service.href}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Seção de notícias */}
+      <section className="py-10 px-4 bg-gray-50">
+        <div className="container mx-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <h2 className="text-2xl font-bold flex items-center">
+              <FileText className="mr-2 text-blue-600" />
+              Notícias e Publicações
+            </h2>
+            <Link href="/public/noticias">
+              <a className="text-blue-600 hover:underline mt-2 sm:mt-0 flex items-center">
+                Ver todas <ChevronRight size={16} />
+              </a>
+            </Link>
+          </div>
+
+          <Tabs defaultValue="Todas">
+            <TabsList className="mb-6 bg-transparent border-b pb-2 w-full overflow-x-auto flex-no-wrap whitespace-nowrap justify-start">
+              {newsCategories.map((category) => (
+                <TabsTrigger 
+                  key={category} 
+                  value={category}
+                  className="rounded-full px-4 py-1 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+                >
+                  {category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <TabsContent value="Todas" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {news.map((item) => (
+                  <NewsCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    excerpt={item.excerpt}
+                    date={formatDate(item.date)}
+                    imageUrl={item.imageUrl}
+                    category={item.category}
+                  />
+                ))}
+              </div>
+            </TabsContent>
+            {/* Renderizar abas filtradas para outras categorias */}
+            {newsCategories.slice(1).map((category) => (
+              <TabsContent key={category} value={category} className="mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {news
+                    .filter(item => item.category === category)
+                    .map((item) => (
+                      <NewsCard
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        excerpt={item.excerpt}
+                        date={formatDate(item.date)}
+                        imageUrl={item.imageUrl}
+                        category={item.category}
+                      />
+                    ))}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </section>
+
+      {/* Seção de vereadores e eventos próximos */}
+      <section className="py-10 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Vereadores */}
+            <div className="lg:col-span-2">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold flex items-center">
+                  <Users className="mr-2 text-blue-600" />
+                  Vereadores
+                </h2>
+                <Link href="/public/vereadores">
+                  <a className="text-blue-600 hover:underline flex items-center">
+                    Ver todos <ChevronRight size={16} />
+                  </a>
+                </Link>
+              </div>
+
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent>
+                  {councilors.map((councilor) => (
+                    <CarouselItem key={councilor.id} className="md:basis-1/2 lg:basis-1/3">
+                      <div className="p-1">
+                        <CouncilorCard
+                          id={councilor.id}
+                          name={councilor.name}
+                          role={councilor.role}
+                          party={councilor.party}
+                          imageUrl={councilor.imageUrl}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <div className="flex justify-center mt-4">
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </div>
+              </Carousel>
+            </div>
+
+            {/* Próximos eventos */}
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold flex items-center">
+                  <Calendar className="mr-2 text-blue-600" />
+                  Agenda
+                </h2>
+                <Link href="/public/eventos">
+                  <a className="text-blue-600 hover:underline flex items-center">
+                    Ver todos <ChevronRight size={16} />
+                  </a>
+                </Link>
+              </div>
+
+              <div className="space-y-4">
+                {events.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    id={event.id}
+                    title={event.title}
+                    date={event.date}
+                    time={event.time}
+                    location={event.location}
+                    type={event.type}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Banner de chamada para ação */}
+      <section className="py-12 px-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Participe da Vida Política da Cidade</h2>
+          <p className="max-w-2xl mx-auto mb-8 opacity-90">
+            Acompanhe as sessões, envie sugestões de projetos de lei, participe das audiências públicas
+            e contribua para o desenvolvimento da nossa cidade.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
+              Ouvidoria
+            </Button>
+            <Button size="lg" variant="outline" className="text-white border-white hover:bg-blue-600">
+              Calendário de Audiências
+            </Button>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

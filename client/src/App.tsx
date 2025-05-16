@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
@@ -23,6 +23,7 @@ import CommitteeForm from "@/pages/committees/CommitteeForm";
 import CommitteeDetails from "@/pages/committees/CommitteeDetails";
 import CouncilorList from "@/pages/councilors/CouncilorList";
 import CouncilorDetails from "@/pages/councilors/CouncilorDetails";
+import PublicRoutes from "@/public/PublicRoutes";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationProvider } from "@/context/NotificationContext";
 import NotificationToast from "@/components/ui/notifications/NotificationToast";
@@ -77,14 +78,23 @@ function UnauthenticatedApp() {
 }
 
 function App() {
-  // Verificar se estamos na rota de verificação de e-mail
-  const isVerifyEmailRoute = window.location.pathname === "/verify-email";
-  const isLoginRoute = window.location.pathname === "/login";
+  const [location] = useLocation();
+  
+  // Verificar se estamos em rotas especiais
+  const isVerifyEmailRoute = location === "/verify-email";
+  const isLoginRoute = location === "/login";
+  const isPublicRoute = location.startsWith("/public");
   
   const { isLoading, isAuthenticated } = useAuth();
   
-  // Renderizar o app com base no estado de autenticação
+  // Renderizar o app com base no estado de autenticação e rota
   const renderApp = () => {
+    // Se estamos em uma rota pública, renderize o site público
+    if (isPublicRoute) {
+      return <PublicRoutes />;
+    }
+    
+    // Se estiver carregando a autenticação, mostre o loading
     if (isLoading) {
       return (
         <div className="h-screen flex items-center justify-center">
@@ -103,12 +113,15 @@ function App() {
       );
     }
     
-    // Caso contrário, renderize o app não autenticado
-    return isVerifyEmailRoute || isLoginRoute ? (
-      <UnauthenticatedApp />
-    ) : (
-      <LoginPage />
-    );
+    // Caso contrário, renderize o app não autenticado ou redirecione para a página pública
+    if (isVerifyEmailRoute || isLoginRoute) {
+      return <UnauthenticatedApp />;
+    } else {
+      // Redirecionar para a página pública se não estiver autenticado
+      // e não estiver em nenhuma rota especial
+      window.location.href = "/public";
+      return null;
+    }
   };
   
   return (
