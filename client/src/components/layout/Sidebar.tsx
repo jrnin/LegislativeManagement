@@ -22,6 +22,7 @@ export default function Sidebar() {
   const navigation = [
     { name: "Dashboard", href: "/", icon: PieChart },
     { name: "Usuários", href: "/users", icon: Users },
+    { name: "Vereadores", href: "/councilors", icon: UsersRound },
     { name: "Legislaturas", href: "/legislatures", icon: Building },
     { name: "Eventos", href: "/events", icon: Calendar, badge: "3" },
     { name: "Atividades Legislativas", href: "/activities", icon: FileText, badge: "Novo" },

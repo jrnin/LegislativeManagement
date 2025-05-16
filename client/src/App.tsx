@@ -21,6 +21,8 @@ import DocumentForm from "@/pages/documents/DocumentForm";
 import CommitteeList from "@/pages/committees/CommitteeList";
 import CommitteeForm from "@/pages/committees/CommitteeForm";
 import CommitteeDetails from "@/pages/committees/CommitteeDetails";
+import CouncilorList from "@/pages/councilors/CouncilorList";
+import CouncilorDetails from "@/pages/councilors/CouncilorDetails";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationProvider } from "@/context/NotificationContext";
 import NotificationToast from "@/components/ui/notifications/NotificationToast";
