@@ -8,8 +8,7 @@ import {
   Files,
   LogOut,
   PieChart,
-  Settings,
-  UsersRound
+  Settings
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,7 +25,6 @@ export default function Sidebar() {
     { name: "Eventos", href: "/events", icon: Calendar, badge: "3" },
     { name: "Atividades Legislativas", href: "/activities", icon: FileText, badge: "Novo" },
     { name: "Documentos", href: "/documents", icon: Files },
-    { name: "Comissões", href: "/committees", icon: UsersRound, badge: "Novo" },
   ];
 
   const getInitials = (name: string) => {

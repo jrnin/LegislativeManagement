@@ -15,16 +15,19 @@ export function useAuth() {
   } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     retry: false,
-    enabled: true, // Habilitando a consulta automática
+    enabled: false, // Desabilitar a consulta automática
     staleTime: 1000 * 60 * 5, // 5 minutos
   });
 
   useEffect(() => {
-    // Definir loading como false após a consulta inicial
-    if (!queryLoading) {
+    // Executar a consulta apenas uma vez na montagem do componente
+    const checkAuth = async () => {
+      await refetch();
       setLocalLoading(false);
-    }
-  }, [queryLoading]);
+    };
+    
+    checkAuth();
+  }, [refetch]);
 
   // Função para fazer login
   const login = async (email: string, password: string) => {
