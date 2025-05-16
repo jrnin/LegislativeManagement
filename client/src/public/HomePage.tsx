@@ -638,6 +638,65 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Seção de redes sociais com feed do Instagram */}
+      <section className="py-14 px-4 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="container mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-3">Siga-nos nas Redes Sociais</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Acompanhe nosso trabalho, notícias, eventos e mantenha-se atualizado sobre as atividades 
+              da Câmara Municipal de Jaíba.
+            </p>
+          </div>
+          
+          <div className="flex justify-center space-x-6 mb-10">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
+               className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center 
+                         hover:bg-blue-700 transition-colors">
+              <Facebook size={24} />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" 
+               className="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center 
+                         hover:bg-sky-600 transition-colors">
+              <Twitter size={24} />
+            </a>
+            <a href="https://instagram.com/camaradejaiba" target="_blank" rel="noopener noreferrer" 
+               className="w-12 h-12 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 
+                         text-white rounded-full flex items-center justify-center hover:opacity-90 transition-opacity">
+              <Instagram size={24} />
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" 
+               className="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center 
+                         hover:bg-red-700 transition-colors">
+              <Youtube size={24} />
+            </a>
+          </div>
+          
+          {/* Feed do Instagram incorporado */}
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 
+                              rounded-full flex items-center justify-center text-white mr-3">
+                <Instagram size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold">@camaradejaiba</h3>
+                <p className="text-sm text-gray-500">Feed do Instagram</p>
+              </div>
+            </div>
+            
+            <div className="aspect-video w-full overflow-hidden bg-gray-100 rounded-lg">
+              <iframe
+                title="Instagram Feed"
+                src="https://www.instagram.com/camaradejaiba/embed"
+                className="w-full h-full border-0"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
