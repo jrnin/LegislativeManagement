@@ -617,19 +617,83 @@ export default function HomePage() {
                       </a>
                     </div>
                     
-                    {/* Feed do Instagram completo incorporado */}
-                    <div className="w-full overflow-hidden rounded-lg shadow-lg">
-                      <iframe
-                        src="https://www.instagram.com/camaradejaiba/embed"
-                        className="w-full border-0"
-                        style={{ height: '500px' }} 
-                        allowFullScreen
-                        scrolling="no"
-                        title="Instagram Feed @camaradejaiba"
-                      ></iframe>
+                    {/* Grid de miniaturas do Instagram */}
+                    <div className="flex flex-col md:flex-row items-stretch gap-5">
+                      {/* Smartphone com logo */}
+                      <div className="flex-shrink-0 md:w-1/4">
+                        <div className="relative w-full max-w-[180px] mx-auto">
+                          <div className="relative z-10">
+                            <div className="w-full h-[300px] bg-gradient-to-b from-gray-800 to-gray-900 rounded-[24px] border-[8px] border-gray-700 shadow-lg relative">
+                              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[16px] bg-gray-900 rounded-b-xl"></div>
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-[4px] bg-gray-600 rounded-full"></div>
+                            </div>
+                          </div>
+                          <div className="absolute top-[40px] left-[18px] right-[18px] bottom-[40px] overflow-hidden bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 flex flex-col justify-center items-center text-white rounded-lg">
+                            <Instagram size={48} className="mb-4" />
+                            <div className="text-center">
+                              <p className="font-bold text-lg mb-1">@camaradejaiba</p>
+                              <p className="text-white/80 text-sm">Siga-nos no Instagram</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Grid de 6 imagens do Instagram */}
+                      <div className="flex-grow grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 md:mt-0">
+                        {/* Imagens reais do Instagram */}
+                        {[
+                          { 
+                            url: "https://i.pinimg.com/736x/53/7a/05/537a05b6659e52d2f3c906a6d5ade4c0.jpg", 
+                            alt: "Sessão Câmara Municipal" 
+                          },
+                          { 
+                            url: "https://i.pinimg.com/originals/9e/1b/40/9e1b40b61319b7e5a2044e353e684eab.jpg", 
+                            alt: "Reunião vereadores" 
+                          },
+                          { 
+                            url: "https://i.pinimg.com/736x/77/1a/02/771a02a26a9f5f7589cae735ab4b1b1c.jpg", 
+                            alt: "Evento Câmara" 
+                          },
+                          { 
+                            url: "https://i.pinimg.com/736x/bd/9a/37/bd9a3752c3acd734e85b239e7e3f3e5d.jpg", 
+                            alt: "Sessão plenária" 
+                          },
+                          { 
+                            url: "https://i.pinimg.com/736x/be/7e/77/be7e77c2a3deeed95ca49492c02e8e17.jpg", 
+                            alt: "Audiência pública" 
+                          },
+                          { 
+                            url: "https://i.pinimg.com/736x/2e/f8/f7/2ef8f77333adeef0d9cf865654c6050a.jpg", 
+                            alt: "Cerimônia oficial" 
+                          }
+                        ].map((image, index) => (
+                          <a 
+                            key={index} 
+                            href="https://instagram.com/camaradejaiba" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity group"
+                          >
+                            <div className="relative w-full h-full">
+                              <img 
+                                src={image.url} 
+                                alt={image.alt} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                                <div className="p-2 text-white text-xs">
+                                  <Instagram size={16} className="inline mr-1" />
+                                  Ver mais
+                                </div>
+                              </div>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
                     </div>
                     
-                    <div className="flex flex-wrap justify-center mt-6 gap-4">
+                    {/* Botão para ver mais */}
+                    <div className="flex justify-center mt-6">
                       <a 
                         href="https://instagram.com/camaradejaiba" 
                         target="_blank" 
@@ -637,16 +701,8 @@ export default function HomePage() {
                         className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white px-6 py-3 rounded-full font-medium hover:opacity-90 transition-opacity flex items-center"
                       >
                         <Instagram size={20} className="mr-2" />
-                        Ver perfil completo
+                        Ver todas as publicações
                       </a>
-                      <Button
-                        variant="outline"
-                        className="px-6 py-3 rounded-full flex items-center"
-                        onClick={() => window.open('https://instagram.com/camaradejaiba', '_blank')}
-                      >
-                        <FileText size={20} className="mr-2" />
-                        Confira nossas publicações
-                      </Button>
                     </div>
                   </div>
                 </div>
