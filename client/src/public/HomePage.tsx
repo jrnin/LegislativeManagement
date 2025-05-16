@@ -940,11 +940,110 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de vereadores e eventos próximos */}
+      {/* Nova seção de vereadores em cards */}
+      <section className="py-10 px-4 bg-gray-50">
+        <div className="container mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center">
+              <Users className="text-blue-600 mr-3" size={24} />
+              <h2 className="text-2xl font-bold text-gray-800">Vereadores</h2>
+            </div>
+            <Link href="/public/vereadores">
+              <a className="text-blue-600 hover:underline flex items-center">
+                Ver todos <ChevronRight size={16} />
+              </a>
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {/* Card Ana Silva */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="flex flex-col items-center pt-6 pb-4">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
+                  <img 
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=60" 
+                    alt="Ana Silva" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg text-gray-800">Ana Silva</h3>
+                <p className="text-blue-600 text-sm mb-1">Partido A</p>
+                <Badge variant="outline" className="bg-blue-50">Presidente</Badge>
+              </div>
+            </div>
+            
+            {/* Card Carlos Santos */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="flex flex-col items-center pt-6 pb-4">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
+                  <img 
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=60" 
+                    alt="Carlos Santos" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg text-gray-800">Carlos Santos</h3>
+                <p className="text-blue-600 text-sm mb-1">Partido B</p>
+                <Badge variant="outline" className="bg-blue-50">Vice-Presidente</Badge>
+              </div>
+            </div>
+            
+            {/* Card Mariana Oliveira */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="flex flex-col items-center pt-6 pb-4">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
+                  <img 
+                    src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=60" 
+                    alt="Mariana Oliveira" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg text-gray-800">Mariana Oliveira</h3>
+                <p className="text-blue-600 text-sm mb-1">Partido C</p>
+                <Badge variant="outline" className="bg-blue-50">Secretária</Badge>
+              </div>
+            </div>
+            
+            {/* Card Ricardo Almeida */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="flex flex-col items-center pt-6 pb-4">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
+                  <img 
+                    src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=60" 
+                    alt="Ricardo Almeida" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg text-gray-800">Ricardo Almeida</h3>
+                <p className="text-blue-600 text-sm mb-1">Partido B</p>
+                <Badge variant="outline" className="bg-blue-50">Vereador</Badge>
+              </div>
+            </div>
+            
+            {/* Card Paulo Ferreira */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="flex flex-col items-center pt-6 pb-4">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-blue-100">
+                  <img 
+                    src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=60" 
+                    alt="Paulo Ferreira" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg text-gray-800">Paulo Ferreira</h3>
+                <p className="text-blue-600 text-sm mb-1">Partido A</p>
+                <Badge variant="outline" className="bg-blue-50">Vereador</Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Seção de eventos próximos */}
       <section className="py-10 px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Vereadores */}
+            {/* Conteúdo de eventos */}
             <div className="lg:col-span-2">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold flex items-center">
