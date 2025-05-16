@@ -48,8 +48,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getInitials } from '@/lib/utils';
-// Componentes animados para microinterações
-import { AnimatedCouncilorCard } from '@/components/ui/animated-councilor-card';
+// Componentes para UI
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { HoverCard3D } from '@/components/ui/hover-card-3d';
 
@@ -180,7 +179,36 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
   </Link>
 );
 
-// O componente CouncilorCard foi substituído pelo componente AnimatedCouncilorCard importado
+// Componente para card de vereador (versão sem animações)
+interface CouncilorCardProps {
+  id: string;
+  name: string;
+  role: string;
+  party: string;
+  imageUrl?: string;
+}
+
+const CouncilorCard = ({ id, name, role, party, imageUrl }: CouncilorCardProps) => (
+  <Link href={`/public/vereadores/${id}`}>
+    <a className="block">
+      <Card className="text-center hover:shadow-md transition-all">
+        <CardHeader className="pb-2 pt-6">
+          <div className="flex justify-center mb-4">
+            <Avatar className="h-24 w-24 border-4 border-white shadow-md">
+              <AvatarImage src={imageUrl} />
+              <AvatarFallback className="bg-blue-700 text-white text-lg">{getInitials(name)}</AvatarFallback>
+            </Avatar>
+          </div>
+          <CardTitle className="text-lg">{name}</CardTitle>
+          <CardDescription>{party}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Badge variant="outline" className="mx-auto">{role}</Badge>
+        </CardContent>
+      </Card>
+    </a>
+  </Link>
+);
 
 // Componente para card de evento
 interface EventCardProps {
@@ -754,8 +782,8 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {/* Usando o componente AnimatedCouncilorCard para todos os vereadores */}
-            <AnimatedCouncilorCard
+            {/* Usando o componente CouncilorCard para todos os vereadores (sem animações) */}
+            <CouncilorCard
               id="1"
               name="Ana Silva"
               party="Partido A"
@@ -763,7 +791,7 @@ export default function HomePage() {
               imageUrl="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=60"
             />
             
-            <AnimatedCouncilorCard
+            <CouncilorCard
               id="2"
               name="Carlos Santos"
               party="Partido B"
@@ -771,7 +799,7 @@ export default function HomePage() {
               imageUrl="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=60"
             />
             
-            <AnimatedCouncilorCard
+            <CouncilorCard
               id="3"
               name="Mariana Oliveira"
               party="Partido C"
@@ -779,7 +807,7 @@ export default function HomePage() {
               imageUrl="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=60"
             />
             
-            <AnimatedCouncilorCard
+            <CouncilorCard
               id="4"
               name="Ricardo Almeida"
               party="Partido B"
@@ -787,7 +815,7 @@ export default function HomePage() {
               imageUrl="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=60"
             />
             
-            <AnimatedCouncilorCard
+            <CouncilorCard
               id="5"
               name="Paulo Ferreira"
               party="Partido A"
