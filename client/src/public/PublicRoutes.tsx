@@ -3,7 +3,7 @@ import { Switch, Route } from 'wouter';
 import PublicLayout from './PublicLayout';
 import HomePage from './HomePage';
 import VereadoresPage from './VereadoresPage';
-import VereadorDetalhesPage from './VereadorDetalhesPage';
+import VereadorDetailPage from './VereadorDetailPage';
 import DocumentosPage from './DocumentosPage';
 import AtividadesPage from './AtividadesPage';
 import NotFound from '@/pages/not-found';
