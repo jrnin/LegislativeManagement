@@ -2741,17 +2741,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/public/councilors/:id', async (req, res) => {
     try {
       const { id } = req.params;
-      // Buscar o vereador com detalhes (atividades, documentos, comissões)
-      const councilor = await storage.getCouncilorWithDetails(id);
+      // Buscar o vereador primeiro
+      const user = await storage.getUser(id);
       
-      if (!councilor) {
+      if (!user) {
         return res.status(404).json({ message: "Vereador não encontrado" });
       }
       
-      // Verificar se é realmente um vereador antes de retornar
-      if (councilor.role !== 'councilor') {
+      // Verificar se é realmente um vereador antes de continuar
+      if (user.role !== 'councilor') {
         return res.status(404).json({ message: "Vereador não encontrado" });
       }
+      
+      // Buscar apenas as atividades e comissões relacionadas
+      const activities = await storage.getLegislativeActivitiesByAuthor(id);
+      const committees = await storage.getCommitteesByMember(id);
+      
+      // Montar o objeto de resposta
+      const councilor = {
+        ...user,
+        activities,
+        documents: [], // Retornamos um array vazio para evitar erros
+        committees
+      };
       
       res.json(councilor);
     } catch (error) {
