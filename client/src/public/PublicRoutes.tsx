@@ -14,7 +14,7 @@ export default function PublicRoutes() {
       <Switch>
         <Route path="/public" component={HomePage} />
         <Route path="/public/vereadores" component={VereadoresPage} />
-        <Route path="/public/vereadores/:id" component={VereadorDetalhesPage} />
+        <Route path="/public/vereadores/:id" component={VereadorDetailPage} />
         <Route path="/public/documentos" component={DocumentosPage} />
         <Route path="/public/atividades" component={AtividadesPage} />
         {/* Adicionar outras rotas públicas aqui */}

@@ -2737,6 +2737,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter detalhes de um vereador específico (sem autenticação)
+  app.get('/api/public/councilors/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      // Buscar o vereador com detalhes (atividades, documentos, comissões)
+      const councilor = await storage.getCouncilorWithDetails(id);
+      
+      if (!councilor) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Verificar se é realmente um vereador antes de retornar
+      if (councilor.role !== 'councilor') {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      res.json(councilor);
+    } catch (error) {
+      console.error(`Erro ao buscar detalhes do vereador ${req.params.id}:`, error);
+      res.status(500).json({ message: "Erro ao buscar detalhes do vereador" });
+    }
+  });
+
   // Criar o servidor HTTP
   const httpServer = createServer(app);
   
