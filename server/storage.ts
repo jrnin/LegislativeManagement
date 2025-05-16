@@ -193,6 +193,15 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
+  async getCouncilors(): Promise<User[]> {
+    try {
+      return await this.getUsersByRole('councilor');
+    } catch (error) {
+      console.error("Error fetching councilors:", error);
+      return [];
+    }
+  }
+  
   async createUser(userData: Partial<User>): Promise<User> {
     // Generate a verification token if needed
     if (!userData.emailVerified) {
