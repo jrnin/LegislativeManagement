@@ -135,11 +135,12 @@ export default function CommitteeForm() {
 
       queryClient.invalidateQueries({ queryKey: ["/api/committees"] });
       setLocation("/committees");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao salvar comissão:", error);
+      const errorMessage = error?.response?.data?.message || error?.message || "Ocorreu um erro ao salvar a comissão.";
       toast({
         title: "Erro ao salvar",
-        description: "Ocorreu um erro ao salvar a comissão.",
+        description: errorMessage,
         variant: "destructive",
       });
     }

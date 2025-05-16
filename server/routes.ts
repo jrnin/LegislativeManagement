@@ -2488,20 +2488,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const memberIds = req.body.members || [];
 
-      const newCommittee = await storage.createCommittee(committeeData, memberIds);
+      // Verificar se temos todas as informações necessárias
+      if (!committeeData.name) {
+        return res.status(400).json({ message: "Nome da comissão é obrigatório" });
+      }
+      
+      if (!committeeData.type) {
+        return res.status(400).json({ message: "Tipo da comissão é obrigatório" });
+      }
+      
+      if (!committeeData.startDate || isNaN(committeeData.startDate.getTime())) {
+        return res.status(400).json({ message: "Data de início inválida" });
+      }
+      
+      if (!committeeData.endDate || isNaN(committeeData.endDate.getTime())) {
+        return res.status(400).json({ message: "Data de término inválida" });
+      }
 
-      // Notificar usuários sobre a nova comissão
-      sendNotification('all', {
-        type: 'COMMITTEE_CREATED',
-        title: 'Nova Comissão Criada',
-        message: `A comissão "${committeeData.name}" foi criada.`,
-        data: newCommittee
-      });
+      console.log("Criando comissão com dados:", JSON.stringify(committeeData));
+      console.log("Membros:", memberIds);
+
+      const newCommittee = await storage.createCommittee(committeeData, memberIds);
+      console.log("Comissão criada com sucesso:", newCommittee);
+
+      try {
+        // Tentar enviar notificação, mas não falhar se der erro
+        if (typeof sendNotification === 'function') {
+          sendNotification('all', {
+            type: 'COMMITTEE_CREATED',
+            title: 'Nova Comissão Criada',
+            message: `A comissão "${committeeData.name}" foi criada.`,
+            data: newCommittee
+          });
+        }
+      } catch (notificationError) {
+        console.error("Erro ao enviar notificação, mas comissão foi criada:", notificationError);
+      }
 
       res.status(201).json(newCommittee);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating committee:", error);
-      res.status(500).json({ message: "Erro ao criar comissão" });
+      const errorMessage = error.message || "Erro ao criar comissão";
+      res.status(500).json({ message: errorMessage });
     }
   });
 
@@ -2683,31 +2711,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Inicializar a função para enviar notificações em tempo real
   sendNotification = (target: 'all' | string | string[], notification: any) => {
     try {
+      // Se o cliente Map não estiver inicializado, não enviar notificações
+      if (!clients) {
+        console.log('Mapa de clientes WebSocket não inicializado. Notificações desativadas.');
+        return;
+      }
+      
       const message = JSON.stringify(notification);
       
       if (target === 'all') {
         // Enviar para todos os clientes conectados
+        let sentCount = 0;
         clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(message);
+          if (client && client.readyState === WebSocket.OPEN) {
+            try {
+              client.send(message);
+              sentCount++;
+            } catch (err) {
+              console.error('Erro ao enviar mensagem para cliente:', err);
+            }
           }
         });
-        console.log(`Notificação enviada para todos os clientes: ${message}`);
+        console.log(`Notificação enviada para ${sentCount} clientes conectados`);
       } else if (Array.isArray(target)) {
         // Enviar para uma lista de usuários específicos
+        let sentCount = 0;
         target.forEach(userId => {
           const client = clients.get(userId);
           if (client && client.readyState === WebSocket.OPEN) {
-            client.send(message);
-            console.log(`Notificação enviada para usuário ${userId}: ${message}`);
+            try {
+              client.send(message);
+              sentCount++;
+            } catch (err) {
+              console.error(`Erro ao enviar mensagem para usuário ${userId}:`, err);
+            }
           }
         });
+        console.log(`Notificação enviada para ${sentCount}/${target.length} usuários específicos`);
       } else {
         // Enviar para um único usuário
         const client = clients.get(target);
         if (client && client.readyState === WebSocket.OPEN) {
-          client.send(message);
-          console.log(`Notificação enviada para usuário ${target}: ${message}`);
+          try {
+            client.send(message);
+            console.log(`Notificação enviada para usuário ${target}`);
+          } catch (err) {
+            console.error(`Erro ao enviar mensagem para usuário ${target}:`, err);
+          }
+        } else {
+          console.log(`Cliente não encontrado ou não está pronto para o usuário: ${target}`);
         }
       }
     } catch (error) {
