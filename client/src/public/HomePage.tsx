@@ -37,26 +37,27 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getInitials } from '@/lib/utils';
 
-// Componente de banner de destaque
+// Componente de banner de destaque com serviços integrados
 const HeroBanner = () => (
-  <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-    <div className="absolute inset-0 bg-[url('/hero-pattern.svg')] opacity-10"></div>
-    <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-      <div className="max-w-3xl">
-        <h1 className="text-3xl md:text-5xl font-bold mb-4">
-          Câmara Municipal - Portal Transparente
-        </h1>
-        <p className="text-lg md:text-xl opacity-90 mb-8">
-          Acompanhe as atividades legislativas, conheça os vereadores e tenha acesso a todos os documentos públicos de forma rápida e transparente.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
-            Sessões ao Vivo
-          </Button>
-          <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-600">
-            Ouvidoria
-          </Button>
-        </div>
+  <div className="relative">
+    <div className="relative bg-gradient-to-r from-blue-400 to-indigo-700 text-white">    
+      <div className="container mx-auto px-8 py-16 md:py-24 relative z-10">
+        <div className="max-w-3xl">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">
+            Câmara Municipal - Portal Transparente
+          </h1>
+          <p className="text-lg md:text-xl opacity-90 mb-8">
+            Acompanhe as atividades legislativas, conheça os vereadores e tenha acesso a todos os documentos públicos de forma rápida e transparente.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
+              Sessões ao Vivo
+            </Button>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-600">
+              Ouvidoria
+            </Button>
+          </div>
+        </div>      
       </div>
     </div>
   </div>
@@ -416,22 +417,30 @@ export default function HomePage() {
       {/* Banner de destaque */}
       <HeroBanner />
 
-      {/* Seção de serviços rápidos */}
-      <section className="py-10 px-4">
-        <div className="container mx-auto">
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <Zap className="mr-2 text-blue-600" /> 
-            Serviços ao Cidadão
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Seção de serviços rápidos (agora compacta, abaixo do vídeo) */}
+      <section className="bg-white shadow-md py-6 relative z-10 -mt-1">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-xl font-bold flex items-center text-blue-700">
+              <Zap className="mr-2" /> 
+              Serviços ao Cidadão
+            </h2>
+            <Link href="/public/servicos">
+              <a className="text-blue-600 hover:underline text-sm flex items-center">
+                Ver todos <ChevronRight size={14} />
+              </a>
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {quickServices.map((service, index) => (
-              <QuickServiceCard
-                key={index}
-                title={service.title}
-                description={service.description}
-                icon={service.icon}
-                href={service.href}
-              />
+              <Link key={index} href={service.href}>
+                <a className="flex flex-col items-center p-3 rounded-lg hover:bg-blue-50 transition-colors text-center group">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-2 group-hover:bg-blue-200">
+                    <service.icon size={20} />
+                  </div>
+                  <span className="text-sm font-medium">{service.title}</span>
+                </a>
+              </Link>
             ))}
           </div>
         </div>
