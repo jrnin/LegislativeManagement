@@ -51,6 +51,8 @@ function AuthenticatedApp() {
         <Route path="/committees/new" component={CommitteeForm} />
         <Route path="/committees/edit/:id" component={CommitteeForm} />
         <Route path="/committees/:id" component={CommitteeDetails} />
+        <Route path="/councilors" component={CouncilorList} />
+        <Route path="/councilors/:id" component={CouncilorDetails} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
