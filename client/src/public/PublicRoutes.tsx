@@ -4,6 +4,8 @@ import PublicLayout from './PublicLayout';
 import HomePage from './HomePage';
 import VereadoresPage from './VereadoresPage';
 import VereadorDetalhesPage from './VereadorDetalhesPage';
+import DocumentosPage from './DocumentosPage';
+import AtividadesPage from './AtividadesPage';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
@@ -13,6 +15,8 @@ export default function PublicRoutes() {
         <Route path="/public" component={HomePage} />
         <Route path="/public/vereadores" component={VereadoresPage} />
         <Route path="/public/vereadores/:id" component={VereadorDetalhesPage} />
+        <Route path="/public/documentos" component={DocumentosPage} />
+        <Route path="/public/atividades" component={AtividadesPage} />
         {/* Adicionar outras rotas públicas aqui */}
         <Route component={NotFound} />
       </Switch>
