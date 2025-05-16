@@ -20,7 +20,13 @@ import {
   Facebook,
   Twitter,
   Instagram,
-  Youtube
+  Youtube,
+  CloudSun,
+  CloudRain,
+  Cloud,
+  Sun,
+  Umbrella,
+  Thermometer
 } from 'lucide-react';
 import { 
   Card, 
@@ -561,32 +567,97 @@ export default function HomePage() {
                 </div>
                 
                 {/* Coluna da direita (menor, sem imagens) - ocupa 1/3 do espaço */}
-                <div className="bg-white rounded-lg shadow-md p-4">
-                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800">Últimas Notícias</h3>
-                  
-                  <div className="space-y-4">
-                    {news.slice(0, 6).map((item) => (
-                      <div key={item.id} className="border-b pb-4 last:border-0 last:pb-0">
-                        <div className="flex justify-between items-start mb-1">
-                          <Badge variant="outline" className="text-xs">
-                            {item.category}
-                          </Badge>
-                          <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
+                <div className="space-y-6">
+                  {/* Previsão do tempo semanal */}
+                  <div className="bg-white rounded-lg shadow-md p-4">
+                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800 flex items-center">
+                      <CloudSun className="mr-2 text-blue-600" size={20} />
+                      Previsão do Tempo
+                    </h3>
+                    
+                    <div className="space-y-3">
+                      {/* Clima atual */}
+                      <div className="flex items-center justify-between mb-4 bg-gradient-to-r from-blue-50 to-sky-50 p-3 rounded-lg">
+                        <div>
+                          <div className="text-gray-600 text-sm">Hoje</div>
+                          <div className="text-lg font-semibold">Jaíba, MG</div>
+                          <div className="flex items-center">
+                            <Thermometer size={14} className="text-red-500 mr-1" /> 
+                            <span className="text-2xl font-bold">27°</span>
+                          </div>
                         </div>
-                        <Link href={`/public/noticias/${item.id}`}>
-                          <a className="block">
-                            <h4 className="font-medium text-sm hover:text-blue-600 transition-colors leading-tight">
-                              {item.title}
-                            </h4>
-                          </a>
-                        </Link>
+                        <div className="text-blue-500">
+                          <CloudSun size={48} />
+                        </div>
                       </div>
-                    ))}
+                      
+                      {/* Previsão por dias da semana */}
+                      <div className="grid grid-cols-4 gap-2 mb-3">
+                        {[
+                          { day: 'Seg', temp: '27°', icon: Sun, desc: 'Ensolarado' },
+                          { day: 'Ter', temp: '25°', icon: CloudSun, desc: 'Parcialmente nublado' },
+                          { day: 'Qua', temp: '26°', icon: Cloud, desc: 'Nublado' },
+                          { day: 'Qui', temp: '24°', icon: CloudRain, desc: 'Chuva' },
+                        ].map((item, index) => (
+                          <div key={index} className="text-center p-2 bg-gray-50 rounded">
+                            <div className="text-xs font-medium mb-1">{item.day}</div>
+                            <div className="text-blue-600">
+                              {React.createElement(item.icon, { size: 24 })}
+                            </div>
+                            <div className="text-sm font-semibold mt-1">{item.temp}</div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { label: 'Umidade', value: '75%', icon: Umbrella },
+                          { label: 'Vento', value: '12 km/h', icon: CloudSun },
+                          { label: 'Chuva', value: '10%', icon: CloudRain },
+                        ].map((item, index) => (
+                          <div key={index} className="text-center border border-gray-100 rounded py-2">
+                            <div className="text-blue-600 mb-1">
+                              {React.createElement(item.icon, { size: 16 })}
+                            </div>
+                            <div className="text-xs text-gray-600">{item.label}</div>
+                            <div className="text-sm font-medium">{item.value}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   
-                  <Button variant="ghost" size="sm" className="w-full mt-4 text-blue-600 hover:text-blue-800">
-                    Ver mais notícias
-                  </Button>
+                  {/* Últimas notícias */}
+                  <div className="bg-white rounded-lg shadow-md p-4">
+                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800 flex items-center">
+                      <FileText className="mr-2 text-blue-600" size={20} />
+                      Últimas Notícias
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      {news.slice(0, 5).map((item) => (
+                        <div key={item.id} className="border-b pb-4 last:border-0 last:pb-0">
+                          <div className="flex justify-between items-start mb-1">
+                            <Badge variant="outline" className="text-xs">
+                              {item.category}
+                            </Badge>
+                            <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
+                          </div>
+                          <Link href={`/public/noticias/${item.id}`}>
+                            <a className="block">
+                              <h4 className="font-medium text-sm hover:text-blue-600 transition-colors leading-tight">
+                                {item.title}
+                              </h4>
+                            </a>
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <Button variant="ghost" size="sm" className="w-full mt-4 text-blue-600 hover:text-blue-800">
+                      Ver mais notícias
+                    </Button>
+                  </div>
                 </div>
               </div>
             </TabsContent>
