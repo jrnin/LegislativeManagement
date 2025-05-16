@@ -617,51 +617,36 @@ export default function HomePage() {
                       </a>
                     </div>
                     
-                    <div className="flex flex-col md:flex-row items-stretch gap-5">
-                      {/* Smartphone com preview */}
-                      <div className="flex-shrink-0 md:w-1/4">
-                        <div className="relative w-full max-w-[180px] mx-auto">
-                          <div className="relative z-10">
-                            {/* Smartphone mockup simples em vez de imagem externa */}
-                            <div className="w-full h-[320px] bg-gradient-to-b from-gray-800 to-gray-900 rounded-[24px] border-[8px] border-gray-700 shadow-lg relative">
-                              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[16px] bg-gray-900 rounded-b-xl"></div>
-                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-[4px] bg-gray-600 rounded-full"></div>
-                            </div>
-                          </div>
-                          <div className="absolute top-[40px] left-[18px] right-[18px] bottom-[40px] overflow-hidden bg-black">
-                            {/* Conteúdo alternativo no lugar do iframe */}
-                            <div className="w-full h-full bg-gradient-to-r from-blue-900 to-indigo-900 p-3 flex flex-col justify-center items-center text-white">
-                              <Instagram size={32} className="mb-2" />
-                              <div className="text-xs text-center">
-                                <p className="font-bold">@camaradejaiba</p>
-                                <p className="text-blue-200 mt-1">Siga-nos no Instagram</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Grid de posts */}
-                      <div className="flex-grow grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mt-4 md:mt-0">
-                        {/* Mockup de imagens do Instagram com exemplos de conteúdo */}
-                        {[
-                          { bg: 'bg-blue-100', icon: <Gavel size={32} className="text-blue-600" /> },
-                          { bg: 'bg-indigo-100', icon: <Users size={32} className="text-indigo-600" /> },
-                          { bg: 'bg-purple-100', icon: <Calendar size={32} className="text-purple-600" /> },
-                          { bg: 'bg-sky-100', icon: <FileText size={32} className="text-sky-600" /> },
-                          { bg: 'bg-cyan-100', icon: <Building size={32} className="text-cyan-600" /> }
-                        ].map((item, index) => (
-                          <a 
-                            key={index} 
-                            href="https://instagram.com/camaradejaiba" 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className={`${item.bg} overflow-hidden aspect-square rounded-md hover:opacity-90 transition-opacity flex items-center justify-center`}
-                          >
-                            {item.icon}
-                          </a>
-                        ))}
-                      </div>
+                    {/* Feed do Instagram completo incorporado */}
+                    <div className="w-full overflow-hidden rounded-lg shadow-lg">
+                      <iframe
+                        src="https://www.instagram.com/camaradejaiba/embed"
+                        className="w-full border-0"
+                        style={{ height: '500px' }} 
+                        allowFullScreen
+                        scrolling="no"
+                        title="Instagram Feed @camaradejaiba"
+                      ></iframe>
+                    </div>
+                    
+                    <div className="flex flex-wrap justify-center mt-6 gap-4">
+                      <a 
+                        href="https://instagram.com/camaradejaiba" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white px-6 py-3 rounded-full font-medium hover:opacity-90 transition-opacity flex items-center"
+                      >
+                        <Instagram size={20} className="mr-2" />
+                        Ver perfil completo
+                      </a>
+                      <Button
+                        variant="outline"
+                        className="px-6 py-3 rounded-full flex items-center"
+                        onClick={() => window.open('https://instagram.com/camaradejaiba', '_blank')}
+                      >
+                        <FileText size={20} className="mr-2" />
+                        Confira nossas publicações
+                      </Button>
                     </div>
                   </div>
                 </div>
