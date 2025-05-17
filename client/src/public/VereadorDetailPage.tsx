@@ -16,15 +16,7 @@ import {
   GraduationCap, 
   Home, 
   Mail, 
-  MapPin, 
-  Phone, 
-  Briefcase, 
-  Facebook, 
-  Instagram, 
-  Twitter, 
-  Linkedin, 
-  Share, 
-  Users 
+  MapPin
 } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -331,7 +323,7 @@ export default function VereadorDetailPage() {
                       <div>
                         <p className="text-sm font-medium text-gray-500">Profissão</p>
                         <div className="flex items-center mt-1">
-                          <Briefcase className="h-4 w-4 mr-2 text-gray-400" />
+                          <Building className="h-4 w-4 mr-2 text-gray-400" />
                           <span className="text-gray-700">{councilor.occupation}</span>
                         </div>
                       </div>
@@ -351,16 +343,16 @@ export default function VereadorDetailPage() {
                       <p className="text-sm font-medium text-gray-500">Redes Sociais</p>
                       <div className="flex items-center mt-2 space-x-3">
                         <a href="#" className="text-blue-600 hover:text-blue-800">
-                          <Facebook className="h-5 w-5" />
+                          <Mail className="h-5 w-5" />
                         </a>
                         <a href="#" className="text-pink-600 hover:text-pink-800">
-                          <Instagram className="h-5 w-5" />
+                          <Calendar className="h-5 w-5" />
                         </a>
                         <a href="#" className="text-blue-400 hover:text-blue-600">
-                          <Twitter className="h-5 w-5" />
+                          <FileText className="h-5 w-5" />
                         </a>
                         <a href="#" className="text-blue-700 hover:text-blue-900">
-                          <Linkedin className="h-5 w-5" />
+                          <User2 className="h-5 w-5" />
                         </a>
                       </div>
                     </div>
@@ -410,7 +402,7 @@ export default function VereadorDetailPage() {
                       value="committees" 
                       className="flex items-center data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-5 py-3"
                     >
-                      <Users className="mr-2 h-4 w-4" />
+                      <User2 className="mr-2 h-4 w-4" />
                       Comissões
                     </TabsTrigger>
                   </TabsList>
@@ -551,7 +543,7 @@ export default function VereadorDetailPage() {
                         </div>
                       ) : (
                         <div className="text-center py-12">
-                          <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                          <User2 className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                           <p className="text-gray-500">Este vereador não participa de nenhuma comissão atualmente.</p>
                         </div>
                       )}
