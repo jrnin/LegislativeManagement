@@ -74,7 +74,7 @@ const ActivityCard = ({ activity }: { activity: Activity }) => (
       <p className="text-sm text-gray-700">{activity.description}</p>
     </CardContent>
     <CardFooter className="pt-0 border-t border-gray-100">
-      <Link href={`/atividades/${activity.id}`}>
+      <Link href={`/public/atividades/${activity.id}`}>
         <a className="text-xs text-blue-600 hover:underline flex items-center">
           Ver detalhes
           <ChevronLeft className="h-3 w-3 ml-1 rotate-180" />
@@ -110,7 +110,7 @@ const DocumentCard = ({ document }: { document: Document }) => (
       <p className="text-sm text-gray-700">{document.description}</p>
     </CardContent>
     <CardFooter className="pt-0 border-t border-gray-100">
-      <Link href={`/documentos/${document.id}`}>
+      <Link href={`/public/documentos/${document.id}`}>
         <a className="text-xs text-blue-600 hover:underline flex items-center">
           Ver detalhes
           <ChevronLeft className="h-3 w-3 ml-1 rotate-180" />
@@ -143,7 +143,7 @@ const CommitteeCard = ({ committee }: { committee: Committee }) => (
       </div>
     </CardHeader>
     <CardFooter className="pt-2 border-t border-gray-100">
-      <Link href={`/comissoes/${committee.id}`}>
+      <Link href={`/public/comissoes/${committee.id}`}>
         <a className="text-xs text-blue-600 hover:underline flex items-center">
           Ver detalhes
           <ChevronLeft className="h-3 w-3 ml-1 rotate-180" />
@@ -181,7 +181,7 @@ export default function VereadorDetailPage() {
           Tentar novamente
         </Button>
         <div className="mt-6">
-          <Link href="/vereadores">
+          <Link href="/public/vereadores">
             <a className="text-blue-600 hover:underline inline-flex items-center">
               <ChevronLeft className="h-4 w-4 mr-1" />
               Voltar para lista de vereadores
@@ -195,7 +195,7 @@ export default function VereadorDetailPage() {
   return (
     <div className="container mx-auto py-12 px-4">
       <div className="mb-6">
-        <Link href="/vereadores">
+        <Link href="/public/vereadores">
           <a className="text-blue-600 hover:underline inline-flex items-center mb-8">
             <ChevronLeft className="h-4 w-4 mr-1" />
             Voltar para lista de vereadores
