@@ -26,7 +26,8 @@ import {
   Cloud,
   Sun,
   Umbrella,
-  Thermometer
+  Thermometer,
+  Loader2
 } from 'lucide-react';
 import { 
   Card, 
@@ -183,32 +184,78 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
 interface CouncilorCardProps {
   id: string;
   name: string;
-  role: string;
-  party: string;
+  role?: string;
+  party?: string;
   imageUrl?: string;
+  profileImageUrl?: string;
+  occupation?: string;
+  education?: string;
 }
 
-const CouncilorCard = ({ id, name, role, party, imageUrl }: CouncilorCardProps) => (
+const CouncilorCard = ({ id, name, role, party, imageUrl, profileImageUrl, occupation, education }: CouncilorCardProps) => (
   <Link href={`/public/vereadores/${id}`}>
     <a className="block">
       <Card className="text-center hover:shadow-md transition-all">
         <CardHeader className="pb-2 pt-6">
           <div className="flex justify-center mb-4">
             <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-              <AvatarImage src={imageUrl} />
+              <AvatarImage src={profileImageUrl || imageUrl} />
               <AvatarFallback className="bg-blue-700 text-white text-lg">{getInitials(name)}</AvatarFallback>
             </Avatar>
           </div>
           <CardTitle className="text-lg">{name}</CardTitle>
-          <CardDescription>{party}</CardDescription>
+          <CardDescription>{party || occupation || "Vereador(a)"}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Badge variant="outline" className="mx-auto">{role}</Badge>
+          <Badge variant="outline" className="mx-auto">{role || education || "Legislatura Atual"}</Badge>
         </CardContent>
       </Card>
     </a>
   </Link>
 );
+
+// Componente para exibir vereadores na página inicial
+const HomeCouncilors = () => {
+  const { data: councilors, isLoading, error } = useQuery<any[]>({
+    queryKey: ['/api/public/councilors'],
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-10">
+        <div className="animate-spin text-blue-600">
+          <Users size={40} />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !councilors) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-red-500 mb-4">Não foi possível carregar os vereadores.</p>
+      </div>
+    );
+  }
+
+  // Mostrar apenas os primeiros 5 vereadores
+  const displayedCouncilors = councilors.slice(0, 5);
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      {displayedCouncilors.map((councilor) => (
+        <CouncilorCard
+          key={councilor.id}
+          id={councilor.id}
+          name={councilor.name}
+          profileImageUrl={councilor.profileImageUrl || ''}
+          occupation={councilor.occupation || ''}
+          education={councilor.education || ''}
+        />
+      ))}
+    </div>
+  );
+};
 
 // Componente para card de evento
 interface EventCardProps {
@@ -766,7 +813,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Nova seção de vereadores em cards */}
+      {/* Nova seção de vereadores em cards com dados da API */}
       <section className="py-10 px-4 bg-white">
         <div className="container mx-auto">
           <div className="flex justify-between items-center mb-8">
@@ -781,48 +828,7 @@ export default function HomePage() {
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {/* Usando o componente CouncilorCard para todos os vereadores (sem animações) */}
-            <CouncilorCard
-              id="1"
-              name="Ana Silva"
-              party="Partido A"
-              role="Presidente"
-              imageUrl="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=60"
-            />
-            
-            <CouncilorCard
-              id="2"
-              name="Carlos Santos"
-              party="Partido B"
-              role="Vice-Presidente"
-              imageUrl="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=60"
-            />
-            
-            <CouncilorCard
-              id="3"
-              name="Mariana Oliveira"
-              party="Partido C"
-              role="Secretária"
-              imageUrl="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=60"
-            />
-            
-            <CouncilorCard
-              id="4"
-              name="Ricardo Almeida"
-              party="Partido B"
-              role="Vereador"
-              imageUrl="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=60"
-            />
-            
-            <CouncilorCard
-              id="5"
-              name="Paulo Ferreira"
-              party="Partido A"
-              role="Vereador"
-              imageUrl="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=60"
-            />
-          </div>
+          <HomeCouncilors />
         </div>
       </section>
 
