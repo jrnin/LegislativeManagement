@@ -71,8 +71,8 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "returnNull" }),
       refetchInterval: false,
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
+      refetchOnWindowFocus: true,
+      staleTime: 0, // Desativando o cache para ver as mudanças imediatamente
       retry: false,
     },
     mutations: {
