@@ -69,7 +69,7 @@ const HeroBanner = () => {
               className="absolute w-[300%] h-[300%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
               title="Background Video"
             ></iframe>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 to-indigo-900/50"></div>
             
             {/* Conteúdo do banner */}
             <div className="container mx-auto px-8 py-16 md:py-24 relative z-10 h-full flex flex-col justify-center">
