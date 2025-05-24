@@ -13,11 +13,23 @@ export default function PublicRoutes() {
     <PublicLayout>
       <Switch>
         <Route path="/public" component={HomePage} />
+        <Route path="/" component={HomePage} />
+        
         <Route path="/public/vereadores" component={VereadoresPage} />
+        <Route path="/vereadores" component={VereadoresPage} />
+        
         <Route path="/public/vereadores/:id" component={VereadorDetailPage} />
+        <Route path="/vereadores/:id" component={VereadorDetailPage} />
+        
         <Route path="/public/documentos" component={DocumentosPage} />
+        <Route path="/documentos" component={DocumentosPage} />
+        
         <Route path="/public/documentos/:id" component={() => <div>Detalhes do Documento</div>} />
+        <Route path="/documentos/:id" component={() => <div>Detalhes do Documento</div>} />
+        
         <Route path="/public/atividades" component={AtividadesPage} />
+        <Route path="/atividades" component={AtividadesPage} />
+        
         {/* Adicionar outras rotas públicas aqui */}
         <Route component={NotFound} />
       </Switch>

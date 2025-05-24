@@ -83,7 +83,14 @@ function App() {
   // Verificar se estamos em rotas especiais
   const isVerifyEmailRoute = location === "/verify-email";
   const isLoginRoute = location === "/login";
-  const isPublicRoute = location.startsWith("/public");
+  
+  // Verificar se estamos em uma rota pública
+  // Considerar tanto "/public" quanto rotas na raiz como públicas
+  const isPublicRoute = location.startsWith("/public") || 
+                       location === "/" || 
+                       location.startsWith("/documentos") || 
+                       location.startsWith("/vereadores") || 
+                       location.startsWith("/atividades");
   
   const { isLoading, isAuthenticated } = useAuth();
   
@@ -119,7 +126,7 @@ function App() {
     } else {
       // Redirecionar para a página pública se não estiver autenticado
       // e não estiver em nenhuma rota especial
-      window.location.href = "/public";
+      window.location.href = "/";
       return null;
     }
   };
