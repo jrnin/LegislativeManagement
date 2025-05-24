@@ -102,9 +102,35 @@ export const uploadAvatar = multer({
 });
 
 /**
+ * Middleware to check if the route is public and should bypass authentication
+ */
+export function isPublicRoute(req: Request): boolean {
+  // Lista de rotas públicas que não precisam de autenticação
+  const publicRoutes = [
+    '/api/public/',        // Todas as rotas que começam com /api/public/
+    '/api/verify-email',   // Rota de verificação de email
+    '/api/login',          // Rotas de login
+    '/api/register',       // Rota de registro
+    '/api/auth/user'       // Rota para verificar usuário atual
+  ];
+  
+  // Verifica se a URL atual é uma rota pública
+  return publicRoutes.some(route => 
+    route.endsWith('/') 
+      ? req.path.startsWith(route) 
+      : req.path === route || req.path.startsWith(route + '/')
+  );
+}
+
+/**
  * Middleware to check if user is authenticated with custom session
  */
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  // Se for uma rota pública, permitir acesso sem autenticação
+  if (isPublicRoute(req)) {
+    return next();
+  }
+  
   // Verificar primeiramente se o usuário está autenticado pelo Replit
   if (req.isAuthenticated && req.isAuthenticated()) {
     console.log("Usuário autenticado pelo Replit:", req.user);
@@ -130,6 +156,11 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
  * Middleware to check if user is an administrator
  */
 export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  // Se for uma rota pública, permitir acesso sem autenticação
+  if (isPublicRoute(req)) {
+    return next();
+  }
+  
   const userId = (req.session as any).userId;
   
   if (!userId) {
