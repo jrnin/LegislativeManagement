@@ -669,8 +669,115 @@ export class DatabaseStorage implements IStorage {
     return document;
   }
   
-  async getAllDocuments(): Promise<Document[]> {
-    return await db.select().from(documents).orderBy(desc(documents.documentDate));
+  async getAllDocuments(filters?: any, page: number = 1, limit: number = 10): Promise<Document[]> {
+    // Construir a query base
+    let query = db.select().from(documents);
+    
+    // Aplicar filtros se fornecidos
+    if (filters) {
+      // Filtro por tipo de documento
+      if (filters.documentType) {
+        query = query.where(eq(documents.documentType, filters.documentType));
+      }
+      
+      // Filtro por status
+      if (filters.status) {
+        query = query.where(eq(documents.status, filters.status));
+      }
+      
+      // Filtro por intervalo de datas
+      if (filters.dateRange) {
+        if (filters.dateRange.start) {
+          query = query.where(gte(documents.documentDate, filters.dateRange.start));
+        }
+        if (filters.dateRange.end) {
+          query = query.where(lte(documents.documentDate, filters.dateRange.end));
+        }
+      }
+      
+      // Filtro por texto (busca na descrição)
+      if (filters.search) {
+        query = query.where(
+          like(documents.description, `%${filters.search}%`)
+        );
+      }
+    }
+    
+    // Aplicar ordenação (mais recentes primeiro)
+    query = query.orderBy(desc(documents.documentDate));
+    
+    // Aplicar paginação
+    const offset = (page - 1) * limit;
+    query = query.limit(limit).offset(offset);
+    
+    // Executar a query
+    return await query;
+  }
+  
+  /**
+   * Count documents with filters (for pagination)
+   */
+  async getDocumentsCount(filters?: any): Promise<number> {
+    // Construir a query base
+    let query = db.select({ count: count() }).from(documents);
+    
+    // Aplicar filtros se fornecidos
+    if (filters) {
+      // Filtro por tipo de documento
+      if (filters.documentType) {
+        query = query.where(eq(documents.documentType, filters.documentType));
+      }
+      
+      // Filtro por status
+      if (filters.status) {
+        query = query.where(eq(documents.status, filters.status));
+      }
+      
+      // Filtro por intervalo de datas
+      if (filters.dateRange) {
+        if (filters.dateRange.start) {
+          query = query.where(gte(documents.documentDate, filters.dateRange.start));
+        }
+        if (filters.dateRange.end) {
+          query = query.where(lte(documents.documentDate, filters.dateRange.end));
+        }
+      }
+      
+      // Filtro por texto (busca na descrição)
+      if (filters.search) {
+        query = query.where(
+          like(documents.description, `%${filters.search}%`)
+        );
+      }
+    }
+    
+    // Executar a query
+    const result = await query;
+    return result[0]?.count || 0;
+  }
+  
+  /**
+   * Get unique document types for filter dropdowns
+   */
+  async getDocumentTypes(): Promise<string[]> {
+    const result = await db
+      .selectDistinct({ type: documents.documentType })
+      .from(documents)
+      .orderBy(documents.documentType);
+    
+    return result.map(item => item.type);
+  }
+  
+  /**
+   * Get unique document status values for filter dropdowns
+   */
+  async getDocumentStatusTypes(): Promise<string[]> {
+    const result = await db
+      .selectDistinct({ status: documents.status })
+      .from(documents)
+      .orderBy(documents.status);
+    
+    return result.map(item => item.status);
   }
   
   async getDocumentHistory(id: number): Promise<Document[]> {

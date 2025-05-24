@@ -1110,8 +1110,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all documents
   app.get('/api/documents', requireAuth, async (req, res) => {
     try {
-      const documents = await storage.getAllDocuments();
-      res.json(documents);
+      const { 
+        type, 
+        status, 
+        startDate, 
+        endDate, 
+        search, 
+        page = '1', 
+        limit = '10'
+      } = req.query;
+
+      // Converter para números
+      const pageNum = parseInt(page as string, 10) || 1;
+      const limitNum = parseInt(limit as string, 10) || 10;
+      
+      // Construir objeto de filtro
+      const filters: any = {};
+      
+      if (type) filters.documentType = type;
+      if (status) filters.status = status;
+      
+      // Filtro de data
+      if (startDate || endDate) {
+        filters.dateRange = {};
+        if (startDate) filters.dateRange.start = new Date(startDate as string);
+        if (endDate) filters.dateRange.end = new Date(endDate as string);
+      }
+      
+      // Filtro de busca por texto
+      if (search) filters.search = search as string;
+      
+      // Obter documentos do banco de dados
+      const documents = await storage.getAllDocuments(filters, pageNum, limitNum);
+      
+      // Obter total de documentos para paginação
+      const total = await storage.getDocumentsCount(filters);
+      
+      res.json({
+        documents,
+        pagination: {
+          total,
+          page: pageNum,
+          limit: limitNum,
+          pages: Math.ceil(total / limitNum)
+        }
+      });
     } catch (error) {
       console.error("Error fetching documents:", error);
       res.status(500).json({ message: "Erro ao buscar documentos" });
@@ -2734,6 +2777,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao buscar vereadores para exibição pública:", error);
       res.status(500).json({ message: "Erro ao buscar vereadores" });
+    }
+  });
+  
+  // Rota pública para obter documentos (sem autenticação)
+  app.get('/api/public/documents', async (req, res) => {
+    try {
+      // Parâmetros de filtro e paginação
+      const { 
+        type, 
+        status, 
+        startDate, 
+        endDate, 
+        search, 
+        page = '1', 
+        limit = '10'
+      } = req.query;
+
+      // Converter para números
+      const pageNum = parseInt(page as string, 10) || 1;
+      const limitNum = parseInt(limit as string, 10) || 10;
+      
+      // Construir objeto de filtro
+      const filters: any = {};
+      
+      if (type) filters.documentType = type;
+      if (status) filters.status = status;
+      
+      // Filtro de data
+      if (startDate || endDate) {
+        filters.dateRange = {};
+        if (startDate) filters.dateRange.start = new Date(startDate as string);
+        if (endDate) filters.dateRange.end = new Date(endDate as string);
+      }
+      
+      // Filtro de busca por texto
+      if (search) filters.search = search as string;
+      
+      console.log("Buscando documentos públicos com filtros:", filters);
+      
+      // Obter documentos do banco de dados
+      const documents = await storage.getAllDocuments(filters, pageNum, limitNum);
+      
+      // Obter total de documentos para paginação
+      const total = await storage.getDocumentsCount(filters);
+      
+      // Obter tipos de documentos e status para os filtros
+      const documentTypes = await storage.getDocumentTypes();
+      const statusTypes = await storage.getDocumentStatusTypes();
+      
+      res.json({
+        documents,
+        pagination: {
+          total,
+          page: pageNum,
+          limit: limitNum,
+          pages: Math.ceil(total / limitNum)
+        },
+        filters: {
+          documentTypes,
+          statusTypes
+        }
+      });
+    } catch (error) {
+      console.error("Erro ao buscar documentos para exibição pública:", error);
+      res.status(500).json({ message: "Erro ao buscar documentos" });
     }
   });
 

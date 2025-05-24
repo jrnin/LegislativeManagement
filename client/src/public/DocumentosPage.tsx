@@ -1,706 +1,464 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
-import { Helmet } from 'react-helmet';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
   FileText, 
   Search, 
-  Filter, 
-  Download,
-  Eye,
-  Calendar,
-  ArrowUpDown,
-  ChevronDown,
-  List,
-  Grid
+  Calendar, 
+  FilterX, 
+  Download, 
+  ChevronLeft, 
+  ChevronRight,
+  Loader2
 } from 'lucide-react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuCheckboxItem,
-} from '@/components/ui/dropdown-menu';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Helmet } from 'react-helmet';
 
 // Interface para documento
 interface Document {
   id: number;
-  title: string;
-  type: string;
-  number: string;
-  date: string;
-  category: string;
-  status: string;
-  author?: string;
-  description?: string;
-  fileUrl?: string;
+  documentNumber: number;
+  documentType: string;
+  documentDate: string;
+  authorType: string;
+  description: string;
+  filePath?: string;
+  fileName?: string;
   fileType?: string;
-  fileSize?: string;
-  downloadCount?: number;
+  status: string;
+  activityId?: number;
+  eventId?: number;
+  parentDocumentId?: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-// Componente de card para documento
-const DocumentCard = ({ document }: { document: Document }) => (
-  <Card className="h-full hover:shadow-md transition-all">
-    <div className={`h-1 ${getDocumentTypeColor(document.type)}`} />
-    <CardHeader className="pb-2">
-      <div className="flex justify-between">
-        <Badge 
-          variant="outline" 
-          className={getDocumentTypeColor(document.type, true)}
-        >
-          {document.type}
-        </Badge>
-        <Badge variant="secondary">{document.number}</Badge>
-      </div>
-      <CardTitle className="text-base mt-2 line-clamp-2">{document.title}</CardTitle>
-      <CardDescription className="flex items-center gap-1">
-        <Calendar className="h-3 w-3" />
-        {formatDate(document.date)}
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="pb-2 pt-0">
-      {document.description && (
-        <p className="text-sm text-gray-600 line-clamp-2 mb-2">{document.description}</p>
-      )}
-      <div className="flex justify-between items-center text-xs text-gray-500">
-        <span>Categoria: {document.category}</span>
-        {document.fileType && (
-          <Badge variant="outline" className="text-xs">
-            {document.fileType.toUpperCase()}
-          </Badge>
-        )}
-      </div>
-    </CardContent>
-    <CardFooter className="flex gap-2">
-      <Button variant="outline" size="sm" className="flex-1 gap-1">
-        <Eye className="h-3 w-3" />
-        Visualizar
-      </Button>
-      {document.fileUrl && (
-        <Button variant="outline" size="sm" className="flex-1 gap-1">
-          <Download className="h-3 w-3" />
-          Download
-        </Button>
-      )}
-    </CardFooter>
-  </Card>
-);
+// Interface para paginação
+interface Pagination {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
 
-// Função para formatar data
-const formatDate = (dateString: string) => {
-  try {
-    const date = new Date(dateString);
-    return format(date, "dd/MM/yyyy", { locale: ptBR });
-  } catch (error) {
-    return dateString;
-  }
-};
+// Interface para filtros disponíveis
+interface Filters {
+  documentTypes: string[];
+  statusTypes: string[];
+}
 
-// Função para determinar a cor com base no tipo de documento
-const getDocumentTypeColor = (type: string, isBadge: boolean = false) => {
-  let colorClass = "";
-  
-  switch (type.toLowerCase()) {
-    case "lei":
-    case "lei complementar":
-      colorClass = isBadge ? "text-green-800 bg-green-50" : "bg-green-500";
-      break;
-    case "decreto":
-    case "decreto legislativo":
-      colorClass = isBadge ? "text-blue-800 bg-blue-50" : "bg-blue-500";
-      break;
-    case "resolução":
-      colorClass = isBadge ? "text-purple-800 bg-purple-50" : "bg-purple-500";
-      break;
-    case "portaria":
-      colorClass = isBadge ? "text-yellow-800 bg-yellow-50" : "bg-yellow-500";
-      break;
-    case "parecer":
-      colorClass = isBadge ? "text-orange-800 bg-orange-50" : "bg-orange-500";
-      break;
-    case "ata":
-      colorClass = isBadge ? "text-teal-800 bg-teal-50" : "bg-teal-500";
-      break;
-    default:
-      colorClass = isBadge ? "text-gray-800 bg-gray-50" : "bg-gray-500";
-  }
-  
-  return colorClass;
-};
+// Interface para a resposta da API
+interface DocumentsResponse {
+  documents: Document[];
+  pagination: Pagination;
+  filters: Filters;
+}
 
 export default function DocumentosPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string[]>([]);
-  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
-  const [yearFilter, setYearFilter] = useState<string>('');
+  // Estados para filtros e paginação
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState('');
+  const [type, setType] = useState('');
+  const [status, setStatus] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState<string>('date-desc');
 
-  // Dados mockados de documentos
-  const mockDocuments: Document[] = [
-    {
-      id: 1,
-      title: "Lei Orçamentária Anual 2023",
-      type: "Lei",
-      number: "123/2023",
-      date: "2023-03-15",
-      category: "Orçamento",
-      status: "Aprovada",
-      description: "Estima a receita e fixa a despesa do Município para o exercício financeiro de 2023.",
-      fileUrl: "/documentos/lei_123_2023.pdf",
-      fileType: "pdf",
-      fileSize: "2.4 MB",
-      downloadCount: 127
-    },
-    {
-      id: 2,
-      title: "Plano Diretor Municipal",
-      type: "Lei Complementar",
-      number: "021/2022",
-      date: "2022-11-10",
-      category: "Urbanismo",
-      status: "Aprovada",
-      description: "Institui o Plano Diretor do Município e estabelece as diretrizes e normas para o planejamento urbano.",
-      fileUrl: "/documentos/lei_comp_021_2022.pdf",
-      fileType: "pdf",
-      fileSize: "5.7 MB",
-      downloadCount: 243
-    },
-    {
-      id: 3,
-      title: "Resolução sobre o Regimento Interno da Câmara",
-      type: "Resolução",
-      number: "045/2022",
-      date: "2022-09-20",
-      category: "Legislativo",
-      status: "Aprovada",
-      description: "Altera dispositivos do Regimento Interno da Câmara Municipal.",
-      fileUrl: "/documentos/resolucao_045_2022.pdf",
-      fileType: "pdf",
-      fileSize: "1.2 MB",
-      downloadCount: 89
-    },
-    {
-      id: 4,
-      title: "Decreto de Nomeação de Servidores",
-      type: "Decreto",
-      number: "078/2023",
-      date: "2023-02-05",
-      category: "Administrativo",
-      status: "Publicado",
-      description: "Dispõe sobre a nomeação de servidores aprovados em concurso público.",
-      fileUrl: "/documentos/decreto_078_2023.pdf",
-      fileType: "pdf",
-      fileSize: "850 KB",
-      downloadCount: 56
-    },
-    {
-      id: 5,
-      title: "Portaria de Organização Administrativa",
-      type: "Portaria",
-      number: "032/2023",
-      date: "2023-01-15",
-      category: "Administrativo",
-      status: "Publicada",
-      description: "Dispõe sobre a organização administrativa da Câmara Municipal.",
-      fileUrl: "/documentos/portaria_032_2023.pdf",
-      fileType: "pdf",
-      fileSize: "730 KB",
-      downloadCount: 43
-    },
-    {
-      id: 6,
-      title: "Parecer da Comissão de Finanças sobre o Orçamento",
-      type: "Parecer",
-      number: "012/2023",
-      date: "2023-03-10",
-      category: "Orçamento",
-      status: "Aprovado",
-      description: "Parecer da Comissão de Finanças e Orçamento sobre o Projeto de Lei Orçamentária Anual 2023.",
-      fileUrl: "/documentos/parecer_012_2023.pdf",
-      fileType: "pdf",
-      fileSize: "1.1 MB",
-      downloadCount: 38
-    },
-    {
-      id: 7,
-      title: "Ata da Sessão Ordinária",
-      type: "Ata",
-      number: "015/2023",
-      date: "2023-04-05",
-      category: "Legislativo",
-      status: "Aprovada",
-      description: "Ata da 15ª Sessão Ordinária da Câmara Municipal realizada em 05 de abril de 2023.",
-      fileUrl: "/documentos/ata_015_2023.pdf",
-      fileType: "pdf",
-      fileSize: "980 KB",
-      downloadCount: 27
-    },
-    {
-      id: 8,
-      title: "Lei de Proteção Ambiental",
-      type: "Lei",
-      number: "128/2023",
-      date: "2023-04-22",
-      category: "Meio Ambiente",
-      status: "Aprovada",
-      description: "Estabelece normas de proteção ambiental e preservação dos recursos naturais no Município.",
-      fileUrl: "/documentos/lei_128_2023.pdf",
-      fileType: "pdf",
-      fileSize: "3.2 MB",
-      downloadCount: 95
-    },
-    {
-      id: 9,
-      title: "Decreto de Regulamentação do Trânsito",
-      type: "Decreto",
-      number: "082/2023",
-      date: "2023-03-28",
-      category: "Transporte",
-      status: "Publicado",
-      description: "Regulamenta o trânsito em áreas centrais do Município e estabelece horários de circulação.",
-      fileUrl: "/documentos/decreto_082_2023.pdf",
-      fileType: "pdf",
-      fileSize: "1.5 MB",
-      downloadCount: 72
-    },
-    {
-      id: 10,
-      title: "Lei de Incentivo à Cultura",
-      type: "Lei",
-      number: "131/2023",
-      date: "2023-05-10",
-      category: "Cultura",
-      status: "Aprovada",
-      description: "Institui o Programa Municipal de Incentivo à Cultura e estabelece mecanismos de fomento.",
-      fileUrl: "/documentos/lei_131_2023.pdf",
-      fileType: "pdf",
-      fileSize: "2.1 MB",
-      downloadCount: 63
-    },
-    {
-      id: 11,
-      title: "Parecer da Comissão de Educação",
-      type: "Parecer",
-      number: "018/2023",
-      date: "2023-05-05",
-      category: "Educação",
-      status: "Aprovado",
-      description: "Parecer da Comissão de Educação sobre o Projeto de Lei de Reforma Educacional.",
-      fileUrl: "/documentos/parecer_018_2023.pdf",
-      fileType: "pdf",
-      fileSize: "920 KB",
-      downloadCount: 41
-    },
-    {
-      id: 12,
-      title: "Ata da Audiência Pública",
-      type: "Ata",
-      number: "003/2023",
-      date: "2023-04-18",
-      category: "Participação Popular",
-      status: "Aprovada",
-      description: "Ata da Audiência Pública realizada para discutir o Plano de Mobilidade Urbana.",
-      fileUrl: "/documentos/ata_ap_003_2023.pdf",
-      fileType: "pdf",
-      fileSize: "1.3 MB",
-      downloadCount: 58
-    }
-  ];
+  // Construir query string para filtros
+  const getQueryString = () => {
+    const params = new URLSearchParams();
+    if (page > 1) params.append('page', page.toString());
+    if (limit !== 10) params.append('limit', limit.toString());
+    if (search) params.append('search', search);
+    if (type) params.append('type', type);
+    if (status) params.append('status', status);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    return params.toString();
+  };
 
-  // Simulando consulta à API para obter documentos
-  const { data: documents = mockDocuments } = useQuery({
-    queryKey: ['/api/public/documents'],
-    enabled: false,
-    initialData: mockDocuments
+  // Buscar documentos da API
+  const { data, isLoading, error, refetch } = useQuery<DocumentsResponse>({
+    queryKey: [`/api/public/documents?${getQueryString()}`],
   });
 
-  // Extrair tipos únicos de documentos
-  const uniqueTypes = Array.from(new Set(documents.map(d => d.type)));
-  
-  // Extrair categorias únicas
-  const uniqueCategories = Array.from(new Set(documents.map(d => d.category)));
-  
-  // Extrair anos únicos
-  const uniqueYears = Array.from(new Set(documents.map(d => {
-    const year = new Date(d.date).getFullYear();
-    return year.toString();
-  }))).sort((a, b) => parseInt(b) - parseInt(a)); // Ordenar do mais recente para o mais antigo
-
-  // Aplicar filtros e ordenação
-  const filteredDocuments = documents
-    .filter(doc => {
-      // Filtro de pesquisa por texto
-      const matchesSearch = 
-        searchTerm === '' || 
-        doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.number.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      // Filtro por tipo de documento
-      const matchesType = typeFilter.length === 0 || typeFilter.includes(doc.type);
-      
-      // Filtro por categoria
-      const matchesCategory = categoryFilter.length === 0 || categoryFilter.includes(doc.category);
-      
-      // Filtro por ano
-      const matchesYear = !yearFilter || new Date(doc.date).getFullYear().toString() === yearFilter;
-      
-      return matchesSearch && matchesType && matchesCategory && matchesYear;
-    })
-    .sort((a, b) => {
-      // Ordenação
-      switch (sortBy) {
-        case 'date-desc':
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        case 'date-asc':
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        case 'title-asc':
-          return a.title.localeCompare(b.title);
-        case 'title-desc':
-          return b.title.localeCompare(a.title);
-        case 'downloads-desc':
-          return (b.downloadCount || 0) - (a.downloadCount || 0);
-        default:
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-      }
-    });
-
-  // Alternar seleção de tipo no filtro
-  const toggleTypeFilter = (type: string) => {
-    setTypeFilter(prev => 
-      prev.includes(type) 
-        ? prev.filter(t => t !== type) 
-        : [...prev, type]
-    );
+  // Formatar data para exibição
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
   };
 
-  // Alternar seleção de categoria no filtro
-  const toggleCategoryFilter = (category: string) => {
-    setCategoryFilter(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category) 
-        : [...prev, category]
-    );
-  };
-
-  // Limpar todos os filtros
+  // Função para limpar todos os filtros
   const clearFilters = () => {
-    setSearchTerm('');
-    setTypeFilter([]);
-    setCategoryFilter([]);
-    setYearFilter('');
+    setSearch('');
+    setType('');
+    setStatus('');
+    setStartDate('');
+    setEndDate('');
+    setPage(1);
+  };
+
+  // Executar busca quando filtros mudam
+  useEffect(() => {
+    refetch();
+  }, [page, limit, search, type, status, startDate, endDate, refetch]);
+
+  // Função para baixar arquivo
+  const downloadFile = (document: Document) => {
+    if (document.filePath) {
+      window.open(document.filePath, '_blank');
+    }
+  };
+
+  // Determinar cor do badge de status
+  const getStatusBadgeClass = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'vigente':
+        return 'bg-green-100 text-green-800 hover:bg-green-200';
+      case 'revogada':
+        return 'bg-red-100 text-red-800 hover:bg-red-200';
+      case 'alterada':
+        return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
+      case 'suspenso':
+        return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
+      default:
+        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+    }
+  };
+
+  // Renderizar grid de documentos
+  const renderDocumentGrid = () => {
+    if (!data || !data.documents.length) {
+      return (
+        <div className="text-center py-20 bg-gray-50 rounded-lg">
+          <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-medium text-gray-700 mb-2">Nenhum documento encontrado</h3>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Tente ajustar os filtros ou realizar uma nova busca para encontrar o que procura.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {data.documents.map(doc => (
+          <Card key={doc.id} className="h-full hover:shadow-md transition-shadow">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-md flex items-center">
+                    <FileText className="h-4 w-4 mr-2 text-blue-600" />
+                    {doc.documentType} Nº {doc.documentNumber}
+                  </CardTitle>
+                  <CardDescription>
+                    {formatDate(doc.documentDate)}
+                  </CardDescription>
+                </div>
+                <Badge className={getStatusBadgeClass(doc.status)}>
+                  {doc.status}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-700 line-clamp-3">{doc.description}</p>
+            </CardContent>
+            <CardFooter className="flex justify-between border-t pt-4">
+              <Link href={`/public/documentos/${doc.id}`}>
+                <a className="text-xs text-blue-600 hover:underline flex items-center">
+                  Ver detalhes
+                  <ChevronRight className="h-3 w-3 ml-1" />
+                </a>
+              </Link>
+              {doc.filePath && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-blue-600 hover:underline flex items-center"
+                  onClick={() => downloadFile(doc)}
+                >
+                  <Download className="h-3 w-3 mr-1" />
+                  Baixar
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    );
+  };
+
+  // Renderizar tabela de documentos
+  const renderDocumentTable = () => {
+    if (!data || !data.documents.length) {
+      return (
+        <div className="text-center py-20 bg-gray-50 rounded-lg">
+          <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-medium text-gray-700 mb-2">Nenhum documento encontrado</h3>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Tente ajustar os filtros ou realizar uma nova busca para encontrar o que procura.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b bg-gray-50">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {data.documents.map(doc => (
+              <tr key={doc.id} className="hover:bg-gray-50">
+                <td className="px-4 py-4 text-sm">{doc.documentType}</td>
+                <td className="px-4 py-4 text-sm">{doc.documentNumber}</td>
+                <td className="px-4 py-4 text-sm">{formatDate(doc.documentDate)}</td>
+                <td className="px-4 py-4 text-sm">
+                  <div className="line-clamp-2">{doc.description}</div>
+                </td>
+                <td className="px-4 py-4 text-sm text-right">
+                  <Badge className={getStatusBadgeClass(doc.status)}>
+                    {doc.status}
+                  </Badge>
+                </td>
+                <td className="px-4 py-4 text-sm text-right">
+                  <div className="flex justify-end space-x-2">
+                    <Link href={`/public/documentos/${doc.id}`}>
+                      <a className="text-blue-600 hover:underline text-xs">
+                        Ver detalhes
+                      </a>
+                    </Link>
+                    {doc.filePath && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-xs text-blue-600 hover:underline"
+                        onClick={() => downloadFile(doc)}
+                      >
+                        Baixar
+                      </Button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  // Renderizar paginação
+  const renderPagination = () => {
+    if (!data || !data.pagination || data.pagination.pages <= 1) {
+      return null;
+    }
+
+    return (
+      <div className="flex justify-between items-center mt-6">
+        <div className="text-sm text-gray-500">
+          Mostrando {(data.pagination.page - 1) * data.pagination.limit + 1} a{' '}
+          {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)}{' '}
+          de {data.pagination.total} documentos
+        </div>
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          
+          {Array.from({ length: Math.min(5, data.pagination.pages) }, (_, i) => {
+            let pageNum;
+            if (data.pagination.pages <= 5) {
+              pageNum = i + 1;
+            } else if (page <= 3) {
+              pageNum = i + 1;
+            } else if (page >= data.pagination.pages - 2) {
+              pageNum = data.pagination.pages - 4 + i;
+            } else {
+              pageNum = page - 2 + i;
+            }
+            
+            return (
+              <Button
+                key={pageNum}
+                variant={page === pageNum ? "default" : "outline"}
+                size="sm"
+                onClick={() => setPage(pageNum)}
+              >
+                {pageNum}
+              </Button>
+            );
+          })}
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => Math.min(data?.pagination.pages || 1, p + 1))}
+            disabled={page === (data?.pagination.pages || 1)}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <>
+    <div className="container mx-auto py-12 px-4">
       <Helmet>
-        <title>Documentos | Sistema Legislativo</title>
-        <meta name="description" content="Acesse leis, decretos, resoluções, portarias e outros documentos oficiais da Câmara Municipal." />
+        <title>Documentos Públicos - Sistema Legislativo</title>
+        <meta name="description" content="Acesse documentos oficiais, decretos, leis, e outros documentos públicos do Sistema Legislativo." />
       </Helmet>
 
-      {/* Banner da página */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12 px-4">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">Documentos Oficiais</h1>
-              <p className="text-blue-100 max-w-2xl">
-                Acesse leis, decretos, resoluções, portarias e outros documentos oficiais. 
-                Todos os documentos estão disponíveis para consulta e download.
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <FileText size={80} className="text-blue-200 opacity-70" />
-            </div>
-          </div>
-        </div>
+      <div className="flex items-center gap-3 mb-8">
+        <FileText size={30} className="text-blue-600" />
+        <h1 className="text-3xl font-bold text-gray-800">Documentos Públicos</h1>
       </div>
 
-      {/* Barra de pesquisa e filtros */}
-      <div className="bg-white border-b shadow-sm py-4 px-4 sticky top-0 z-10">
-        <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="relative w-full md:w-auto md:flex-grow">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Buscar documentos..."
-                className="pl-9 pr-4"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <Filter size={16} />
-                    Tipo
-                    {typeFilter.length > 0 && (
-                      <Badge className="ml-1 bg-blue-100 text-blue-800">{typeFilter.length}</Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Tipos de Documento</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {uniqueTypes.map(type => (
-                    <DropdownMenuCheckboxItem
-                      key={type}
-                      checked={typeFilter.includes(type)}
-                      onCheckedChange={() => toggleTypeFilter(type)}
-                    >
-                      {type}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <Filter size={16} />
-                    Categoria
-                    {categoryFilter.length > 0 && (
-                      <Badge className="ml-1 bg-blue-100 text-blue-800">{categoryFilter.length}</Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Categorias</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {uniqueCategories.map(category => (
-                    <DropdownMenuCheckboxItem
-                      key={category}
-                      checked={categoryFilter.includes(category)}
-                      onCheckedChange={() => toggleCategoryFilter(category)}
-                    >
-                      {category}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Select value={yearFilter} onValueChange={setYearFilter}>
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Ano" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todos os anos</SelectItem>
-                  {uniqueYears.map(year => (
-                    <SelectItem key={year} value={year}>{year}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Ordenar por" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date-desc">Mais recentes</SelectItem>
-                  <SelectItem value="date-asc">Mais antigos</SelectItem>
-                  <SelectItem value="title-asc">Título (A-Z)</SelectItem>
-                  <SelectItem value="title-desc">Título (Z-A)</SelectItem>
-                  <SelectItem value="downloads-desc">Mais baixados</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="flex rounded-md border">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="icon"
-                  className="rounded-none rounded-l-md"
-                  onClick={() => setViewMode('grid')}
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="icon"
-                  className="rounded-none rounded-r-md"
-                  onClick={() => setViewMode('list')}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
+      <Card className="mb-8">
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <Input
+                  placeholder="Pesquisar documentos..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full"
+                  prefix={<Search className="h-4 w-4 text-gray-400" />}
+                />
               </div>
-
-              {(searchTerm || typeFilter.length > 0 || categoryFilter.length > 0 || yearFilter) && (
-                <Button variant="ghost" onClick={clearFilters} className="text-blue-600">
-                  Limpar Filtros
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Lista de documentos */}
-      <section className="py-10 px-4">
-        <div className="container mx-auto">
-          {filteredDocuments.length === 0 ? (
-            <div className="text-center py-12">
-              <h3 className="text-2xl font-semibold mb-2">Nenhum documento encontrado</h3>
-              <p className="text-gray-500 mb-4">
-                Não foram encontrados documentos correspondentes aos filtros aplicados.
-              </p>
-              <Button onClick={clearFilters}>Limpar Filtros</Button>
-            </div>
-          ) : (
-            <>
-              <div className="mb-6">
-                <p className="text-gray-600">
-                  Mostrando {filteredDocuments.length} documentos
-                  {(searchTerm || typeFilter.length > 0 || categoryFilter.length > 0 || yearFilter) && " com os filtros aplicados"}
-                </p>
-              </div>
-
-              {viewMode === 'grid' ? (
-                // Visualização em grid
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredDocuments.map(document => (
-                    <DocumentCard key={document.id} document={document} />
-                  ))}
-                </div>
-              ) : (
-                // Visualização em lista
-                <div className="bg-white rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[80px]">Tipo</TableHead>
-                        <TableHead className="w-[120px]">Número</TableHead>
-                        <TableHead>Título</TableHead>
-                        <TableHead className="w-[120px]">Data</TableHead>
-                        <TableHead className="w-[120px]">Categoria</TableHead>
-                        <TableHead className="w-[100px]">Arquivo</TableHead>
-                        <TableHead className="text-right w-[120px]">Ações</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredDocuments.map(document => (
-                        <TableRow key={document.id}>
-                          <TableCell>
-                            <Badge 
-                              variant="outline" 
-                              className={getDocumentTypeColor(document.type, true)}
-                            >
-                              {document.type}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{document.number}</TableCell>
-                          <TableCell>
-                            <div className="font-medium">{document.title}</div>
-                            {document.description && (
-                              <div className="text-xs text-gray-500 line-clamp-1">{document.description}</div>
-                            )}
-                          </TableCell>
-                          <TableCell>{formatDate(document.date)}</TableCell>
-                          <TableCell>{document.category}</TableCell>
-                          <TableCell>
-                            {document.fileType && (
-                              <div className="flex items-center">
-                                <Badge variant="outline" className="text-xs">
-                                  {document.fileType.toUpperCase()} {document.fileSize && `• ${document.fileSize}`}
-                                </Badge>
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right flex justify-end gap-2">
-                            <Button variant="ghost" size="icon" className="text-blue-600">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            {document.fileUrl && (
-                              <Button variant="ghost" size="icon" className="text-blue-600">
-                                <Download className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
+              
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="w-full md:w-48">
+                  <Select value={type} onValueChange={setType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tipo de documento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todos os tipos</SelectItem>
+                      {data?.filters.documentTypes.map(type => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
-            </>
-          )}
-        </div>
-      </section>
-
-      {/* Seção de informações sobre documentos */}
-      <section className="py-10 px-4 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Sobre os Documentos Oficiais</h2>
-              <p className="text-gray-600 mb-4">
-                Os documentos oficiais são instrumentos legais e administrativos que regulam o funcionamento do poder legislativo
-                e sua relação com os cidadãos e demais órgãos públicos.
-              </p>
-              <p className="text-gray-600">
-                Através desta página, você pode acessar, consultar e baixar todos os documentos produzidos pela Câmara Municipal,
-                garantindo transparência e acesso à informação.
-              </p>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Tipos de Documentos</h2>
-              <div className="space-y-2">
-                <div>
-                  <h3 className="font-medium">Leis</h3>
-                  <p className="text-sm text-gray-600">Normas jurídicas que estabelecem direitos, deveres e obrigações.</p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Decretos</h3>
-                  <p className="text-sm text-gray-600">Atos administrativos que regulamentam leis ou dispõem sobre organização administrativa.</p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Resoluções</h3>
-                  <p className="text-sm text-gray-600">Atos normativos que tratam de matérias de interesse interno da Câmara.</p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Portarias</h3>
-                  <p className="text-sm text-gray-600">Atos administrativos que tratam de assuntos internos ou determinações específicas.</p>
+                
+                <div className="w-full md:w-48">
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todos os status</SelectItem>
+                      {data?.filters.statusTypes.map(status => (
+                        <SelectItem key={status} value={status}>{status}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
+
+            <div className="flex flex-col md:flex-row justify-between items-end gap-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="w-full md:w-auto">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Data inicial</label>
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="w-full md:w-auto">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Data final</label>
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2 w-full md:w-auto">
+                <Button 
+                  variant="outline" 
+                  onClick={clearFilters}
+                  className="flex items-center w-full md:w-auto justify-center"
+                >
+                  <FilterX className="h-4 w-4 mr-2" />
+                  Limpar filtros
+                </Button>
+                
+                <Button 
+                  onClick={() => refetch()} 
+                  className="flex items-center w-full md:w-auto justify-center"
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  Buscar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="mb-6 flex justify-between items-center">
+        <div className="text-sm text-gray-500">
+          {data?.pagination.total || 0} documentos encontrados
+        </div>
+        
+        <Tabs defaultValue="grid" onValueChange={(v) => setViewMode(v as 'grid' | 'list')}>
+          <TabsList className="grid w-[200px] grid-cols-2">
+            <TabsTrigger value="grid">Grade</TabsTrigger>
+            <TabsTrigger value="list">Lista</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <div className="flex flex-col items-center">
+            <Loader2 className="h-8 w-8 text-blue-600 animate-spin mb-4" />
+            <p className="text-gray-500">Carregando documentos...</p>
           </div>
         </div>
-      </section>
-    </>
+      ) : error ? (
+        <div className="text-center py-20 bg-gray-50 rounded-lg">
+          <p className="text-red-500 mb-4">Ocorreu um erro ao carregar os documentos.</p>
+          <Button onClick={() => refetch()} variant="outline">
+            Tentar novamente
+          </Button>
+        </div>
+      ) : (
+        <div>
+          {viewMode === 'grid' ? renderDocumentGrid() : renderDocumentTable()}
+          {renderPagination()}
+        </div>
+      )}
+    </div>
   );
 }
