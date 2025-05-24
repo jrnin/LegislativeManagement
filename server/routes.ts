@@ -2816,18 +2816,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Buscando documentos públicos com filtros:", filters);
       
-      // Obter documentos do banco de dados
-      const documents = await storage.getAllDocuments(filters, pageNum, limitNum);
+      // Buscar documentos usando o método sem filtros, por enquanto
+      const documents = await storage.getAllDocuments();
       
-      // Obter total de documentos para paginação
-      const total = await storage.getDocumentsCount(filters);
+      // Paginação manual, temporária
+      const startIndex = (pageNum - 1) * limitNum;
+      const endIndex = startIndex + limitNum;
+      const paginatedDocuments = documents.slice(startIndex, endIndex);
       
-      // Obter tipos de documentos e status para os filtros
-      const documentTypes = await storage.getDocumentTypes();
-      const statusTypes = await storage.getDocumentStatusTypes();
+      // Contar total de documentos
+      const total = documents.length;
+      
+      // Obter tipos de documentos e status únicos a partir dos documentos existentes
+      const uniqueTypes = [...new Set(documents.map(doc => doc.documentType))];
+      const uniqueStatuses = [...new Set(documents.map(doc => doc.status))];
       
       res.json({
-        documents,
+        documents: paginatedDocuments,
         pagination: {
           total,
           page: pageNum,
@@ -2835,8 +2840,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           pages: Math.ceil(total / limitNum)
         },
         filters: {
-          documentTypes,
-          statusTypes
+          documentTypes: uniqueTypes,
+          statusTypes: uniqueStatuses
         }
       });
     } catch (error) {

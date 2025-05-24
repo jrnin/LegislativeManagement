@@ -171,11 +171,9 @@ export default function DocumentosPage() {
               <p className="text-sm text-gray-700 line-clamp-3">{doc.description}</p>
             </CardContent>
             <CardFooter className="flex justify-between border-t pt-4">
-              <Link href={`/public/documentos/${doc.id}`}>
-                <a className="text-xs text-blue-600 hover:underline flex items-center">
-                  Ver detalhes
-                  <ChevronRight className="h-3 w-3 ml-1" />
-                </a>
+              <Link href={`/public/documentos/${doc.id}`} className="text-xs text-blue-600 hover:underline flex items-center">
+                Ver detalhes
+                <ChevronRight className="h-3 w-3 ml-1" />
               </Link>
               {doc.filePath && (
                 <Button 
@@ -238,10 +236,8 @@ export default function DocumentosPage() {
                 </td>
                 <td className="px-4 py-4 text-sm text-right">
                   <div className="flex justify-end space-x-2">
-                    <Link href={`/public/documentos/${doc.id}`}>
-                      <a className="text-blue-600 hover:underline text-xs">
-                        Ver detalhes
-                      </a>
+                    <Link href={`/public/documentos/${doc.id}`} className="text-blue-600 hover:underline text-xs">
+                      Ver detalhes
                     </Link>
                     {doc.filePath && (
                       <Button 
@@ -270,8 +266,8 @@ export default function DocumentosPage() {
     }
 
     return (
-      <div className="flex justify-between items-center mt-6">
-        <div className="text-sm text-gray-500">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
+        <div className="text-sm text-gray-500 w-full md:w-auto text-center md:text-left">
           Mostrando {(data.pagination.page - 1) * data.pagination.limit + 1} a{' '}
           {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)}{' '}
           de {data.pagination.total} documentos

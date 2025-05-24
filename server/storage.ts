@@ -669,49 +669,63 @@ export class DatabaseStorage implements IStorage {
     return document;
   }
   
-  async getAllDocuments(filters?: any, page: number = 1, limit: number = 10): Promise<Document[]> {
-    // Construir a query base
-    let query = db.select().from(documents);
-    
-    // Aplicar filtros se fornecidos
-    if (filters) {
-      // Filtro por tipo de documento
-      if (filters.documentType) {
-        query = query.where(eq(documents.documentType, filters.documentType));
-      }
+  async getAllDocuments(): Promise<Document[]> {
+    return await db.select().from(documents).orderBy(desc(documents.documentDate));
+  }
+
+  async getFilteredDocuments(filters?: any, page: number = 1, limit: number = 10): Promise<Document[]> {
+    try {
+      // Base query
+      let query = db.select().from(documents);
       
-      // Filtro por status
-      if (filters.status) {
-        query = query.where(eq(documents.status, filters.status));
-      }
-      
-      // Filtro por intervalo de datas
-      if (filters.dateRange) {
-        if (filters.dateRange.start) {
-          query = query.where(gte(documents.documentDate, filters.dateRange.start));
+      // Apply filters if provided
+      if (filters) {
+        const whereConditions = [];
+        
+        // Filter by document type
+        if (filters.documentType) {
+          whereConditions.push(eq(documents.documentType, filters.documentType));
         }
-        if (filters.dateRange.end) {
-          query = query.where(lte(documents.documentDate, filters.dateRange.end));
+        
+        // Filter by status
+        if (filters.status) {
+          whereConditions.push(eq(documents.status, filters.status));
+        }
+        
+        // Filter by date range
+        if (filters.dateRange) {
+          if (filters.dateRange.start) {
+            whereConditions.push(gte(documents.documentDate, filters.dateRange.start));
+          }
+          if (filters.dateRange.end) {
+            whereConditions.push(lte(documents.documentDate, filters.dateRange.end));
+          }
+        }
+        
+        // Filter by text search in description
+        if (filters.search) {
+          whereConditions.push(like(documents.description, `%${filters.search}%`));
+        }
+        
+        // Apply all conditions if any
+        if (whereConditions.length > 0) {
+          query = query.where(and(...whereConditions));
         }
       }
       
-      // Filtro por texto (busca na descrição)
-      if (filters.search) {
-        query = query.where(
-          like(documents.description, `%${filters.search}%`)
-        );
-      }
+      // Apply sorting and pagination
+      query = query.orderBy(desc(documents.documentDate));
+      
+      // Apply pagination
+      const offset = (page - 1) * limit;
+      query = query.limit(limit).offset(offset);
+      
+      // Execute query
+      return await query;
+    } catch (error) {
+      console.error("Error in getFilteredDocuments:", error);
+      return [];
     }
-    
-    // Aplicar ordenação (mais recentes primeiro)
-    query = query.orderBy(desc(documents.documentDate));
-    
-    // Aplicar paginação
-    const offset = (page - 1) * limit;
-    query = query.limit(limit).offset(offset);
-    
-    // Executar a query
-    return await query;
   }
   
   /**
