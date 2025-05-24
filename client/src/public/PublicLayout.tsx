@@ -95,25 +95,25 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
   // Links do menu principal
   const mainMenuLinks = [
-    { name: 'Home', href: '/public' },
-    { name: 'Vereadores', href: '/public/vereadores' },
-    { name: 'Documentos', href: '/public/documentos' },
-    { name: 'Atividades Legislativas', href: '/public/atividades' },
-    { name: 'Transparência', href: '/public/transparencia' },
-    { name: 'Notícias', href: '/public/noticias' },
-    { name: 'Contato', href: '/public/contato' },
+    { name: 'Home', href: '/' },
+    { name: 'Vereadores', href: '/vereadores' },
+    { name: 'Documentos', href: '/documentos' },
+    { name: 'Atividades Legislativas', href: '/atividades' },
+    { name: 'Transparência', href: '/transparencia' },
+    { name: 'Notícias', href: '/noticias' },
+    { name: 'Contato', href: '/contato' },
   ];
 
   // Serviços de acesso rápido
   const quickServices = [
-    { name: 'Sessões', href: '/public/sessoes', icon: Zap },
-    { name: 'Atas', href: '/public/atas', icon: Zap },
-    { name: 'Transparência', href: '/public/transparencia', icon: Zap },
-    { name: 'Licitações', href: '/public/licitacoes', icon: Zap },
-    { name: 'Contratos', href: '/public/contratos', icon: Zap },
-    { name: 'Documentos', href: '/public/documentos', icon: Zap },
-    { name: 'Relatórios', href: '/public/relatorios', icon: Zap },
-    { name: 'Audiências', href: '/public/audiencias', icon: Zap },
+    { name: 'Sessões', href: '/sessoes', icon: Zap },
+    { name: 'Atas', href: '/atas', icon: Zap },
+    { name: 'Transparência', href: '/transparencia', icon: Zap },
+    { name: 'Licitações', href: '/licitacoes', icon: Zap },
+    { name: 'Contratos', href: '/contratos', icon: Zap },
+    { name: 'Documentos', href: '/documentos', icon: Zap },
+    { name: 'Relatórios', href: '/relatorios', icon: Zap },
+    { name: 'Audiências', href: '/audiencias', icon: Zap },
   ];
 
   return (
@@ -221,7 +221,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           <div className="container mx-auto">
             <div className="flex justify-between items-center">
               {/* Logo */}
-              <Link href="/public">
+              <Link href="/">
                 <button className="flex items-center space-x-2">
                   <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xl">
                     SL
