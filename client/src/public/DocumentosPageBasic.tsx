@@ -61,7 +61,14 @@ export default function DocumentosPageBasic() {
 
   // Buscar documentos da API
   const { data, isLoading, error, refetch } = useQuery<DocumentsResponse>({
-    queryKey: [`/api/public/documents?${getQueryString()}`],
+    queryKey: ['/api/public/documents', getQueryString()],
+    queryFn: async () => {
+      const response = await fetch(`/api/public/documents?${getQueryString()}`);
+      if (!response.ok) {
+        throw new Error('Erro ao carregar documentos');
+      }
+      return response.json();
+    }
   });
 
   // Formatar data para exibição
