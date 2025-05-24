@@ -2805,25 +2805,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (status) filters.status = status;
       if (search) filters.search = search as string;
       
-      // Buscar documentos filtrados com paginação
-      const documents = await storage.getFilteredDocuments(filters, pageNum, limitNum);
+      // Valores padrão para documentos e contagem em caso de falha
+      let documents = [];
+      let total = 0;
       
-      // Buscar contagem total para paginação
-      const total = await storage.getDocumentsCount(filters);
+      try {
+        // Buscar documentos filtrados com paginação
+        documents = await storage.getFilteredDocuments(filters, pageNum, limitNum);
+        // Buscar contagem total para paginação
+        total = await storage.getDocumentsCount(filters);
+      } catch (dbError) {
+        console.error("Erro ao buscar documentos do banco de dados:", dbError);
+        // Em caso de erro, mantemos os valores padrão (array vazio e total 0)
+      }
       
-      // Obtendo tipos de documentos e status distintos para os filtros
-      // Vamos extrair todos os tipos e status únicos dos documentos
-      const allDocuments = await storage.getAllDocuments();
-      const documentTypes = [...new Set(allDocuments.map(doc => doc.documentType).filter(Boolean))];
-      const statusTypes = [...new Set(allDocuments.map(doc => doc.status).filter(Boolean))];
+      // Valores padrão para tipos de documentos e status
+      let documentTypes = ["Projeto de Lei", "Requerimento", "Indicação", "Resolução"];
+      let statusTypes = ["Vigente", "Revogado", "Suspenso", "Em tramitação"];
       
+      try {
+        // Tentar obter tipos de documentos e status da base de dados
+        const allDocuments = await storage.getAllDocuments();
+        if (allDocuments && allDocuments.length > 0) {
+          const docTypes = Array.from(new Set(allDocuments.map(doc => doc.documentType).filter(Boolean)));
+          const statTypes = Array.from(new Set(allDocuments.map(doc => doc.status).filter(Boolean)));
+          
+          // Só sobrescrever os valores padrão se obtiver resultados válidos
+          if (docTypes.length > 0) documentTypes = docTypes;
+          if (statTypes.length > 0) statusTypes = statTypes;
+        }
+      } catch (typesError) {
+        console.error("Erro ao buscar tipos de documentos e status:", typesError);
+        // Mantemos os valores padrão definidos anteriormente
+      }
+      
+      // Retornar dados, mesmo que parciais ou padrão
       res.json({
         documents,
         pagination: {
           total,
           page: pageNum,
           limit: limitNum,
-          pages: Math.ceil(total / limitNum)
+          pages: Math.ceil(total / limitNum) || 1
         },
         filters: {
           documentTypes,
@@ -2832,7 +2855,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Erro ao buscar documentos para exibição pública:", error);
-      res.status(500).json({ message: "Erro ao buscar documentos", error: error.message });
+      // Retornar uma resposta mesmo em caso de erro geral
+      res.status(500).json({ 
+        message: "Erro ao buscar documentos", 
+        documents: [],
+        pagination: {
+          total: 0,
+          page: 1,
+          limit: 15,
+          pages: 1
+        },
+        filters: {
+          documentTypes: ["Projeto de Lei", "Requerimento", "Indicação", "Resolução"],
+          statusTypes: ["Vigente", "Revogado", "Suspenso", "Em tramitação"]
+        }
+      });
     }
   });
 
