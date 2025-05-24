@@ -171,9 +171,11 @@ export default function DocumentosPage() {
               <p className="text-sm text-gray-700 line-clamp-3">{doc.description}</p>
             </CardContent>
             <CardFooter className="flex justify-between border-t pt-4">
-              <Link href={`/public/documentos/${doc.id}`} className="text-xs text-blue-600 hover:underline flex items-center">
-                Ver detalhes
-                <ChevronRight className="h-3 w-3 ml-1" />
+              <Link href={`/public/documentos/${doc.id}`}>
+                <span className="text-xs text-blue-600 hover:underline flex items-center">
+                  Ver detalhes
+                  <ChevronRight className="h-3 w-3 ml-1" />
+                </span>
               </Link>
               {doc.filePath && (
                 <Button 
@@ -338,13 +340,15 @@ export default function DocumentosPage() {
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
-                <Input
-                  placeholder="Pesquisar documentos..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full"
-                  prefix={<Search className="h-4 w-4 text-gray-400" />}
-                />
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Pesquisar documentos..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-10"
+                  />
+                </div>
               </div>
               
               <div className="flex flex-col md:flex-row gap-4">
