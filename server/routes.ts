@@ -45,98 +45,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
   
-  // PUBLIC ROUTES (não requerem autenticação)
-  
-  // Rota pública para buscar documentos
-  app.get('/api/public/documents', async (req, res) => {
-    try {
-      const { page = '1', limit = '15', search = '', type = '', status = '' } = req.query;
-      
-      // Converter parâmetros para números
-      const pageNum = parseInt(page as string, 10);
-      const limitNum = parseInt(limit as string, 10);
-      
-      // Construir objeto de filtro
-      const filters: any = {};
-      
-      if (type) filters.documentType = type;
-      if (status) filters.status = status;
-      if (search) filters.search = search as string;
-      
-      // Buscar documentos filtrados com paginação
-      const documents = await storage.getFilteredDocuments(filters, pageNum, limitNum);
-      
-      // Buscar contagem total para paginação
-      const total = await storage.getDocumentsCount(filters);
-      
-      // Buscar tipos de documentos e status para filtros
-      const allDocuments = await storage.getAllDocuments();
-      const documentTypes = Array.from(new Set(allDocuments.map(doc => doc.documentType).filter(Boolean)));
-      const statusTypes = Array.from(new Set(allDocuments.map(doc => doc.status).filter(Boolean)));
-      
-      res.json({
-        documents,
-        pagination: {
-          total,
-          page: pageNum,
-          limit: limitNum,
-          pages: Math.ceil(total / limitNum) || 1
-        },
-        filters: {
-          documentTypes,
-          statusTypes
-        }
-      });
-    } catch (error) {
-      console.error("Erro ao buscar documentos públicos:", error);
-      res.status(500).json({ message: "Erro ao buscar documentos" });
-    }
-  });
-  
-  // Rota pública para buscar detalhes de um documento
-  app.get('/api/public/documents/:id', async (req, res) => {
-    try {
-      const documentId = parseInt(req.params.id, 10);
-      const document = await storage.getDocument(documentId);
-      
-      if (!document) {
-        return res.status(404).json({ message: "Documento não encontrado" });
-      }
-      
-      res.json(document);
-    } catch (error) {
-      console.error("Erro ao buscar documento:", error);
-      res.status(500).json({ message: "Erro ao buscar documento" });
-    }
-  });
-  
-  // Rota pública para buscar vereadores
-  app.get('/api/public/councilors', async (req, res) => {
-    try {
-      const councilors = await storage.getCouncilors();
-      res.json(councilors);
-    } catch (error) {
-      console.error("Erro ao buscar vereadores:", error);
-      res.status(500).json({ message: "Erro ao buscar vereadores" });
-    }
-  });
-  
-  // Rota pública para buscar detalhes de um vereador
-  app.get('/api/public/councilors/:id', async (req, res) => {
-    try {
-      const councilor = await storage.getUser(req.params.id);
-      
-      if (!councilor) {
-        return res.status(404).json({ message: "Vereador não encontrado" });
-      }
-      
-      res.json(councilor);
-    } catch (error) {
-      console.error("Erro ao buscar vereador:", error);
-      res.status(500).json({ message: "Erro ao buscar vereador" });
-    }
-  });
-  
   // AUTH ROUTES
   
   // Get current authenticated user
@@ -2897,48 +2805,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (status) filters.status = status;
       if (search) filters.search = search as string;
       
-      // Valores padrão para documentos e contagem em caso de falha
-      let documents = [];
-      let total = 0;
+      // Buscar documentos filtrados com paginação
+      const documents = await storage.getFilteredDocuments(filters, pageNum, limitNum);
       
-      try {
-        // Buscar documentos filtrados com paginação
-        documents = await storage.getFilteredDocuments(filters, pageNum, limitNum);
-        // Buscar contagem total para paginação
-        total = await storage.getDocumentsCount(filters);
-      } catch (dbError) {
-        console.error("Erro ao buscar documentos do banco de dados:", dbError);
-        // Em caso de erro, mantemos os valores padrão (array vazio e total 0)
-      }
+      // Buscar contagem total para paginação
+      const total = await storage.getDocumentsCount(filters);
       
-      // Valores padrão para tipos de documentos e status
-      let documentTypes = ["Projeto de Lei", "Requerimento", "Indicação", "Resolução"];
-      let statusTypes = ["Vigente", "Revogado", "Suspenso", "Em tramitação"];
+      // Obtendo tipos de documentos e status distintos para os filtros
+      // Vamos extrair todos os tipos e status únicos dos documentos
+      const allDocuments = await storage.getAllDocuments();
+      const documentTypes = [...new Set(allDocuments.map(doc => doc.documentType).filter(Boolean))];
+      const statusTypes = [...new Set(allDocuments.map(doc => doc.status).filter(Boolean))];
       
-      try {
-        // Tentar obter tipos de documentos e status da base de dados
-        const allDocuments = await storage.getAllDocuments();
-        if (allDocuments && allDocuments.length > 0) {
-          const docTypes = Array.from(new Set(allDocuments.map(doc => doc.documentType).filter(Boolean)));
-          const statTypes = Array.from(new Set(allDocuments.map(doc => doc.status).filter(Boolean)));
-          
-          // Só sobrescrever os valores padrão se obtiver resultados válidos
-          if (docTypes.length > 0) documentTypes = docTypes;
-          if (statTypes.length > 0) statusTypes = statTypes;
-        }
-      } catch (typesError) {
-        console.error("Erro ao buscar tipos de documentos e status:", typesError);
-        // Mantemos os valores padrão definidos anteriormente
-      }
-      
-      // Retornar dados, mesmo que parciais ou padrão
       res.json({
         documents,
         pagination: {
           total,
           page: pageNum,
           limit: limitNum,
-          pages: Math.ceil(total / limitNum) || 1
+          pages: Math.ceil(total / limitNum)
         },
         filters: {
           documentTypes,
@@ -2947,21 +2832,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Erro ao buscar documentos para exibição pública:", error);
-      // Retornar uma resposta mesmo em caso de erro geral
-      res.status(500).json({ 
-        message: "Erro ao buscar documentos", 
-        documents: [],
-        pagination: {
-          total: 0,
-          page: 1,
-          limit: 15,
-          pages: 1
-        },
-        filters: {
-          documentTypes: ["Projeto de Lei", "Requerimento", "Indicação", "Resolução"],
-          statusTypes: ["Vigente", "Revogado", "Suspenso", "Em tramitação"]
-        }
-      });
+      res.status(500).json({ message: "Erro ao buscar documentos", error: error.message });
     }
   });
 

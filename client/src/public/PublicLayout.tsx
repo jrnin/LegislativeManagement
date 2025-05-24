@@ -95,13 +95,13 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
   // Links do menu principal
   const mainMenuLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Vereadores', href: '/vereadores' },
-    { name: 'Documentos', href: '/documentos' },
-    { name: 'Atividades Legislativas', href: '/atividades' },
-    { name: 'Transparência', href: '/transparencia' },
-    { name: 'Notícias', href: '/noticias' },
-    { name: 'Contato', href: '/contato' },
+    { name: 'Home', href: '/public' },
+    { name: 'Vereadores', href: '/public/vereadores' },
+    { name: 'Documentos', href: '/public/documentos' },
+    { name: 'Atividades Legislativas', href: '/public/atividades' },
+    { name: 'Transparência', href: '/public/transparencia' },
+    { name: 'Notícias', href: '/public/noticias' },
+    { name: 'Contato', href: '/public/contato' },
   ];
 
   // Serviços de acesso rápido
