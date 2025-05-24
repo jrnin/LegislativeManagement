@@ -62,6 +62,7 @@ export default function DocumentosPageBasic() {
   // Buscar documentos da API
   const { data, isLoading, error, refetch } = useQuery<DocumentsResponse>({
     queryKey: [`/api/public/documents?${getQueryString()}`],
+    retry: 1,
   });
 
   // Formatar data para exibição
@@ -274,7 +275,7 @@ export default function DocumentosPageBasic() {
                       <p className="text-sm text-gray-700 line-clamp-3">{doc.description}</p>
                     </CardContent>
                     <CardFooter className="pt-2 border-t">
-                      <Link href={`/public/documentos/${doc.id}`}>
+                      <Link href={`/documentos/${doc.id}`}>
                         <span className="text-blue-600 hover:underline text-sm cursor-pointer">
                           Ver detalhes
                         </span>
