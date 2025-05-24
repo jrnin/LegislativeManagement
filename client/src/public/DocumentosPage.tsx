@@ -236,8 +236,10 @@ export default function DocumentosPage() {
                 </td>
                 <td className="px-4 py-4 text-sm text-right">
                   <div className="flex justify-end space-x-2">
-                    <Link href={`/public/documentos/${doc.id}`} className="text-blue-600 hover:underline text-xs">
-                      Ver detalhes
+                    <Link href={`/public/documentos/${doc.id}`}>
+                      <span className="text-blue-600 hover:underline text-xs">
+                        Ver detalhes
+                      </span>
                     </Link>
                     {doc.filePath && (
                       <Button 

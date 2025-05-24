@@ -2828,8 +2828,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const total = documents.length;
       
       // Obter tipos de documentos e status únicos a partir dos documentos existentes
-      const uniqueTypes = [...new Set(documents.map(doc => doc.documentType))];
-      const uniqueStatuses = [...new Set(documents.map(doc => doc.status))];
+      // Obter tipos de documentos e status únicos
+      const uniqueTypes = Array.from(new Set(documents.map(doc => doc.documentType).filter(Boolean)));
+      const uniqueStatuses = Array.from(new Set(documents.map(doc => doc.status).filter(Boolean)));
       
       res.json({
         documents: paginatedDocuments,
