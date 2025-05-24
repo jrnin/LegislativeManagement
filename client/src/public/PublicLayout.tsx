@@ -387,7 +387,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 {mainMenuLinks.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href}>
-                      <a className="hover:underline">{link.name}</a>
+                      <span className="hover:underline cursor-pointer">{link.name}</span>
                     </Link>
                   </li>
                 ))}
@@ -407,15 +407,15 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             <p>&copy; {new Date().getFullYear()} Sistema Legislativo. Todos os direitos reservados.</p>
             <p className="mt-2">
               <Link href="/public/privacidade">
-                <a className="hover:underline">Política de Privacidade</a>
+                <span className="hover:underline cursor-pointer">Política de Privacidade</span>
               </Link>
               {" | "}
               <Link href="/public/acessibilidade">
-                <a className="hover:underline">Acessibilidade</a>
+                <span className="hover:underline cursor-pointer">Acessibilidade</span>
               </Link>
               {" | "}
               <Link href="/public/mapa-do-site">
-                <a className="hover:underline">Mapa do Site</a>
+                <span className="hover:underline cursor-pointer">Mapa do Site</span>
               </Link>
             </p>
           </div>

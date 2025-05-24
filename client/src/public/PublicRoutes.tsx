@@ -4,7 +4,7 @@ import PublicLayout from './PublicLayout';
 import HomePage from './HomePage';
 import VereadoresPage from './VereadoresPage';
 import VereadorDetailPage from './VereadorDetailPage';
-import DocumentosPage from './DocumentosPage';
+import DocumentosPage from './DocumentosPageBasic';
 import AtividadesPage from './AtividadesPage';
 import NotFound from '@/pages/not-found';
 
