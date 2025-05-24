@@ -2787,53 +2787,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { 
         type, 
         status, 
-        startDate, 
-        endDate, 
         search, 
         page = '1', 
-        limit = '10'
+        limit = '15'
       } = req.query;
 
       // Converter para números
       const pageNum = parseInt(page as string, 10) || 1;
-      const limitNum = parseInt(limit as string, 10) || 10;
+      const limitNum = parseInt(limit as string, 10) || 15;
+      
+      console.log("Buscando documentos públicos com filtros:", req.query);
       
       // Construir objeto de filtro
       const filters: any = {};
       
       if (type) filters.documentType = type;
       if (status) filters.status = status;
-      
-      // Filtro de data
-      if (startDate || endDate) {
-        filters.dateRange = {};
-        if (startDate) filters.dateRange.start = new Date(startDate as string);
-        if (endDate) filters.dateRange.end = new Date(endDate as string);
-      }
-      
-      // Filtro de busca por texto
       if (search) filters.search = search as string;
       
-      console.log("Buscando documentos públicos com filtros:", filters);
+      // Buscar documentos filtrados com paginação
+      const documents = await storage.getFilteredDocuments(filters, pageNum, limitNum);
       
-      // Buscar documentos usando o método sem filtros, por enquanto
-      const documents = await storage.getAllDocuments();
+      // Buscar contagem total para paginação
+      const total = await storage.getDocumentsCount(filters);
       
-      // Paginação manual, temporária
-      const startIndex = (pageNum - 1) * limitNum;
-      const endIndex = startIndex + limitNum;
-      const paginatedDocuments = documents.slice(startIndex, endIndex);
-      
-      // Contar total de documentos
-      const total = documents.length;
-      
-      // Obter tipos de documentos e status únicos a partir dos documentos existentes
-      // Obter tipos de documentos e status únicos
-      const uniqueTypes = Array.from(new Set(documents.map(doc => doc.documentType).filter(Boolean)));
-      const uniqueStatuses = Array.from(new Set(documents.map(doc => doc.status).filter(Boolean)));
+      // Obtendo tipos de documentos e status distintos para os filtros
+      // Vamos extrair todos os tipos e status únicos dos documentos
+      const allDocuments = await storage.getAllDocuments();
+      const documentTypes = [...new Set(allDocuments.map(doc => doc.documentType).filter(Boolean))];
+      const statusTypes = [...new Set(allDocuments.map(doc => doc.status).filter(Boolean))];
       
       res.json({
-        documents: paginatedDocuments,
+        documents,
         pagination: {
           total,
           page: pageNum,
@@ -2841,13 +2826,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           pages: Math.ceil(total / limitNum)
         },
         filters: {
-          documentTypes: uniqueTypes,
-          statusTypes: uniqueStatuses
+          documentTypes,
+          statusTypes
         }
       });
     } catch (error) {
       console.error("Erro ao buscar documentos para exibição pública:", error);
-      res.status(500).json({ message: "Erro ao buscar documentos" });
+      res.status(500).json({ message: "Erro ao buscar documentos", error: error.message });
     }
   });
 
