@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Loader2, Search, Filter, ChevronDown, ChevronUp, X, Calendar, Tag } from 'lucide-react';
+import { FileText, Loader2, Search, Filter, ChevronDown, ChevronUp, X, Calendar, Tag, LayoutGrid, List, FileDown, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,15 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
+import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,6 +71,7 @@ export default function DocumentosPageBasic() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [totalDocuments, setTotalDocuments] = useState(0);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
   // Construir query string para filtros
   const getQueryString = () => {
@@ -158,19 +168,42 @@ export default function DocumentosPageBasic() {
           <h1 className="text-3xl font-bold text-gray-800">Documentos Públicos</h1>
         </div>
         
-        <Button
-          onClick={toggleFilters}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <Filter className="h-4 w-4" />
-          Filtros
-          {isFilterOpen ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <div className="border rounded-md p-1 flex">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setViewMode('grid')}
+              title="Visualização em grade"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setViewMode('list')}
+              title="Visualização em lista"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <Button
+            onClick={toggleFilters}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            Filtros
+            {isFilterOpen ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Filtros animados */}
@@ -335,41 +368,109 @@ export default function DocumentosPageBasic() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {documents.map((doc, index) => (
-                <motion.div
-                  key={doc.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.3 }}
-                >
-                  <Card className="h-full hover:shadow-md transition-shadow flex flex-col">
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-md flex items-center">
-                            <FileText className="h-4 w-4 mr-2 text-blue-600" />
-                            {doc.documentType} Nº {doc.documentNumber}
-                          </CardTitle>
-                          <p className="text-sm text-gray-500">{formatDate(doc.documentDate)}</p>
-                        </div>
-                        <Badge className={getStatusBadgeClass(doc.status)}>
-                          {doc.status}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex-1">
-                      <p className="text-sm text-gray-700 line-clamp-3">{doc.description}</p>
-                    </CardContent>
-                    <CardFooter className="pt-2 border-t mt-auto">
-                      <a href={`/documentos/${doc.id}`} className="text-blue-600 hover:underline text-sm cursor-pointer">
-                        Ver detalhes
-                      </a>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
+              {viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {documents.map((doc, index) => (
+                    <motion.div
+                      key={doc.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05, duration: 0.3 }}
+                    >
+                      <Card className="h-full hover:shadow-md transition-shadow flex flex-col">
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <CardTitle className="text-md flex items-center">
+                                <FileText className="h-4 w-4 mr-2 text-blue-600" />
+                                {doc.documentType} Nº {doc.documentNumber}
+                              </CardTitle>
+                              <p className="text-sm text-gray-500">{formatDate(doc.documentDate)}</p>
+                            </div>
+                            <Badge className={getStatusBadgeClass(doc.status)}>
+                              {doc.status}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="flex-1">
+                          <p className="text-sm text-gray-700 line-clamp-3">{doc.description}</p>
+                        </CardContent>
+                        <CardFooter className="pt-2 border-t mt-auto">
+                          <a href={`/documentos/${doc.id}`} className="text-blue-600 hover:underline text-sm cursor-pointer">
+                            Ver detalhes
+                          </a>
+                        </CardFooter>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[180px]">Tipo / Número</TableHead>
+                        <TableHead className="w-[120px]">Data</TableHead>
+                        <TableHead>Descrição</TableHead>
+                        <TableHead className="w-[100px]">Situação</TableHead>
+                        <TableHead className="w-[100px] text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {documents.map((doc, index) => (
+                        <motion.tr
+                          key={doc.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.03, duration: 0.2 }}
+                          className="border-b last:border-b-0"
+                        >
+                          <TableCell className="font-medium">
+                            <div className="flex items-center">
+                              <FileText className="h-4 w-4 mr-2 text-blue-600 flex-shrink-0" />
+                              <span>
+                                {doc.documentType} Nº {doc.documentNumber}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>{formatDate(doc.documentDate)}</TableCell>
+                          <TableCell className="max-w-md">
+                            <p className="truncate">{doc.description}</p>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getStatusBadgeClass(doc.status)}>
+                              {doc.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end space-x-2">
+                              <a 
+                                href={`/documentos/${doc.id}`}
+                                className="inline-flex items-center justify-center p-1 rounded-md text-gray-600 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                                title="Ver detalhes"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </a>
+                              {doc.filePath && (
+                                <a 
+                                  href={doc.filePath} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center justify-center p-1 rounded-md text-gray-600 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                                  title="Baixar documento"
+                                >
+                                  <FileDown className="h-4 w-4" />
+                                </a>
+                              )}
+                            </div>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </motion.div>
           ) : (
             <motion.div
