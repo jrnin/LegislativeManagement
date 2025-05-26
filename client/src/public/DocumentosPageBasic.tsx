@@ -225,32 +225,30 @@ export default function DocumentosPageBasic() {
             
             <div className="flex items-center gap-2">
               <label className="text-sm text-gray-600">Tipo:</label>
-              <Select value={type} onValueChange={setType}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Todos os tipos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todos os tipos</SelectItem>
-                  {filterOptions.documentTypes.map((docType, index) => (
-                    <SelectItem key={`${docType}-${index}`} value={docType}>{docType}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select 
+                value={type} 
+                onChange={(e) => setType(e.target.value)}
+                className="w-48 h-10 px-3 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Todos os tipos</option>
+                {filterOptions.documentTypes.map((docType, index) => (
+                  <option key={`${docType}-${index}`} value={docType}>{docType}</option>
+                ))}
+              </select>
             </div>
             
             <div className="flex items-center gap-2">
               <label className="text-sm text-gray-600">Situação:</label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Todas as situações" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todas as situações</SelectItem>
-                  {filterOptions.statusTypes.map((statusType, index) => (
-                    <SelectItem key={`${statusType}-${index}`} value={statusType}>{statusType}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select 
+                value={status} 
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-48 h-10 px-3 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Todas as situações</option>
+                {filterOptions.statusTypes.map((statusType, index) => (
+                  <option key={`${statusType}-${index}`} value={statusType}>{statusType}</option>
+                ))}
+              </select>
             </div>
             
             {(search || type || status) && (
