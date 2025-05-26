@@ -301,7 +301,7 @@ const HomeCouncilorsModern = () => {
                       src={councilor.profileImageUrl} 
                       className="object-cover w-full h-full rounded-[6px]"
                     />
-                    <AvatarFallback className="bg-blue-800 text-white text-2xl lg:text-3xl font-bold rounded-[6px]">
+                    <AvatarFallback className="text-white text-2xl lg:text-3xl font-bold rounded-[6px]" style={{backgroundColor: '#7FA653'}}>
                       {getInitials(councilor.name)}
                     </AvatarFallback>
                   </Avatar>
