@@ -390,14 +390,22 @@ export default function HomePage() {
         <meta name="description" content="Portal público do Sistema Legislativo Municipal. Acesse informações sobre vereadores, documentos, atividades legislativas e mais." />
       </Helmet>
 
-      {/* Seção Hero Principal */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden" style={{background: 'linear-gradient(135deg, #7FA653 0%, #63783D 100%)'}}>
-        {/* Elemento decorativo de fundo */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full"></div>
-          <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full"></div>
-          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full"></div>
+      {/* Seção Hero Principal com vídeo de fundo */}
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
+        {/* Vídeo de fundo */}
+        <div className="absolute inset-0 w-full h-full z-0">
+          <iframe
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
+            title="Vídeo de fundo da Câmara Municipal"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
         </div>
+        
+        {/* Overlay escuro para melhorar legibilidade do texto */}
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center text-white">

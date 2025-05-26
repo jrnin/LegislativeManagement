@@ -227,12 +227,12 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               {/* Logo */}
               <Link href="/">
                 <button className="flex items-center space-x-2">
-                  <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl" style={{background: 'linear-gradient(to bottom right, #7FA653, #63783D)'}}>
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl" style={{background: 'linear-gradient(to bottom right, #253529, #48654e)'}}>
                     SL
                   </div>
                   <div className="hidden sm:block">
                     <h1 className="text-xl font-bold">
-                      <span style={{color: '#7FA653'}}>Sistema</span>
+                      <span style={{color: '#253529'}}>Sistema</span>
                       <span className={`${
                         location === '/public' && !isScrolled
                           ? 'text-white' 
@@ -278,7 +278,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                           : isDarkMode 
                             ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
                             : 'hover:opacity-80'
-                    }`} style={location === link.href ? {backgroundColor: '#7FA653'} : {color: '#63783D'}}>
+                    }`} style={location === link.href ? {backgroundColor: '#48654e'} : {color: '#253529'}}>
                       {link.name}
                     </button>
                   </Link>
@@ -289,7 +289,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                     variant={location === '/public' && !isScrolled ? "secondary" : "outline"} 
                     size="sm"
                     className="text-white hover:opacity-90"
-                    style={{backgroundColor: '#7FA653', borderColor: '#7FA653'}}
+                    style={{backgroundColor: '#48654e', borderColor: '#48654e'}}
                     onClick={() => window.location.href = "/login"}
                   >
                     Área Restrita
