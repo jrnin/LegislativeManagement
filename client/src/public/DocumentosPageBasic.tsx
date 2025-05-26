@@ -170,12 +170,12 @@ export default function DocumentosPageBasic() {
       </Helmet>
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16">
+      <div className="text-white py-16" style={{background: 'linear-gradient(to right, #7FA653, #63783D)'}}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-4">Documentos Públicos</h1>
-              <p className="text-xl text-green-100 max-w-2xl">
+              <p className="text-xl text-white opacity-90 max-w-2xl">
                 Acesse documentos oficiais, leis, decretos, atas e outros arquivos públicos da 
                 Câmara Municipal. Utilize ferramentas de busca avançada para encontrar informações específicas.
               </p>

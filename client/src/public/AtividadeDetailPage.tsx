@@ -198,7 +198,7 @@ export default function AtividadeDetailPage() {
             <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-medium text-gray-700 mb-2">Atividade não encontrada</h2>
             <p className="text-gray-500 mb-6">{error || 'A atividade solicitada não existe ou foi removida.'}</p>
-            <Button onClick={() => window.history.back()} className="bg-green-600 hover:bg-green-700">
+            <Button onClick={() => window.history.back()} className="text-white hover:opacity-90" style={{backgroundColor: '#7FA653'}}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar às Atividades
             </Button>
