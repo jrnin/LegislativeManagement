@@ -72,7 +72,7 @@ export default function DocumentosPageBasic() {
   // Construir query string para filtros
   const getQueryString = () => {
     const params = new URLSearchParams();
-    params.append('limit', '15');
+    // Remover limite para mostrar todos os documentos
     if (search) params.append('search', search);
     if (type) params.append('type', type);
     if (status) params.append('status', status);
