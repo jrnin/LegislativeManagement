@@ -324,6 +324,8 @@ export default function DocumentosPage() {
   };
 
   return (
+
+    
     <div className="container mx-auto py-12 px-4">
       <Helmet>
         <title>Documentos Públicos - Sistema Legislativo</title>
