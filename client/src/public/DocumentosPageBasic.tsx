@@ -95,10 +95,16 @@ export default function DocumentosPageBasic() {
   const fetchDocuments = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/public/documents?${getQueryString()}`);
+      const response = await fetch(`/api/public/documents?${getQueryString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
       
       if (!response.ok) {
-        throw new Error('Erro ao carregar documentos');
+        throw new Error(`Erro ao carregar documentos: ${response.status}`);
       }
       
       const data: DocumentsResponse = await response.json();

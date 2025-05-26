@@ -92,13 +92,19 @@ function App() {
                        location.startsWith("/vereadores") || 
                        location.startsWith("/atividades");
   
-  const { isLoading, isAuthenticated } = useAuth();
+  // Só usar hook de auth se não for rota pública
+  const { isLoading, isAuthenticated } = isPublicRoute ? { isLoading: false, isAuthenticated: false } : useAuth();
   
   // Renderizar o app com base no estado de autenticação e rota
   const renderApp = () => {
-    // Se estamos em uma rota pública, renderize o site público
+    // Se estamos em uma rota pública, renderize o site público sem verificação de auth
     if (isPublicRoute) {
-      return <PublicRoutes />;
+      return (
+        <TooltipProvider>
+          <PublicRoutes />
+          <Toaster />
+        </TooltipProvider>
+      );
     }
     
     // Se estiver carregando a autenticação, mostre o loading
