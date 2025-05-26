@@ -257,6 +257,98 @@ const HomeCouncilors = () => {
   );
 };
 
+// Componente moderno para exibir vereadores baseado na referência visual
+const HomeCouncilorsModern = () => {
+  const { data: councilors, isLoading, error } = useQuery<any[]>({
+    queryKey: ['/api/public/councilors'],
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="flex items-center space-x-3 text-white">
+          <div className="animate-spin">
+            <Users size={32} />
+          </div>
+          <span className="text-lg">Carregando vereadores...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !councilors) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-white mb-4">Não foi possível carregar os vereadores.</p>
+      </div>
+    );
+  }
+
+  // Mostrar apenas os primeiros 3 vereadores em destaque
+  const displayedCouncilors = councilors.slice(0, 3);
+
+  return (
+    <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
+      {displayedCouncilors.map((councilor, index) => (
+        <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
+          <a className="group">
+            <div className="flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105">
+              {/* Avatar com efeito de destaque */}
+              <div className="relative mb-4">
+                <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl group-hover:shadow-2xl transition-all">
+                  <Avatar className="w-full h-full">
+                    <AvatarImage 
+                      src={councilor.profileImageUrl} 
+                      className="object-cover w-full h-full"
+                    />
+                    <AvatarFallback className="bg-blue-800 text-white text-xl lg:text-2xl font-bold">
+                      {getInitials(councilor.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                
+                {/* Badge de destaque para o primeiro vereador */}
+                {index === 0 && (
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                    <Users size={16} className="text-blue-700" />
+                  </div>
+                )}
+              </div>
+              
+              {/* Informações do vereador */}
+              <div className="text-white">
+                <h3 className="text-lg lg:text-xl font-bold mb-1 group-hover:text-blue-200 transition-colors">
+                  {councilor.name}
+                </h3>
+                <p className="text-blue-100 text-sm lg:text-base mb-2">
+                  {councilor.occupation || 'Vereador(a)'}
+                </p>
+                <div className="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-xs lg:text-sm font-medium text-white backdrop-blur-sm">
+                  {councilor.education || 'Legislatura Atual'}
+                </div>
+              </div>
+            </div>
+          </a>
+        </Link>
+      ))}
+      
+      {/* Indicador visual de que há mais vereadores */}
+      {councilors.length > 3 && (
+        <div className="flex flex-col items-center text-center">
+          <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center mb-3">
+            <span className="text-white/70 text-sm lg:text-base font-medium">
+              +{councilors.length - 3}
+            </span>
+          </div>
+          <p className="text-white/70 text-sm">
+            Mais vereadores
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Componente para card de evento
 interface EventCardProps {
   id: number;
@@ -813,22 +905,37 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Nova seção de vereadores em cards com dados da API */}
-      <section className="py-10 px-4 bg-white">
-        <div className="container mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center">
-              <Users className="text-blue-600 mr-3" size={24} />
-              <h2 className="text-2xl font-bold text-gray-800">Vereadores</h2>
-            </div>
+      {/* Nova seção de vereadores com design moderno */}
+      <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 relative overflow-hidden">
+        {/* Elemento decorativo de fundo */}
+        <div className="absolute top-0 right-0 w-64 h-64 opacity-10">
+          <svg viewBox="0 0 200 200" className="w-full h-full">
+            <circle cx="100" cy="100" r="80" fill="white" />
+            <path d="M100,20 L100,180 M20,100 L180,100" stroke="white" strokeWidth="2" />
+          </svg>
+        </div>
+        
+        <div className="container mx-auto relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-white mb-4">Nossa Equipe de Vereadores</h2>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              Conheça os representantes eleitos que trabalham em prol do desenvolvimento de nossa cidade
+            </p>
+          </div>
+          
+          {/* Cards de vereadores em layout horizontal */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+            <HomeCouncilorsModern />
+          </div>
+          
+          <div className="text-center">
             <Link href="/public/vereadores">
-              <a className="text-blue-600 hover:underline flex items-center">
-                Ver todos <ChevronRight size={16} />
+              <a className="inline-flex items-center px-8 py-3 bg-white text-blue-700 font-semibold rounded-full hover:bg-blue-50 transition-all shadow-lg">
+                Ver todos os vereadores
+                <ChevronRight size={20} className="ml-2" />
               </a>
             </Link>
           </div>
-          
-          <HomeCouncilors />
         </div>
       </section>
 
