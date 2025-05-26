@@ -840,7 +840,7 @@ export default function HomePage() {
                       <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-video">
                         <iframe
                           className="w-full h-full"
-                          src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=placeholder"
+                          src="https://www.youtube.com/watch?v=hcESKWXjRdY=placeholder"
                           title="Vídeo da Câmara Municipal"
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -878,7 +878,7 @@ export default function HomePage() {
                         <div 
                           key={index} 
                           className="flex gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer"
-                          onClick={() => window.open('https://www.youtube.com/@CâmaraMunicipaldeJaíba', '_blank')}
+                          onClick={() => window.open('https://www.youtube.com/@C%C3%A2maraMunicipaldeJa%C3%ADba', '_blank')}
                         >
                           <div className="w-20 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded flex-shrink-0 flex items-center justify-center relative">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="white" className="drop-shadow-sm">
@@ -973,7 +973,7 @@ export default function HomePage() {
         </div>
       </section>     
       {/* Nova seção de vereadores com design moderno */}
-      <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 relative overflow-hidden">
+      <section className="py-16 px-4 bg-gradient-to-r from-green-600 to-emerald-700 relative overflow-hidden">
         {/* Elemento decorativo de fundo */}
         <div className="absolute top-0 right-0 w-64 h-64 opacity-10">
           <svg viewBox="0 0 200 200" className="w-full h-full">
@@ -985,7 +985,7 @@ export default function HomePage() {
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">Nossa Equipe de Vereadores</h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl text-green-100 max-w-3xl mx-auto">
               Conheça os representantes eleitos que trabalham em prol do desenvolvimento de nossa cidade
             </p>
           </div>
@@ -997,7 +997,7 @@ export default function HomePage() {
           
           <div className="text-center">
             <Link href="/public/vereadores">
-              <a className="inline-flex items-center px-8 py-3 bg-white text-blue-700 font-semibold rounded-full hover:bg-blue-50 transition-all shadow-lg">
+              <a className="inline-flex items-center px-8 py-3 bg-white text-green-700 font-semibold rounded-full hover:bg-green-50 transition-all shadow-lg">
                 Ver todos os vereadores
                 <ChevronRight size={20} className="ml-2" />
               </a>
@@ -1171,7 +1171,7 @@ export default function HomePage() {
       </section>
 
       {/* Banner de chamada para ação */}
-      <section className="py-12 px-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white">
+      <section className="py-12 px-4 bg-gradient-to-r from-green-700 to-emerald-800 text-white">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Participe da Vida Política da Cidade</h2>
           <p className="max-w-2xl mx-auto mb-8 opacity-90">
@@ -1179,10 +1179,10 @@ export default function HomePage() {
             e contribua para o desenvolvimento da nossa cidade.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
+            <Button size="lg" className="bg-white text-green-700 hover:bg-green-50">
               Ouvidoria
             </Button>
-            <Button size="lg" className="text-blue border-white hover:bg-blue-600">
+            <Button size="lg" className="text-green border-white hover:bg-green-600">
               Calendário de Audiências
             </Button>
           </div>
