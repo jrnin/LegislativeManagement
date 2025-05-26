@@ -838,15 +838,18 @@ export default function HomePage() {
                     {/* Vídeo em Destaque */}
                     <div className="mb-4">
                       <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-video">
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-500 to-red-600">
-                          <div className="text-center text-white">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="mx-auto mb-2">
-                              <path d="M8 5v14l11-7z"/>
-                            </svg>
-                            <p className="text-sm font-medium">Sessão Ordinária - 15/01/2024</p>
-                            <p className="text-xs opacity-90">Discussão do Orçamento Municipal</p>
-                          </div>
-                        </div>
+                        <iframe
+                          className="w-full h-full"
+                          src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=placeholder"
+                          title="Vídeo da Câmara Municipal"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                      <div className="mt-2">
+                        <h4 className="text-sm font-medium text-gray-900">Sessão Ordinária - Última transmissão</h4>
+                        <p className="text-xs text-gray-500">Discussão do Orçamento Municipal 2024</p>
                       </div>
                     </div>
                     
@@ -872,9 +875,13 @@ export default function HomePage() {
                           duration: "28:45"
                         }
                       ].map((video, index) => (
-                        <div key={index} className="flex gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer">
-                          <div className="w-20 h-12 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center relative">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-gray-600">
+                        <div 
+                          key={index} 
+                          className="flex gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer"
+                          onClick={() => window.open('https://www.youtube.com/@C%C3%A2maraMunicipaldeJa%C3%ADba', '_blank')}
+                        >
+                          <div className="w-20 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded flex-shrink-0 flex items-center justify-center relative">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" className="drop-shadow-sm">
                               <path d="M8 5v14l11-7z"/>
                             </svg>
                             <span className="absolute bottom-0 right-0 bg-black bg-opacity-75 text-white text-xs px-1 rounded-tl text-[10px]">
@@ -882,7 +889,7 @@ export default function HomePage() {
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight">
+                            <h4 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight hover:text-red-600 transition-colors">
                               {video.title}
                             </h4>
                             <p className="text-xs text-gray-500 mt-1">{video.views}</p>
