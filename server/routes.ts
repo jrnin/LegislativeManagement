@@ -2874,6 +2874,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota pública para obter atividades legislativas (sem autenticação)
   app.get('/api/public/legislative-activities', async (req, res) => {
     try {
+      // Definir cabeçalho de resposta JSON
+      res.setHeader('Content-Type', 'application/json');
+      
       // Parâmetros de filtro
       const { 
         type, 
@@ -2887,13 +2890,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activities = await storage.getAllLegislativeActivities();
       
       // Aplicar filtros se fornecidos
-      let filteredActivities = activities;
+      let filteredActivities = activities || [];
       
       if (search) {
         const searchTerm = (search as string).toLowerCase();
         filteredActivities = filteredActivities.filter(activity => 
-          activity.description.toLowerCase().includes(searchTerm) ||
-          activity.activityType.toLowerCase().includes(searchTerm)
+          activity.description?.toLowerCase().includes(searchTerm) ||
+          activity.activityType?.toLowerCase().includes(searchTerm)
         );
       }
       
@@ -2909,19 +2912,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (statusFilter === 'aprovada' && activity.approved) return true;
           if (statusFilter === 'pendente' && activity.needsApproval && !activity.approved) return true;
           if (statusFilter === 'rejeitada' && activity.needsApproval && activity.approved === false) return true;
+          if (statusFilter === 'tramitando' && !activity.needsApproval) return true;
           return false;
         });
       }
       
       // Obter tipos únicos para os filtros
-      const activityTypes = [...new Set(activities.map(activity => activity.activityType))];
-      const statusTypes = ['aprovada', 'pendente', 'rejeitada'];
+      const activityTypes = [...new Set((activities || []).map(activity => activity.activityType))];
+      const statusTypes = ['aprovada', 'pendente', 'rejeitada', 'tramitando'];
       
       // Mapear dados para o formato esperado pela página
       const mappedActivities = filteredActivities.map(activity => ({
         id: activity.id,
         title: `${activity.activityType} Nº ${activity.activityNumber}`,
-        description: activity.description,
+        description: activity.description || 'Sem descrição disponível',
         type: activity.activityType,
         status: activity.approved ? 'aprovada' : (activity.needsApproval ? 'pendente' : 'tramitando'),
         sessionDate: activity.activityDate,
@@ -2943,10 +2947,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
       
-      res.json(response);
+      return res.status(200).json(response);
     } catch (error) {
       console.error("Erro ao buscar atividades legislativas públicas:", error);
-      res.status(500).json({ message: "Erro ao buscar atividades legislativas" });
+      return res.status(500).json({ 
+        activities: [],
+        pagination: { total: 0, page: 1, limit: 0, pages: 0 },
+        filters: { activityTypes: [], statusTypes: [] },
+        message: "Erro ao buscar atividades legislativas" 
+      });
     }
   });
 
