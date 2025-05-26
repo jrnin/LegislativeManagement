@@ -53,11 +53,11 @@ const QuickServiceCard = ({ title, description, icon: Icon, href }: QuickService
     <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 border-0 bg-white/80 backdrop-blur-sm">
       <CardContent className="p-6">
         <div className="flex items-start space-x-4">
-          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#CFE0BC'}}>
-            <Icon size={24} style={{color: '#63783D'}} />
+          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#253529'}}>
+            <Icon size={24} style={{color: '#e4e6da'}} />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#63783D'}}>
+            <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#253529'}}>
               {title}
             </h3>
             <p className="text-gray-600 text-sm leading-relaxed">
@@ -94,7 +94,7 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
             />
           </div>
         )}
-        <Badge className="absolute top-3 left-3 text-xs" style={{backgroundColor: '#7FA653', color: 'white'}}>
+        <Badge className="absolute top-3 left-3 text-xs" style={{backgroundColor: '#253529', color: 'white'}}>
           {category}
         </Badge>
       </div>
@@ -649,7 +649,7 @@ export default function HomePage() {
                   <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-video">
                     <iframe
                       className="w-full h-full"
-                      src="https://www.youtube.com/embed/hcESKWXjRdY"
+                      src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                       title="Vídeo da Câmara Municipal"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

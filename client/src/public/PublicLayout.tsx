@@ -124,7 +124,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       </Helmet>
 
       {/* Top bar com opções de acessibilidade e redes sociais */}
-      <div className="w-full py-2 px-4 text-white text-sm" style={{backgroundColor: '#63783D'}}>
+      <div className="w-full py-2 px-4 text-white text-sm" style={{backgroundColor: '#253529'}}>
         <div className="container mx-auto flex flex-wrap justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
