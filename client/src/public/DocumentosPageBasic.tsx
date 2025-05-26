@@ -231,8 +231,8 @@ export default function DocumentosPageBasic() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">Todos os tipos</SelectItem>
-                  {filterOptions.documentTypes.map(type => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  {filterOptions.documentTypes.map((docType, index) => (
+                    <SelectItem key={`${docType}-${index}`} value={docType}>{docType}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -246,8 +246,8 @@ export default function DocumentosPageBasic() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">Todas as situações</SelectItem>
-                  {filterOptions.statusTypes.map(status => (
-                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  {filterOptions.statusTypes.map((statusType, index) => (
+                    <SelectItem key={`${statusType}-${index}`} value={statusType}>{statusType}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
