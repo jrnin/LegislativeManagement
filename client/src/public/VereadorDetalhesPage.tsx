@@ -289,7 +289,7 @@ export default function VereadorDetalhesPage() {
       </Helmet>
 
       {/* Cabeçalho com informações principais */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 px-4">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-8 px-4">
         <div className="container mx-auto">
           <div className="flex items-center mb-4">
             <Button 

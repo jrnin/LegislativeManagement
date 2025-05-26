@@ -58,12 +58,12 @@ export default function VereadoresPage() {
       </Helmet>
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-4">Vereadores</h1>
-              <p className="text-xl text-blue-100 max-w-2xl">
+              <p className="text-xl text-green-100 max-w-2xl">
                 Conheça os representantes eleitos que trabalham em prol do desenvolvimento de nossa cidade. 
                 Acompanhe o trabalho dos vereadores e fiscalize o processo legislativo.
               </p>
