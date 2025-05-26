@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FileText, Loader2, Search, Filter, ChevronDown, ChevronUp, X, Calendar, Tag, LayoutGrid, List, FileDown, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -169,11 +169,30 @@ export default function DocumentosPageBasic() {
         <meta name="description" content="Consulte documentos públicos da Câmara Municipal com ferramentas de busca e filtros avançados." />
       </Helmet>
       
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-4">Documentos Públicos</h1>
+              <p className="text-xl text-blue-100 max-w-2xl">
+                Acesse documentos oficiais, leis, decretos, atas e outros arquivos públicos da 
+                Câmara Municipal. Utilize ferramentas de busca avançada para encontrar informações específicas.
+              </p>
+            </div>
+            <div className="hidden lg:block">
+              <div className="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <FileText size={64} className="text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="container mx-auto py-12 px-4">
               <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
-                      <FileText size={30} className="text-blue-600" />
-                      <h1 className="text-3xl font-bold text-gray-800">Documentos Públicos</h1>
+                      <h2 className="text-2xl font-bold text-gray-800">Pesquisar Documentos</h2>
                   </div>
 
                   <div className="flex gap-2">

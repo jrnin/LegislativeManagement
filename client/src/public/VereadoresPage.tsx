@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Users, ChevronRight } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Helmet } from 'react-helmet';
 
 // Interface para o modelo de Vereador (baseado na tabela users do banco de dados)
 interface Councilor {
@@ -50,11 +51,33 @@ export default function VereadoresPage() {
   });
 
   return (
-    <div className="container mx-auto py-12 px-4">
-      <div className="flex items-center gap-3 mb-8">
-        <Users size={30} className="text-blue-600" />
-        <h1 className="text-3xl font-bold text-gray-800">Vereadores</h1>
+    <>
+      <Helmet>
+        <title>Vereadores | Sistema Legislativo</title>
+        <meta name="description" content="Conheça os vereadores da Câmara Municipal e seus trabalhos em prol do desenvolvimento da cidade." />
+      </Helmet>
+
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-4">Vereadores</h1>
+              <p className="text-xl text-blue-100 max-w-2xl">
+                Conheça os representantes eleitos que trabalham em prol do desenvolvimento de nossa cidade. 
+                Acompanhe o trabalho dos vereadores e fiscalize o processo legislativo.
+              </p>
+            </div>
+            <div className="hidden lg:block">
+              <div className="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <Users size={64} className="text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div className="container mx-auto py-12 px-4">
 
       {isLoading ? (
         <div className="flex justify-center py-20">
@@ -83,13 +106,14 @@ export default function VereadoresPage() {
         <p className="text-gray-600 mb-4">
           Conheça os vereadores que trabalham em prol do desenvolvimento de nossa cidade.
         </p>
-        <Link href="/public">
+        <Link href="/">
           <a className="text-blue-600 hover:underline inline-flex items-center">
             <ChevronRight className="h-4 w-4 mr-1 rotate-180" />
             Voltar para página inicial
           </a>
         </Link>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
