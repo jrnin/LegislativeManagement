@@ -184,35 +184,43 @@ export default function DocumentosPageBasic() {
       </div>
 
       <div className="container mx-auto py-8 px-4">
-        {/* Filtros Horizontais */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <Filter className="h-5 w-5 mr-2 text-blue-600" />
-            Filtrar Documentos
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Pesquisar por texto
+        {/* Barra de Busca Principal */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Buscar documentos
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
-                  placeholder="Digite palavras-chave..."
+                  placeholder="Digite o número, tipo ou palavras-chave do documento..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10"
+                  className="w-full pl-12 h-12 text-base"
                 />
               </div>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tipo de documento
-              </label>
+            <Button 
+              onClick={applyFilters} 
+              className="h-12 px-8 bg-blue-600 hover:bg-blue-700"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              Buscar
+            </Button>
+          </div>
+        </div>
+
+        {/* Filtros Avançados */}
+        <div className="bg-gray-50 rounded-lg border p-4 mb-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="text-sm font-medium text-gray-700">Filtros:</span>
+            
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-600">Tipo:</label>
               <Select value={type} onValueChange={setType}>
-                <SelectTrigger>
+                <SelectTrigger className="w-48">
                   <SelectValue placeholder="Todos os tipos" />
                 </SelectTrigger>
                 <SelectContent>
@@ -224,12 +232,10 @@ export default function DocumentosPageBasic() {
               </Select>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Situação
-              </label>
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-600">Situação:</label>
               <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
+                <SelectTrigger className="w-48">
                   <SelectValue placeholder="Todas as situações" />
                 </SelectTrigger>
                 <SelectContent>
@@ -241,26 +247,17 @@ export default function DocumentosPageBasic() {
               </Select>
             </div>
             
-            <div className="flex flex-col justify-end">
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={clearFilters}
-                  className="flex-1"
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Limpar
-                </Button>
-                
-                <Button 
-                  onClick={applyFilters} 
-                  className="flex-1"
-                >
-                  <Search className="h-4 w-4 mr-1" />
-                  Buscar
-                </Button>
-              </div>
-            </div>
+            {(search || type || status) && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={clearFilters}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Limpar filtros
+              </Button>
+            )}
           </div>
         </div>
 
@@ -312,11 +309,22 @@ export default function DocumentosPageBasic() {
           </div>
         )}
 
-        {/* Resultados */}
-        <div className="mb-4 flex justify-between items-center">
-          <span className="text-sm text-gray-500">
-            {totalDocuments} documento{totalDocuments !== 1 ? 's' : ''} encontrado{totalDocuments !== 1 ? 's' : ''}
-          </span>
+        {/* Cabeçalho dos Resultados */}
+        <div className="mb-6 bg-white rounded-lg border p-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold text-gray-900">Documentos Encontrados</h2>
+              <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                {totalDocuments} {totalDocuments === 1 ? 'documento' : 'documentos'}
+              </Badge>
+            </div>
+            
+            {totalDocuments > 0 && (
+              <div className="text-sm text-gray-500">
+                Ordenado por data (mais recente primeiro)
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Lista de documentos */}
@@ -334,92 +342,90 @@ export default function DocumentosPageBasic() {
         ) : (
           <div>
             {documents.length > 0 ? (
-              <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead className="w-[200px] font-semibold">Documento</TableHead>
-                      <TableHead className="w-[120px] font-semibold">Data</TableHead>
-                      <TableHead className="font-semibold">Descrição</TableHead>
-                      <TableHead className="w-[120px] font-semibold">Situação</TableHead>
-                      <TableHead className="w-[180px] text-center font-semibold">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {documents.map((doc, index) => (
-                      <motion.tr
-                        key={doc.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.03, duration: 0.2 }}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <TableCell className="font-medium">
-                          <div className="flex items-center">
-                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                              <FileText className="h-4 w-4 text-blue-600" />
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900">
-                                {doc.documentType} Nº {doc.documentNumber}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {doc.fileName || 'Documento PDF'}
-                              </div>
+              <div className="space-y-4">
+                {documents.map((doc, index) => (
+                  <motion.div
+                    key={doc.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.3 }}
+                    className="bg-white rounded-lg border shadow-sm p-6 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between">
+                      {/* Informações principais do documento */}
+                      <div className="flex-1">
+                        <div className="flex items-center mb-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                            <FileText className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {doc.documentType} Nº {doc.documentNumber}
+                            </h3>
+                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                              <span className="flex items-center">
+                                <span>Data: {formatDate(doc.documentDate)}</span>
+                              </span>
+                              <span>•</span>
+                              <span>{doc.fileName || 'Documento PDF'}</span>
                             </div>
                           </div>
-                        </TableCell>
-                        <TableCell className="text-gray-600">
-                          {formatDate(doc.documentDate)}
-                        </TableCell>
-                        <TableCell className="max-w-md">
-                          <p className="text-gray-700 line-clamp-2" title={doc.description}>
+                        </div>
+                        
+                        {/* Descrição */}
+                        <div className="mb-4">
+                          <p className="text-gray-700 leading-relaxed">
                             {doc.description}
                           </p>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadgeClass(doc.status)}>
-                            {doc.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-center space-x-2">
+                        </div>
+                        
+                        {/* Status e ações na mesma linha */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <span className="text-sm text-gray-500 mr-2">Situação:</span>
+                            <Badge className={getStatusBadgeClass(doc.status)}>
+                              {doc.status}
+                            </Badge>
+                          </div>
+                          
+                          <div className="flex items-center space-x-3">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => window.open(`/documentos/${doc.id}`, '_blank')}
-                              className="flex items-center gap-1"
+                              className="flex items-center gap-2"
                             >
-                              <Eye className="h-3 w-3" />
+                              <Eye className="h-4 w-4" />
                               Visualizar
                             </Button>
+                            
                             {doc.filePath ? (
                               <Button
                                 variant="default"
                                 size="sm"
                                 onClick={() => handleDownload(doc)}
-                                className="flex items-center gap-1"
+                                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
                               >
-                                <Download className="h-3 w-3" />
-                                Download
+                                <Download className="h-4 w-4" />
+                                Baixar PDF
                               </Button>
                             ) : (
                               <Button
                                 variant="outline"
                                 size="sm"
                                 disabled
-                                className="flex items-center gap-1 opacity-50"
+                                className="flex items-center gap-2 opacity-50"
                               >
-                                <Download className="h-3 w-3" />
+                                <Download className="h-4 w-4" />
                                 Indisponível
                               </Button>
                             )}
                           </div>
-                        </TableCell>
-                      </motion.tr>
-                    ))}
-                  </TableBody>
-                </Table>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             ) : (
               <motion.div
