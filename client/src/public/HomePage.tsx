@@ -295,13 +295,13 @@ const HomeCouncilorsModern = () => {
             <div className="flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105">
               {/* Avatar com efeito de destaque */}
               <div className="relative mb-4">
-                <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-[10px] overflow-hidden border-4 border-white shadow-xl group-hover:shadow-2xl transition-all">
+                <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-[10px] overflow-hidden border-4 border-white shadow-xl group-hover:shadow-2xl transition-all">
                   <Avatar className="w-full h-full rounded-[6px]">
                     <AvatarImage 
                       src={councilor.profileImageUrl} 
                       className="object-cover w-full h-full rounded-[6px]"
                     />
-                    <AvatarFallback className="bg-blue-800 text-white text-xl lg:text-2xl font-bold rounded-[6px]">
+                    <AvatarFallback className="bg-blue-800 text-white text-2xl lg:text-3xl font-bold rounded-[6px]">
                       {getInitials(councilor.name)}
                     </AvatarFallback>
                   </Avatar>
