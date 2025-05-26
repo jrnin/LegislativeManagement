@@ -29,84 +29,18 @@ import {
   Thermometer,
   Loader2
 } from 'lucide-react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getInitials } from '@/lib/utils';
-// Componentes para UI
-import { AnimatedCard } from '@/components/ui/animated-card';
-import { HoverCard3D } from '@/components/ui/hover-card-3d';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
-// Componente de banner de destaque com vídeo do YouTube como background
-const HeroBanner = () => {
-  const [isMuted, setIsMuted] = React.useState(true);
-  
-  return (
-    <div className="relative">
-      {/* Container de vídeo */}
-      <div className="relative h-[500px] overflow-hidden">
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <div className="relative w-full h-full">
-            <iframe
-              src={`https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1&playlist=l7VAs92qEXA`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              className="absolute w-[300%] h-[300%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-              title="Background Video"
-            ></iframe>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 to-indigo-900/50"></div>
-            
-            {/* Conteúdo do banner */}
-            <div className="container mx-auto px-8 py-16 md:py-24 relative z-10 h-full flex flex-col justify-center">
-              <div className="max-w-3xl text-white">
-                <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                  Câmara Municipal - Portal Transparente
-                </h1>
-                <p className="text-lg md:text-xl opacity-90 mb-8">
-                  Acompanhe as atividades legislativas, conheça os vereadores e tenha acesso a todos os documentos públicos de forma rápida e transparente.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
-                    Sessões ao Vivo
-                  </Button>
-                  <Button size="lg" className="border-white text-white hover:bg-blue-600">
-                    Ouvidoria
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Botão para controlar áudio */}
-            <button 
-              onClick={() => setIsMuted(!isMuted)}
-              className="absolute bottom-4 right-4 z-20 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white"
-              aria-label={isMuted ? "Ativar som" : "Desativar som"}
-            >
-              {isMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+// Função auxiliar para obter iniciais
+const getInitials = (name: string) => {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase();
 };
 
-// Componente de card para serviço rápido
+// Interface para QuickServiceCard
 interface QuickServiceCardProps {
   title: string;
   description: string;
@@ -116,28 +50,28 @@ interface QuickServiceCardProps {
 
 const QuickServiceCard = ({ title, description, icon: Icon, href }: QuickServiceCardProps) => (
   <Link href={href}>
-    <a className="block h-full">
-      <Card className="h-full transition-all hover:shadow-md hover:border-blue-200">
-        <CardHeader className="pb-2">
-          <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-2">
-            <Icon size={24} />
+    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 border-0 bg-white/80 backdrop-blur-sm">
+      <CardContent className="p-6">
+        <div className="flex items-start space-x-4">
+          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#CFE0BC'}}>
+            <Icon size={24} style={{color: '#63783D'}} />
           </div>
-          <CardTitle className="text-lg">{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500">{description}</p>
-        </CardContent>
-        <CardFooter>
-          <div className="text-sm text-blue-600 flex items-center">
-            Acessar <ChevronRight size={16} className="ml-1" />
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#63783D'}}>
+              {title}
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {description}
+            </p>
           </div>
-        </CardFooter>
-      </Card>
-    </a>
+          <ChevronRight size={20} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
+        </div>
+      </CardContent>
+    </Card>
   </Link>
 );
 
-// Componente de card para notícia
+// Interface para NewsCard
 interface NewsCardProps {
   id: number;
   title: string;
@@ -149,38 +83,38 @@ interface NewsCardProps {
 
 const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProps) => (
   <Link href={`/public/noticias/${id}`}>
-    <a className="block h-full">
-      <Card className="h-full overflow-hidden hover:shadow-md transition-all">
+    <Card className="group cursor-pointer h-full hover:shadow-lg transition-all duration-300">
+      <div className="relative">
         {imageUrl && (
-          <div className="aspect-video w-full overflow-hidden">
+          <div className="aspect-[16/9] overflow-hidden rounded-t-lg">
             <img 
               src={imageUrl} 
-              alt={title} 
-              className="w-full h-full object-cover transition-transform hover:scale-105"
+              alt={title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
         )}
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center mb-2">
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200">{category}</Badge>
-            <span className="text-xs text-gray-500">{date}</span>
-          </div>
-          <CardTitle className="text-lg leading-tight">{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-600 line-clamp-3">{excerpt}</p>
-        </CardContent>
-        <CardFooter>
-          <div className="text-sm text-blue-600 flex items-center">
-            Ler mais <ArrowRight size={14} className="ml-1" />
-          </div>
-        </CardFooter>
-      </Card>
-    </a>
+        <Badge className="absolute top-3 left-3 text-xs" style={{backgroundColor: '#7FA653', color: 'white'}}>
+          {category}
+        </Badge>
+      </div>
+      <CardContent className="p-4">
+        <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+          {title}
+        </h3>
+        <p className="text-gray-600 text-sm line-clamp-3 mb-3">
+          {excerpt}
+        </p>
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-gray-500">{date}</span>
+          <ArrowRight size={16} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
+        </div>
+      </CardContent>
+    </Card>
   </Link>
 );
 
-// Componente para card de vereador (versão sem animações)
+// Interface para CouncilorCard
 interface CouncilorCardProps {
   id: string;
   name: string;
@@ -194,162 +128,34 @@ interface CouncilorCardProps {
 
 const CouncilorCard = ({ id, name, role, party, imageUrl, profileImageUrl, occupation, education }: CouncilorCardProps) => (
   <Link href={`/public/vereadores/${id}`}>
-    <a className="block">
-      <Card className="text-center hover:shadow-md transition-all">
-        <CardHeader className="pb-2 pt-6">
-          <div className="flex justify-center mb-4">
-            <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-              <AvatarImage src={profileImageUrl || imageUrl} />
-              <AvatarFallback className="text-white text-lg" style={{backgroundColor: '#7FA653'}}>{getInitials(name)}</AvatarFallback>
-            </Avatar>
-          </div>
-          <CardTitle className="text-lg">{name}</CardTitle>
-          <CardDescription>{party || occupation || "Vereador(a)"}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Badge variant="outline" className="mx-auto">{role || education || "Legislatura Atual"}</Badge>
-        </CardContent>
-      </Card>
-    </a>
+    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg">
+      <CardHeader className="pb-2 pt-6">
+        <div className="flex justify-center mb-4">
+          <Avatar className="h-24 w-24 border-4 border-white shadow-md">
+            <AvatarImage src={profileImageUrl || imageUrl} />
+            <AvatarFallback className="text-white text-lg" style={{backgroundColor: '#7FA653'}}>{getInitials(name)}</AvatarFallback>
+          </Avatar>
+        </div>
+        <CardTitle className="text-lg">{name}</CardTitle>
+        <CardDescription>{party || occupation || "Vereador(a)"}</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {role && (
+          <Badge variant="secondary" className="mb-2">
+            {role}
+          </Badge>
+        )}
+        {education && (
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {education}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   </Link>
 );
 
-// Componente para exibir vereadores na página inicial
-const HomeCouncilors = () => {
-  const { data: councilors, isLoading, error } = useQuery<any[]>({
-    queryKey: ['/api/public/councilors'],
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-10">
-        <div className="animate-spin text-blue-600">
-          <Users size={40} />
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !councilors) {
-    return (
-      <div className="text-center py-10">
-        <p className="text-red-500 mb-4">Não foi possível carregar os vereadores.</p>
-      </div>
-    );
-  }
-
-  // Mostrar apenas os primeiros 5 vereadores
-  const displayedCouncilors = councilors.slice(0, 5);
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-      {displayedCouncilors.map((councilor) => (
-        <CouncilorCard
-          key={councilor.id}
-          id={councilor.id}
-          name={councilor.name}
-          profileImageUrl={councilor.profileImageUrl || ''}
-          occupation={councilor.occupation || ''}
-          education={councilor.education || ''}
-        />
-      ))}
-    </div>
-  );
-};
-
-// Componente moderno para exibir vereadores baseado na referência visual
-const HomeCouncilorsModern = () => {
-  const { data: councilors, isLoading, error } = useQuery<any[]>({
-    queryKey: ['/api/public/councilors'],
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <div className="flex items-center space-x-3 text-white">
-          <div className="animate-spin">
-            <Users size={32} />
-          </div>
-          <span className="text-lg">Carregando vereadores...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !councilors) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-white mb-4">Não foi possível carregar os vereadores.</p>
-      </div>
-    );
-  }
-
-  // Mostrar apenas os primeiros 5 vereadores em destaque
-  const displayedCouncilors = councilors.slice(0, 5);
-
-  return (
-    <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
-      {displayedCouncilors.map((councilor, index) => (
-        <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
-          <a className="group">
-            <div className="flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105">
-              {/* Avatar com efeito de destaque */}
-              <div className="relative mb-4">
-                <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-[10px] overflow-hidden border-4 border-white shadow-xl group-hover:shadow-2xl transition-all">
-                  <Avatar className="w-full h-full rounded-[6px]">
-                    <AvatarImage 
-                      src={councilor.profileImageUrl} 
-                      className="object-cover w-full h-full rounded-[6px]"
-                    />
-                    <AvatarFallback className="text-white text-2xl lg:text-3xl font-bold rounded-[6px]" style={{backgroundColor: '#7FA653'}}>
-                      {getInitials(councilor.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                
-                {/* Badge de destaque para o primeiro vereador */}
-                {index === 0 && (
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
-                    <Users size={16} className="text-blue-700" />
-                  </div>
-                )}
-              </div>
-              
-              {/* Informações do vereador */}
-              <div className="text-white">
-                <h3 className="text-lg lg:text-xl font-bold mb-1 group-hover:text-blue-200 transition-colors">
-                  {councilor.name}
-                </h3>
-                <p className="text-blue-100 text-sm lg:text-base mb-2">
-                  {councilor.occupation || 'Vereador(a)'}
-                </p>
-                <div className="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-xs lg:text-sm font-medium text-white backdrop-blur-sm">
-                  {councilor.education || 'Legislatura Atual'}
-                </div>
-              </div>
-            </div>
-          </a>
-        </Link>
-      ))}
-      
-      {/* Indicador visual de que há mais vereadores */}
-      {councilors.length > 5 && (
-        <div className="flex flex-col items-center text-center">
-          <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center mb-3">
-            <span className="text-white/70 text-sm lg:text-base font-medium">
-              +{councilors.length - 5}
-            </span>
-          </div>
-          <p className="text-white/70 text-sm">
-            Mais vereadores
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Componente para card de evento
+// Interface para EventCard
 interface EventCardProps {
   id: number;
   title: string;
@@ -360,43 +166,45 @@ interface EventCardProps {
 }
 
 const EventCard = ({ id, title, date, time, location, type }: EventCardProps) => (
-  <Link href={`/public/eventos/${id}`}>
-    <a className="block">
-      <Card className="hover:shadow-md transition-all">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 h-2" />
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-base">{title}</CardTitle>
-              <CardDescription className="text-xs">{type}</CardDescription>
-            </div>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700 flex items-center">
-              <Calendar size={12} className="mr-1" /> {date}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="pb-0">
-          <div className="flex flex-col text-sm space-y-1">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Horário:</span>
-              <span>{time}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Local:</span>
-              <span>{location}</span>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className="pt-4">
-          <Button variant="ghost" className="w-full text-blue-700">Ver detalhes</Button>
-        </CardFooter>
-      </Card>
-    </a>
-  </Link>
+  <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg border-l-4" style={{borderLeftColor: '#7FA653'}}>
+    <CardContent className="p-4">
+      <div className="flex items-start justify-between mb-2">
+        <Badge variant="outline" className="text-xs" style={{borderColor: '#7FA653', color: '#63783D'}}>
+          {type}
+        </Badge>
+        <span className="text-xs text-gray-500">{time}</span>
+      </div>
+      <h3 className="font-semibold text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+        {title}
+      </h3>
+      <div className="space-y-1 text-xs text-gray-600">
+        <div className="flex items-center">
+          <Calendar size={12} className="mr-1" />
+          {date}
+        </div>
+        <div className="flex items-center">
+          <Building size={12} className="mr-1" />
+          {location}
+        </div>
+      </div>
+    </CardContent>
+  </Card>
 );
 
-// Serviços rápidos
+// Dados mockados para serviços rápidos
 const quickServices = [
+  {
+    title: "Transparência",
+    description: "Acesse informações sobre orçamento, despesas e receitas municipais",
+    icon: PieChart,
+    href: "/public/transparencia"
+  },
+  {
+    title: "Atividades Legislativas",
+    description: "Consulte atividades, projetos de lei e deliberações em andamento",
+    icon: Gavel,
+    href: "/public/atividades"
+  },
   {
     title: "Sessões",
     description: "Acompanhe as sessões da Câmara, calendário e pautas de reuniões",
@@ -498,22 +306,15 @@ const mockCouncilors = [
     id: "4",
     name: "Ricardo Almeida",
     role: "Vereador",
-    party: "Partido A",
-    imageUrl: "https://randomuser.me/api/portraits/men/22.jpg"
+    party: "Partido D",
+    imageUrl: "https://randomuser.me/api/portraits/men/55.jpg"
   },
   {
     id: "5",
-    name: "Juliana Costa",
+    name: "Fernanda Costa",
     role: "Vereadora",
-    party: "Partido D",
-    imageUrl: "https://randomuser.me/api/portraits/women/23.jpg"
-  },
-  {
-    id: "6",
-    name: "Paulo Ferreira",
-    role: "Vereador",
-    party: "Partido B",
-    imageUrl: "https://randomuser.me/api/portraits/men/35.jpg"
+    party: "Partido E",
+    imageUrl: "https://randomuser.me/api/portraits/women/28.jpg"
   }
 ];
 
@@ -521,27 +322,27 @@ const mockCouncilors = [
 const mockEvents = [
   {
     id: 1,
-    title: "Sessão Ordinária",
-    date: "22/05/2023",
-    time: "14:00",
+    title: "Sessão Ordinária da Câmara Municipal",
+    date: "15/05/2023",
+    time: "09:00",
     location: "Plenário Principal",
-    type: "Sessão Plenária"
+    type: "Sessão Ordinária"
   },
   {
     id: 2,
-    title: "Audiência Pública - Plano Diretor",
-    date: "24/05/2023",
-    time: "19:00",
-    location: "Auditório Municipal",
+    title: "Audiência Pública - Orçamento 2024",
+    date: "18/05/2023",
+    time: "14:00",
+    location: "Auditório da Câmara",
     type: "Audiência Pública"
   },
   {
     id: 3,
-    title: "Reunião da Comissão de Educação",
-    date: "25/05/2023",
-    time: "10:00",
-    location: "Sala de Comissões",
-    type: "Reunião de Comissão"
+    title: "Reunião da Comissão de Finanças",
+    date: "22/05/2023",
+    time: "10:30",
+    location: "Sala de Reuniões",
+    type: "Comissão"
   },
   {
     id: 4,
@@ -553,8 +354,6 @@ const mockEvents = [
   }
 ];
 
-
-
 export default function HomePage() {
   // Simulando consultas à API para obter dados
   const { data: events = mockEvents } = useQuery({
@@ -563,10 +362,9 @@ export default function HomePage() {
     initialData: mockEvents
   });
 
-  const { data: councilors = mockCouncilors } = useQuery({
+  const { data: councilors = [], isLoading: councilorLoading } = useQuery({
     queryKey: ['/api/public/councilors'],
-    enabled: false,
-    initialData: mockCouncilors
+    enabled: true
   });
 
   const { data: news = mockNews } = useQuery({
@@ -592,50 +390,71 @@ export default function HomePage() {
         <meta name="description" content="Portal público do Sistema Legislativo Municipal. Acesse informações sobre vereadores, documentos, atividades legislativas e mais." />
       </Helmet>
 
-      {/* Banner de destaque */}
-      <HeroBanner />
-
-      {/* Seção de serviços rápidos (agora compacta, abaixo do vídeo) */}
-      <section className="bg-white shadow-md py-6 relative z-10 -mt-1">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="text-xl font-bold flex items-center text-blue-700">
-              <Zap className="mr-2" /> 
-              Serviços ao Cidadão
-            </h2>
-            <Link href="/public/servicos">
-              <a className="text-blue-600 hover:underline text-sm flex items-center">
-                Ver todos <ChevronRight size={14} />
-              </a>
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {quickServices.map((service, index) => (
-              <Link key={index} href={service.href}>
-                <a className="flex flex-col items-center p-3 rounded-lg hover:bg-blue-50 transition-colors text-center group">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-2 group-hover:bg-blue-200">
-                    <service.icon size={20} />
-                  </div>
-                  <span className="text-sm font-medium">{service.title}</span>
-                </a>
-              </Link>
-            ))}
+      {/* Seção Hero Principal */}
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden" style={{background: 'linear-gradient(135deg, #7FA653 0%, #63783D 100%)'}}>
+        {/* Elemento decorativo de fundo */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full"></div>
+          <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full"></div>
+          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center text-white">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Sistema Legislativo
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
+              Transparência, participação e democracia ao alcance de todos os cidadãos
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-white text-green-700 hover:bg-gray-100">
+                <Users className="mr-2" />
+                Conheça os Vereadores
+              </Button>
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-green-700">
+                <FileText className="mr-2" />
+                Documentos Públicos
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Seção de Vereadores foi removida conforme solicitado */}
+      {/* Seção de Serviços Rápidos */}
+      <section className="py-16 px-4 bg-white">
+        <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4" style={{color: '#63783D'}}>Acesso Rápido</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Encontre rapidamente as informações que você precisa sobre a Câmara Municipal
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {quickServices.slice(0, 8).map((service, index) => (
+              <QuickServiceCard
+                key={index}
+                title={service.title}
+                description={service.description}
+                icon={service.icon}
+                href={service.href}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
             <h2 className="text-2xl font-bold flex items-center">
-              <FileText className="mr-2 text-blue-600" />
+              <FileText className="mr-2" style={{color: '#7FA653'}} />
               Notícias e Publicações
             </h2>
             <Link href="/public/noticias">
-              <a className="text-blue-600 hover:underline mt-2 sm:mt-0 flex items-center">
+              <a className="hover:underline mt-2 sm:mt-0 flex items-center" style={{color: '#7FA653'}}>
                 Ver todas <ChevronRight size={16} />
               </a>
             </Link>
@@ -649,256 +468,261 @@ export default function HomePage() {
                 <div className="p-6">
                   <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Notícias da Câmara</h2>
                       
-                      {/* Destaque principal com carrossel */}
-                      <Carousel
-                        opts={{ loop: true }}
-                        className="w-full mb-8"
-                      >
-                        <CarouselContent>
-                          {news.slice(0, 3).map((item) => (
-                            <CarouselItem key={item.id}>
-                              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
-                                <img
-                                  src={item.imageUrl} 
-                                  alt={item.title}
-                                  className="h-full w-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
-                                  <Badge className="self-start mb-2 bg-blue-600 hover:bg-blue-700">
-                                    {item.category}
-                                  </Badge>
-                                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                                  <p className="text-white/90 line-clamp-2 mb-3">{item.excerpt}</p>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-white/70 text-sm">{item.date}</span>
-                                    <Link href={`/public/noticias/${item.id}`}>
-                                      <a className="text-white hover:text-blue-200 text-sm flex items-center transition-colors">
-                                        Ler matéria <ArrowRight size={14} className="ml-1" />
-                                      </a>
-                                    </Link>
-                                  </div>
-                                </div>
-                              </div>
-                            </CarouselItem>
-                          ))}
-                        </CarouselContent>
-                        <div className="flex justify-center mt-4 gap-2">
-                          <CarouselPrevious />
-                          <CarouselNext />
-                        </div>
-                      </Carousel>
-                      
-                      {/* Grid de notícias secundárias */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {news.map((item) => (
-                          <div key={item.id} className="border-b pb-4 last:border-0">
-                            <div className="flex justify-between items-start mb-2">
-                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600">
+                  {/* Destaque principal com carrossel */}
+                  <Carousel
+                    opts={{ loop: true }}
+                    className="w-full mb-8"
+                  >
+                    <CarouselContent>
+                      {news.slice(0, 3).map((item) => (
+                        <CarouselItem key={item.id}>
+                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
+                            <img
+                              src={item.imageUrl} 
+                              alt={item.title}
+                              className="h-full w-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+                              <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#7FA653'}}>
                                 {item.category}
                               </Badge>
-                              <span className="text-xs text-gray-500">{item.date}</span>
-                            </div>
-                            <Link href={`/public/noticias/${item.id}`}>
-                              <a className="block mb-2">
-                                <h4 className="font-medium hover:text-blue-600 transition-colors">
-                                  {item.title}
-                                </h4>
-                              </a>
-                            </Link>
-                            <p className="text-sm text-gray-600 line-clamp-2 mb-3">{item.excerpt}</p>
-                            <Link href={`/public/noticias/${item.id}`}>
-                              <a className="text-sm text-blue-600 hover:underline flex items-center">
-                                Ler mais <ChevronRight size={14} className="ml-1" />
-                              </a>
-                            </Link>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Coluna da direita (menor, sem imagens) - ocupa 1/3 do espaço */}
-                <div>
-                  {/* Widget do clima */}
-                  <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800 flex items-center">
-                      <CloudSun className="mr-2 text-blue-600" size={20} />
-                      Clima na Cidade
-                    </h3>
-                    
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <div className="text-gray-500 text-sm">Hoje</div>
-                        <div className="text-2xl font-bold text-gray-800">25°C</div>
-                        <div className="text-gray-500 text-sm">Sensação 27°C</div>
-                      </div>
-                      <div className="text-5xl text-blue-500">
-                        <CloudSun />
-                      </div>
-                    </div>
-                    
-                    <p className="text-sm text-gray-600 mb-4">
-                      Parcialmente nublado hoje com possibilidade de chuvas isoladas à tarde.
-                    </p>
-                    
-                    <div className="flex justify-between mb-4">
-                      {[
-                        { day: 'Seg', temp: '27°', icon: Sun, desc: 'Ensolarado' },
-                        { day: 'Ter', temp: '25°', icon: CloudSun, desc: 'Parcialmente nublado' },
-                        { day: 'Qua', temp: '26°', icon: Cloud, desc: 'Nublado' },
-                        { day: 'Qui', temp: '24°', icon: CloudRain, desc: 'Chuva' },
-                      ].map((item, index) => (
-                        <div key={index} className="text-center p-2 bg-gray-50 rounded">
-                          <div className="text-xs font-medium mb-1">{item.day}</div>
-                          <div className="text-blue-600">
-                            {React.createElement(item.icon, { size: 24 })}
-                          </div>
-                          <div className="text-sm font-semibold mt-1">{item.temp}</div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-3">
-                      {[
-                        { label: 'Umidade', value: '75%', icon: Umbrella },
-                        { label: 'Vento', value: '12 km/h', icon: CloudSun },
-                        { label: 'Chuva', value: '10%', icon: CloudRain },
-                      ].map((item, index) => (
-                        <div key={index} className="text-center border border-gray-100 rounded py-2">
-                          <div className="text-blue-600 mb-1">
-                            {React.createElement(item.icon, { size: 16 })}
-                          </div>
-                          <div className="text-xs text-gray-600">{item.label}</div>
-                          <div className="text-sm font-medium">{item.value}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Últimas notícias */}
-                  <div className="bg-white rounded-lg shadow-md p-4">
-                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800 flex items-center">
-                      <FileText className="mr-2 text-blue-600" size={20} />
-                      Últimas Notícias
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      {news.slice(0, 5).map((item) => (
-                        <div key={item.id} className="border-b pb-4 last:border-0 last:pb-0">
-                          <div className="flex justify-between items-start mb-1">
-                            <Badge variant="outline" className="text-xs">
-                              {item.category}
-                            </Badge>
-                            <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
-                          </div>
-                          <Link href={`/public/noticias/${item.id}`}>
-                            <a className="block">
-                              <h4 className="font-medium text-sm hover:text-blue-600 transition-colors leading-tight">
+                              <h3 className="text-white text-xl font-bold mb-2 line-clamp-2">
                                 {item.title}
-                              </h4>
-                            </a>
-                          </Link>
-                        </div>
+                              </h3>
+                              <p className="text-gray-200 text-sm line-clamp-2 mb-3">
+                                {item.excerpt}
+                              </p>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-300 text-xs">{formatDate(item.date)}</span>
+                                <Button size="sm" variant="secondary" className="text-xs">
+                                  Ler mais
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CarouselItem>
                       ))}
-                    </div>
-                    
-                    <Button variant="ghost" size="sm" className="w-full mt-4 text-blue-600 hover:text-blue-800">
-                      Ver mais notícias
-                    </Button>
-                  </div>
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                  </Carousel>
                   
-                  {/* Feed do YouTube */}
-                  <div className="bg-white rounded-lg shadow-md p-4 mt-6">
-                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800 flex items-center">
-                      <svg className="mr-2 text-red-600" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                      </svg>
-                      Canal no YouTube
-                    </h3>
-                    
-                    {/* Vídeo em Destaque */}
-                    <div className="mb-4">
-                      <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-video">
-                        <iframe
-                          className="w-full h-full"
-                          src="https://www.youtube.com/watch?v=hcESKWXjRdY=placeholder"
-                          title="Vídeo da Câmara Municipal"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
-                      <div className="mt-2">
-                        <h4 className="text-sm font-medium text-gray-900">Sessão Ordinária - Última transmissão</h4>
-                        <p className="text-xs text-gray-500">Discussão do Orçamento Municipal 2024</p>
-                      </div>
-                    </div>
-                    
-                    {/* Lista de Vídeos Recentes */}
-                    <div className="space-y-3">
-                      {[
-                        {
-                          title: "Audiência Pública - Plano Diretor",
-                          date: "há 3 dias",
-                          views: "245 visualizações",
-                          duration: "1:32:15"
-                        },
-                        {
-                          title: "Sessão Extraordinária",
-                          date: "há 1 semana",
-                          views: "189 visualizações", 
-                          duration: "45:30"
-                        },
-                        {
-                          title: "Reunião de Comissões",
-                          date: "há 2 semanas",
-                          views: "156 visualizações",
-                          duration: "28:45"
-                        }
-                      ].map((video, index) => (
-                        <div 
-                          key={index} 
-                          className="flex gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer"
-                          onClick={() => window.open('https://www.youtube.com/@C%C3%A2maraMunicipaldeJa%C3%ADba', '_blank')}
-                        >
-                          <div className="w-20 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded flex-shrink-0 flex items-center justify-center relative">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" className="drop-shadow-sm">
-                              <path d="M8 5v14l11-7z"/>
-                            </svg>
-                            <span className="absolute bottom-0 right-0 bg-black bg-opacity-75 text-white text-xs px-1 rounded-tl text-[10px]">
-                              {video.duration}
-                            </span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight hover:text-red-600 transition-colors">
-                              {video.title}
-                            </h4>
-                            <p className="text-xs text-gray-500 mt-1">{video.views}</p>
-                            <p className="text-xs text-gray-400">{video.date}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full mt-4 text-red-600 border-red-200 hover:bg-red-50"
-                      onClick={() => window.open('https://www.youtube.com/@CâmaraMunicipaldeJaíba', '_blank')}
-                    >
-                      <svg className="mr-2" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                      </svg>
-                      Ver Canal Completo
-                    </Button>
+                  {/* Grid de notícias menores */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {news.slice(3, 7).map((item) => (
+                      <NewsCard
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        excerpt={item.excerpt}
+                        date={formatDate(item.date)}
+                        imageUrl={item.imageUrl}
+                        category={item.category}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
             </div>
+            
+            {/* Coluna da direita (sidebar) - ocupa 1/3 do espaço */}
+            <div className="space-y-6">
+              {/* Próximos eventos */}
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <Calendar className="mr-2" style={{color: '#7FA653'}} size={20} />
+                  Próximos Eventos
+                </h3>
+                
+                <div className="space-y-4">
+                  {events.slice(0, 4).map((event) => (
+                    <EventCard
+                      key={event.id}
+                      id={event.id}
+                      title={event.title}
+                      date={event.date}
+                      time={event.time}
+                      location={event.location}
+                      type={event.type}
+                    />
+                  ))}
+                </div>
+                
+                <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#7FA653'}}>
+                  Ver agenda completa
+                </Button>
+              </div>
+              
+              {/* Widget do clima */}
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <Sun className="mr-2" style={{color: '#7FA653'}} size={20} />
+                  Clima Hoje
+                </h3>
+                
+                <div className="text-center mb-4">
+                  <div className="flex items-center justify-center mb-2">
+                    <Sun size={32} style={{color: '#7FA653'}} />
+                    <span className="text-3xl font-bold ml-2">28°C</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Ensolarado</p>
+                  <p className="text-xs text-gray-500">Máx: 32°C • Mín: 22°C</p>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-2 mb-4">
+                  {[
+                    { day: 'Seg', temp: '27°', icon: Sun, desc: 'Ensolarado' },
+                    { day: 'Ter', temp: '25°', icon: CloudSun, desc: 'Parcialmente nublado' },
+                    { day: 'Qua', temp: '26°', icon: Cloud, desc: 'Nublado' },
+                    { day: 'Qui', temp: '24°', icon: CloudRain, desc: 'Chuva' },
+                  ].map((item, index) => (
+                    <div key={index} className="text-center p-2 bg-gray-50 rounded">
+                      <div className="text-xs font-medium mb-1">{item.day}</div>
+                      <div style={{color: '#7FA653'}}>
+                        {React.createElement(item.icon, { size: 24 })}
+                      </div>
+                      <div className="text-sm font-semibold mt-1">{item.temp}</div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { label: 'Umidade', value: '75%', icon: Umbrella },
+                    { label: 'Vento', value: '12 km/h', icon: CloudSun },
+                    { label: 'Chuva', value: '10%', icon: CloudRain },
+                  ].map((item, index) => (
+                    <div key={index} className="text-center border border-gray-100 rounded py-2">
+                      <div className="mb-1" style={{color: '#7FA653'}}>
+                        {React.createElement(item.icon, { size: 16 })}
+                      </div>
+                      <div className="text-xs text-gray-600">{item.label}</div>
+                      <div className="text-sm font-medium">{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Últimas notícias */}
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <FileText className="mr-2" style={{color: '#7FA653'}} size={20} />
+                  Últimas Notícias
+                </h3>
+                
+                <div className="space-y-4">
+                  {news.slice(0, 5).map((item) => (
+                    <div key={item.id} className="border-b pb-4 last:border-0 last:pb-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <Badge variant="outline" className="text-xs" style={{borderColor: '#7FA653', color: '#63783D'}}>
+                          {item.category}
+                        </Badge>
+                        <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
+                      </div>
+                      <Link href={`/public/noticias/${item.id}`}>
+                        <a className="block">
+                          <h4 className="font-medium text-sm hover:opacity-80 transition-colors leading-tight" style={{color: '#63783D'}}>
+                            {item.title}
+                          </h4>
+                        </a>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+                
+                <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#7FA653'}}>
+                  Ver mais notícias
+                </Button>
+              </div>
+              
+              {/* Feed do YouTube */}
+              <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <svg className="mr-2 text-red-600" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  Canal no YouTube
+                </h3>
+                
+                {/* Vídeo em Destaque */}
+                <div className="mb-4">
+                  <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-video">
+                    <iframe
+                      className="w-full h-full"
+                      src="https://www.youtube.com/embed/hcESKWXjRdY"
+                      title="Vídeo da Câmara Municipal"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <h4 className="text-sm font-medium text-gray-900">Sessão Ordinária - Última transmissão</h4>
+                    <p className="text-xs text-gray-500">Discussão do Orçamento Municipal 2024</p>
+                  </div>
+                </div>
+                
+                {/* Lista de Vídeos Recentes */}
+                <div className="space-y-3">
+                  {[
+                    {
+                      title: "Audiência Pública - Plano Diretor",
+                      date: "há 3 dias",
+                      views: "245 visualizações",
+                      duration: "1:32:15"
+                    },
+                    {
+                      title: "Discussão sobre Meio Ambiente",
+                      date: "há 1 semana",
+                      views: "156 visualizações",
+                      duration: "45:22"
+                    },
+                    {
+                      title: "Prestação de Contas Trimestral",
+                      date: "há 2 semanas",
+                      views: "89 visualizações",
+                      duration: "28:45"
+                    }
+                  ].map((video, index) => (
+                    <div key={index} className="flex space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors">
+                      <div className="relative w-16 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-red-600">
+                            <path d="M8 5v14l11-7z"/>
+                          </svg>
+                          <span className="absolute bottom-0 right-0 bg-black bg-opacity-75 text-white text-xs px-1 rounded-tl text-[10px]">
+                            {video.duration}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight hover:text-red-600 transition-colors">
+                          {video.title}
+                        </h4>
+                        <p className="text-xs text-gray-500 mt-1">{video.views}</p>
+                        <p className="text-xs text-gray-400">{video.date}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-4 text-red-600 border-red-200 hover:bg-red-50"
+                  onClick={() => window.open('https://www.youtube.com/@CâmaraMunicipaldeJaíba', '_blank')}
+                >
+                  <svg className="mr-2" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  Ver Canal Completo
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
-      </section>     
+      </section>
+
       {/* Nova seção de vereadores com design moderno */}
       <section className="py-16 px-4 relative overflow-hidden" style={{background: 'linear-gradient(to right, #7FA653, #63783D)'}}>
         {/* Elemento decorativo de fundo */}
@@ -911,207 +735,130 @@ export default function HomePage() {
         
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">Nossa Equipe de Vereadores</h2>
-            <p className="text-xl text-white opacity-90 max-w-3xl mx-auto">
-              Conheça os representantes eleitos que trabalham em prol do desenvolvimento de nossa cidade
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Nossos Vereadores
+            </h2>
+            <p className="text-white/90 max-w-2xl mx-auto">
+              Conheça os representantes eleitos que trabalham pela nossa cidade
             </p>
           </div>
           
-          {/* Cards de vereadores em layout horizontal */}
-          <div className="bg-white/08 backdrop-blur-sm rounded-2xl p-8 mb-8">
-            <HomeCouncilorsModern />
-          </div>
+          {councilorLoading ? (
+            <div className="flex justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 lg:gap-6">
+              {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 5).map((councilor, index) => (
+                <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
+                  <div className="group cursor-pointer text-center">
+                    {/* Container da imagem com hover e badge */}
+                    <div className="relative mb-3 lg:mb-4">
+                      <Avatar className="w-20 h-20 lg:w-24 lg:h-24 mx-auto border-4 border-white/30 group-hover:border-white transition-all duration-300 group-hover:scale-105">
+                        <AvatarImage 
+                          src={councilor.profileImageUrl} 
+                          className="object-cover w-full h-full rounded-[6px]"
+                        />
+                        <AvatarFallback className="text-white text-2xl lg:text-3xl font-bold rounded-[6px]" style={{backgroundColor: '#7FA653'}}>
+                          {getInitials(councilor.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+                    
+                    {/* Badge de destaque para o primeiro vereador */}
+                    {index === 0 && (
+                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                        <Users size={16} style={{color: '#63783D'}} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Informações do vereador */}
+                  <div className="text-white">
+                    <h3 className="text-lg lg:text-xl font-bold mb-1 group-hover:text-blue-200 transition-colors">
+                      {councilor.name}
+                    </h3>
+                    <p className="text-white/80 text-sm mb-2">
+                      {councilor.party || councilor.occupation || "Vereador(a)"}
+                    </p>
+                    {councilor.role && (
+                      <Badge variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
+                        {councilor.role}
+                      </Badge>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
           
-          <div className="text-center">
+          <div className="text-center mt-8">
             <Link href="/public/vereadores">
-              <a className="inline-flex items-center px-8 py-3 bg-white font-semibold rounded-full hover:opacity-90 transition-all shadow-lg" style={{color: '#63783D'}}>
-                Ver todos os vereadores
-                <ChevronRight size={20} className="ml-2" />
-              </a>
+              <Button variant="outline" className="border-white text-white hover:bg-white" style={{color: '#63783D'}}>
+                <Users className="mr-2" />
+                Ver Todos os Vereadores
+              </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Seção de cards de documentos, atividades e calendário */}
-      <section className="py-12 px-4 bg-gray-50">
+      {/* Seção de estatísticas */}
+      <section className="py-16 px-4 bg-white">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Card de Últimos Documentos */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                    <FileText className="text-blue-600" size={20} />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800">Últimos Documentos</h3>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4" style={{color: '#63783D'}}>Transparência em Números</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Dados atualizados sobre as atividades e gestão da Câmara Municipal
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { number: "247", label: "Projetos de Lei", icon: FileText },
+              { number: "89", label: "Sessões Realizadas", icon: Calendar },
+              { number: "15", label: "Vereadores Ativos", icon: Users },
+              { number: "156", label: "Documentos Públicos", icon: Building }
+            ].map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{backgroundColor: '#CFE0BC'}}>
+                  {React.createElement(stat.icon, { size: 32, color: '#63783D' })}
                 </div>
-                
-                <div className="space-y-4">
-                  {[
-                    { title: "Lei Complementar nº 043/2023", date: "15/05/2023", type: "Lei Complementar" },
-                    { title: "Decreto Legislativo nº 12/2023", date: "10/05/2023", type: "Decreto" },
-                    { title: "Resolução nº 007/2023", date: "05/05/2023", type: "Resolução" },
-                    { title: "Portaria nº 133/2023", date: "28/04/2023", type: "Portaria" },
-                  ].map((doc, index) => (
-                    <div key={index} className="border-b pb-3 last:border-0 last:pb-0">
-                      <div className="flex justify-between items-start mb-1">
-                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">
-                          {doc.type}
-                        </Badge>
-                        <span className="text-xs text-gray-500">{doc.date}</span>
-                      </div>
-                      <Link href={`/public/documentos/${index}`}>
-                        <a className="text-sm font-medium hover:text-blue-600 transition-colors line-clamp-1">
-                          {doc.title}
-                        </a>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-                
-                <Link href="/public/documentos">
-                  <a className="mt-4 text-blue-600 hover:underline text-sm flex items-center justify-center pt-3 border-t">
-                    Ver todos os documentos <ChevronRight size={16} className="ml-1"/>
-                  </a>
-                </Link>
+                <div className="text-3xl font-bold mb-2" style={{color: '#7FA653'}}>{stat.number}</div>
+                <div className="text-gray-600">{stat.label}</div>
               </div>
-            </div>
-            
-            {/* Card de Atividades Legislativas */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                    <Gavel className="text-green-600" size={20} />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800">Atividades Legislativas</h3>
-                </div>
-                
-                <div className="space-y-4">
-                  {[
-                    { title: "Projeto de Lei nº 076/2023 - Reforma do Parque Municipal", date: "18/05/2023", type: "Projeto de Lei" },
-                    { title: "Moção de Aplausos aos Professores da Rede Municipal", date: "12/05/2023", type: "Moção" },
-                    { title: "Indicação nº 134/2023 - Melhorias no Trânsito", date: "08/05/2023", type: "Indicação" },
-                    { title: "Requerimento nº 045/2023 - Informações sobre Obras", date: "02/05/2023", type: "Requerimento" },
-                  ].map((activity, index) => (
-                    <div key={index} className="border-b pb-3 last:border-0 last:pb-0">
-                      <div className="flex justify-between items-start mb-1">
-                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
-                          {activity.type}
-                        </Badge>
-                        <span className="text-xs text-gray-500">{activity.date}</span>
-                      </div>
-                      <Link href={`/public/atividades/${index}`}>
-                        <a className="text-sm font-medium hover:text-green-600 transition-colors line-clamp-1">
-                          {activity.title}
-                        </a>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-                
-                <Link href="/public/atividades">
-                  <a className="mt-4 text-green-600 hover:underline text-sm flex items-center justify-center pt-3 border-t">
-                    Ver todas as atividades <ChevronRight size={16} className="ml-1"/>
-                  </a>
-                </Link>
-              </div>
-            </div>
-            
-            {/* Card de Calendário de Eventos */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                    <Calendar className="text-purple-600" size={20} />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800">Calendário de Eventos</h3>
-                </div>
-                
-                <div className="mb-4">
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <div className="flex justify-between items-center mb-3">
-                      <button className="p-1 text-gray-500 hover:text-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M15 18l-6-6 6-6" />
-                        </svg>
-                      </button>
-                      <h4 className="font-medium">Maio 2023</h4>
-                      <button className="p-1 text-gray-500 hover:text-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M9 18l6-6-6-6" />
-                        </svg>
-                      </button>
-                    </div>
-                    
-                    <div className="grid grid-cols-7 text-center gap-1">
-                      {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((day, i) => (
-                        <div key={i} className="text-xs font-medium text-gray-500 py-1">
-                          {day}
-                        </div>
-                      ))}
-                      
-                      {Array(31).fill(0).map((_, i) => {
-                        const day = i + 1;
-                        const hasEvent = [3, 10, 15, 22, 24].includes(day);
-                        return (
-                          <div 
-                            key={i} 
-                            className={`
-                              text-xs py-1 rounded-full
-                              ${hasEvent ? 'bg-purple-100 text-purple-700 font-medium' : 'text-gray-700'}
-                            `}
-                          >
-                            {day}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="border-l-4 border-purple-500 pl-3 py-1">
-                    <p className="text-xs text-gray-500">03/05 - 14:00</p>
-                    <p className="text-sm font-medium">Sessão Ordinária</p>
-                  </div>
-                  <div className="border-l-4 border-purple-500 pl-3 py-1">
-                    <p className="text-xs text-gray-500">10/05 - 10:00</p>
-                    <p className="text-sm font-medium">Reunião de Comissão</p>
-                  </div>
-                  <div className="border-l-4 border-purple-500 pl-3 py-1">
-                    <p className="text-xs text-gray-500">15/05 - 19:00</p>
-                    <p className="text-sm font-medium">Audiência Pública</p>
-                  </div>
-                </div>
-                
-                <Link href="/public/eventos">
-                  <a className="mt-4 text-purple-600 hover:underline text-sm flex items-center justify-center pt-3 border-t">
-                    Ver todos os eventos <ChevronRight size={16} className="ml-1"/>
-                  </a>
-                </Link>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Banner de chamada para ação */}
-      <section className="py-12 px-4 text-white" style={{background: 'linear-gradient(to right, #99CD85, #7FA653)'}}>
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Participe da Vida Política da Cidade</h2>
-          <p className="max-w-2xl mx-auto mb-8 opacity-90">
-            Acompanhe as sessões, envie sugestões de projetos de lei, participe das audiências públicas
-            e contribua para o desenvolvimento da nossa cidade.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white hover:opacity-90" style={{color: '#63783D'}}>
-              Ouvidoria
-            </Button>
-            <Button size="lg" className="text-white border-white hover:opacity-90" style={{backgroundColor: '#63783D'}}>
-              Calendário de Audiências
-            </Button>
+      {/* Seção de redes sociais */}
+      <section className="py-12 px-4 bg-gray-50">
+        <div className="container mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold mb-4" style={{color: '#63783D'}}>Siga-nos nas Redes Sociais</h2>
+            <p className="text-gray-600">
+              Fique por dentro das últimas notícias e atividades da Câmara
+            </p>
+          </div>
+          
+          <div className="flex justify-center space-x-6">
+            {[
+              { icon: Facebook, color: "#1877F2", name: "Facebook" },
+              { icon: Instagram, color: "#E4405F", name: "Instagram" },
+              { icon: Twitter, color: "#1DA1F2", name: "Twitter" },
+              { icon: Youtube, color: "#FF0000", name: "YouTube" }
+            ].map((social, index) => (
+              <a
+                key={index}
+                href="#"
+                className="w-12 h-12 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
+                style={{ backgroundColor: social.color }}
+                aria-label={social.name}
+              >
+                {React.createElement(social.icon, { size: 24 })}
+              </a>
+            ))}
           </div>
         </div>
       </section>
