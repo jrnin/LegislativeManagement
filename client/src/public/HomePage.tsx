@@ -391,11 +391,17 @@ export default function HomePage() {
       </Helmet>
 
       {/* Seção Hero Principal com vídeo de fundo */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Vídeo de fundo */}
         <div className="absolute inset-0 w-full h-full z-0">
           <iframe
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            style={{
+              width: '100vw',
+              height: '100vh',
+              transform: 'scale(1.2)',
+              transformOrigin: 'center center'
+            }}
             src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
             title="Vídeo de fundo da Câmara Municipal"
             frameBorder="0"
