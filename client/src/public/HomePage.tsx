@@ -391,15 +391,14 @@ export default function HomePage() {
       </Helmet>
 
       {/* Seção Hero Principal com vídeo de fundo */}
-      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center overflow-hidden">
         {/* Vídeo de fundo */}
         <div className="absolute inset-0 w-full h-full z-0">
           <iframe
             className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             style={{
               width: '100%',
-              height: '100%',
-              filter: 'blur(1px)'
+              height: '100%'
             }}
             src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
             title="Vídeo de fundo da Câmara Municipal"
@@ -409,7 +408,7 @@ export default function HomePage() {
           />
         </div>
         
-        {/* Overlay com cor personalizada e desfoque */}
+        {/* Overlay com cor personalizada */}
         <div className="absolute inset-0 z-10" style={{backgroundColor: 'rgba(194, 207, 180, 0.7)'}}></div>
         
         <div className="container mx-auto px-4 relative z-10">
