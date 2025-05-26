@@ -553,10 +553,7 @@ const mockEvents = [
   }
 ];
 
-// Categorias de notícias
-const newsCategories = [
-  "Todas", "Institucional", "Meio Ambiente", "Urbanismo", "Educação", "Saúde", "Fiscalização"
-];
+
 
 export default function HomePage() {
   // Simulando consultas à API para obter dados
@@ -644,28 +641,13 @@ export default function HomePage() {
             </Link>
           </div>
           
-          {/* Abas de categorias de notícias */}
-          <Tabs defaultValue="Todas" className="mt-4">
-            <TabsList className="bg-white p-1 rounded-lg shadow-sm mb-6 overflow-x-auto flex flex-nowrap w-full">
-              {newsCategories.map((category) => (
-                <TabsTrigger 
-                  key={category}
-                  value={category}
-                  className="px-4 py-2 rounded-md data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 whitespace-nowrap"
-                >
-                  {category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            
-            {/* Conteúdo da aba "Todas" */}
-            <TabsContent value="Todas" className="mt-0">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
-                <div className="lg:col-span-2">
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-                    <div className="p-6">
-                      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Notícias da Câmara</h2>
+          {/* Seção de notícias sem filtros */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
+            <div className="lg:col-span-2">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Notícias da Câmara</h2>
                       
                       {/* Destaque principal com carrossel */}
                       <Carousel
@@ -913,63 +895,8 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-            </TabsContent>
-            
-            {/* Renderizar abas filtradas para outras categorias */}
-            {newsCategories.slice(1).map((category) => (
-              <TabsContent key={category} value={category} className="mt-0">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Coluna da esquerda (maior, com imagens) */}
-                  <div className="lg:col-span-2 space-y-6">
-                    <h3 className="text-lg font-semibold mb-4 text-blue-800">Destaques de {category}</h3>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      {news
-                        .filter(item => item.category === category)
-                        .slice(0, 4)
-                        .map((item) => (
-                          <NewsCard
-                            key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            excerpt={item.excerpt}
-                            date={formatDate(item.date)}
-                            imageUrl={item.imageUrl}
-                            category={item.category}
-                          />
-                        ))}
-                    </div>
-                  </div>
-                  
-                  {/* Coluna da direita (menor, sem imagens) */}
-                  <div className="bg-white rounded-lg shadow-md p-4">
-                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800">Mais em {category}</h3>
-                    
-                    <div className="space-y-4">
-                      {news
-                        .filter(item => item.category === category)
-                        .slice(0, 5)
-                        .map((item) => (
-                          <div key={item.id} className="border-b pb-4 last:border-0 last:pb-0">
-                            <div className="flex justify-between items-start mb-1">
-                              <span className="text-xs text-blue-600">{category}</span>
-                              <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
-                            </div>
-                            <Link href={`/public/noticias/${item.id}`}>
-                              <a className="block">
-                                <h4 className="font-medium text-sm hover:text-blue-600 transition-colors leading-tight">
-                                  {item.title}
-                                </h4>
-                              </a>
-                            </Link>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+            </div>
+          </div>
         </div>
       </section>     
       {/* Nova seção de vereadores com design moderno */}
