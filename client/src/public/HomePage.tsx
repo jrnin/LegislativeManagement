@@ -284,8 +284,8 @@ const HomeCouncilorsModern = () => {
     );
   }
 
-  // Mostrar apenas os primeiros 3 vereadores em destaque
-  const displayedCouncilors = councilors.slice(0, 3);
+  // Mostrar apenas os primeiros 5 vereadores em destaque
+  const displayedCouncilors = councilors.slice(0, 5);
 
   return (
     <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
@@ -333,11 +333,11 @@ const HomeCouncilorsModern = () => {
       ))}
       
       {/* Indicador visual de que há mais vereadores */}
-      {councilors.length > 3 && (
+      {councilors.length > 5 && (
         <div className="flex flex-col items-center text-center">
           <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center mb-3">
             <span className="text-white/70 text-sm lg:text-base font-medium">
-              +{councilors.length - 3}
+              +{councilors.length - 5}
             </span>
           </div>
           <p className="text-white/70 text-sm">
