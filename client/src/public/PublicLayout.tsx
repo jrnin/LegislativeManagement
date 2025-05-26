@@ -124,35 +124,39 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       </Helmet>
 
       {/* Top bar com opções de acessibilidade e redes sociais */}
-      <div className="w-full py-2 px-4 bg-blue-800 text-white text-sm">
+      <div className="w-full py-2 px-4 text-white text-sm" style={{backgroundColor: '#63783D'}}>
         <div className="container mx-auto flex flex-wrap justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <span className="mr-2 font-medium">Acessibilidade:</span>
               <button 
                 onClick={toggleDarkMode} 
-                className="p-1 rounded-md hover:bg-blue-700" 
+                className="p-1 rounded-md hover:opacity-80" 
+                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
                 aria-label={isDarkMode ? "Modo claro" : "Modo escuro"}
               >
                 {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               <button 
                 onClick={increaseFontSize} 
-                className="p-1 rounded-md hover:bg-blue-700 text-xs" 
+                className="p-1 rounded-md hover:opacity-80 text-xs" 
+                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
                 aria-label="Aumentar fonte"
               >
                 A+
               </button>
               <button 
                 onClick={decreaseFontSize} 
-                className="p-1 rounded-md hover:bg-blue-700 text-xs" 
+                className="p-1 rounded-md hover:opacity-80 text-xs" 
+                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
                 aria-label="Diminuir fonte"
               >
                 A-
               </button>
               <button 
                 onClick={resetFontSize} 
-                className="p-1 rounded-md hover:bg-blue-700 text-xs" 
+                className="p-1 rounded-md hover:opacity-80 text-xs" 
+                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
                 aria-label="Resetar fonte"
               >
                 A
@@ -223,12 +227,12 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               {/* Logo */}
               <Link href="/">
                 <button className="flex items-center space-x-2">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl" style={{background: 'linear-gradient(to bottom right, #7FA653, #63783D)'}}>
                     SL
                   </div>
                   <div className="hidden sm:block">
                     <h1 className="text-xl font-bold">
-                      <span className="text-blue-600">Sistema</span>
+                      <span style={{color: '#7FA653'}}>Sistema</span>
                       <span className={`${
                         location === '/public' && !isScrolled
                           ? 'text-white' 
@@ -268,13 +272,13 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   <Link key={link.href} href={link.href}>
                     <button className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                       location === link.href 
-                        ? 'bg-blue-600 text-white' 
+                        ? 'text-white' 
                         : location === '/public' && !isScrolled
                           ? 'text-white hover:bg-white/20'
                           : isDarkMode 
                             ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
-                            : 'text-gray-700 hover:bg-gray-100'
-                    }`}>
+                            : 'hover:opacity-80'
+                    }`} style={location === link.href ? {backgroundColor: '#7FA653'} : {color: '#63783D'}}>
                       {link.name}
                     </button>
                   </Link>
@@ -284,6 +288,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   <Button 
                     variant={location === '/public' && !isScrolled ? "secondary" : "outline"} 
                     size="sm"
+                    className="text-white hover:opacity-90"
+                    style={{backgroundColor: '#7FA653', borderColor: '#7FA653'}}
                     onClick={() => window.location.href = "/login"}
                   >
                     Área Restrita

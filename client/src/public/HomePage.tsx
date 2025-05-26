@@ -200,7 +200,7 @@ const CouncilorCard = ({ id, name, role, party, imageUrl, profileImageUrl, occup
           <div className="flex justify-center mb-4">
             <Avatar className="h-24 w-24 border-4 border-white shadow-md">
               <AvatarImage src={profileImageUrl || imageUrl} />
-              <AvatarFallback className="bg-blue-700 text-white text-lg">{getInitials(name)}</AvatarFallback>
+              <AvatarFallback className="text-white text-lg" style={{backgroundColor: '#7FA653'}}>{getInitials(name)}</AvatarFallback>
             </Avatar>
           </div>
           <CardTitle className="text-lg">{name}</CardTitle>
