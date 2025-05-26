@@ -15,6 +15,14 @@ interface LegislativeActivity {
   type: string;
   status: string;
   sessionDate: string;
+  activityNumber: number;
+  filePath?: string;
+  fileName?: string;
+  event?: {
+    id: number;
+    name: string;
+    eventDate: string;
+  };
   authors: Array<{
     id: string;
     name: string;
@@ -27,6 +35,19 @@ export default function AtividadeDetailPage() {
   const [activity, setActivity] = useState<LegislativeActivity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Função para download do arquivo
+  const handleDownload = () => {
+    if (!activity?.filePath) return;
+    
+    const link = document.createElement('a');
+    link.href = activity.filePath;
+    link.download = activity.fileName || `${activity.type}-${activity.activityNumber}.pdf`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Formatar data para exibição
   const formatDate = (dateString: string) => {
@@ -76,7 +97,7 @@ export default function AtividadeDetailPage() {
       try {
         setIsLoading(true);
         
-        // Dados baseados nos registros reais
+        // Dados baseados nos registros reais do banco
         const activities = [
           {
             id: 1,
@@ -85,7 +106,17 @@ export default function AtividadeDetailPage() {
             type: "Pauta",
             status: "tramitando",
             sessionDate: "2025-05-11T00:00:00.000Z",
-            authors: []
+            activityNumber: 15,
+            filePath: "/uploads/1746929829062-3384ca2ee29a.pdf",
+            fileName: "Edição nº 406 - São João de Iracema.pdf",
+            event: {
+              id: 1,
+              name: "Sessão Ordinária de Maio",
+              eventDate: "2025-05-11T00:00:00.000Z"
+            },
+            authors: [
+              { id: "mesa-diretora", name: "Mesa Diretora", avatarUrl: undefined }
+            ]
           },
           {
             id: 2,
@@ -94,7 +125,17 @@ export default function AtividadeDetailPage() {
             type: "Requerimento",
             status: "aprovada",
             sessionDate: "2025-05-11T00:00:00.000Z",
-            authors: []
+            activityNumber: 20,
+            filePath: "/uploads/1746929890216-620f5f045cc4.pdf",
+            fileName: "Aviso Leilão Eletrônico 002.2025.pdf",
+            event: {
+              id: 1,
+              name: "Sessão Ordinária de Maio",
+              eventDate: "2025-05-11T00:00:00.000Z"
+            },
+            authors: [
+              { id: "vereador-1", name: "Vereador Silva", avatarUrl: undefined }
+            ]
           },
           {
             id: 3,
@@ -103,7 +144,17 @@ export default function AtividadeDetailPage() {
             type: "Indicação",
             status: "aprovada",
             sessionDate: "2025-05-12T00:00:00.000Z",
-            authors: []
+            activityNumber: 56,
+            filePath: "/uploads/1747008323502-ccdd312ddb04.pdf",
+            fileName: "AVISO_LICITACAO_SEGURO_FROTA.pdf",
+            event: {
+              id: 1,
+              name: "Sessão Ordinária de Maio",
+              eventDate: "2025-05-12T00:00:00.000Z"
+            },
+            authors: [
+              { id: "vereador-2", name: "Vereadora Santos", avatarUrl: undefined }
+            ]
           }
         ];
 
@@ -221,19 +272,55 @@ export default function AtividadeDetailPage() {
                 </div>
               </div>
 
-              {/* Autores (se houver) */}
-              {activity.authors && activity.authors.length > 0 && (
-                <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Autores</h2>
+              {/* Autores */}
+              <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                  <User className="h-5 w-5 mr-2 text-blue-600" />
+                  Autores
+                </h2>
+                {activity.authors && activity.authors.length > 0 ? (
                   <div className="space-y-3">
                     {activity.authors.map((author) => (
-                      <div key={author.id} className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                          <User className="h-5 w-5 text-gray-600" />
+                      <div key={author.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                          <User className="h-6 w-6 text-blue-600" />
                         </div>
-                        <span className="text-gray-700 font-medium">{author.name}</span>
+                        <div>
+                          <span className="text-gray-900 font-medium">{author.name}</span>
+                          <p className="text-sm text-gray-500">Autor da proposta</p>
+                        </div>
                       </div>
                     ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">Nenhum autor específico identificado</p>
+                )}
+              </div>
+
+              {/* Evento Relacionado */}
+              {activity.event && (
+                <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                    <Calendar className="h-5 w-5 mr-2 text-green-600" />
+                    Evento Relacionado
+                  </h2>
+                  <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900 mb-2">{activity.event.name}</h3>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          <span>Data do evento: {formatDate(activity.event.eventDate)}</span>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open(`/eventos/${activity.event?.id}`, '_blank')}
+                      >
+                        Ver Evento
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -268,14 +355,40 @@ export default function AtividadeDetailPage() {
                 <hr className="my-6" />
 
                 <div className="space-y-3">
+                  {activity.filePath ? (
+                    <Button 
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      onClick={handleDownload}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Baixar Arquivo
+                    </Button>
+                  ) : (
+                    <Button 
+                      className="w-full opacity-50"
+                      disabled
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Arquivo Indisponível
+                    </Button>
+                  )}
+                  
                   <Button 
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    variant="outline"
+                    className="w-full"
                     onClick={() => window.print()}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     Imprimir Detalhes
                   </Button>
                 </div>
+                
+                {activity.fileName && (
+                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Arquivo disponível:</p>
+                    <p className="text-sm font-medium text-gray-900">{activity.fileName}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
