@@ -2871,6 +2871,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter atividades legislativas (sem autenticação)
+  app.get('/api/public/legislative-activities', async (req, res) => {
+    try {
+      // Parâmetros de filtro
+      const { 
+        type, 
+        status, 
+        search
+      } = req.query;
+
+      console.log("Buscando atividades legislativas públicas com filtros:", req.query);
+      
+      // Buscar todas as atividades legislativas do banco
+      const activities = await storage.getAllLegislativeActivities();
+      
+      // Aplicar filtros se fornecidos
+      let filteredActivities = activities;
+      
+      if (search) {
+        const searchTerm = (search as string).toLowerCase();
+        filteredActivities = filteredActivities.filter(activity => 
+          activity.description.toLowerCase().includes(searchTerm) ||
+          activity.activityType.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      if (type) {
+        filteredActivities = filteredActivities.filter(activity => 
+          activity.activityType === type
+        );
+      }
+      
+      if (status) {
+        const statusFilter = status as string;
+        filteredActivities = filteredActivities.filter(activity => {
+          if (statusFilter === 'aprovada' && activity.approved) return true;
+          if (statusFilter === 'pendente' && activity.needsApproval && !activity.approved) return true;
+          if (statusFilter === 'rejeitada' && activity.needsApproval && activity.approved === false) return true;
+          return false;
+        });
+      }
+      
+      // Obter tipos únicos para os filtros
+      const activityTypes = [...new Set(activities.map(activity => activity.activityType))];
+      const statusTypes = ['aprovada', 'pendente', 'rejeitada'];
+      
+      // Mapear dados para o formato esperado pela página
+      const mappedActivities = filteredActivities.map(activity => ({
+        id: activity.id,
+        title: `${activity.activityType} Nº ${activity.activityNumber}`,
+        description: activity.description,
+        type: activity.activityType,
+        status: activity.approved ? 'aprovada' : (activity.needsApproval ? 'pendente' : 'tramitando'),
+        sessionDate: activity.activityDate,
+        authors: [] // Por enquanto vazio, pode ser expandido para buscar autores
+      }));
+      
+      // Montar resposta no formato esperado
+      const response = {
+        activities: mappedActivities,
+        pagination: {
+          total: mappedActivities.length,
+          page: 1,
+          limit: mappedActivities.length,
+          pages: 1
+        },
+        filters: {
+          activityTypes,
+          statusTypes
+        }
+      };
+      
+      res.json(response);
+    } catch (error) {
+      console.error("Erro ao buscar atividades legislativas públicas:", error);
+      res.status(500).json({ message: "Erro ao buscar atividades legislativas" });
+    }
+  });
+
   // Criar o servidor HTTP
   const httpServer = createServer(app);
   
