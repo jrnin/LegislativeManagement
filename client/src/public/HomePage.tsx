@@ -825,6 +825,85 @@ export default function HomePage() {
                       Ver mais notícias
                     </Button>
                   </div>
+                  
+                  {/* Feed do YouTube */}
+                  <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 text-blue-800 flex items-center">
+                      <svg className="mr-2 text-red-600" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                      Canal no YouTube
+                    </h3>
+                    
+                    {/* Vídeo em Destaque */}
+                    <div className="mb-4">
+                      <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-video">
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-500 to-red-600">
+                          <div className="text-center text-white">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="mx-auto mb-2">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                            <p className="text-sm font-medium">Sessão Ordinária - 15/01/2024</p>
+                            <p className="text-xs opacity-90">Discussão do Orçamento Municipal</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Lista de Vídeos Recentes */}
+                    <div className="space-y-3">
+                      {[
+                        {
+                          title: "Audiência Pública - Plano Diretor",
+                          date: "há 3 dias",
+                          views: "245 visualizações",
+                          duration: "1:32:15"
+                        },
+                        {
+                          title: "Sessão Extraordinária",
+                          date: "há 1 semana",
+                          views: "189 visualizações", 
+                          duration: "45:30"
+                        },
+                        {
+                          title: "Reunião de Comissões",
+                          date: "há 2 semanas",
+                          views: "156 visualizações",
+                          duration: "28:45"
+                        }
+                      ].map((video, index) => (
+                        <div key={index} className="flex gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer">
+                          <div className="w-20 h-12 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center relative">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-gray-600">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                            <span className="absolute bottom-0 right-0 bg-black bg-opacity-75 text-white text-xs px-1 rounded-tl text-[10px]">
+                              {video.duration}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight">
+                              {video.title}
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-1">{video.views}</p>
+                            <p className="text-xs text-gray-400">{video.date}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full mt-4 text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => window.open('https://www.youtube.com/@C%C3%A2maraMunicipaldeJa%C3%ADba', '_blank')}
+                    >
+                      <svg className="mr-2" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                      Ver Canal Completo
+                    </Button>
+                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -885,26 +964,7 @@ export default function HomePage() {
             ))}
           </Tabs>
         </div>
-      </section>
-      {/* Banner de chamada para ação */}
-      <section className="py-12 px-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Participe da Vida Política da Cidade</h2>
-          <p className="max-w-2xl mx-auto mb-8 opacity-90">
-            Acompanhe as sessões, envie sugestões de projetos de lei, participe das audiências públicas
-            e contribua para o desenvolvimento da nossa cidade.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
-              Ouvidoria
-            </Button>
-            <Button size="lg" className="text-blue border-white hover:bg-blue-600">
-              Calendário de Audiências
-            </Button>
-          </div>
-        </div>
-      </section>
-
+      </section>     
       {/* Nova seção de vereadores com design moderno */}
       <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 relative overflow-hidden">
         {/* Elemento decorativo de fundo */}
@@ -924,7 +984,7 @@ export default function HomePage() {
           </div>
           
           {/* Cards de vereadores em layout horizontal */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+          <div className="bg-white/08 backdrop-blur-sm rounded-2xl p-8 mb-8">
             <HomeCouncilorsModern />
           </div>
           
@@ -1099,6 +1159,25 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Banner de chamada para ação */}
+      <section className="py-12 px-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Participe da Vida Política da Cidade</h2>
+          <p className="max-w-2xl mx-auto mb-8 opacity-90">
+            Acompanhe as sessões, envie sugestões de projetos de lei, participe das audiências públicas
+            e contribua para o desenvolvimento da nossa cidade.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50">
+              Ouvidoria
+            </Button>
+            <Button size="lg" className="text-blue border-white hover:bg-blue-600">
+              Calendário de Audiências
+            </Button>
           </div>
         </div>
       </section>
