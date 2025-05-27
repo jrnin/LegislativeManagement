@@ -653,15 +653,22 @@ export default function HomePage() {
                     {/* Container da imagem */}
                     <div className="relative mb-6">
                       <div className="relative">
-                        <Avatar className="w-12 h-12 mx-auto border-2 border-white/40 group-hover:border-white transition-all duration-300 shadow-lg">
-                          <AvatarImage 
-                            src={councilor.profileImageUrl} 
-                            className="object-cover w-full h-full"
-                          />
-                          <AvatarFallback className="text-white text-sm font-bold" style={{backgroundColor: '#8aa88a'}}>
-                            {getInitials(councilor.name)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div 
+                          className="mx-auto border-4 border-white/40 group-hover:border-white transition-all duration-300 shadow-2xl rounded-lg overflow-hidden"
+                          style={{width: '220px', height: '290px'}}
+                        >
+                          {councilor.profileImageUrl ? (
+                            <img 
+                              src={councilor.profileImageUrl} 
+                              alt={councilor.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white text-4xl font-bold" style={{backgroundColor: '#8aa88a'}}>
+                              {getInitials(councilor.name)}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Badge de destaque para o primeiro vereador */}
