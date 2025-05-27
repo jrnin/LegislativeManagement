@@ -481,8 +481,8 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Serviços para População */}
             <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-blue-500/30"></div>
-              <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-8 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-blue-500/30"></div>
+              <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-6 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
                 {/* Padrão decorativo */}
                 <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
                   <svg viewBox="0 0 100 100" className="w-full h-full">
@@ -493,24 +493,24 @@ export default function HomePage() {
                 </div>
 
                 <div className="relative z-10">
-                  <div className="flex items-center mb-8">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 group-hover:bg-white/30 transition-all duration-300">
-                      <Users size={32} className="text-white" />
+                  <div className="flex items-center mb-6">
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-3 group-hover:bg-white/30 transition-all duration-300">
+                      <Users size={24} className="text-white" />
                     </div>
                     <div>
-                      <h3 className="text-3xl font-bold">População</h3>
-                      <p className="text-blue-100 text-sm">Serviços ao cidadão</p>
+                      <h3 className="text-2xl font-bold">População</h3>
+                      <p className="text-blue-100 text-xs">Serviços ao cidadão</p>
                     </div>
                   </div>
                   
-                  <div className="flex flex-col lg:flex-row items-start gap-6">
+                  <div className="flex flex-col lg:flex-row items-start gap-4">
                     <img 
                       src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
                       alt="Atendimento ao cidadão"
-                      className="w-28 h-28 rounded-2xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
+                      className="w-20 h-20 rounded-xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
                     />
                     <div className="flex-1">
-                      <div className="grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-1 gap-2">
                         {[
                           "Água - 2ª via e débitos",
                           "Atendimento Genergy", 
@@ -522,18 +522,18 @@ export default function HomePage() {
                           "Diário Oficial"
                         ].map((service, index) => (
                           <div key={index} className="flex items-center group/item cursor-pointer">
-                            <div className="w-3 h-3 bg-white rounded-full mr-3 group-hover/item:scale-110 transition-transform duration-200"></div>
-                            <span className="text-sm group-hover/item:text-blue-100 transition-colors duration-200">{service}</span>
+                            <div className="w-2 h-2 bg-white rounded-full mr-2 group-hover/item:scale-110 transition-transform duration-200"></div>
+                            <span className="text-xs group-hover/item:text-blue-100 transition-colors duration-200">{service}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-8">
-                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-3 px-6 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center">
+                  <div className="mt-6">
+                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-2 px-4 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-sm">
                       <span>Acessar Serviços</span>
-                      <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                     </button>
                   </div>
                 </div>
@@ -542,8 +542,8 @@ export default function HomePage() {
 
             {/* Serviços para Empresas */}
             <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-green-700 rounded-3xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-green-500/30"></div>
-              <div className="relative bg-gradient-to-br from-green-500 to-green-700 rounded-3xl p-8 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-green-700 rounded-2xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-green-500/30"></div>
+              <div className="relative bg-gradient-to-br from-green-500 to-green-700 rounded-2xl p-6 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
                 {/* Padrão decorativo */}
                 <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
                   <svg viewBox="0 0 100 100" className="w-full h-full">
@@ -554,24 +554,24 @@ export default function HomePage() {
                 </div>
 
                 <div className="relative z-10">
-                  <div className="flex items-center mb-8">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 group-hover:bg-white/30 transition-all duration-300">
-                      <Building size={32} className="text-white" />
+                  <div className="flex items-center mb-6">
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-3 group-hover:bg-white/30 transition-all duration-300">
+                      <Building size={24} className="text-white" />
                     </div>
                     <div>
-                      <h3 className="text-3xl font-bold">Empresas</h3>
-                      <p className="text-green-100 text-sm">Serviços empresariais</p>
+                      <h3 className="text-2xl font-bold">Empresas</h3>
+                      <p className="text-green-100 text-xs">Serviços empresariais</p>
                     </div>
                   </div>
                   
-                  <div className="flex flex-col lg:flex-row items-start gap-6">
+                  <div className="flex flex-col lg:flex-row items-start gap-4">
                     <img 
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
                       alt="Serviços empresariais"
-                      className="w-28 h-28 rounded-2xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
+                      className="w-20 h-20 rounded-xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
                     />
                     <div className="flex-1">
-                      <div className="grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-1 gap-2">
                         {[
                           "Consulta de débitos",
                           "DECAM",
@@ -583,18 +583,18 @@ export default function HomePage() {
                           "Verificar documentos"
                         ].map((service, index) => (
                           <div key={index} className="flex items-center group/item cursor-pointer">
-                            <div className="w-3 h-3 bg-white rounded-full mr-3 group-hover/item:scale-110 transition-transform duration-200"></div>
-                            <span className="text-sm group-hover/item:text-green-100 transition-colors duration-200">{service}</span>
+                            <div className="w-2 h-2 bg-white rounded-full mr-2 group-hover/item:scale-110 transition-transform duration-200"></div>
+                            <span className="text-xs group-hover/item:text-green-100 transition-colors duration-200">{service}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-8">
-                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-3 px-6 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center">
+                  <div className="mt-6">
+                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-2 px-4 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-sm">
                       <span>Acessar Serviços</span>
-                      <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                     </button>
                   </div>
                 </div>
@@ -603,8 +603,8 @@ export default function HomePage() {
 
             {/* Serviços para Funcionários */}
             <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-orange-700 rounded-3xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-orange-500/30"></div>
-              <div className="relative bg-gradient-to-br from-orange-500 to-orange-700 rounded-3xl p-8 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-orange-500/30"></div>
+              <div className="relative bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl p-6 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
                 {/* Padrão decorativo */}
                 <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
                   <svg viewBox="0 0 100 100" className="w-full h-full">
@@ -614,24 +614,24 @@ export default function HomePage() {
                 </div>
 
                 <div className="relative z-10">
-                  <div className="flex items-center mb-8">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 group-hover:bg-white/30 transition-all duration-300">
-                      <FileText size={32} className="text-white" />
+                  <div className="flex items-center mb-6">
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-3 group-hover:bg-white/30 transition-all duration-300">
+                      <FileText size={24} className="text-white" />
                     </div>
                     <div>
-                      <h3 className="text-3xl font-bold">Funcionários</h3>
-                      <p className="text-orange-100 text-sm">Portal do servidor</p>
+                      <h3 className="text-2xl font-bold">Funcionários</h3>
+                      <p className="text-orange-100 text-xs">Portal do servidor</p>
                     </div>
                   </div>
                   
-                  <div className="flex flex-col lg:flex-row items-start gap-6">
+                  <div className="flex flex-col lg:flex-row items-start gap-4">
                     <img 
                       src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
                       alt="Serviços para funcionários"
-                      className="w-28 h-28 rounded-2xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
+                      className="w-20 h-20 rounded-xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
                     />
                     <div className="flex-1">
-                      <div className="grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-1 gap-2">
                         {[
                           "Denúncias - Assédio Moral",
                           "Gestão administrativa",
@@ -640,18 +640,18 @@ export default function HomePage() {
                           "RH WEB"
                         ].map((service, index) => (
                           <div key={index} className="flex items-center group/item cursor-pointer">
-                            <div className="w-3 h-3 bg-white rounded-full mr-3 group-hover/item:scale-110 transition-transform duration-200"></div>
-                            <span className="text-sm group-hover/item:text-orange-100 transition-colors duration-200">{service}</span>
+                            <div className="w-2 h-2 bg-white rounded-full mr-2 group-hover/item:scale-110 transition-transform duration-200"></div>
+                            <span className="text-xs group-hover/item:text-orange-100 transition-colors duration-200">{service}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-8">
-                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-3 px-6 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center">
+                  <div className="mt-6">
+                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-2 px-4 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-sm">
                       <span>Acessar Serviços</span>
-                      <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                     </button>
                   </div>
                 </div>
