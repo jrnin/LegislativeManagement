@@ -53,11 +53,11 @@ const QuickServiceCard = ({ title, description, icon: Icon, href }: QuickService
     <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 border-0 bg-white/80 backdrop-blur-sm">
       <CardContent className="p-6">
         <div className="flex items-start space-x-4">
-          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#253529'}}>
-            <Icon size={24} style={{color: '#e4e6da'}} />
+          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#CFE0BC'}}>
+            <Icon size={24} style={{color: '#63783D'}} />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#253529'}}>
+            <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#63783D'}}>
               {title}
             </h3>
             <p className="text-gray-600 text-sm leading-relaxed">
@@ -94,7 +94,7 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
             />
           </div>
         )}
-        <Badge className="absolute top-3 left-3 text-xs" style={{backgroundColor: '#253529', color: 'white'}}>
+        <Badge className="absolute top-3 left-3 text-xs" style={{backgroundColor: '#7FA653', color: 'white'}}>
           {category}
         </Badge>
       </div>
@@ -109,47 +109,6 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
           <span className="text-xs text-gray-500">{date}</span>
           <ArrowRight size={16} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
         </div>
-      </CardContent>
-    </Card>
-  </Link>
-);
-
-// Interface para CouncilorCard
-interface CouncilorCardProps {
-  id: string;
-  name: string;
-  role?: string;
-  party?: string;
-  imageUrl?: string;
-  profileImageUrl?: string;
-  occupation?: string;
-  education?: string;
-}
-
-const CouncilorCard = ({ id, name, role, party, imageUrl, profileImageUrl, occupation, education }: CouncilorCardProps) => (
-  <Link href={`/public/vereadores/${id}`}>
-    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg">
-      <CardHeader className="pb-2 pt-6">
-        <div className="flex justify-center mb-4">
-          <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-            <AvatarImage src={profileImageUrl || imageUrl} />
-            <AvatarFallback className="text-white text-lg" style={{backgroundColor: '#7FA653'}}>{getInitials(name)}</AvatarFallback>
-          </Avatar>
-        </div>
-        <CardTitle className="text-lg">{name}</CardTitle>
-        <CardDescription>{party || occupation || "Vereador(a)"}</CardDescription>
-      </CardHeader>
-      <CardContent className="pt-0">
-        {role && (
-          <Badge variant="secondary" className="mb-2">
-            {role}
-          </Badge>
-        )}
-        {education && (
-          <p className="text-sm text-gray-600 line-clamp-2">
-            {education}
-          </p>
-        )}
       </CardContent>
     </Card>
   </Link>
@@ -228,12 +187,6 @@ const quickServices = [
     description: "Informações sobre processos licitatórios, contratos e convênios",
     icon: FileSearch,
     href: "/public/licitacoes"
-  },
-  {
-    title: "Transparência",
-    description: "Dados orçamentários, despesas, receitas e relatórios fiscais",
-    icon: PieChart,
-    href: "/public/transparencia"
   },
   {
     title: "Audiências",
@@ -397,8 +350,8 @@ export default function HomePage() {
           <iframe
             className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             style={{
-              width: '1900',
-              height: '600',
+              width: '100vw',
+              height: '100vh',
               transform: 'scale(1.2)',
               transformOrigin: 'center center'
             }}
@@ -413,20 +366,20 @@ export default function HomePage() {
         {/* Overlay escuro para melhorar legibilidade do texto */}
         <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-20">
           <div className="text-center text-white">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Sistema Legislativo
             </h1>
             <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
-              Transparência, participação e democracia ao alcance de todos.
+              Transparência, participação e democracia ao alcance de todos os cidadãos
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-green-700 hover:bg-gray-100">
                 <Users className="mr-2" />
                 Conheça os Vereadores
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-green-700 hover:bg-white hover:text-green-700">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-green-700">
                 <FileText className="mr-2" />
                 Documentos Públicos
               </Button>
@@ -439,7 +392,7 @@ export default function HomePage() {
       <section className="py-16 px-4 bg-white">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4" style={{color: '#48654e'}}>Acesso Rápido</h2>
+            <h2 className="text-3xl font-bold mb-4" style={{color: '#63783D'}}>Acesso Rápido</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Encontre rapidamente as informações que você precisa sobre a Câmara Municipal
             </p>
@@ -464,22 +417,23 @@ export default function HomePage() {
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
             <h2 className="text-2xl font-bold flex items-center">
-              <FileText className="mr-2" style={{color: '#48654e'}} />
+              <FileText className="mr-2" style={{color: '#7FA653'}} />
               Notícias e Publicações
             </h2>
             <Link href="/public/noticias">
-              <a className="hover:underline mt-2 sm:mt-0 flex items-center" style={{color: '#48654e'}}>
+              <a className="hover:underline mt-2 sm:mt-0 flex items-center" style={{color: '#7FA653'}}>
                 Ver todas <ChevronRight size={16} />
               </a>
             </Link>
           </div>
           
           {/* Seção de notícias sem filtros */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
             <div className="lg:col-span-2">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-                <div className="p-6">                
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Notícias da Câmara</h2>
                       
                   {/* Destaque principal com carrossel */}
                   <Carousel
@@ -496,7 +450,7 @@ export default function HomePage() {
                               className="h-full w-full object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
-                              <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#48654e'}}>
+                              <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#7FA653'}}>
                                 {item.category}
                               </Badge>
                               <h3 className="text-white text-xl font-bold mb-2 line-clamp-2">
@@ -521,7 +475,7 @@ export default function HomePage() {
                   </Carousel>
                   
                   {/* Grid de notícias menores */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {news.slice(3, 7).map((item) => (
                       <NewsCard
                         key={item.id}
@@ -539,11 +493,11 @@ export default function HomePage() {
             </div>
             
             {/* Coluna da direita (sidebar) - ocupa 1/3 do espaço */}
-            
+            <div className="space-y-6">
               {/* Próximos eventos */}
               <div className="bg-white rounded-lg shadow-md p-4">
-                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
-                  <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <Calendar className="mr-2" style={{color: '#7FA653'}} size={20} />
                   Próximos Eventos
                 </h3>
                 
@@ -561,14 +515,13 @@ export default function HomePage() {
                   ))}
                 </div>
                 
-                <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
+                <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#7FA653'}}>
                   Ver agenda completa
                 </Button>
               </div>
-           
-            
+              
               {/* Widget do clima */}
-              <div className="bg-[#e4e6da] rounded-lg shadow-md p-4">
+              <div className="bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
                   <Sun className="mr-2" style={{color: '#7FA653'}} size={20} />
                   Clima Hoje
@@ -598,26 +551,74 @@ export default function HomePage() {
                       <div className="text-sm font-semibold mt-1">{item.temp}</div>
                     </div>
                   ))}
-                </div>   
-
-                {/* Grid de notícias menores */}
-                <div className="grid grid-cols-1 sm:grid-cols-1 gap-6">
-                  {news.slice(3, 7).map((item) => (
-                    <NewsCard
-                      key={item.id}
-                      id={item.id}
-                      title={item.title}
-                      excerpt={item.excerpt}
-                      date={formatDate(item.date)}
-                      imageUrl={item.imageUrl}
-                      category={item.category}
-                    />
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { label: 'Umidade', value: '75%', icon: Umbrella },
+                    { label: 'Vento', value: '12 km/h', icon: CloudSun },
+                    { label: 'Chuva', value: '10%', icon: CloudRain },
+                  ].map((item, index) => (
+                    <div key={index} className="text-center border border-gray-100 rounded py-2">
+                      <div className="mb-1" style={{color: '#7FA653'}}>
+                        {React.createElement(item.icon, { size: 16 })}
+                      </div>
+                      <div className="text-xs text-gray-600">{item.label}</div>
+                      <div className="text-sm font-medium">{item.value}</div>
+                    </div>
                   ))}
                 </div>
-              </div>      
-                      
-             
-            
+              </div>
+              
+              {/* Assuntos em Alta */}
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <svg className="mr-2" style={{color: '#7FA653'}} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  Assuntos em Alta
+                </h3>
+                
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="px-3 py-2 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
+                           style={{backgroundColor: '#CFE0BC', color: '#63783D'}}>
+                      IPTU 2025
+                    </Badge>
+                    <Badge variant="secondary" className="px-3 py-2 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
+                           style={{backgroundColor: '#CFE0BC', color: '#63783D'}}>
+                      Nota Fiscal Eletrônica
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="px-3 py-2 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
+                           style={{backgroundColor: '#CFE0BC', color: '#63783D'}}>
+                      Pregão Eletrônico
+                    </Badge>
+                    <Badge variant="secondary" className="px-3 py-2 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
+                           style={{backgroundColor: '#CFE0BC', color: '#63783D'}}>
+                      Consulta de Processos
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="px-3 py-2 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
+                           style={{backgroundColor: '#CFE0BC', color: '#63783D'}}>
+                      Ouvidoria
+                    </Badge>
+                    <Badge variant="secondary" className="px-3 py-2 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
+                           style={{backgroundColor: '#CFE0BC', color: '#63783D'}}>
+                      Serviços Online
+                    </Badge>
+                  </div>
+                </div>
+                
+                <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#7FA653'}}>
+                  Ver todos os serviços
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -647,7 +648,7 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-10">
-              {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 5).map((councilor, index) => (
+              {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 5).map((councilor: any, index: number) => (
                 <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
                   <div className="group cursor-pointer text-center transform transition-all duration-300 hover:scale-105">
                     {/* Container da imagem */}
