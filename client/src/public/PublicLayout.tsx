@@ -190,27 +190,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
       {/* Header principal com vídeo de background */}
       <div className="relative">
-        {/* Container de vídeo */}
-        {location === '/public' && (
-          <div className="absolute inset-0 w-full h-[500px] overflow-hidden z-0">
-            <div className="relative w-full h-full">
-              <iframe
-                src={`https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1&playlist=l7VAs92qEXA`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                className="absolute w-[300%] h-[300%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                title="Background Video"
-              ></iframe>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70 z-10"></div>
-              <button 
-                onClick={() => setIsMuted(!isMuted)}
-                className="absolute bottom-4 right-4 z-20 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white"
-                aria-label={isMuted ? "Ativar som" : "Desativar som"}
-              >
-                {isMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
-              </button>
-            </div>
-          </div>
-        )}
+        
 
         {/* Header/Navbar com efeito glass */}
         <header 

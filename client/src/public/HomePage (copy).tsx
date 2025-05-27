@@ -475,11 +475,12 @@ export default function HomePage() {
           </div>
           
           {/* Seção de notícias sem filtros */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 lg:grid-cols-4 gap-4">
             {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
             <div className="lg:col-span-2">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-                <div className="p-6">                
+                <div className="p-6">
+                  
                       
                   {/* Destaque principal com carrossel */}
                   <Carousel
@@ -539,7 +540,7 @@ export default function HomePage() {
             </div>
             
             {/* Coluna da direita (sidebar) - ocupa 1/3 do espaço */}
-            
+            <div className="space-x-12 m-2 flex">
               {/* Próximos eventos */}
               <div className="bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
@@ -565,10 +566,9 @@ export default function HomePage() {
                   Ver agenda completa
                 </Button>
               </div>
-           
-            
+              
               {/* Widget do clima */}
-              <div className="bg-[#e4e6da] rounded-lg shadow-md p-4">
+              <div className="bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
                   <Sun className="mr-2" style={{color: '#7FA653'}} size={20} />
                   Clima Hoje
@@ -598,114 +598,174 @@ export default function HomePage() {
                       <div className="text-sm font-semibold mt-1">{item.temp}</div>
                     </div>
                   ))}
-                </div>   
-
-                {/* Grid de notícias menores */}
-                <div className="grid grid-cols-1 sm:grid-cols-1 gap-6">
-                  {news.slice(3, 7).map((item) => (
-                    <NewsCard
-                      key={item.id}
-                      id={item.id}
-                      title={item.title}
-                      excerpt={item.excerpt}
-                      date={formatDate(item.date)}
-                      imageUrl={item.imageUrl}
-                      category={item.category}
-                    />
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { label: 'Umidade', value: '75%', icon: Umbrella },
+                    { label: 'Vento', value: '12 km/h', icon: CloudSun },
+                    { label: 'Chuva', value: '10%', icon: CloudRain },
+                  ].map((item, index) => (
+                    <div key={index} className="text-center border border-gray-100 rounded py-2">
+                      <div className="mb-1" style={{color: '#7FA653'}}>
+                        {React.createElement(item.icon, { size: 16 })}
+                      </div>
+                      <div className="text-xs text-gray-600">{item.label}</div>
+                      <div className="text-sm font-medium">{item.value}</div>
+                    </div>
                   ))}
                 </div>
-              </div>      
-                      
-             
-            
+              </div>
+              
+              {/* Últimas notícias */}
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <FileText className="mr-2" style={{color: '#7FA653'}} size={20} />
+                  Últimas Notícias
+                </h3>
+                
+                <div className="space-y-4">
+                  {news.slice(0, 5).map((item) => (
+                    <div key={item.id} className="border-b pb-4 last:border-0 last:pb-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <Badge variant="outline" className="text-xs" style={{borderColor: '#7FA653', color: '#63783D'}}>
+                          {item.category}
+                        </Badge>
+                        <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
+                      </div>
+                      <Link href={`/public/noticias/${item.id}`}>
+                        <a className="block">
+                          <h4 className="font-medium text-sm hover:opacity-80 transition-colors leading-tight" style={{color: '#63783D'}}>
+                            {item.title}
+                          </h4>
+                        </a>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+                
+                <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#7FA653'}}>
+                  Ver mais notícias
+                </Button>
+              </div>
+              
+              {/* Feed do YouTube */}
+              <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <svg className="mr-2 text-red-600" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  Canal no YouTube
+                </h3>
+                
+                {/* Vídeo em Destaque */}
+                <div className="mb-4">
+                  <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-video">
+                    <iframe
+                      className="w-full h-full"
+                      src="https://www.youtube.com/watch?v=hcESKWXjRdY&t"
+                      title="Vídeo da Câmara Municipal"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <h4 className="text-sm font-medium text-gray-900">Sessão Ordinária - Última transmissão</h4>
+                    <p className="text-xs text-gray-500">Discussão do Orçamento Municipal 2024</p>
+                  </div>
+                </div>        
+                           
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-4 text-red-600 border-red-200 hover:bg-red-50"
+                  onClick={() => window.open('https://www.youtube.com/@CâmaraMunicipaldeJaíba', '_blank')}
+                >
+                  <svg className="mr-2" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  Ver Canal Completo
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Nova seção de vereadores com design moderno */}
-      <section className="py-20 px-4 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #48654e 0%, #253529 100%)'}}>
-        {/* Elementos decorativos de fundo */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-40 h-40 opacity-5" style={{backgroundColor: '#8aa88a'}} 
-               className="rounded-full"></div>
-          <div className="absolute bottom-10 right-20 w-32 h-32 opacity-5" style={{backgroundColor: '#8aa88a'}} 
-               className="rounded-full"></div>
-          <div className="absolute top-1/2 left-1/3 w-24 h-24 opacity-5" style={{backgroundColor: '#8aa88a'}} 
-               className="rounded-full"></div>
+      <section className="py-16 px-4 relative overflow-hidden" style={{background: 'linear-gradient(to right, #7FA653, #63783D)'}}>
+        {/* Elemento decorativo de fundo */}
+        <div className="absolute top-0 right-0 w-64 h-64 opacity-10">
+          <svg viewBox="0 0 200 200" className="w-full h-full">
+            <circle cx="100" cy="100" r="80" fill="white" />
+            <path d="M100,20 L100,180 M20,100 L180,100" stroke="white" strokeWidth="2" />
+          </svg>
         </div>
         
         <div className="container mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-4">
               Nossos Vereadores
             </h2>
-            <p className="text-white/90 text-lg max-w-3xl mx-auto leading-relaxed">
-              Conheça os representantes eleitos que trabalham incansavelmente pelo desenvolvimento da nossa cidade
+            <p className="text-white/90 max-w-2xl mx-auto">
+              Conheça os representantes eleitos que trabalham pela nossa cidade
             </p>
           </div>
           
           {councilorLoading ? (
             <div className="flex justify-center">
-              <Loader2 className="h-12 w-12 animate-spin text-white" />
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-10">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 lg:gap-6">
               {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 5).map((councilor, index) => (
                 <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
-                  <div className="group cursor-pointer text-center transform transition-all duration-300 hover:scale-105">
-                    {/* Container da imagem */}
-                    <div className="relative mb-6">
-                      <div className="relative">
-                        <Avatar className="w-32 h-32 lg:w-36 lg:h-36 mx-auto border-4 border-white/40 group-hover:border-white transition-all duration-300 shadow-2xl">
-                          <AvatarImage 
-                            src={councilor.profileImageUrl} 
-                            className="object-cover w-full h-full rounded-full"
-                          />
-                          <AvatarFallback className="text-white text-3xl lg:text-4xl font-bold rounded-full" style={{backgroundColor: '#8aa88a'}}>
-                            {getInitials(councilor.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        
-                        {/* Anel decorativo */}
-                        <div className="absolute inset-0 rounded-full border-2 opacity-30 group-hover:opacity-60 transition-opacity duration-300"
-                             style={{borderColor: '#8aa88a'}}></div>
-                      </div>
-                      
-                      {/* Badge de destaque para o primeiro vereador */}
-                      {index === 0 && (
-                        <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full flex items-center justify-center shadow-xl"
-                             style={{backgroundColor: '#8aa88a'}}>
-                          <Users size={20} className="text-white" />
-                        </div>
-                      )}
+                  <div className="group cursor-pointer text-center">
+                    {/* Container da imagem com hover e badge */}
+                    <div className="relative mb-3 lg:mb-4">
+                      <Avatar className="w-20 h-20 lg:w-24 lg:h-24 mx-auto border-4 border-white/30 group-hover:border-white transition-all duration-300 group-hover:scale-105">
+                        <AvatarImage 
+                          src={councilor.profileImageUrl} 
+                          className="object-cover w-full h-full rounded-[6px]"
+                        />
+                        <AvatarFallback className="text-white text-2xl lg:text-3xl font-bold rounded-[6px]" style={{backgroundColor: '#7FA653'}}>
+                          {getInitials(councilor.name)}
+                        </AvatarFallback>
+                      </Avatar>
                     </div>
                     
-                    {/* Informações do vereador */}
-                    <div className="text-white space-y-3">
-                      <h3 className="text-xl lg:text-2xl font-bold group-hover:opacity-80 transition-opacity duration-300">
-                        {councilor.name}
-                      </h3>
-                      <p className="text-white/90 text-base font-medium">
-                        {councilor.party || councilor.occupation || "Vereador(a)"}
-                      </p>
-                      {councilor.role && (
-                        <Badge className="text-sm px-3 py-1 text-white border-2" 
-                               style={{backgroundColor: 'rgba(138, 168, 138, 0.3)', borderColor: '#8aa88a'}}>
-                          {councilor.role}
-                        </Badge>
-                      )}
-                    </div>
+                    {/* Badge de destaque para o primeiro vereador */}
+                    {index === 0 && (
+                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                        <Users size={16} style={{color: '#63783D'}} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Informações do vereador */}
+                  <div className="text-white">
+                    <h3 className="text-lg lg:text-xl font-bold mb-1 group-hover:text-blue-200 transition-colors">
+                      {councilor.name}
+                    </h3>
+                    <p className="text-white/80 text-sm mb-2">
+                      {councilor.party || councilor.occupation || "Vereador(a)"}
+                    </p>
+                    {councilor.role && (
+                      <Badge variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
+                        {councilor.role}
+                      </Badge>
+                    )}
                   </div>
                 </Link>
               ))}
             </div>
           )}
           
-          <div className="text-center mt-12">
+          <div className="text-center mt-8">
             <Link href="/public/vereadores">
-              <Button size="lg" className="text-white border-2 px-8 py-3 text-lg font-semibold hover:opacity-90 transition-all duration-300"
-                      style={{backgroundColor: 'rgba(138, 168, 138, 0.2)', borderColor: '#8aa88a'}}>
-                <Users className="mr-3" size={24} />
+              <Button variant="outline" className="border-white text-white hover:bg-white" style={{color: '#63783D'}}>
+                <Users className="mr-2" />
                 Ver Todos os Vereadores
               </Button>
             </Link>
