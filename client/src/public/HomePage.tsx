@@ -626,12 +626,9 @@ export default function HomePage() {
       <section className="py-20 px-4 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #48654e 0%, #253529 100%)'}}>
         {/* Elementos decorativos de fundo */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-40 h-40 opacity-5" style={{backgroundColor: '#8aa88a'}} 
-               className="rounded-full"></div>
-          <div className="absolute bottom-10 right-20 w-32 h-32 opacity-5" style={{backgroundColor: '#8aa88a'}} 
-               className="rounded-full"></div>
-          <div className="absolute top-1/2 left-1/3 w-24 h-24 opacity-5" style={{backgroundColor: '#8aa88a'}} 
-               className="rounded-full"></div>
+          <div className="absolute top-20 left-10 w-40 h-40 opacity-5 rounded-full" style={{backgroundColor: '#8aa88a'}}></div>
+          <div className="absolute bottom-10 right-20 w-32 h-32 opacity-5 rounded-full" style={{backgroundColor: '#8aa88a'}}></div>
+          <div className="absolute top-1/2 left-1/3 w-24 h-24 opacity-5 rounded-full" style={{backgroundColor: '#8aa88a'}}></div>
         </div>
         
         <div className="container mx-auto relative z-10">
@@ -656,19 +653,15 @@ export default function HomePage() {
                     {/* Container da imagem */}
                     <div className="relative mb-6">
                       <div className="relative">
-                        <Avatar className="w-32 h-32 lg:w-36 lg:h-36 mx-auto border-4 border-white/40 group-hover:border-white transition-all duration-300 shadow-2xl">
+                        <Avatar className="w-12 h-12 mx-auto border-2 border-white/40 group-hover:border-white transition-all duration-300 shadow-lg">
                           <AvatarImage 
                             src={councilor.profileImageUrl} 
-                            className="object-cover w-full h-full rounded-full"
+                            className="object-cover w-full h-full"
                           />
-                          <AvatarFallback className="text-white text-3xl lg:text-4xl font-bold rounded-full" style={{backgroundColor: '#8aa88a'}}>
+                          <AvatarFallback className="text-white text-sm font-bold" style={{backgroundColor: '#8aa88a'}}>
                             {getInitials(councilor.name)}
                           </AvatarFallback>
                         </Avatar>
-                        
-                        {/* Anel decorativo */}
-                        <div className="absolute inset-0 rounded-full border-2 opacity-30 group-hover:opacity-60 transition-opacity duration-300"
-                             style={{borderColor: '#8aa88a'}}></div>
                       </div>
                       
                       {/* Badge de destaque para o primeiro vereador */}
