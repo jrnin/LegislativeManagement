@@ -646,22 +646,26 @@ export default function HomePage() {
               <Loader2 className="h-12 w-12 animate-spin text-white" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 lg:gap-10">
               {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 5).map((councilor, index) => (
                 <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
                   <div className="group cursor-pointer text-center transform transition-all duration-300 hover:scale-105">
                     {/* Container da imagem */}
                     <div className="relative mb-6">
                       <div className="relative">
-                        <Avatar className="w-12 h-12 mx-auto border-2 border-white/40 group-hover:border-white transition-all duration-300 shadow-lg">
-                          <AvatarImage 
-                            src={councilor.profileImageUrl} 
-                            className="object-cover w-full h-full"
-                          />
-                          <AvatarFallback className="text-white text-sm font-bold" style={{backgroundColor: '#8aa88a'}}>
-                            {getInitials(councilor.name)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div className="w-72 h-56 mx-auto border-2 border-white/40 group-hover:border-white transition-all duration-300 shadow-lg rounded-lg overflow-hidden">
+                          {councilor.profileImageUrl ? (
+                            <img 
+                              src={councilor.profileImageUrl} 
+                              alt={councilor.name}
+                              className="object-cover w-full h-full"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white text-4xl font-bold" style={{backgroundColor: '#8aa88a'}}>
+                              {getInitials(councilor.name)}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Badge de destaque para o primeiro vereador */}
