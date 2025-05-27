@@ -459,6 +459,176 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Seção de Serviços por Categoria */}
+      <section className="py-20 px-4 bg-gray-100">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4" style={{color: '#63783D'}}>Serviços</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+              Acesse os serviços disponíveis organizados por categoria
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Serviços para População */}
+            <div className="bg-blue-600 rounded-2xl overflow-hidden shadow-xl">
+              <div className="p-8 text-white">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                    <Users size={24} className="text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold">População</h3>
+                </div>
+                
+                <div className="flex items-center mb-6">
+                  <img 
+                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                    alt="Atendimento ao cidadão"
+                    className="w-24 h-24 rounded-lg object-cover mr-4"
+                  />
+                  <div className="flex-1">
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Água - 2ª via e débitos
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Atendimento Genergy
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Banco de dados ambiental
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Carta de serviços
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Cartilha de arborização
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Consulta de débitos
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Dados cadastrais imóvel
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Diário Oficial
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Serviços para Empresas */}
+            <div className="bg-green-600 rounded-2xl overflow-hidden shadow-xl">
+              <div className="p-8 text-white">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                    <Building size={24} className="text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold">Empresas</h3>
+                </div>
+                
+                <div className="flex items-center mb-6">
+                  <img 
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                    alt="Serviços empresariais"
+                    className="w-24 h-24 rounded-lg object-cover mr-4"
+                  />
+                  <div className="flex-1">
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Consulta de débitos
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        DECAM
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        ICMS/DIPAM
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Legislação ISSQN
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        NFe e outros
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Notas fiscais
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        PPLI
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Verificar documentos
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Serviços para Funcionários */}
+            <div className="bg-orange-500 rounded-2xl overflow-hidden shadow-xl">
+              <div className="p-8 text-white">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                    <FileText size={24} className="text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold">Funcionários</h3>
+                </div>
+                
+                <div className="flex items-center mb-6">
+                  <img 
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                    alt="Serviços para funcionários"
+                    className="w-24 h-24 rounded-lg object-cover mr-4"
+                  />
+                  <div className="flex-1">
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Denúncias - Assédio Moral
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Gestão administrativa
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Holerite online
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        Informe de rendimentos
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                        RH WEB
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">
         <div className="container mx-auto">
