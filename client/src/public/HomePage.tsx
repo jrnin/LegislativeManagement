@@ -653,7 +653,7 @@ export default function HomePage() {
                     {/* Container da imagem */}
                     <div className="relative mb-6">
                       <div className="relative">
-                        <div className="w-72 h-56 mx-auto border-2 border-white/40 group-hover:border-white transition-all duration-300 shadow-lg rounded-lg overflow-hidden">
+                        <div className="w-67 h-90 mx-auto border-2 border-white/40 group-hover:border-white transition-all duration-300 shadow-lg rounded-lg overflow-hidden" style={{width: '270px', height: '360px'}}>
                           {councilor.profileImageUrl ? (
                             <img 
                               src={councilor.profileImageUrl} 
