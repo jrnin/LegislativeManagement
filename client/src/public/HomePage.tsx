@@ -459,172 +459,223 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de Serviços por Categoria */}
-      <section className="py-20 px-4 bg-gray-100">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4" style={{color: '#63783D'}}>Serviços</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-              Acesse os serviços disponíveis organizados por categoria
+      {/* Seção de Serviços Moderna e Interativa */}
+      <section className="py-24 px-4 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}>
+        {/* Elementos decorativos de fundo */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full opacity-10 animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-64 h-64 bg-green-200 rounded-full opacity-10 animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-orange-200 rounded-full opacity-10 animate-pulse" style={{animationDelay: '4s'}}></div>
+        </div>
+
+        <div className="container mx-auto relative z-10">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-orange-500 bg-clip-text text-transparent">
+              Serviços Digitais
+            </h2>
+            <p className="text-gray-600 max-w-3xl mx-auto text-xl leading-relaxed">
+              Acesse nossos serviços de forma rápida e eficiente, organizados por categoria para sua conveniência
             </p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Serviços para População */}
-            <div className="bg-blue-600 rounded-2xl overflow-hidden shadow-xl">
-              <div className="p-8 text-white">
-                <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
-                    <Users size={24} className="text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold">População</h3>
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-blue-500/30"></div>
+              <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-8 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
+                {/* Padrão decorativo */}
+                <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
+                  <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <circle cx="50" cy="50" r="40" fill="white" />
+                    <circle cx="30" cy="30" r="20" fill="white" />
+                    <circle cx="70" cy="70" r="15" fill="white" />
+                  </svg>
                 </div>
-                
-                <div className="flex items-center mb-6">
-                  <img 
-                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-                    alt="Atendimento ao cidadão"
-                    className="w-24 h-24 rounded-lg object-cover mr-4"
-                  />
-                  <div className="flex-1">
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Água - 2ª via e débitos
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Atendimento Genergy
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Banco de dados ambiental
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Carta de serviços
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Cartilha de arborização
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Consulta de débitos
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Dados cadastrais imóvel
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Diário Oficial
-                      </li>
-                    </ul>
+
+                <div className="relative z-10">
+                  <div className="flex items-center mb-8">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 group-hover:bg-white/30 transition-all duration-300">
+                      <Users size={32} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-bold">População</h3>
+                      <p className="text-blue-100 text-sm">Serviços ao cidadão</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col lg:flex-row items-start gap-6">
+                    <img 
+                      src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                      alt="Atendimento ao cidadão"
+                      className="w-28 h-28 rounded-2xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
+                    />
+                    <div className="flex-1">
+                      <div className="grid grid-cols-1 gap-3">
+                        {[
+                          "Água - 2ª via e débitos",
+                          "Atendimento Genergy", 
+                          "Banco de dados ambiental",
+                          "Carta de serviços",
+                          "Cartilha de arborização",
+                          "Consulta de débitos",
+                          "Dados cadastrais imóvel",
+                          "Diário Oficial"
+                        ].map((service, index) => (
+                          <div key={index} className="flex items-center group/item cursor-pointer">
+                            <div className="w-3 h-3 bg-white rounded-full mr-3 group-hover/item:scale-110 transition-transform duration-200"></div>
+                            <span className="text-sm group-hover/item:text-blue-100 transition-colors duration-200">{service}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-3 px-6 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center">
+                      <span>Acessar Serviços</span>
+                      <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Serviços para Empresas */}
-            <div className="bg-green-600 rounded-2xl overflow-hidden shadow-xl">
-              <div className="p-8 text-white">
-                <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
-                    <Building size={24} className="text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold">Empresas</h3>
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-green-700 rounded-3xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-green-500/30"></div>
+              <div className="relative bg-gradient-to-br from-green-500 to-green-700 rounded-3xl p-8 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
+                {/* Padrão decorativo */}
+                <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
+                  <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <rect x="20" y="20" width="60" height="60" fill="white" />
+                    <rect x="10" y="10" width="30" height="30" fill="white" />
+                    <rect x="60" y="60" width="30" height="30" fill="white" />
+                  </svg>
                 </div>
-                
-                <div className="flex items-center mb-6">
-                  <img 
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-                    alt="Serviços empresariais"
-                    className="w-24 h-24 rounded-lg object-cover mr-4"
-                  />
-                  <div className="flex-1">
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Consulta de débitos
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        DECAM
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        ICMS/DIPAM
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Legislação ISSQN
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        NFe e outros
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Notas fiscais
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        PPLI
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Verificar documentos
-                      </li>
-                    </ul>
+
+                <div className="relative z-10">
+                  <div className="flex items-center mb-8">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 group-hover:bg-white/30 transition-all duration-300">
+                      <Building size={32} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-bold">Empresas</h3>
+                      <p className="text-green-100 text-sm">Serviços empresariais</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col lg:flex-row items-start gap-6">
+                    <img 
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                      alt="Serviços empresariais"
+                      className="w-28 h-28 rounded-2xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
+                    />
+                    <div className="flex-1">
+                      <div className="grid grid-cols-1 gap-3">
+                        {[
+                          "Consulta de débitos",
+                          "DECAM",
+                          "ICMS/DIPAM",
+                          "Legislação ISSQN",
+                          "NFe e outros",
+                          "Notas fiscais",
+                          "PPLI",
+                          "Verificar documentos"
+                        ].map((service, index) => (
+                          <div key={index} className="flex items-center group/item cursor-pointer">
+                            <div className="w-3 h-3 bg-white rounded-full mr-3 group-hover/item:scale-110 transition-transform duration-200"></div>
+                            <span className="text-sm group-hover/item:text-green-100 transition-colors duration-200">{service}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-3 px-6 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center">
+                      <span>Acessar Serviços</span>
+                      <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Serviços para Funcionários */}
-            <div className="bg-orange-500 rounded-2xl overflow-hidden shadow-xl">
-              <div className="p-8 text-white">
-                <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
-                    <FileText size={24} className="text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold">Funcionários</h3>
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-orange-700 rounded-3xl transform group-hover:scale-105 transition-all duration-500 shadow-2xl group-hover:shadow-orange-500/30"></div>
+              <div className="relative bg-gradient-to-br from-orange-500 to-orange-700 rounded-3xl p-8 text-white overflow-hidden transform group-hover:scale-105 transition-all duration-500">
+                {/* Padrão decorativo */}
+                <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
+                  <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <polygon points="50,10 90,50 50,90 10,50" fill="white" />
+                    <polygon points="30,30 70,30 70,70 30,70" fill="white" />
+                  </svg>
                 </div>
-                
-                <div className="flex items-center mb-6">
-                  <img 
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-                    alt="Serviços para funcionários"
-                    className="w-24 h-24 rounded-lg object-cover mr-4"
-                  />
-                  <div className="flex-1">
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Denúncias - Assédio Moral
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Gestão administrativa
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Holerite online
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        Informe de rendimentos
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                        RH WEB
-                      </li>
-                    </ul>
+
+                <div className="relative z-10">
+                  <div className="flex items-center mb-8">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 group-hover:bg-white/30 transition-all duration-300">
+                      <FileText size={32} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-bold">Funcionários</h3>
+                      <p className="text-orange-100 text-sm">Portal do servidor</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col lg:flex-row items-start gap-6">
+                    <img 
+                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                      alt="Serviços para funcionários"
+                      className="w-28 h-28 rounded-2xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
+                    />
+                    <div className="flex-1">
+                      <div className="grid grid-cols-1 gap-3">
+                        {[
+                          "Denúncias - Assédio Moral",
+                          "Gestão administrativa",
+                          "Holerite online",
+                          "Informe de rendimentos",
+                          "RH WEB"
+                        ].map((service, index) => (
+                          <div key={index} className="flex items-center group/item cursor-pointer">
+                            <div className="w-3 h-3 bg-white rounded-full mr-3 group-hover/item:scale-110 transition-transform duration-200"></div>
+                            <span className="text-sm group-hover/item:text-orange-100 transition-colors duration-200">{service}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-3 px-6 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center">
+                      <span>Acessar Serviços</span>
+                      <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Estatísticas interativas */}
+          <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { number: "12.5k+", label: "Serviços Realizados", color: "text-blue-600" },
+              { number: "98%", label: "Satisfação", color: "text-green-600" },
+              { number: "24/7", label: "Disponibilidade", color: "text-orange-600" },
+              { number: "150+", label: "Tipos de Serviços", color: "text-purple-600" }
+            ].map((stat, index) => (
+              <div key={index} className="text-center group cursor-pointer">
+                <div className={`text-4xl md:text-5xl font-bold mb-2 ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
+                  {stat.number}
+                </div>
+                <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
