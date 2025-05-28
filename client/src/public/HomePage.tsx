@@ -390,45 +390,78 @@ export default function HomePage() {
         <meta name="description" content="Portal público do Sistema Legislativo Municipal. Acesse informações sobre vereadores, documentos, atividades legislativas e mais." />
       </Helmet>
 
-      {/* Seção Hero Principal com vídeo de fundo */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Vídeo de fundo */}
+      {/* Seção Hero Principal com vista aérea */}
+      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+        {/* Imagem de fundo da cidade */}
         <div className="absolute inset-0 w-full h-full z-0">
-          <iframe
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-            style={{
-              width: '1900',
-              height: '600',
-              transform: 'scale(1.2)',
-              transformOrigin: 'center center'
-            }}
-            src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
-            title="Vídeo de fundo da Câmara Municipal"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
+          <img
+            src="https://images.unsplash.com/photo-1473116763249-2faaef81ccda?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+            alt="Vista aérea da cidade"
+            className="w-full h-full object-cover"
           />
         </div>
         
-        {/* Overlay escuro para melhorar legibilidade do texto */}
-        <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+        {/* Overlay com gradiente */}
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/40 via-blue-800/30 to-blue-700/40 z-10"></div>
         
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center text-white">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Sistema Legislativo
+        {/* Elementos geométricos decorativos */}
+        <div className="absolute bottom-0 right-0 z-20">
+          <svg width="400" height="200" viewBox="0 0 400 200" className="opacity-80">
+            {/* Triângulos azuis */}
+            <polygon points="300,200 400,200 400,100" fill="#2563eb" />
+            <polygon points="200,200 300,200 250,150" fill="#3b82f6" />
+            {/* Triângulos vermelhos */}
+            <polygon points="350,200 400,200 400,150" fill="#dc2626" />
+            <polygon points="250,200 300,200 275,175" fill="#ef4444" />
+          </svg>
+        </div>
+        
+        {/* Informações de clima */}
+        <div className="absolute top-6 left-6 z-30 bg-white/20 backdrop-blur-sm rounded-lg p-3 text-white">
+          <div className="flex items-center space-x-2">
+            <Sun size={20} />
+            <span className="text-sm font-medium">19°</span>
+            <span className="text-xs">Parcialmente Nublado</span>
+          </div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-20">
+          <div className="text-center text-white max-w-4xl mx-auto">
+            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+              Portal da
+              <br />
+              <span className="text-blue-300">Câmara Municipal</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
-              Transparência, participação e democracia ao alcance de todos.
-            </p>
+            
+            {/* Barra de busca */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Digite sua busca"
+                  className="w-full px-6 py-4 rounded-full text-gray-800 text-lg focus:outline-none focus:ring-4 focus:ring-blue-300/50 shadow-2xl"
+                />
+                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition-colors duration-200">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Botões de ação */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-green-700 hover:bg-gray-100">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full shadow-xl">
                 <Users className="mr-2" />
                 Conheça os Vereadores
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-green-700 hover:bg-white hover:text-green-700">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-full">
                 <FileText className="mr-2" />
                 Documentos Públicos
+              </Button>
+              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-full">
+                <Calendar className="mr-2" />
+                Agenda de Sessões
               </Button>
             </div>
           </div>
@@ -799,22 +832,8 @@ export default function HomePage() {
                       <div className="text-sm font-semibold mt-1">{item.temp}</div>
                     </div>
                   ))}
-                </div>   
-
-                {/* Grid de notícias menores */}
-                <div className="grid grid-cols-1 sm:grid-cols-1 gap-6">
-                  {news.slice(3, 7).map((item) => (
-                    <NewsCard
-                      key={item.id}
-                      id={item.id}
-                      title={item.title}
-                      excerpt={item.excerpt}
-                      date={formatDate(item.date)}
-                      imageUrl={item.imageUrl}
-                      category={item.category}
-                    />
-                  ))}
-                </div>
+                </div>  
+                
               </div>      
                       
              
@@ -828,7 +847,7 @@ export default function HomePage() {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#48654e'}}>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#48654e'}}>
                 <Users size={24} className="text-white" />
               </div>
               <div>
@@ -840,10 +859,10 @@ export default function HomePage() {
           
           {councilorLoading ? (
             <div className="flex justify-center">
-              <Loader2 className="h-12 w-12 animate-spin" style={{color: '#48654e'}} />
+              <Loader2 className="h-16 w-16 animate-spin" style={{color: '#48654e'}} />
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
               {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 12).map((councilor, index) => (
                 <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
                   <div className="group cursor-pointer text-center">
@@ -870,7 +889,7 @@ export default function HomePage() {
                         </div>
                       )}
                       
-                      <div className="w-24 h-28 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
+                      <div className="w-34 h-50 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
                         {councilor.profileImageUrl ? (
                           <img 
                             src={councilor.profileImageUrl} 
@@ -912,65 +931,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de estatísticas */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4" style={{color: '#63783D'}}>Transparência em Números</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Dados atualizados sobre as atividades e gestão da Câmara Municipal
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { number: "247", label: "Projetos de Lei", icon: FileText },
-              { number: "89", label: "Sessões Realizadas", icon: Calendar },
-              { number: "15", label: "Vereadores Ativos", icon: Users },
-              { number: "156", label: "Documentos Públicos", icon: Building }
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{backgroundColor: '#CFE0BC'}}>
-                  {React.createElement(stat.icon, { size: 32, color: '#63783D' })}
-                </div>
-                <div className="text-3xl font-bold mb-2" style={{color: '#7FA653'}}>{stat.number}</div>
-                <div className="text-gray-600">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Seção de redes sociais */}
-      <section className="py-12 px-4 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-4" style={{color: '#63783D'}}>Siga-nos nas Redes Sociais</h2>
-            <p className="text-gray-600">
-              Fique por dentro das últimas notícias e atividades da Câmara
-            </p>
-          </div>
-          
-          <div className="flex justify-center space-x-6">
-            {[
-              { icon: Facebook, color: "#1877F2", name: "Facebook" },
-              { icon: Instagram, color: "#E4405F", name: "Instagram" },
-              { icon: Twitter, color: "#1DA1F2", name: "Twitter" },
-              { icon: Youtube, color: "#FF0000", name: "YouTube" }
-            ].map((social, index) => (
-              <a
-                key={index}
-                href="#"
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
-                style={{ backgroundColor: social.color }}
-                aria-label={social.name}
-              >
-                {React.createElement(social.icon, { size: 24 })}
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+    
     </>
   );
 }
