@@ -530,13 +530,7 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="mt-6">
-                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-2 px-4 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-sm">
-                      <span>Acessar Serviços</span>
-                      <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </button>
-                  </div>
-                </div>
+  </div>
               </div>
             </div>
 
@@ -589,14 +583,7 @@ export default function HomePage() {
                         ))}
                       </div>
                     </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-2 px-4 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-sm">
-                      <span>Acessar Serviços</span>
-                      <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </button>
-                  </div>
+                  </div>                  
                 </div>
               </div>
             </div>
@@ -646,14 +633,7 @@ export default function HomePage() {
                         ))}
                       </div>
                     </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <button className="w-full bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl py-2 px-4 text-white font-semibold hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-sm">
-                      <span>Acessar Serviços</span>
-                      <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </button>
-                  </div>
+                  </div>                  
                 </div>
               </div>
             </div>
@@ -843,75 +823,76 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Nova seção de vereadores com design moderno */}
-      <section className="py-20 px-4 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #48654e 0%, #253529 100%)'}}>
-        {/* Elementos decorativos de fundo */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-40 h-40 opacity-5 rounded-full" style={{backgroundColor: '#8aa88a'}}></div>
-          <div className="absolute bottom-10 right-20 w-32 h-32 opacity-5 rounded-full" style={{backgroundColor: '#8aa88a'}}></div>
-          <div className="absolute top-1/2 left-1/3 w-24 h-24 opacity-5 rounded-full" style={{backgroundColor: '#8aa88a'}}></div>
-        </div>
-        
-        <div className="container mx-auto relative z-10">
+      {/* Seção de Vereadores - Layout Grid */}
+      <section className="py-20 px-4 bg-white">
+        <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Nossos Vereadores
-            </h2>
-            <p className="text-white/90 text-lg max-w-3xl mx-auto leading-relaxed">
-              Conheça os representantes eleitos que trabalham incansavelmente pelo desenvolvimento da nossa cidade
-            </p>
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#48654e'}}>
+                <Users size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-4xl font-bold" style={{color: '#48654e'}}>Vereadores</h2>
+                <p className="text-gray-500 text-sm">2025-2028</p>
+              </div>
+            </div>
           </div>
           
           {councilorLoading ? (
             <div className="flex justify-center">
-              <Loader2 className="h-12 w-12 animate-spin text-white" />
+              <Loader2 className="h-12 w-12 animate-spin" style={{color: '#48654e'}} />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 lg:gap-10">
-              {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 5).map((councilor, index) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
+              {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 12).map((councilor, index) => (
                 <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
-                  <div className="group cursor-pointer text-center transform transition-all duration-300 hover:scale-105">
-                    {/* Container da imagem */}
-                    <div className="relative mb-6">
-                      <div className="relative">
-                        <div className="w-67 h-90 mx-auto border-2 border-white/40 group-hover:border-white transition-all duration-300 shadow-lg rounded-lg overflow-hidden" style={{width: '270px', height: '360px'}}>
-                          {councilor.profileImageUrl ? (
-                            <img 
-                              src={councilor.profileImageUrl} 
-                              alt={councilor.name}
-                              className="object-cover w-full h-full"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-white text-4xl font-bold" style={{backgroundColor: '#8aa88a'}}>
-                              {getInitials(councilor.name)}
+                  <div className="group cursor-pointer text-center">
+                    {/* Container da imagem com badges de cargo */}
+                    <div className="relative mb-3">
+                      {/* Badge de cargo */}
+                      {councilor.role && (
+                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
+                          {councilor.role === 'Presidente' && (
+                            <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                              Presidente
+                            </div>
+                          )}
+                          {councilor.role === 'Vice-Presidente' && (
+                            <div className="bg-red-400 text-white px-2 py-1 rounded text-xs font-bold">
+                              {index === 0 ? '2º Vice-Presidente' : '1º Vice-Presidente'}
+                            </div>
+                          )}
+                          {councilor.role === 'Secretário' && (
+                            <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+                              {index === 4 ? '1º Secretário' : '2º Secretário'}
                             </div>
                           )}
                         </div>
-                      </div>
-                      
-                      {/* Badge de destaque para o primeiro vereador */}
-                      {index === 0 && (
-                        <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full flex items-center justify-center shadow-xl"
-                             style={{backgroundColor: '#8aa88a'}}>
-                          <Users size={20} className="text-white" />
-                        </div>
                       )}
+                      
+                      <div className="w-24 h-28 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
+                        {councilor.profileImageUrl ? (
+                          <img 
+                            src={councilor.profileImageUrl} 
+                            alt={councilor.name}
+                            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white text-lg font-bold" style={{backgroundColor: '#8aa88a'}}>
+                            {getInitials(councilor.name)}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Informações do vereador */}
-                    <div className="text-white space-y-3">
-                      <h3 className="text-xl lg:text-2xl font-bold group-hover:opacity-80 transition-opacity duration-300">
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold group-hover:opacity-80 transition-opacity duration-300" style={{color: '#48654e'}}>
                         {councilor.name}
                       </h3>
-                      <p className="text-white/90 text-base font-medium">
-                        {councilor.party || councilor.occupation || "Vereador(a)"}
+                      <p className="text-xs text-gray-600">
+                        {councilor.party || "Partido"}
                       </p>
-                      {councilor.role && (
-                        <Badge className="text-sm px-3 py-1 text-white border-2" 
-                               style={{backgroundColor: 'rgba(138, 168, 138, 0.3)', borderColor: '#8aa88a'}}>
-                          {councilor.role}
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 </Link>
@@ -921,9 +902,9 @@ export default function HomePage() {
           
           <div className="text-center mt-12">
             <Link href="/public/vereadores">
-              <Button size="lg" className="text-white border-2 px-8 py-3 text-lg font-semibold hover:opacity-90 transition-all duration-300"
-                      style={{backgroundColor: 'rgba(138, 168, 138, 0.2)', borderColor: '#8aa88a'}}>
-                <Users className="mr-3" size={24} />
+              <Button size="lg" className="text-white hover:opacity-90 transition-all duration-300"
+                      style={{backgroundColor: '#48654e'}}>
+                <Users className="mr-3" size={20} />
                 Ver Todos os Vereadores
               </Button>
             </Link>
