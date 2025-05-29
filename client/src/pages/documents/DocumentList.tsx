@@ -163,9 +163,9 @@ export default function DocumentList() {
       doc.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.documentNumber?.toString().includes(searchTerm);
     
-    const matchesStatus = !filterStatus || doc.status === filterStatus;
-    const matchesType = !filterType || doc.documentType === filterType;
-    const matchesAuthor = !filterAuthor || doc.authorType === filterAuthor;
+    const matchesStatus = !filterStatus || filterStatus === "todos" || doc.status === filterStatus;
+    const matchesType = !filterType || filterType === "todos" || doc.documentType === filterType;
+    const matchesAuthor = !filterAuthor || filterAuthor === "todos" || doc.authorType === filterAuthor;
     
     return matchesSearch && matchesStatus && matchesType && matchesAuthor;
   });
@@ -478,7 +478,7 @@ export default function DocumentList() {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="todos">Todos os status</SelectItem>
                   <SelectItem value="Vigente">Vigente</SelectItem>
                   <SelectItem value="Revogada">Revogada</SelectItem>
                   <SelectItem value="Alterada">Alterada</SelectItem>
@@ -491,7 +491,7 @@ export default function DocumentList() {
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os tipos</SelectItem>
+                  <SelectItem value="todos">Todos os tipos</SelectItem>
                   {documentTypes.map(type => (
                     <SelectItem key={type} value={type}>{type}</SelectItem>
                   ))}
@@ -503,7 +503,7 @@ export default function DocumentList() {
                   <SelectValue placeholder="Autor" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os autores</SelectItem>
+                  <SelectItem value="todos">Todos os autores</SelectItem>
                   {authorTypes.map(author => (
                     <SelectItem key={author} value={author}>{author}</SelectItem>
                   ))}
