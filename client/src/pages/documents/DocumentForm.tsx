@@ -484,7 +484,7 @@ export default function DocumentForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Nenhum vereador selecionado</SelectItem>
+                          <SelectItem value="none">Nenhum vereador selecionado</SelectItem>
                           {councilors.map((councilor: any) => (
                             <SelectItem key={councilor.id} value={councilor.id}>
                               {councilor.name}
