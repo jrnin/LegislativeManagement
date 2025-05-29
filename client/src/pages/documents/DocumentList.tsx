@@ -182,8 +182,8 @@ export default function DocumentList() {
   // Document statistics
   const totalDocuments = documents.length;
   const vigentDocuments = documents.filter(doc => doc.status === "Vigente").length;
-  const documentTypes = Array.from(new Set(documents.map(doc => doc.documentType))).filter(Boolean);
-  const authorTypes = Array.from(new Set(documents.map(doc => doc.authorType))).filter(Boolean);
+  const documentTypes = Array.from(new Set(documents.map(doc => doc.documentType))).filter(type => type && type.trim() !== "");
+  const authorTypes = Array.from(new Set(documents.map(doc => doc.authorType))).filter(type => type && type.trim() !== "");
 
   const columns: ColumnDef<Document>[] = [
     {
