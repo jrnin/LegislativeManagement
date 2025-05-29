@@ -26,6 +26,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -459,11 +465,17 @@ export default function DocumentList() {
       </AlertDialog>
 
       {/* Modal de Novo Documento */}
-      {console.log("Estado do modal:", showNewDocumentModal)}
-      <DocumentFormModal 
-        open={showNewDocumentModal}
-        onOpenChange={setShowNewDocumentModal}
-      />
+      <Dialog open={showNewDocumentModal} onOpenChange={setShowNewDocumentModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Novo Documento</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            <p>Modal de teste funcionando!</p>
+            <Button onClick={() => setShowNewDocumentModal(false)}>Fechar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
