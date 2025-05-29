@@ -60,10 +60,21 @@ export default function CouncilorDetails() {
   });
 
   // Buscar documentos do vereador
-  const { data: documents, isLoading: isDocumentsLoading } = useQuery({
+  const { data: councilorDocuments, isLoading: isDocumentsLoading } = useQuery({
     queryKey: [`/api/users/${id}/documents`],
     enabled: !!id,
   });
+
+  // Buscar documentos gerais da câmara (todos os documentos do sistema)
+  const { data: allDocumentsResponse } = useQuery({
+    queryKey: ["/api/documents"],
+    enabled: true,
+  });
+
+  // Usar documentos específicos do vereador ou todos os documentos do sistema
+  const documents = Array.isArray(councilorDocuments) && councilorDocuments.length > 0 
+    ? councilorDocuments 
+    : (allDocumentsResponse?.documents || []);
 
   // Buscar comissões do vereador
   const { data: committees, isLoading: isCommitteesLoading } = useQuery({
