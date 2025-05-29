@@ -17,7 +17,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-
 import {
   Table,
   TableBody,
@@ -26,7 +25,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -454,8 +452,6 @@ export default function DocumentList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-
     </div>
   );
 }
