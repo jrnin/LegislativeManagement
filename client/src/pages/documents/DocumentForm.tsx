@@ -24,6 +24,7 @@ const formSchema = z.object({
   documentType: z.string().min(1, { message: "Tipo de documento é obrigatório" }),
   documentDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Data inválida" }),
   authorType: z.string().min(1, { message: "Tipo de autor é obrigatório" }),
+  authorId: z.string().optional(), // ID do vereador selecionado
   description: z.string().min(3, { message: "Descrição é obrigatória" }),
   status: z.string().min(1, { message: "Situação é obrigatória" }),
   activityId: z.coerce.number().optional(),
@@ -66,6 +67,10 @@ export default function DocumentForm() {
     select: (data) => data.filter(doc => doc.id !== Number(documentId)), // Exclude current document
   });
 
+  const { data: councilors = [] } = useQuery({
+    queryKey: ["/api/councilors"],
+  });
+
   // Fetch document history if editing
   useEffect(() => {
     if (documentId) {
@@ -92,6 +97,7 @@ export default function DocumentForm() {
       documentType: "",
       documentDate: new Date().toISOString().split('T')[0],
       authorType: "",
+      authorId: "",
       description: "",
       status: "",
       activityId: undefined,
@@ -108,6 +114,7 @@ export default function DocumentForm() {
         documentType: document.documentType || "",
         documentDate: document.documentDate ? new Date(document.documentDate).toISOString().split('T')[0] : "",
         authorType: document.authorType || "",
+        authorId: document.authorId || "",
         description: document.description || "",
         status: document.status || "",
         activityId: document.activityId ?? undefined,
@@ -127,6 +134,9 @@ export default function DocumentForm() {
       formData.append("documentType", data.documentType);
       formData.append("documentDate", data.documentDate);
       formData.append("authorType", data.authorType);
+      if (data.authorId) {
+        formData.append("authorId", data.authorId);
+      }
       formData.append("description", data.description);
       formData.append("status", data.status);
       
@@ -251,6 +261,7 @@ export default function DocumentForm() {
 
   const documentTypes = [
     "Pauta", 
+    "Portaria",
     "Decreto", 
     "Decreto Legislativo", 
     "Lei Complementar", 
@@ -428,20 +439,20 @@ export default function DocumentForm() {
                 />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="authorType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Autor do Documento</FormLabel>
+                      <FormLabel>Tipo de Autor</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione o autor" />
+                            <SelectValue placeholder="Selecione o tipo" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -452,6 +463,38 @@ export default function DocumentForm() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="authorId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vereador Autor</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o vereador" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="">Nenhum vereador selecionado</SelectItem>
+                          {councilors.map((councilor: any) => (
+                            <SelectItem key={councilor.id} value={councilor.id}>
+                              {councilor.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Selecione o vereador autor do documento (opcional)
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
