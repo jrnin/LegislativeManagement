@@ -97,6 +97,25 @@ export default function VereadorDetalhesPage() {
   const { id } = useParams();
   const [_, setLocation] = useLocation();
 
+  // Buscar vereador específico
+  const { data: realCouncilor } = useQuery({
+    queryKey: [`/api/users/${id}`],
+    enabled: !!id,
+  });
+
+  // Buscar documentos relacionados ao vereador
+  const { data: councilorDocuments = [] } = useQuery({
+    queryKey: [`/api/users/${id}/documents`],
+    enabled: !!id,
+  });
+
+  // Buscar documentos gerais da câmara (se não houver documentos específicos do vereador)
+  const { data: allDocumentsResponse } = useQuery({
+    queryKey: ["/api/public/documents"],
+  });
+
+  const allDocuments = Array.isArray(allDocumentsResponse) ? allDocumentsResponse : (allDocumentsResponse?.documents || []);
+
   // Dados mockados de um vereador específico
   const mockCouncilor: Councilor = {
     id: id || "1",
@@ -229,24 +248,17 @@ export default function VereadorDetalhesPage() {
     }
   ];
 
-  // Simulação de consultas à API
-  const { data: councilor = mockCouncilor } = useQuery({
-    queryKey: [`/api/public/councilors/${id}`],
-    enabled: false,
-    initialData: mockCouncilor
-  });
-
+  // Usar dados reais quando disponíveis, senão usar mock
+  const councilor = realCouncilor || mockCouncilor;
+  
   const { data: activities = mockActivities } = useQuery({
     queryKey: [`/api/public/councilors/${id}/activities`],
     enabled: false,
     initialData: mockActivities
   });
 
-  const { data: documents = mockDocuments } = useQuery({
-    queryKey: [`/api/public/councilors/${id}/documents`],
-    enabled: false,
-    initialData: mockDocuments
-  });
+  // Usar os documentos reais do banco de dados
+  const documents = Array.isArray(councilorDocuments) && councilorDocuments.length > 0 ? councilorDocuments : allDocuments;
 
   const { data: commissions = mockCommissions } = useQuery({
     queryKey: [`/api/public/councilors/${id}/commissions`],
@@ -576,15 +588,20 @@ export default function VereadorDetalhesPage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {documents.map((doc) => (
+                          {documents.map((doc: any) => (
                             <TableRow key={doc.id}>
-                              <TableCell className="font-medium">{doc.type}</TableCell>
-                              <TableCell>{doc.number}</TableCell>
-                              <TableCell>{formatDate(doc.date)}</TableCell>
+                              <TableCell className="font-medium">{doc.documentType || doc.type}</TableCell>
+                              <TableCell>{doc.documentNumber || doc.number}</TableCell>
+                              <TableCell>{doc.documentDate ? formatDate(new Date(doc.documentDate).toISOString().split('T')[0]) : (doc.date ? formatDate(doc.date) : 'N/A')}</TableCell>
                               <TableCell>{doc.description}</TableCell>
                               <TableCell>
-                                {doc.file ? (
-                                  <Button size="sm" variant="outline" className="gap-1 text-blue-600">
+                                {doc.fileName || doc.file ? (
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    className="gap-1 text-blue-600"
+                                    onClick={() => window.open(`/api/files/documents/${doc.id}`, '_blank')}
+                                  >
                                     <ExternalLink className="h-3 w-3" />
                                     Ver
                                   </Button>
