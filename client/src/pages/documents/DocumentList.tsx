@@ -454,6 +454,12 @@ export default function DocumentList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modal de Novo Documento */}
+      <DocumentFormModal 
+        open={showNewDocumentModal}
+        onOpenChange={setShowNewDocumentModal}
+      />
     </div>
   );
 }
