@@ -19,7 +19,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Document, LegislativeActivity, Event } from "@shared/schema";
+import { Document, LegislativeActivity, Event, User } from "@shared/schema";
 import { File, Upload } from "lucide-react";
 
 const formSchema = z.object({
@@ -50,14 +50,17 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
   
   const { data: activities = [] } = useQuery<LegislativeActivity[]>({
     queryKey: ["/api/activities"],
+    enabled: open,
   });
 
   const { data: events = [] } = useQuery<Event[]>({
     queryKey: ["/api/events"],
+    enabled: open,
   });
 
-  const { data: councilors = [] } = useQuery({
+  const { data: councilors = [] } = useQuery<Councilor[]>({
     queryKey: ["/api/councilors"],
+    enabled: open,
   });
 
   const form = useForm<FormData>({
@@ -380,7 +383,7 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
                         <SelectItem value="">Nenhuma atividade</SelectItem>
                         {activities.map((activity) => (
                           <SelectItem key={activity.id} value={activity.id.toString()}>
-                            {activity.title}
+                            {activity.description || `Atividade ${activity.id}`}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -409,7 +412,7 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
                         <SelectItem value="">Nenhum evento</SelectItem>
                         {events.map((event) => (
                           <SelectItem key={event.id} value={event.id.toString()}>
-                            {event.title}
+                            {event.description || `Evento ${event.id}`}
                           </SelectItem>
                         ))}
                       </SelectContent>
