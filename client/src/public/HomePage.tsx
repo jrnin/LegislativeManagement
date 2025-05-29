@@ -460,7 +460,7 @@ export default function HomePage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Card de Contratos */}
             <div className="group relative">
               <div className="bg-gradient-to-r from-pink-500 to-red-500 rounded-3xl p-8 text-white overflow-hidden shadow-2xl group-hover:shadow-pink-500/30 transition-all duration-500">
@@ -479,12 +479,7 @@ export default function HomePage() {
                         { icon: "🏗️", text: "Obras" },
                         { icon: "📦", text: "Almoxarifado" },
                         { icon: "📱", text: "APP Almoxarifado" },
-                        { icon: "🚗", text: "Frotas" },
-                        { icon: "📱", text: "APP Frotas" },
-                        { icon: "💼", text: "Patrimônio" },
-                        { icon: "📱", text: "APP Patrimônio" },
-                        { icon: "🌐", text: "Portal do Gestor" },
-                        { icon: "📊", text: "Monitor DF-e" }
+                        { icon: "🚗", text: "Frotas" }
                       ].map((service, index) => (
                         <button key={index} className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200 text-left backdrop-blur-sm border border-white/10">
                           <span className="text-lg mr-2">{service.icon}</span>
@@ -499,7 +494,7 @@ export default function HomePage() {
                     <img 
                       src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
                       alt="Profissional de contratos"
-                      className="w-32 h-40 object-cover rounded-2xl shadow-lg"
+                      className="w-300 h-80 object-cover rounded-2xl shadow-lg"
                     />
                   </div>
                 </div>
@@ -524,11 +519,7 @@ export default function HomePage() {
                         { icon: "🎯", text: "Controladoria" },
                         { icon: "📋", text: "Prestação de Contas" },
                         { icon: "🤝", text: "Convênios" },
-                        { icon: "🌐", text: "Portal do Gestor" },
-                        { icon: "💰", text: "Tesouraria" },
-                        { icon: "🔒", text: "Controle Interno" },
-                        { icon: "🏠", text: "Controle da Caixa" },
-                        { icon: "📱", text: "BI" }
+                        { icon: "🌐", text: "Portal do Gestor" }
                       ].map((service, index) => (
                         <button key={index} className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200 text-left backdrop-blur-sm border border-white/10">
                           <span className="text-lg mr-2">{service.icon}</span>
@@ -549,26 +540,49 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Estatísticas interativas */}
-          <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { number: "12.5k+", label: "Serviços Realizados", color: "text-blue-600" },
-              { number: "98%", label: "Satisfação", color: "text-green-600" },
-              { number: "24/7", label: "Disponibilidade", color: "text-orange-600" },
-              { number: "150+", label: "Tipos de Serviços", color: "text-purple-600" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group cursor-pointer">
-                <div className={`text-4xl md:text-5xl font-bold mb-2 ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
-                  {stat.number}
-                </div>
-                <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
-                  {stat.label}
+            {/* Card de Contábil */}
+            <div className="group relative">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white overflow-hidden shadow-2xl group-hover:shadow-blue-500/30 transition-all duration-500">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-6">
+                      <h3 className="text-3xl font-bold mr-3">Contábil</h3>
+                      <span className="text-sm bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">SOLUÇÕES</span>
+                    </div>
+
+                    {/* Grid de serviços */}
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {[
+                        { icon: "📊", text: "ContaDil" },
+                        { icon: "📈", text: "Planejamento" },
+                        { icon: "🎯", text: "Controladoria" },
+                        { icon: "📋", text: "Prestação de Contas" },
+                        { icon: "🤝", text: "Convênios" },
+                        { icon: "🌐", text: "Portal do Gestor" }
+                      ].map((service, index) => (
+                        <button key={index} className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200 text-left backdrop-blur-sm border border-white/10">
+                          <span className="text-lg mr-2">{service.icon}</span>
+                          <span className="text-sm font-medium">{service.text}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Imagem do profissional */}
+                  <div className="ml-6">
+                    <img 
+                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                      alt="Profissional contábil"
+                      className="w-32 h-40 object-cover rounded-2xl shadow-lg"
+                    />
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
+
+         
         </div>
       </section>
 
@@ -713,6 +727,34 @@ export default function HomePage() {
                   ))}
                 </div>  
                 
+              </div>
+              
+              {/* Widget de Assuntos em Alta */}
+              <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
+                  <Zap className="mr-2" style={{color: '#7FA653'}} size={20} />
+                  Assuntos em alta
+                </h3>
+                
+                <div className="space-y-3">
+                  {[
+                    "IPTU 2025",
+                    "Nota Fiscal Eletrônica", 
+                    "Pregão Eletrônico",
+                    "Consulta de Processos",
+                    "Ouvidoria",
+                    "Serviços Online"
+                  ].map((topic, index) => (
+                    <button 
+                      key={index} 
+                      className="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 border border-gray-200 hover:border-gray-300"
+                    >
+                      <span className="text-sm font-medium text-gray-700 hover:text-gray-900">
+                        {topic}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>      
                       
              
