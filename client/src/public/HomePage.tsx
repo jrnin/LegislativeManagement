@@ -27,7 +27,9 @@ import {
   Sun,
   Umbrella,
   Thermometer,
-  Loader2
+  Loader2,
+  Clock,
+  Eye
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,6 +40,121 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 // Função auxiliar para obter iniciais
 const getInitials = (name: string) => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase();
+};
+
+// Componente para exibir as últimas atividades legislativas
+const LegislativeActivitiesWidget = () => {
+  const { data: activities, isLoading } = useQuery({
+    queryKey: ['/api/public/legislative-activities'],
+    select: (data: any) => data?.activities || []
+  });
+
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'aprovado':
+        return 'bg-green-100 text-green-800';
+      case 'em_tramitacao':
+        return 'bg-blue-100 text-blue-800';
+      case 'rejeitado':
+        return 'bg-red-100 text-red-800';
+      case 'pendente':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'em_tramitacao':
+        return 'Em Tramitação';
+      case 'aprovado':
+        return 'Aprovado';
+      case 'rejeitado':
+        return 'Rejeitado';
+      case 'pendente':
+        return 'Pendente';
+      default:
+        return status;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {activities?.slice(0, 6).map((activity: any) => (
+        <Link key={activity.id} href={`/public/atividades/${activity.id}`}>
+          <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-4 border-l-green-500">
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm leading-tight" style={{color: '#48654e'}}>
+                      {activity.title}
+                    </h4>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {activity.type || 'Atividade Legislativa'}
+                    </p>
+                  </div>
+                  <Badge className={`text-xs ${getStatusColor(activity.status)}`}>
+                    {getStatusText(activity.status)}
+                  </Badge>
+                </div>
+                
+                {activity.description && (
+                  <p className="text-xs text-gray-700 line-clamp-2">
+                    {activity.description.substring(0, 100)}...
+                  </p>
+                )}
+                
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <div className="flex items-center">
+                    <Clock size={12} className="mr-1" />
+                    {formatDate(activity.date || activity.createdAt)}
+                  </div>
+                  <div className="flex items-center">
+                    <Eye size={12} className="mr-1" />
+                    Ver detalhes
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      ))}
+      
+      {(!activities || activities.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <FileText size={32} className="mx-auto mb-2 opacity-50" />
+          <p className="text-sm">Nenhuma atividade encontrada</p>
+        </div>
+      )}
+      
+      <div className="text-center mt-6">
+        <Link href="/public/atividades">
+          <Button variant="outline" size="sm" className="text-sm">
+            <FileText className="mr-2" size={16} />
+            Ver Todas as Atividades
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
 };
 
 // Interface para QuickServiceCard
@@ -441,150 +558,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de Serviços Moderna e Interativa */}
-      <section className="py-24 px-4 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}>
-        {/* Elementos decorativos de fundo */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full opacity-10 animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-64 h-64 bg-green-200 rounded-full opacity-10 animate-pulse" style={{animationDelay: '2s'}}></div>
-          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-orange-200 rounded-full opacity-10 animate-pulse" style={{animationDelay: '4s'}}></div>
-        </div>
-
-        <div className="container mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-orange-500 bg-clip-text text-transparent">
-              Serviços Digitais
-            </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto text-xl leading-relaxed">
-              Acesse nossos serviços de forma rápida e eficiente, organizados por categoria para sua conveniência
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Card de Contratos */}
-            <div className="group relative">
-              <div className="bg-gradient-to-r from-pink-500 to-red-500 rounded-3xl p-8 text-white overflow-hidden shadow-2xl group-hover:shadow-pink-500/30 transition-all duration-500">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-6">
-                      <h3 className="text-3xl font-bold mr-3">Contratos</h3>
-                      <span className="text-sm bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">SOLUÇÕES</span>
-                    </div>
-                    
-                    {/* Grid de serviços */}
-                    <div className="grid grid-cols-2 gap-3 mb-6">
-                      {[
-                        { icon: "🛒", text: "Compras" },
-                        { icon: "📋", text: "Contratos" },
-                        { icon: "🏗️", text: "Obras" },
-                        { icon: "📦", text: "Almoxarifado" },
-                        { icon: "📱", text: "APP Almoxarifado" },
-                        { icon: "🚗", text: "Frotas" }
-                      ].map((service, index) => (
-                        <button key={index} className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200 text-left backdrop-blur-sm border border-white/10">
-                          <span className="text-lg mr-2">{service.icon}</span>
-                          <span className="text-sm font-medium">{service.text}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Imagem do profissional */}
-                  <div className="ml-6">
-                    <img 
-                      src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-                      alt="Profissional de contratos"
-                      className="w-300 h-80 object-cover rounded-2xl shadow-lg"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Card de Contábil */}
-            <div className="group relative">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white overflow-hidden shadow-2xl group-hover:shadow-blue-500/30 transition-all duration-500">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-6">
-                      <h3 className="text-3xl font-bold mr-3">Contábil</h3>
-                      <span className="text-sm bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">SOLUÇÕES</span>
-                    </div>
-                    
-                    {/* Grid de serviços */}
-                    <div className="grid grid-cols-2 gap-3 mb-6">
-                      {[
-                        { icon: "📊", text: "ContaDil" },
-                        { icon: "📈", text: "Planejamento" },
-                        { icon: "🎯", text: "Controladoria" },
-                        { icon: "📋", text: "Prestação de Contas" },
-                        { icon: "🤝", text: "Convênios" },
-                        { icon: "🌐", text: "Portal do Gestor" }
-                      ].map((service, index) => (
-                        <button key={index} className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200 text-left backdrop-blur-sm border border-white/10">
-                          <span className="text-lg mr-2">{service.icon}</span>
-                          <span className="text-sm font-medium">{service.text}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Imagem do profissional */}
-                  <div className="ml-6">
-                    <img 
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-                      alt="Profissional contábil"
-                      className="w-32 h-40 object-cover rounded-2xl shadow-lg"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Card de Contábil */}
-            <div className="group relative">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white overflow-hidden shadow-2xl group-hover:shadow-blue-500/30 transition-all duration-500">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-6">
-                      <h3 className="text-3xl font-bold mr-3">Contábil</h3>
-                      <span className="text-sm bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">SOLUÇÕES</span>
-                    </div>
-
-                    {/* Grid de serviços */}
-                    <div className="grid grid-cols-2 gap-3 mb-6">
-                      {[
-                        { icon: "📊", text: "ContaDil" },
-                        { icon: "📈", text: "Planejamento" },
-                        { icon: "🎯", text: "Controladoria" },
-                        { icon: "📋", text: "Prestação de Contas" },
-                        { icon: "🤝", text: "Convênios" },
-                        { icon: "🌐", text: "Portal do Gestor" }
-                      ].map((service, index) => (
-                        <button key={index} className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200 text-left backdrop-blur-sm border border-white/10">
-                          <span className="text-lg mr-2">{service.icon}</span>
-                          <span className="text-sm font-medium">{service.text}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Imagem do profissional */}
-                  <div className="ml-6">
-                    <img 
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-                      alt="Profissional contábil"
-                      className="w-32 h-40 object-cover rounded-2xl shadow-lg"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-         
-        </div>
-      </section>
+  
 
       {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">
@@ -726,43 +700,38 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>  
+                {/* Widget de Assuntos em Alta - Nuvem de Tags */}
+                <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
+                    <Zap className="mr-2" style={{color: '#7FA653'}} size={20} />
+                    Assuntos em alta
+                  </h3>
+
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { text: "Iptu 2025", size: "text-lg", color: "bg-blue-100 hover:bg-blue-200 text-blue-800" },
+                      { text: "Nota Fiscal", size: "text-sm", color: "bg-green-100 hover:bg-green-200 text-green-800" }, 
+                      { text: "Pregão Eletrônico", size: "text-base", color: "bg-purple-100 hover:bg-purple-200 text-purple-800" },
+                      { text: "Processos", size: "text-sm", color: "bg-orange-100 hover:bg-orange-200 text-orange-800" },
+                      { text: "Ouvidoria", size: "text-xs", color: "bg-red-100 hover:bg-red-200 text-red-800" },
+                      { text: "Serviços Online", size: "text-base", color: "bg-teal-100 hover:bg-teal-200 text-teal-800" },
+                      { text: "Licitações", size: "text-sm", color: "bg-indigo-100 hover:bg-indigo-200 text-indigo-800" },
+                      { text: "Documentos", size: "text-xs", color: "bg-pink-100 hover:bg-pink-200 text-pink-800" },
+                      { text: "Transparência", size: "text-sm", color: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800" }
+                    ].map((tag, index) => (
+                      <button 
+                        key={index} 
+                        className={`px-3 py-1 rounded-full transition-all duration-200 transform hover:scale-105 ${tag.size} ${tag.color} font-medium shadow-sm hover:shadow-md`}
+                      >
+                        {tag.text}
+                      </button>
+                    ))}
+                  </div>                
+                </div>  
                 
               </div>
               
-              {/* Widget de Assuntos em Alta - Nuvem de Tags */}
-              <div className="bg-white rounded-lg shadow-md p-4 mt-6">
-                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
-                  <Zap className="mr-2" style={{color: '#7FA653'}} size={20} />
-                  Assuntos em alta
-                </h3>
                 
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { text: "IPTU 2025", size: "text-lg", color: "bg-blue-100 hover:bg-blue-200 text-blue-800" },
-                    { text: "Nota Fiscal", size: "text-sm", color: "bg-green-100 hover:bg-green-200 text-green-800" }, 
-                    { text: "Pregão Eletrônico", size: "text-base", color: "bg-purple-100 hover:bg-purple-200 text-purple-800" },
-                    { text: "Processos", size: "text-sm", color: "bg-orange-100 hover:bg-orange-200 text-orange-800" },
-                    { text: "Ouvidoria", size: "text-xs", color: "bg-red-100 hover:bg-red-200 text-red-800" },
-                    { text: "Serviços Online", size: "text-base", color: "bg-teal-100 hover:bg-teal-200 text-teal-800" },
-                    { text: "Licitações", size: "text-sm", color: "bg-indigo-100 hover:bg-indigo-200 text-indigo-800" },
-                    { text: "Documentos", size: "text-xs", color: "bg-pink-100 hover:bg-pink-200 text-pink-800" },
-                    { text: "Transparência", size: "text-sm", color: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800" }
-                  ].map((tag, index) => (
-                    <button 
-                      key={index} 
-                      className={`px-3 py-1 rounded-full transition-all duration-200 transform hover:scale-105 ${tag.size} ${tag.color} font-medium shadow-sm hover:shadow-md`}
-                    >
-                      {tag.text}
-                    </button>
-                  ))}
-                </div>
-                
-                <div className="mt-4 text-center">
-                  <button className="text-xs text-gray-500 hover:text-gray-700 underline">
-                    Ver todos os assuntos
-                  </button>
-                </div>
-              </div>      
                       
              
             
@@ -770,7 +739,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção de Vereadores - Layout Grid */}
+      {/* Seção de Vereadores e Atividades Legislativas - Layout em Duas Colunas */}
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto">
           <div className="text-center mb-16">
@@ -779,82 +748,150 @@ export default function HomePage() {
                 <Users size={24} className="text-white" />
               </div>
               <div>
-                <h2 className="text-4xl font-bold" style={{color: '#48654e'}}>Vereadores</h2>
+                <h2 className="text-4xl font-bold" style={{color: '#48654e'}}>Vereadores e Atividades Legislativas</h2>
                 <p className="text-gray-500 text-sm">2025-2028</p>
               </div>
             </div>
           </div>
           
-          {councilorLoading ? (
-            <div className="flex justify-center">
-              <Loader2 className="h-16 w-16 animate-spin" style={{color: '#48654e'}} />
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-              {(councilors?.length > 0 ? councilors : mockCouncilors).slice(0, 12).map((councilor, index) => (
-                <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
-                  <div className="group cursor-pointer text-center">
-                    {/* Container da imagem com badges de cargo */}
-                    <div className="relative mb-3">
-                      {/* Badge de cargo */}
-                      {councilor.role && (
-                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
-                          {councilor.role === 'Presidente' && (
-                            <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
-                              Presidente
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Coluna da Esquerda - Vereadores (2/3 do espaço) */}
+            <div className="lg:col-span-2">
+              <h3 className="text-2xl font-bold mb-6" style={{color: '#48654e'}}>Nossos Vereadores</h3>
+              
+              {councilorLoading ? (
+                <div className="flex justify-center">
+                  <Loader2 className="h-16 w-16 animate-spin" style={{color: '#48654e'}} />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Primeira linha - 6 vereadores */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                    {(councilors?.length > 0 ? councilors : []).slice(0, 6).map((councilor, index) => (
+                      <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
+                        <div className="group cursor-pointer text-center">
+                          <div className="relative mb-3">
+                            {councilor.role && (
+                              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
+                                {councilor.role === 'Presidente' && (
+                                  <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Presidente
+                                  </div>
+                                )}
+                                {councilor.role === 'Vice-Presidente' && (
+                                  <div className="bg-red-400 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Vice-Presidente
+                                  </div>
+                                )}
+                                {councilor.role === 'Secretário' && (
+                                  <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Secretário
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className="w-24 h-32 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
+                              {councilor.profileImageUrl ? (
+                                <img 
+                                  src={councilor.profileImageUrl} 
+                                  alt={councilor.name}
+                                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold" style={{backgroundColor: '#8aa88a'}}>
+                                  {getInitials(councilor.name)}
+                                </div>
+                              )}
                             </div>
-                          )}
-                          {councilor.role === 'Vice-Presidente' && (
-                            <div className="bg-red-400 text-white px-2 py-1 rounded text-xs font-bold">
-                              {index === 0 ? '2º Vice-Presidente' : '1º Vice-Presidente'}
-                            </div>
-                          )}
-                          {councilor.role === 'Secretário' && (
-                            <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
-                              {index === 4 ? '1º Secretário' : '2º Secretário'}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      <div className="w-34 h-50 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
-                        {councilor.profileImageUrl ? (
-                          <img 
-                            src={councilor.profileImageUrl} 
-                            alt={councilor.name}
-                            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-white text-lg font-bold" style={{backgroundColor: '#8aa88a'}}>
-                            {getInitials(councilor.name)}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Informações do vereador */}
-                    <div className="space-y-1">
-                      <h3 className="text-sm font-bold group-hover:opacity-80 transition-opacity duration-300" style={{color: '#48654e'}}>
-                        {councilor.name}
-                      </h3>
-                      <p className="text-xs text-gray-600">
-                        {councilor.party || "Partido"}
-                      </p>
-                    </div>
+                          
+                          <div className="space-y-1">
+                            <h4 className="text-xs font-bold group-hover:opacity-80 transition-opacity duration-300" style={{color: '#48654e'}}>
+                              {councilor.name}
+                            </h4>
+                            <p className="text-xs text-gray-600">
+                              {councilor.party || "Partido"}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
+                  
+                  {/* Segunda linha - 6 vereadores */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                    {(councilors?.length > 0 ? councilors : []).slice(6, 12).map((councilor, index) => (
+                      <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
+                        <div className="group cursor-pointer text-center">
+                          <div className="relative mb-3">
+                            {councilor.role && (
+                              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
+                                {councilor.role === 'Presidente' && (
+                                  <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Presidente
+                                  </div>
+                                )}
+                                {councilor.role === 'Vice-Presidente' && (
+                                  <div className="bg-red-400 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Vice-Presidente
+                                  </div>
+                                )}
+                                {councilor.role === 'Secretário' && (
+                                  <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Secretário
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className="w-24 h-32 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
+                              {councilor.profileImageUrl ? (
+                                <img 
+                                  src={councilor.profileImageUrl} 
+                                  alt={councilor.name}
+                                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold" style={{backgroundColor: '#8aa88a'}}>
+                                  {getInitials(councilor.name)}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <h4 className="text-xs font-bold group-hover:opacity-80 transition-opacity duration-300" style={{color: '#48654e'}}>
+                              {councilor.name}
+                            </h4>
+                            <p className="text-xs text-gray-600">
+                              {councilor.party || "Partido"}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="text-center mt-8">
+                <Link href="/public/vereadores">
+                  <Button size="lg" className="text-white hover:opacity-90 transition-all duration-300"
+                          style={{backgroundColor: '#48654e'}}>
+                    <Users className="mr-3" size={20} />
+                    Ver Todos os Vereadores
+                  </Button>
                 </Link>
-              ))}
+              </div>
             </div>
-          )}
-          
-          <div className="text-center mt-12">
-            <Link href="/public/vereadores">
-              <Button size="lg" className="text-white hover:opacity-90 transition-all duration-300"
-                      style={{backgroundColor: '#48654e'}}>
-                <Users className="mr-3" size={20} />
-                Ver Todos os Vereadores
-              </Button>
-            </Link>
+            
+            {/* Coluna da Direita - Atividades Legislativas (1/3 do espaço) */}
+            <div className="lg:col-span-1">
+              <h3 className="text-2xl font-bold mb-6" style={{color: '#48654e'}}>Últimas Atividades Legislativas</h3>
+              
+              <LegislativeActivitiesWidget />
+            </div>
           </div>
         </div>
       </section>
