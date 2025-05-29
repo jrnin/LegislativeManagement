@@ -31,6 +31,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { 
   AlertDialog,
@@ -46,6 +47,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   CalendarDays, 
   ChevronLeft, 
@@ -57,7 +60,15 @@ import {
   Plus,
   Search,
   Trash2, 
-  Download
+  Download,
+  Filter,
+  Grid,
+  List,
+  Users,
+  Building,
+  Eye,
+  Calendar,
+  ArrowUpDown
 } from "lucide-react";
 import { formatDate } from "@/utils/formatters";
 
@@ -70,6 +81,10 @@ export default function DocumentList() {
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterType, setFilterType] = useState<string>("");
+  const [filterAuthor, setFilterAuthor] = useState<string>("");
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: documents = [], isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
@@ -142,10 +157,24 @@ export default function DocumentList() {
     );
   };
 
-  // Filter documents by status if filter is applied
-  const filteredDocuments = filterStatus 
-    ? documents.filter(doc => doc.status === filterStatus)
-    : documents;
+  // Enhanced filtering logic
+  const filteredDocuments = documents.filter(doc => {
+    const matchesSearch = !searchTerm || 
+      doc.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.documentNumber?.toString().includes(searchTerm);
+    
+    const matchesStatus = !filterStatus || doc.status === filterStatus;
+    const matchesType = !filterType || doc.documentType === filterType;
+    const matchesAuthor = !filterAuthor || doc.authorType === filterAuthor;
+    
+    return matchesSearch && matchesStatus && matchesType && matchesAuthor;
+  });
+
+  // Document statistics
+  const totalDocuments = documents.length;
+  const vigentDocuments = documents.filter(doc => doc.status === "Vigente").length;
+  const documentTypes = Array.from(new Set(documents.map(doc => doc.documentType))).filter(Boolean);
+  const authorTypes = Array.from(new Set(documents.map(doc => doc.authorType))).filter(Boolean);
 
   const columns: ColumnDef<Document>[] = [
     {
@@ -287,165 +316,351 @@ export default function DocumentList() {
     },
   });
 
+  // Grid view component
+  const GridView = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filteredDocuments.map((doc) => (
+        <Card key={doc.id} className="hover:shadow-lg transition-shadow duration-200">
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <CardTitle className="text-lg">{doc.documentType}</CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline">#{doc.documentNumber}</Badge>
+                  {getStatusBadge(doc.status || "")}
+                </div>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate(`/documents/${doc.id}`)}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    Visualizar
+                  </DropdownMenuItem>
+                  {user?.role === "admin" && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate(`/documents/${doc.id}/edit`)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteDocument(doc)}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 line-clamp-2">
+                {doc.description}
+              </p>
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center">
+                  <Calendar className="mr-1 h-3 w-3" />
+                  {doc.documentDate ? formatDate(doc.documentDate) : 'Data não informada'}
+                </div>
+                {getAuthorTypeBadge(doc.authorType || "")}
+              </div>
+              {doc.fileName && (
+                <div className="flex items-center text-xs text-blue-600">
+                  <FileText className="mr-1 h-3 w-3" />
+                  Arquivo disponível
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+
   return (
     <div className="container px-4 sm:px-6 lg:px-8 mx-auto py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Documentos</h1>
-        {user?.role === "admin" && (
-          <Button onClick={() => navigate("/documents/new")}>
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Documento
-          </Button>
-        )}
+      {/* Header with stats */}
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Gestão de Documentos</h1>
+            <p className="text-gray-500 mt-1">Gerencie todos os documentos legislativos</p>
+          </div>
+          {user?.role === "admin" && (
+            <Button onClick={() => navigate("/documents/new")} size="lg">
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Documento
+            </Button>
+          )}
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <FileText className="h-8 w-8 text-blue-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalDocuments}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Badge className="h-8 w-8 bg-green-100 text-green-600 flex items-center justify-center">
+                  <span className="text-xs font-bold">V</span>
+                </Badge>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Vigentes</p>
+                  <p className="text-2xl font-bold text-gray-900">{vigentDocuments}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Users className="h-8 w-8 text-purple-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Tipos</p>
+                  <p className="text-2xl font-bold text-gray-900">{documentTypes.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Building className="h-8 w-8 text-orange-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Autores</p>
+                  <p className="text-2xl font-bold text-gray-900">{authorTypes.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-      
-      <Card>
-        <CardHeader className="pb-1">
-          <CardTitle>Documentos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center py-4">
-            <div className="relative w-full md:max-w-sm">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Filtrar documentos..."
-                value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
-                onChange={(event) =>
-                  table.getColumn("description")?.setFilterValue(event.target.value)
-                }
-                className="pl-8"
-              />
+
+      {/* Filters and Search */}
+      <Card className="mb-6">
+        <CardContent className="p-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Buscar por descrição ou número..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
             
-            <div className="flex space-x-2">
-              <Button 
-                variant={filterStatus === "" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setFilterStatus("")}
-              >
-                Todos
-              </Button>
-              <Button 
-                variant={filterStatus === "Vigente" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setFilterStatus("Vigente")}
-              >
-                Vigentes
-              </Button>
-              <Button 
-                variant={filterStatus === "Revogada" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setFilterStatus("Revogada")}
-              >
-                Revogados
-              </Button>
-              <Button 
-                variant={filterStatus === "Alterada" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setFilterStatus("Alterada")}
-              >
-                Alterados
-              </Button>
-              <Button 
-                variant={filterStatus === "Suspenso" ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setFilterStatus("Suspenso")}
-              >
-                Suspensos
-              </Button>
-            </div>
-          </div>
-          
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      Carregando...
-                    </TableCell>
-                  </TableRow>
-                ) : table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      Nenhum documento encontrado.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredRowModel().rows.length} documento(s) no total.
-            </div>
-            <div className="space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Próximo
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            <div className="flex flex-wrap gap-2">
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="Vigente">Vigente</SelectItem>
+                  <SelectItem value="Revogada">Revogada</SelectItem>
+                  <SelectItem value="Alterada">Alterada</SelectItem>
+                  <SelectItem value="Suspenso">Suspenso</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos os tipos</SelectItem>
+                  {documentTypes.map(type => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={filterAuthor} onValueChange={setFilterAuthor}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Autor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos os autores</SelectItem>
+                  {authorTypes.map(author => (
+                    <SelectItem key={author} value={author}>{author}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <div className="flex border rounded-md">
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                  className="rounded-r-none"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="rounded-l-none"
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
-      
+
+      {/* Results */}
+      {isLoading ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+            <p className="mt-4 text-gray-500">Carregando documentos...</p>
+          </CardContent>
+        </Card>
+      ) : filteredDocuments.length === 0 ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum documento encontrado</h3>
+            <p className="text-gray-500 mb-4">
+              {documents.length === 0 
+                ? "Ainda não há documentos cadastrados no sistema." 
+                : "Tente ajustar os filtros para encontrar o que procura."}
+            </p>
+            {user?.role === "admin" && documents.length === 0 && (
+              <Button onClick={() => navigate("/documents/new")}>
+                <Plus className="mr-2 h-4 w-4" />
+                Criar Primeiro Documento
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-gray-600">
+              Mostrando {filteredDocuments.length} de {totalDocuments} documentos
+            </p>
+          </div>
+          
+          {viewMode === 'grid' ? (
+            <GridView />
+          ) : (
+            <Card>
+              <CardContent className="p-0">
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                          {headerGroup.headers.map((header) => (
+                            <TableHead key={header.id}>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+                    <TableBody>
+                      {table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row) => (
+                          <TableRow
+                            key={row.id}
+                            data-state={row.getIsSelected() && "selected"}
+                          >
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell key={cell.id}>
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={columns.length} className="h-24 text-center">
+                            Nenhum documento encontrado.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                <div className="flex items-center justify-between space-x-2 p-4">
+                  <div className="text-sm text-muted-foreground">
+                    {table.getFilteredRowModel().rows.length} documento(s) no total.
+                  </div>
+                  <div className="space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => table.previousPage()}
+                      disabled={!table.getCanPreviousPage()}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Anterior
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => table.nextPage()}
+                      disabled={!table.getCanNextPage()}
+                    >
+                      Próximo
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir o documento "{selectedDocument?.documentType} Nº {selectedDocument?.documentNumber}"? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir o documento "{selectedDocument?.documentType} #{selectedDocument?.documentNumber}"?
+              Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-600 hover:bg-red-700"
             >
               Excluir
             </AlertDialogAction>
