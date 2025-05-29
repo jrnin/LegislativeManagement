@@ -301,8 +301,10 @@ export default function DocumentList() {
         <h1 className="text-2xl font-bold">Documentos</h1>
         {user?.role === "admin" && (
           <Button onClick={() => {
-            console.log("Abrindo modal...");
+            console.log("Botão clicado, abrindo modal...");
+            console.log("Estado atual:", showNewDocumentModal);
             setShowNewDocumentModal(true);
+            console.log("Estado após set:", true);
           }}>
             <Plus className="mr-2 h-4 w-4" />
             Novo Documento

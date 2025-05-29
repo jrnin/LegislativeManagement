@@ -43,6 +43,8 @@ interface DocumentFormModalProps {
 export default function DocumentFormModal({ open, onOpenChange, eventId }: DocumentFormModalProps) {
   const { toast } = useToast();
   
+  console.log("DocumentFormModal renderizado - open:", open);
+  
   const { data: activities = [] } = useQuery<LegislativeActivity[]>({
     queryKey: ["/api/activities"],
     enabled: open,
