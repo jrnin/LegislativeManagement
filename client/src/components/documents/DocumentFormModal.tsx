@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -15,12 +15,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Separator } from "@/components/ui/separator";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Document, LegislativeActivity, Event, User } from "@shared/schema";
-import { File, Upload } from "lucide-react";
 
 const formSchema = z.object({
   documentNumber: z.coerce.number().int().positive({ message: "Número do documento deve ser positivo" }),
@@ -32,8 +30,6 @@ const formSchema = z.object({
   status: z.string().min(1, { message: "Situação é obrigatória" }),
   activityId: z.coerce.number().optional(),
   eventId: z.coerce.number().optional(),
-  parentDocumentId: z.coerce.number().optional(),
-  file: z.any().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -46,7 +42,6 @@ interface DocumentFormModalProps {
 
 export default function DocumentFormModal({ open, onOpenChange, eventId }: DocumentFormModalProps) {
   const { toast } = useToast();
-  const [formFile, setFormFile] = useState<File | null>(null);
   
   const { data: activities = [] } = useQuery<LegislativeActivity[]>({
     queryKey: ["/api/activities"],
@@ -66,7 +61,7 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      documentNumber: 0,
+      documentNumber: 1,
       documentType: "",
       documentDate: new Date().toISOString().split('T')[0],
       authorType: "",
@@ -74,123 +69,66 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
       description: "",
       status: "",
       activityId: undefined,
-      eventId: eventId ?? undefined,
-      parentDocumentId: undefined,
-      file: undefined,
-    }
+      eventId: eventId,
+    },
   });
 
-  const createMutation = useMutation({
+  const createDocumentMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const formData = new FormData();
       
-      // Append basic fields
+      // Adicionar dados do documento
       formData.append("documentNumber", data.documentNumber.toString());
       formData.append("documentType", data.documentType);
       formData.append("documentDate", data.documentDate);
       formData.append("authorType", data.authorType);
-      if (data.authorId) {
-        formData.append("authorId", data.authorId);
-      }
       formData.append("description", data.description);
       formData.append("status", data.status);
       
-      // Append optional fields if present
-      if (data.activityId && data.activityId !== 0) {
-        formData.append("activityId", data.activityId.toString());
-      }
-      if (data.eventId && data.eventId !== 0) {
-        formData.append("eventId", data.eventId.toString());
-      }
-      if (data.parentDocumentId && data.parentDocumentId !== 0) {
-        formData.append("parentDocumentId", data.parentDocumentId.toString());
-      }
-      
-      // Append file if present
-      if (formFile) {
-        formData.append("file", formFile);
-      }
-      
-      const response = await fetch("/api/documents", {
+      if (data.authorId) formData.append("authorId", data.authorId);
+      if (data.activityId) formData.append("activityId", data.activityId.toString());
+      if (data.eventId) formData.append("eventId", data.eventId.toString());
+
+      return apiRequest("/api/documents", {
         method: "POST",
         body: formData,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Erro ao criar documento");
-      }
-
-      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       toast({
         title: "Sucesso",
         description: "Documento criado com sucesso!",
       });
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       form.reset();
-      setFormFile(null);
       onOpenChange(false);
     },
     onError: (error: Error) => {
       toast({
         title: "Erro",
-        description: error.message,
+        description: error.message || "Erro ao criar documento",
         variant: "destructive",
       });
     },
   });
 
   const onSubmit = (data: FormData) => {
-    createMutation.mutate(data);
+    createDocumentMutation.mutate(data);
   };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormFile(e.target.files[0]);
-    }
-  };
-
-  const documentTypes = [
-    "Pauta", 
-    "Portaria",
-    "Decreto", 
-    "Decreto Legislativo", 
-    "Lei Complementar", 
-    "Oficio"
-  ];
-
-  const authorTypes = [
-    "Legislativo",
-    "Executivo"
-  ];
-
-  const documentStatuses = [
-    "Vigente",
-    "Revogada",
-    "Alterada",
-    "Suspenso"
-  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Novo Documento</DialogTitle>
           <DialogDescription>
-            Preencha os campos abaixo para criar um novo documento.
+            Preencha as informações do documento
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium">Informações Básicas</h3>
-              <Separator />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="documentNumber"
@@ -198,41 +136,40 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
                   <FormItem>
                     <FormLabel>Número do Documento</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="0" {...field} />
+                      <Input type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="documentType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo do Documento</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
+                    <FormLabel>Tipo de Documento</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o tipo" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {documentTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="Pauta">Pauta</SelectItem>
+                        <SelectItem value="Decreto">Decreto</SelectItem>
+                        <SelectItem value="Decreto Legislativo">Decreto Legislativo</SelectItem>
+                        <SelectItem value="Lei Complementar">Lei Complementar</SelectItem>
+                        <SelectItem value="Oficio">Ofício</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="documentDate"
@@ -246,88 +183,72 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
                   </FormItem>
                 )}
               />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="authorType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo de Autor</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {authorTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="authorId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Vereador Autor</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o vereador" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="">Nenhum vereador selecionado</SelectItem>
-                        {councilors.map((councilor: any) => (
-                          <SelectItem key={councilor.id} value={councilor.id}>
-                            {councilor.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Selecione o vereador autor do documento (opcional)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
+
               <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Situação do Documento</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
+                    <FormLabel>Situação</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione a situação" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {documentStatuses.map((status) => (
-                          <SelectItem key={status} value={status}>
-                            {status}
+                        <SelectItem value="Vigente">Vigente</SelectItem>
+                        <SelectItem value="Revogada">Revogada</SelectItem>
+                        <SelectItem value="Alterada">Alterada</SelectItem>
+                        <SelectItem value="Suspenso">Suspenso</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="authorType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Autor</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo de autor" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Legislativo">Legislativo</SelectItem>
+                        <SelectItem value="Executivo">Executivo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="authorId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vereador (Opcional)</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um vereador" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">Nenhum vereador</SelectItem>
+                        {councilors.map((councilor) => (
+                          <SelectItem key={councilor.id} value={councilor.id}>
+                            {councilor.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -337,43 +258,33 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
                 )}
               />
             </div>
-            
-            <div>
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Descreva o documento..."
-                        className="resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium">Relacionamentos</h3>
-              <Separator />
-            </div>
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Digite a descrição do documento..."
+                      className="min-h-[100px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {activities.length > 0 && (
               <FormField
                 control={form.control}
                 name="activityId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Atividade Legislativa</FormLabel>
-                    <Select 
-                      onValueChange={(value) => field.onChange(value === "" ? undefined : Number(value))} 
-                      defaultValue={field.value?.toString() || ""}
-                    >
+                    <FormLabel>Atividade Legislativa (Opcional)</FormLabel>
+                    <Select onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} defaultValue={field.value?.toString()}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione uma atividade" />
@@ -392,87 +303,14 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="eventId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Evento</FormLabel>
-                    <Select 
-                      onValueChange={(value) => field.onChange(value === "" ? undefined : Number(value))} 
-                      defaultValue={field.value?.toString() || ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um evento" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="">Nenhum evento</SelectItem>
-                        {events.map((event) => (
-                          <SelectItem key={event.id} value={event.id.toString()}>
-                            {event.description || `Evento ${event.id}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium">Arquivo</h3>
-              <Separator />
-            </div>
-
-            <div>
-              <FormField
-                control={form.control}
-                name="file"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Arquivo do Documento</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          type="file"
-                          accept=".pdf,.doc,.docx"
-                          onChange={handleFileChange}
-                          className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
-                        />
-                        {formFile && (
-                          <div className="flex items-center text-sm text-green-600">
-                            <File className="h-4 w-4 mr-1" />
-                            {formFile.name}
-                          </div>
-                        )}
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      Selecione um arquivo PDF, DOC ou DOCX (opcional)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            )}
 
             <div className="flex justify-end space-x-2 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? (
-                  <>
-                    <Upload className="mr-2 h-4 w-4 animate-spin" />
-                    Criando...
-                  </>
-                ) : (
-                  "Criar Documento"
-                )}
+              <Button type="submit" disabled={createDocumentMutation.isPending}>
+                {createDocumentMutation.isPending ? "Salvando..." : "Salvar Documento"}
               </Button>
             </div>
           </form>

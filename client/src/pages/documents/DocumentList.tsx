@@ -465,17 +465,10 @@ export default function DocumentList() {
       </AlertDialog>
 
       {/* Modal de Novo Documento */}
-      <Dialog open={showNewDocumentModal} onOpenChange={setShowNewDocumentModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Novo Documento</DialogTitle>
-          </DialogHeader>
-          <div className="p-4">
-            <p>Modal de teste funcionando!</p>
-            <Button onClick={() => setShowNewDocumentModal(false)}>Fechar</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DocumentFormModal 
+        open={showNewDocumentModal}
+        onOpenChange={setShowNewDocumentModal}
+      />
     </div>
   );
 }
