@@ -258,7 +258,9 @@ export default function VereadorDetalhesPage() {
   });
 
   // Usar os documentos reais do banco de dados
-  const documents = Array.isArray(councilorDocuments) && councilorDocuments.length > 0 ? councilorDocuments : allDocuments;
+  const documents = Array.isArray(councilorDocuments) && councilorDocuments.length > 0 
+    ? councilorDocuments 
+    : (Array.isArray(allDocuments) ? allDocuments : []);
 
   const { data: commissions = mockCommissions } = useQuery({
     queryKey: [`/api/public/councilors/${id}/commissions`],
