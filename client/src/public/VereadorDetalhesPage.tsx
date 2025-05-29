@@ -112,6 +112,7 @@ export default function VereadorDetalhesPage() {
   // Buscar documentos gerais da câmara (se não houver documentos específicos do vereador)
   const { data: allDocumentsResponse } = useQuery({
     queryKey: ["/api/public/documents"],
+    enabled: true,
   });
 
   const allDocuments = Array.isArray(allDocumentsResponse) ? allDocumentsResponse : (allDocumentsResponse?.documents || []);
