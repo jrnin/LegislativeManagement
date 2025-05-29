@@ -85,12 +85,14 @@ function App() {
   const isLoginRoute = location === "/login";
   
   // Verificar se estamos em uma rota pública
-  // Considerar tanto "/public" quanto rotas na raiz como públicas
-  const isPublicRoute = location.startsWith("/public") || 
+  // Considerar tanto "/public" quanto rotas na raiz como públicas, EXCETO /login
+  const isPublicRoute = (location.startsWith("/public") || 
                        location === "/" || 
                        location.startsWith("/documentos") || 
                        location.startsWith("/vereadores") || 
-                       location.startsWith("/atividades");
+                       location.startsWith("/atividades")) &&
+                       !location.startsWith("/login") &&
+                       !location.startsWith("/verify-email");
   
   // Só usar hook de auth se não for rota pública
   const { isLoading, isAuthenticated } = isPublicRoute ? { isLoading: false, isAuthenticated: false } : useAuth();
