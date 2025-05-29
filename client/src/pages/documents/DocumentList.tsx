@@ -17,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import DocumentFormModal from "@/components/documents/DocumentFormModal";
+import DocumentFormModal from "../../components/documents/DocumentFormModal";
 import {
   Table,
   TableBody,
@@ -294,7 +294,10 @@ export default function DocumentList() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Documentos</h1>
         {user?.role === "admin" && (
-          <Button onClick={() => setShowNewDocumentModal(true)}>
+          <Button onClick={() => {
+            console.log("Abrindo modal...");
+            setShowNewDocumentModal(true);
+          }}>
             <Plus className="mr-2 h-4 w-4" />
             Novo Documento
           </Button>
@@ -456,6 +459,7 @@ export default function DocumentList() {
       </AlertDialog>
 
       {/* Modal de Novo Documento */}
+      {console.log("Estado do modal:", showNewDocumentModal)}
       <DocumentFormModal 
         open={showNewDocumentModal}
         onOpenChange={setShowNewDocumentModal}
