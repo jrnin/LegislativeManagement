@@ -391,109 +391,28 @@ export default function HomePage() {
       </Helmet>
 
       {/* Seção Hero Principal com vista aérea */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-        {/* Imagem de fundo da cidade */}
+      <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
+        {/* Vídeo de fundo */}
         <div className="absolute inset-0 w-full h-full z-0">
-          <img
-            src="https://images.unsplash.com/photo-1473116763249-2faaef81ccda?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-            alt="Vista aérea da cidade"
-            className="w-full h-full object-cover"
+          <iframe
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            style={{             
+              transformOrigin: 'center center'
+            }}
+             src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
+            title="Vídeo de fundo da Câmara Municipal"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
           />
-        </div>
-        
-        {/* Overlay com gradiente */}
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/40 via-blue-800/30 to-blue-700/40 z-10"></div>
-        
-        {/* Elementos geométricos decorativos */}
-        <div className="absolute bottom-0 right-0 z-20">
-          <svg width="400" height="200" viewBox="0 0 400 200" className="opacity-80">
-            {/* Triângulos azuis */}
-            <polygon points="300,200 400,200 400,100" fill="#2563eb" />
-            <polygon points="200,200 300,200 250,150" fill="#3b82f6" />
-            {/* Triângulos vermelhos */}
-            <polygon points="350,200 400,200 400,150" fill="#dc2626" />
-            <polygon points="250,200 300,200 275,175" fill="#ef4444" />
-          </svg>
-        </div>
-        
-        {/* Informações de clima */}
-        <div className="absolute top-6 left-6 z-30 bg-white/20 backdrop-blur-sm rounded-lg p-3 text-white">
-          <div className="flex items-center space-x-2">
-            <Sun size={20} />
-            <span className="text-sm font-medium">19°</span>
-            <span className="text-xs">Parcialmente Nublado</span>
-          </div>
-        </div>
-
-        {/* Card de Assuntos em Alta */}
-        <div className="absolute top-20 left-6 z-30 bg-white/90 backdrop-blur-sm rounded-lg p-4 text-gray-800 shadow-lg min-w-[320px]">
-          <div className="flex items-center mb-3">
-            <div className="w-6 h-6 mr-2">
-              <svg viewBox="0 0 24 24" fill="none" className="w-full h-full text-blue-700">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-              </svg>
-            </div>
-            <span className="text-sm font-semibold text-blue-700">Assuntos em alta</span>
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            {[
-              "IPTU 2025",
-              "Nota Fiscal Eletrônica",
-              "Pregão Eletrônico",
-              "Consulta de Processos",
-              "Ouvidoria",
-              "Serviços Online"
-            ].map((topic, index) => (
-              <button
-                key={index}
-                className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-xs font-medium text-gray-700 transition-colors duration-200 border border-gray-200"
-              >
-                {topic}
-              </button>
-            ))}
-          </div>
-        </div>
-        
+        </div>        
+                
+              
         <div className="container mx-auto px-4 relative z-20">
           <div className="text-center text-white max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-              Portal da
-              <br />
-              <span className="text-blue-300">Câmara Municipal</span>
-            </h1>
+          
             
-            {/* Barra de busca */}
-            <div className="max-w-2xl mx-auto mb-8">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Digite sua busca"
-                  className="w-full px-6 py-4 rounded-full text-gray-800 text-lg focus:outline-none focus:ring-4 focus:ring-blue-300/50 shadow-2xl"
-                />
-                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition-colors duration-200">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            
-            {/* Botões de ação */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full shadow-xl">
-                <Users className="mr-2" />
-                Conheça os Vereadores
-              </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-full">
-                <FileText className="mr-2" />
-                Documentos Públicos
-              </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-full">
-                <Calendar className="mr-2" />
-                Agenda de Sessões
-              </Button>
-            </div>
+        
           </div>
         </div>
       </section>
@@ -520,7 +439,138 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section>      
+      </section>
+
+      {/* Seção de Serviços Moderna e Interativa */}
+      <section className="py-24 px-4 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'}}>
+        {/* Elementos decorativos de fundo */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full opacity-10 animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-64 h-64 bg-green-200 rounded-full opacity-10 animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-orange-200 rounded-full opacity-10 animate-pulse" style={{animationDelay: '4s'}}></div>
+        </div>
+
+        <div className="container mx-auto relative z-10">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-orange-500 bg-clip-text text-transparent">
+              Serviços Digitais
+            </h2>
+            <p className="text-gray-600 max-w-3xl mx-auto text-xl leading-relaxed">
+              Acesse nossos serviços de forma rápida e eficiente, organizados por categoria para sua conveniência
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Card de Contratos */}
+            <div className="group relative">
+              <div className="bg-gradient-to-r from-pink-500 to-red-500 rounded-3xl p-8 text-white overflow-hidden shadow-2xl group-hover:shadow-pink-500/30 transition-all duration-500">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-6">
+                      <h3 className="text-3xl font-bold mr-3">Contratos</h3>
+                      <span className="text-sm bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">SOLUÇÕES</span>
+                    </div>
+                    
+                    {/* Grid de serviços */}
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {[
+                        { icon: "🛒", text: "Compras" },
+                        { icon: "📋", text: "Contratos" },
+                        { icon: "🏗️", text: "Obras" },
+                        { icon: "📦", text: "Almoxarifado" },
+                        { icon: "📱", text: "APP Almoxarifado" },
+                        { icon: "🚗", text: "Frotas" },
+                        { icon: "📱", text: "APP Frotas" },
+                        { icon: "💼", text: "Patrimônio" },
+                        { icon: "📱", text: "APP Patrimônio" },
+                        { icon: "🌐", text: "Portal do Gestor" },
+                        { icon: "📊", text: "Monitor DF-e" }
+                      ].map((service, index) => (
+                        <button key={index} className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200 text-left backdrop-blur-sm border border-white/10">
+                          <span className="text-lg mr-2">{service.icon}</span>
+                          <span className="text-sm font-medium">{service.text}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Imagem do profissional */}
+                  <div className="ml-6">
+                    <img 
+                      src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                      alt="Profissional de contratos"
+                      className="w-32 h-40 object-cover rounded-2xl shadow-lg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card de Contábil */}
+            <div className="group relative">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white overflow-hidden shadow-2xl group-hover:shadow-blue-500/30 transition-all duration-500">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-6">
+                      <h3 className="text-3xl font-bold mr-3">Contábil</h3>
+                      <span className="text-sm bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">SOLUÇÕES</span>
+                    </div>
+                    
+                    {/* Grid de serviços */}
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {[
+                        { icon: "📊", text: "ContaDil" },
+                        { icon: "📈", text: "Planejamento" },
+                        { icon: "🎯", text: "Controladoria" },
+                        { icon: "📋", text: "Prestação de Contas" },
+                        { icon: "🤝", text: "Convênios" },
+                        { icon: "🌐", text: "Portal do Gestor" },
+                        { icon: "💰", text: "Tesouraria" },
+                        { icon: "🔒", text: "Controle Interno" },
+                        { icon: "🏠", text: "Controle da Caixa" },
+                        { icon: "📱", text: "BI" }
+                      ].map((service, index) => (
+                        <button key={index} className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200 text-left backdrop-blur-sm border border-white/10">
+                          <span className="text-lg mr-2">{service.icon}</span>
+                          <span className="text-sm font-medium">{service.text}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Imagem do profissional */}
+                  <div className="ml-6">
+                    <img 
+                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                      alt="Profissional contábil"
+                      className="w-32 h-40 object-cover rounded-2xl shadow-lg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Estatísticas interativas */}
+          <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { number: "12.5k+", label: "Serviços Realizados", color: "text-blue-600" },
+              { number: "98%", label: "Satisfação", color: "text-green-600" },
+              { number: "24/7", label: "Disponibilidade", color: "text-orange-600" },
+              { number: "150+", label: "Tipos de Serviços", color: "text-purple-600" }
+            ].map((stat, index) => (
+              <div key={index} className="text-center group cursor-pointer">
+                <div className={`text-4xl md:text-5xl font-bold mb-2 ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
+                  {stat.number}
+                </div>
+                <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">
