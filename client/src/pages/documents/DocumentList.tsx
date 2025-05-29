@@ -17,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import DocumentFormModal from "../../components/documents/DocumentFormModal";
+
 import {
   Table,
   TableBody,
@@ -26,12 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -76,7 +71,6 @@ export default function DocumentList() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [showNewDocumentModal, setShowNewDocumentModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
 
   const { data: documents = [], isLoading } = useQuery<Document[]>({
@@ -300,12 +294,7 @@ export default function DocumentList() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Documentos</h1>
         {user?.role === "admin" && (
-          <Button onClick={() => {
-            console.log("Botão clicado, abrindo modal...");
-            console.log("Estado atual:", showNewDocumentModal);
-            setShowNewDocumentModal(true);
-            console.log("Estado após set:", true);
-          }}>
+          <Button onClick={() => navigate("/documents/new")}>
             <Plus className="mr-2 h-4 w-4" />
             Novo Documento
           </Button>
@@ -466,11 +455,7 @@ export default function DocumentList() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Modal de Novo Documento */}
-      <DocumentFormModal 
-        open={showNewDocumentModal}
-        onOpenChange={setShowNewDocumentModal}
-      />
+
     </div>
   );
 }
