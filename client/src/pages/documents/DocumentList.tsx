@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
@@ -80,9 +80,9 @@ export default function DocumentList() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<string>("");
-  const [filterType, setFilterType] = useState<string>("");
-  const [filterAuthor, setFilterAuthor] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("todos");
+  const [filterType, setFilterType] = useState<string>("todos");
+  const [filterAuthor, setFilterAuthor] = useState<string>("todos");
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -90,7 +90,14 @@ export default function DocumentList() {
     queryKey: ["/api/documents"],
   });
 
-  const documents = Array.isArray(documentsResponse) ? documentsResponse : (documentsResponse?.documents || []);
+  const documents: Document[] = useMemo(() => {
+    if (!documentsResponse) return [];
+    if (Array.isArray(documentsResponse)) return documentsResponse;
+    if (documentsResponse && typeof documentsResponse === 'object' && 'documents' in documentsResponse) {
+      return (documentsResponse as any).documents || [];
+    }
+    return [];
+  }, [documentsResponse]);
 
   const deleteMutation = useMutation({
     mutationFn: async (documentId: number) => {
