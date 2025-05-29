@@ -86,9 +86,11 @@ export default function DocumentList() {
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: documents = [], isLoading } = useQuery<Document[]>({
+  const { data: documentsResponse, isLoading } = useQuery({
     queryKey: ["/api/documents"],
   });
+
+  const documents = Array.isArray(documentsResponse) ? documentsResponse : (documentsResponse?.documents || []);
 
   const deleteMutation = useMutation({
     mutationFn: async (documentId: number) => {
