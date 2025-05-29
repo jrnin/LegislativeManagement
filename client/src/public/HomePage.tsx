@@ -729,31 +729,38 @@ export default function HomePage() {
                 
               </div>
               
-              {/* Widget de Assuntos em Alta */}
+              {/* Widget de Assuntos em Alta - Nuvem de Tags */}
               <div className="bg-white rounded-lg shadow-md p-4 mt-6">
                 <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
                   <Zap className="mr-2" style={{color: '#7FA653'}} size={20} />
                   Assuntos em alta
                 </h3>
                 
-                <div className="space-y-3">
+                <div className="flex flex-wrap gap-2">
                   {[
-                    "IPTU 2025",
-                    "Nota Fiscal Eletrônica", 
-                    "Pregão Eletrônico",
-                    "Consulta de Processos",
-                    "Ouvidoria",
-                    "Serviços Online"
-                  ].map((topic, index) => (
+                    { text: "IPTU 2025", size: "text-lg", color: "bg-blue-100 hover:bg-blue-200 text-blue-800" },
+                    { text: "Nota Fiscal", size: "text-sm", color: "bg-green-100 hover:bg-green-200 text-green-800" }, 
+                    { text: "Pregão Eletrônico", size: "text-base", color: "bg-purple-100 hover:bg-purple-200 text-purple-800" },
+                    { text: "Processos", size: "text-sm", color: "bg-orange-100 hover:bg-orange-200 text-orange-800" },
+                    { text: "Ouvidoria", size: "text-xs", color: "bg-red-100 hover:bg-red-200 text-red-800" },
+                    { text: "Serviços Online", size: "text-base", color: "bg-teal-100 hover:bg-teal-200 text-teal-800" },
+                    { text: "Licitações", size: "text-sm", color: "bg-indigo-100 hover:bg-indigo-200 text-indigo-800" },
+                    { text: "Documentos", size: "text-xs", color: "bg-pink-100 hover:bg-pink-200 text-pink-800" },
+                    { text: "Transparência", size: "text-sm", color: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800" }
+                  ].map((tag, index) => (
                     <button 
                       key={index} 
-                      className="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 border border-gray-200 hover:border-gray-300"
+                      className={`px-3 py-1 rounded-full transition-all duration-200 transform hover:scale-105 ${tag.size} ${tag.color} font-medium shadow-sm hover:shadow-md`}
                     >
-                      <span className="text-sm font-medium text-gray-700 hover:text-gray-900">
-                        {topic}
-                      </span>
+                      {tag.text}
                     </button>
                   ))}
+                </div>
+                
+                <div className="mt-4 text-center">
+                  <button className="text-xs text-gray-500 hover:text-gray-700 underline">
+                    Ver todos os assuntos
+                  </button>
                 </div>
               </div>      
                       
