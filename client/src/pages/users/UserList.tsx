@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { 
   ColumnDef,
   flexRender,
@@ -42,6 +45,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,6 +71,24 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+// Schema de validação para o formulário de usuário
+const userFormSchema = z.object({
+  name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres" }),
+  email: z.string().email({ message: "Email inválido" }),
+  phone: z.string().min(10, { message: "Telefone deve ter pelo menos 10 dígitos" }),
+  userType: z.enum(["Administrador", "Vereador"], { 
+    message: "Selecione um tipo de usuário válido" 
+  }),
+  party: z.string().optional(),
+  position: z.string().optional(),
+  address: z.string().optional(),
+  birthDate: z.string().optional(),
+  profession: z.string().optional(),
+  education: z.string().optional(),
+});
+
+type UserFormData = z.infer<typeof userFormSchema>;
+
 export default function UserList() {
   const [, navigate] = useLocation();
   const { user: currentUser } = useAuth();
@@ -66,9 +97,48 @@ export default function UserList() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { data: users = [], isLoading } = useQuery<User[]>({
     queryKey: ["/api/users"],
+  });
+
+  const form = useForm<UserFormData>({
+    resolver: zodResolver(userFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      userType: "Vereador",
+      party: "",
+      position: "",
+      address: "",
+      birthDate: "",
+      profession: "",
+      education: "",
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (data: UserFormData) => {
+      await apiRequest("POST", "/api/users", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Usuário criado",
+        description: "O usuário foi criado com sucesso.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setShowCreateModal(false);
+      form.reset();
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao criar usuário",
+        description: error.message,
+      });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -101,6 +171,10 @@ export default function UserList() {
       deleteMutation.mutate(selectedUser.id);
       setShowDeleteAlert(false);
     }
+  };
+
+  const onSubmit = (data: UserFormData) => {
+    createMutation.mutate(data);
   };
 
   const columns: ColumnDef<User>[] = [
@@ -212,10 +286,201 @@ export default function UserList() {
     <div className="container px-4 sm:px-6 lg:px-8 mx-auto py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Usuários</h1>
-        <Button onClick={() => navigate("/users/new")}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Usuário
-        </Button>
+        <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Usuário
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Criar Novo Usuário</DialogTitle>
+              <DialogDescription>
+                Preencha os dados para criar um novo usuário no sistema.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome Completo</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Digite o nome completo" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} placeholder="email@exemplo.com" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Telefone</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="(11) 99999-9999" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="userType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Usuário</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o tipo" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Administrador">Administrador</SelectItem>
+                            <SelectItem value="Vereador">Vereador</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="party"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Partido (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: PT, PSDB, etc." />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="position"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cargo (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: Presidente, Vice-presidente" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Endereço (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Endereço completo" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="birthDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Data de Nascimento (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="profession"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Profissão (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: Advogado, Empresário" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="education"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Formação (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Ex: Direito, Administração" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowCreateModal(false);
+                      form.reset();
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={createMutation.isPending}
+                  >
+                    {createMutation.isPending ? "Criando..." : "Criar Usuário"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
       
       <Card>
