@@ -58,7 +58,7 @@ export default function DocumentFormModal({ open, onOpenChange, eventId }: Docum
     enabled: open,
   });
 
-  const { data: councilors = [] } = useQuery<Councilor[]>({
+  const { data: councilors = [] } = useQuery<User[]>({
     queryKey: ["/api/councilors"],
     enabled: open,
   });
