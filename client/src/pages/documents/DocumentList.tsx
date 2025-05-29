@@ -371,7 +371,7 @@ export default function DocumentList() {
               <div className="flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center">
                   <Calendar className="mr-1 h-3 w-3" />
-                  {doc.documentDate ? formatDate(doc.documentDate) : 'Data não informada'}
+                  {doc.documentDate ? formatDate(new Date(doc.documentDate).toISOString()) : 'Data não informada'}
                 </div>
                 {getAuthorTypeBadge(doc.authorType || "")}
               </div>
