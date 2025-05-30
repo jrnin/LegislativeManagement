@@ -43,11 +43,16 @@ export default function Sidebar() {
     <div className="flex flex-col h-full">
       <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
         <div className="flex items-center justify-center flex-shrink-0 px-4 mb-5">
-          <div className="flex items-center space-x-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-xl">
-              SL
+          <div className="flex items-center space-x-3">
+            <img 
+              src="/src/assets/logo.png" 
+              alt="Câmara Municipal de Jaíba" 
+              className="w-10 h-10 object-contain"
+            />
+            <div>
+              <h1 className="text-sm font-bold text-slate-800">Câmara Municipal</h1>
+              <h2 className="text-sm font-semibold text-slate-600">de Jaíba</h2>
             </div>
-            <h1 className="text-xl font-bold gradient-heading">Sistema<span className="text-slate-700">Legislativo</span></h1>
           </div>
         </div>
         

@@ -206,21 +206,23 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             <div className="flex justify-between items-center">
               {/* Logo */}
               <Link href="/">
-                <button className="flex items-center space-x-2">
-                  <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl" style={{background: 'linear-gradient(to bottom right, #253529, #48654e)'}}>
-                    SL
-                  </div>
+                <button className="flex items-center space-x-3">
+                  <img 
+                    src="/src/assets/logo.png" 
+                    alt="Câmara Municipal de Jaíba" 
+                    className="w-14 h-14 object-contain"
+                  />
                   <div className="hidden sm:block">
                     <h1 className="text-xl font-bold">
-                      <span style={{color: '#253529'}}>Sistema</span>
-                      <span className={`${
-                        location === '/public' && !isScrolled
-                          ? 'text-white' 
-                          : isDarkMode 
-                            ? 'text-gray-300' 
-                            : 'text-slate-700'
-                      }`}>Legislativo</span>
+                      <span style={{color: '#253529'}}>Câmara Municipal</span>
                     </h1>
+                    <h2 className={`text-lg font-semibold ${
+                      location === '/public' && !isScrolled
+                        ? 'text-white' 
+                        : isDarkMode 
+                          ? 'text-gray-300' 
+                          : 'text-slate-700'
+                    }`}>de Jaíba</h2>
                     <p className={`text-xs ${
                       location === '/public' && !isScrolled 
                         ? 'text-blue-100' 
