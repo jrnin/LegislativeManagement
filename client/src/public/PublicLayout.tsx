@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Helmet } from 'react-helmet';
+import logoPath from '@assets/logo.png';
 import { 
   Search, 
   Menu, 
@@ -208,7 +209,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               <Link href="/">
                 <button className="flex items-center space-x-3">
                   <img 
-                    src="@assets/logo.png" 
+                    src={logoPath} 
                     alt="Câmara Municipal de Jaíba" 
                     className="w-14 h-14 object-contain"
                   />

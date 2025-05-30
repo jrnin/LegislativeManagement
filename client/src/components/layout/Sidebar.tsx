@@ -11,6 +11,7 @@ import {
   Settings,
   UsersRound
 } from "lucide-react";
+import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,7 @@ export default function Sidebar() {
         <div className="flex items-center justify-center flex-shrink-0 px-4 mb-5">
           <div className="flex items-center space-x-3">
             <img 
-              src="@assets/logo.png" 
+              src={logoPath} 
               alt="Câmara Municipal de Jaíba" 
               className="w-10 h-10 object-contain"
             />
