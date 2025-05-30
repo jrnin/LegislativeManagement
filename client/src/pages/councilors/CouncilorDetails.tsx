@@ -140,9 +140,9 @@ export default function CouncilorDetails() {
             
             <div className="flex items-center gap-6">
               <div className="relative">
-                <Avatar className="h-24 w-24 ring-4 ring-white/20">
-                  <AvatarImage src={councilor?.profileImageUrl || undefined} alt={councilor?.name} />
-                  <AvatarFallback className="text-2xl bg-white/10 text-white">{councilor?.name ? getInitials(councilor.name) : "VR"}</AvatarFallback>
+                <Avatar className="h-24 w-24 ring-4 ring-white/20 rounded-2xl">
+                  <AvatarImage src={councilor?.profileImageUrl || undefined} alt={councilor?.name} className="rounded-2xl" />
+                  <AvatarFallback className="text-2xl bg-white/10 text-white rounded-2xl">{councilor?.name ? getInitials(councilor.name) : "VR"}</AvatarFallback>
                 </Avatar>
               </div>
               
