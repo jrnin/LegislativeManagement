@@ -33,6 +33,7 @@ function AuthenticatedApp() {
     <Layout>
       <Switch>
         <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
         <Route path="/users" component={UserList} />
         <Route path="/users/new" component={UserForm} />
         <Route path="/users/:id" component={UserForm} />

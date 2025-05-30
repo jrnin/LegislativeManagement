@@ -77,11 +77,11 @@ export default function LoginPage() {
       if (result.success) {
         toast({
           title: "Login realizado com sucesso",
-          description: "Você será redirecionado para a página inicial",
+          description: "Você será redirecionado para o painel administrativo",
         });
         
-        // Redirecionar para página inicial
-        window.location.href = "/";
+        // Redirecionar para o dashboard administrativo
+        window.location.href = "/dashboard";
       } else {
         toast({
           title: "Erro ao fazer login",
