@@ -348,10 +348,21 @@ export default function DocumentList() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Ações</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  
+                  {doc.filePath && (
+                    <DropdownMenuItem 
+                      onClick={() => window.open(`/api/files/documents/${doc.id}`, '_blank')}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Baixar Arquivo
+                    </DropdownMenuItem>
+                  )}
+                  
                   <DropdownMenuItem onClick={() => navigate(`/documents/${doc.id}`)}>
                     <Eye className="mr-2 h-4 w-4" />
                     Visualizar
                   </DropdownMenuItem>
+                  
                   {user?.role === "admin" && (
                     <>
                       <DropdownMenuItem onClick={() => navigate(`/documents/${doc.id}/edit`)}>
