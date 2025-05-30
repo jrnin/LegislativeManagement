@@ -125,9 +125,9 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       </Helmet>
 
       {/* Top bar com opções de acessibilidade e redes sociais */}
-      <div className="w-full py-2 px-4 text-white text-sm" style={{backgroundColor: '#253529'}}>
+      <div className="w-full py-4 px-6 text-white text-sm" style={{backgroundColor: '#253529'}}>
         <div className="container mx-auto flex flex-wrap justify-between items-center">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <div className="flex items-center">
               <span className="mr-2 font-medium">Acessibilidade:</span>
               <button 
@@ -211,19 +211,12 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   <img 
                     src={logoPath} 
                     alt="Câmara Municipal de Jaíba" 
-                    className="w-20 h-20 object-contain"
+                    className="h-20 w-20 object-contain"
                   />
                   <div className="hidden sm:block">
                     <h1 className="text-xl font-bold">
-                      <span style={{color: '#253529'}}>Câmara Municipal</span>
-                    </h1>
-                    <h2 className={`text-lg font-semibold ${
-                      location === '/public' && !isScrolled
-                        ? 'text-white' 
-                        : isDarkMode 
-                          ? 'text-gray-300' 
-                          : 'text-slate-700'
-                    }`}>de Jaíba</h2>
+                      <span style={{color: '#253529'}}>Câmara Municipal de Jaíba</span>
+                    </h1>                    
                     <p className={`text-xs ${
                       location === '/public' && !isScrolled 
                         ? 'text-blue-100' 

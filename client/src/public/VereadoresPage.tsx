@@ -27,7 +27,7 @@ const CouncilorCard = ({ councilor }: { councilor: Councilor }) => (
       <Card className="text-center hover:shadow-lg transition-all h-full">
         <CardHeader className="pb-2 pt-6">
           <div className="flex justify-center mb-4">
-            <Avatar className="h-24 w-24 border-4 border-white shadow-md">
+            <Avatar className="h-44 w-44 border-4 border-white shadow-md">
               <AvatarImage src={councilor.profileImageUrl} />
               <AvatarFallback className="bg-blue-700 text-white text-lg">{getInitials(councilor.name)}</AvatarFallback>
             </Avatar>
@@ -58,7 +58,7 @@ export default function VereadoresPage() {
       </Helmet>
 
       {/* Hero Section */}
-      <div className="text-white py-16" style={{background: 'linear-gradient(to right, #7FA653, #63783D)'}}>
+      <div className="text-white py-16" style={{background: 'linear-gradient(to right, #007825, #1c873d)'}}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>

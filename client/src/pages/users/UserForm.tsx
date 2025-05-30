@@ -45,6 +45,7 @@ const createFormSchema = z.object({
   maritalStatus: z.string().optional(),
   occupation: z.string().optional(),
   education: z.string().optional(),
+  partido: z.string().optional(),
   password: z.string().min(6, { message: "Senha deve ter no mínimo 6 caracteres" }),
   confirmPassword: z.string(),
 }).refine(data => data.password === data.confirmPassword, {
@@ -121,6 +122,7 @@ export default function UserForm() {
       maritalStatus: "",
       occupation: "",
       education: "",
+      partido: "",
       password: "",
       confirmPassword: "",
     }
@@ -144,6 +146,7 @@ export default function UserForm() {
         maritalStatus: user.maritalStatus || "",
         occupation: user.occupation || "",
         education: user.education || "",
+        partido: user.partido || "",
       });
     }
   }, [user, form]);
@@ -536,6 +539,20 @@ export default function UserForm() {
                           <SelectItem value="doutorado">Doutorado</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="partido"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Partido (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: PT, PSDB, MDB..." {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

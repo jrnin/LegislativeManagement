@@ -59,6 +59,7 @@ export const users = pgTable("users", {
   maritalStatus: varchar("marital_status"),
   occupation: varchar("occupation"),
   education: varchar("education"),
+  partido: varchar("partido"),
   password: varchar("password"),
   emailVerified: boolean("email_verified").default(false),
   verificationToken: varchar("verification_token"),
