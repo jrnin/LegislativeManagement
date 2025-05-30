@@ -125,7 +125,7 @@ export default function CouncilorDetails() {
 
       <div className="min-h-screen bg-gray-50">
         {/* Header com informações do vereador */}
-        <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-400 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-green-600 via-green-700 to-green-800 relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative max-w-6xl mx-auto p-6">
             <div className="flex items-center gap-4 mb-6">
@@ -188,24 +188,18 @@ export default function CouncilorDetails() {
             </div>
           ) : (
             <Tabs defaultValue="info" className="w-full">
-              <TabsList className="grid w-full grid-cols-6 bg-white border rounded-lg h-12">
-                <TabsTrigger value="info" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600">
-                  Basic user info
+              <TabsList className="grid w-full grid-cols-4 bg-white border rounded-lg h-12">
+                <TabsTrigger value="info" className="data-[state=active]:bg-green-50 data-[state=active]:text-green-600 data-[state=active]:border-b-2 data-[state=active]:border-green-600">
+                  Informações Básicas
                 </TabsTrigger>
-                <TabsTrigger value="ecommerce" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600">
-                  E-Commerce
+                <TabsTrigger value="activities" className="data-[state=active]:bg-green-50 data-[state=active]:text-green-600 data-[state=active]:border-b-2 data-[state=active]:border-green-600">
+                  Atividades Legislativas
                 </TabsTrigger>
-                <TabsTrigger value="activities" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600">
-                  Activity logs
-                </TabsTrigger>
-                <TabsTrigger value="tickets" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600">
-                  Tickets
-                </TabsTrigger>
-                <TabsTrigger value="affiliate" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600">
-                  Affiliate
-                </TabsTrigger>
-                <TabsTrigger value="documents" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600">
+                <TabsTrigger value="documents" className="data-[state=active]:bg-green-50 data-[state=active]:text-green-600 data-[state=active]:border-b-2 data-[state=active]:border-green-600">
                   Documentos
+                </TabsTrigger>
+                <TabsTrigger value="committees" className="data-[state=active]:bg-green-50 data-[state=active]:text-green-600 data-[state=active]:border-b-2 data-[state=active]:border-green-600">
+                  Comissões
                 </TabsTrigger>
               </TabsList>
 
@@ -313,13 +307,7 @@ export default function CouncilorDetails() {
                 </div>
               </TabsContent>
 
-              {/* Aba E-Commerce (placeholder) */}
-              <TabsContent value="ecommerce" className="mt-6">
-                <div className="bg-white rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-6 text-gray-900">E-Commerce</h3>
-                  <p className="text-gray-500">Funcionalidade em desenvolvimento.</p>
-                </div>
-              </TabsContent>
+
 
               {/* Aba de Atividades Legislativas */}
               <TabsContent value="activities" className="mt-6">
@@ -363,19 +351,47 @@ export default function CouncilorDetails() {
                 </div>
               </TabsContent>
 
-              {/* Aba Tickets (placeholder) */}
-              <TabsContent value="tickets" className="mt-6">
+              {/* Aba de Comissões */}
+              <TabsContent value="committees" className="mt-6">
                 <div className="bg-white rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-6 text-gray-900">Tickets</h3>
-                  <p className="text-gray-500">Funcionalidade em desenvolvimento.</p>
-                </div>
-              </TabsContent>
-
-              {/* Aba Affiliate (placeholder) */}
-              <TabsContent value="affiliate" className="mt-6">
-                <div className="bg-white rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-6 text-gray-900">Affiliate</h3>
-                  <p className="text-gray-500">Funcionalidade em desenvolvimento.</p>
+                  <h3 className="text-lg font-semibold mb-6 text-gray-900">Comissões</h3>
+                  
+                  {!committees || committees.length === 0 ? (
+                    <p className="text-gray-500 text-center py-6">
+                      Este vereador não participa de nenhuma comissão.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {committees.map((committee: any) => {
+                        const isActive = new Date(committee.endDate) > new Date();
+                        return (
+                          <div key={committee.id} className="border rounded-lg p-4 hover:shadow-sm transition-shadow">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-medium text-gray-900">
+                                  {committee.name}
+                                </h4>
+                                <p className="text-sm text-gray-600 mt-1">{committee.type}</p>
+                                <div className="flex items-center mt-2 text-xs text-gray-500">
+                                  <Calendar className="mr-1 h-3 w-3" />
+                                  {committee.startDate ? formatDate(committee.startDate) : 'Data não informada'} - {committee.endDate ? formatDate(committee.endDate) : 'Data não informada'}
+                                </div>
+                                <div className="mt-1 text-xs text-gray-500">
+                                  Função: {committee.role}
+                                </div>
+                              </div>
+                              <Badge className={cn(
+                                "ml-4",
+                                isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                              )}>
+                                {isActive ? "Ativa" : "Encerrada"}
+                              </Badge>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
