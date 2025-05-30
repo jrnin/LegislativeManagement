@@ -71,19 +71,24 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-// Schema de validação para o formulário de usuário
+// Schema de validação para o formulário de usuário (baseado no schema do banco)
 const userFormSchema = z.object({
   name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres" }),
   email: z.string().email({ message: "Email inválido" }),
-  phone: z.string().min(10, { message: "Telefone deve ter pelo menos 10 dígitos" }),
-  userType: z.enum(["Administrador", "Vereador"], { 
+  cpf: z.string().optional(),
+  birthDate: z.string().optional(),
+  zipCode: z.string().optional(),
+  address: z.string().optional(),
+  neighborhood: z.string().optional(),
+  number: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  role: z.enum(["admin", "councilor"], { 
     message: "Selecione um tipo de usuário válido" 
   }),
-  party: z.string().optional(),
-  position: z.string().optional(),
-  address: z.string().optional(),
-  birthDate: z.string().optional(),
-  profession: z.string().optional(),
+  legislatureId: z.coerce.number().optional(),
+  maritalStatus: z.string().optional(),
+  occupation: z.string().optional(),
   education: z.string().optional(),
 });
 
@@ -108,13 +113,18 @@ export default function UserList() {
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
-      userType: "Vereador",
-      party: "",
-      position: "",
-      address: "",
+      cpf: "",
       birthDate: "",
-      profession: "",
+      zipCode: "",
+      address: "",
+      neighborhood: "",
+      number: "",
+      city: "",
+      state: "",
+      role: "councilor",
+      legislatureId: undefined,
+      maritalStatus: "",
+      occupation: "",
       education: "",
     },
   });
@@ -336,12 +346,12 @@ export default function UserList() {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name="cpf"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Telefone</FormLabel>
+                        <FormLabel>CPF (Opcional)</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="(11) 99999-9999" />
+                          <Input {...field} placeholder="000.000.000-00" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -350,7 +360,7 @@ export default function UserList() {
                   
                   <FormField
                     control={form.control}
-                    name="userType"
+                    name="role"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo de Usuário</FormLabel>
@@ -361,8 +371,8 @@ export default function UserList() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Administrador">Administrador</SelectItem>
-                            <SelectItem value="Vereador">Vereador</SelectItem>
+                            <SelectItem value="admin">Administrador</SelectItem>
+                            <SelectItem value="councilor">Vereador</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -370,50 +380,6 @@ export default function UserList() {
                     )}
                   />
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="party"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Partido (Opcional)</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Ex: PT, PSDB, etc." />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="position"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cargo (Opcional)</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Ex: Presidente, Vice-presidente" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Endereço (Opcional)</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Endereço completo" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -432,12 +398,12 @@ export default function UserList() {
                   
                   <FormField
                     control={form.control}
-                    name="profession"
+                    name="maritalStatus"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Profissão (Opcional)</FormLabel>
+                        <FormLabel>Estado Civil (Opcional)</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Ex: Advogado, Empresário" />
+                          <Input {...field} placeholder="Ex: Solteiro, Casado" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -445,19 +411,123 @@ export default function UserList() {
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="education"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Formação (Opcional)</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Ex: Direito, Administração" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="zipCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CEP (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="00000-000" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cidade (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Nome da cidade" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: SP, RJ" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Endereço (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Rua, Avenida..." />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="neighborhood"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bairro (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Nome do bairro" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="number"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="123" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="occupation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ocupação (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: Advogado, Empresário" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="education"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Formação (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ex: Direito, Administração" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button
