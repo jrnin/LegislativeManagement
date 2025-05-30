@@ -48,7 +48,7 @@ export default function Sidebar() {
             <img 
               src={logoPath} 
               alt="Câmara Municipal de Jaíba" 
-              className="w-10 h-10 object-contain"
+              className="w-14 h-14 object-contain"
             />
             <div>
               <h1 className="text-sm font-bold text-slate-800">Câmara Municipal</h1>

@@ -211,7 +211,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   <img 
                     src={logoPath} 
                     alt="Câmara Municipal de Jaíba" 
-                    className="w-14 h-14 object-contain"
+                    className="w-20 h-20 object-contain"
                   />
                   <div className="hidden sm:block">
                     <h1 className="text-xl font-bold">
