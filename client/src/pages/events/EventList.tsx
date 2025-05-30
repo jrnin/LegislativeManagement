@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { 
   ColumnDef,
   flexRender,
@@ -15,7 +12,7 @@ import {
   getFilteredRowModel,
   ColumnFiltersState,
 } from "@tanstack/react-table";
-import { Event, Legislature } from "@shared/schema";
+import { Event } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
@@ -45,17 +42,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,25 +62,6 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/utils/formatters";
 
-// Schema de validação para o formulário
-const eventFormSchema = z.object({
-  eventNumber: z.coerce.number().int().positive({ message: "Número do evento deve ser positivo" }),
-  eventDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Data inválida" }),
-  eventTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: "Formato de horário inválido. Use HH:MM" }),
-  location: z.string().min(3, { message: "Local é obrigatório" }),
-  mapUrl: z.string().url({ message: "URL inválida" }).optional().or(z.literal("")),
-  category: z.enum(["Sessão Ordinária", "Sessão Extraordinária"], { 
-    message: "Selecione uma categoria válida" 
-  }),
-  legislatureId: z.coerce.number().int().positive({ message: "Legislatura é obrigatória" }),
-  description: z.string().min(3, { message: "Descrição é obrigatória" }),
-  status: z.enum(["Aberto", "Andamento", "Concluido", "Cancelado"], { 
-    message: "Selecione um status válido" 
-  }),
-});
-
-type EventFormData = z.infer<typeof eventFormSchema>;
-
 export default function EventList() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
@@ -103,51 +70,9 @@ export default function EventList() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { data: events = [], isLoading } = useQuery<Event[]>({
     queryKey: ["/api/events"],
-  });
-
-  const { data: legislatures = [] } = useQuery<Legislature[]>({
-    queryKey: ["/api/legislatures"],
-  });
-
-  const form = useForm<EventFormData>({
-    resolver: zodResolver(eventFormSchema),
-    defaultValues: {
-      eventNumber: 1,
-      eventDate: "",
-      eventTime: "",
-      location: "",
-      mapUrl: "",
-      category: "Sessão Ordinária",
-      legislatureId: 1,
-      description: "",
-      status: "Aberto",
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: EventFormData) => {
-      await apiRequest("POST", "/api/events", data);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Evento criado",
-        description: "O evento foi criado com sucesso.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
-      setShowCreateModal(false);
-      form.reset();
-    },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        title: "Erro ao criar evento",
-        description: error.message,
-      });
-    },
   });
 
   const deleteMutation = useMutation({
@@ -180,10 +105,6 @@ export default function EventList() {
       deleteMutation.mutate(selectedEvent.id);
       setShowDeleteAlert(false);
     }
-  };
-
-  const onSubmit = (data: EventFormData) => {
-    createMutation.mutate(data);
   };
 
   const getStatusBadge = (status: string) => {
@@ -337,206 +258,10 @@ export default function EventList() {
     <div className="container px-4 sm:px-6 lg:px-8 mx-auto py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Eventos</h1>
-        <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Evento
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Criar Novo Evento</DialogTitle>
-              <DialogDescription>
-                Preencha os dados para criar um novo evento legislativo.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="eventNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Número do Evento</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Categoria</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione a categoria" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Sessão Ordinária">Sessão Ordinária</SelectItem>
-                            <SelectItem value="Sessão Extraordinária">Sessão Extraordinária</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="eventDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Data do Evento</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="eventTime"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Horário</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Local</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Plenário da Câmara Municipal" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="mapUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL do Mapa (Opcional)</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="https://maps.google.com/..." />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="legislatureId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Legislatura</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione a legislatura" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {legislatures.map((legislature) => (
-                              <SelectItem key={legislature.id} value={legislature.id.toString()}>
-                                {legislature.number}ª Legislatura ({new Date(legislature.startDate).getFullYear()}-{new Date(legislature.endDate).getFullYear()})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Aberto">Aberto</SelectItem>
-                            <SelectItem value="Andamento">Em Andamento</SelectItem>
-                            <SelectItem value="Concluido">Concluído</SelectItem>
-                            <SelectItem value="Cancelado">Cancelado</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descrição</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} placeholder="Descrição detalhada do evento..." />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowCreateModal(false);
-                      form.reset();
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={createMutation.isPending}
-                  >
-                    {createMutation.isPending ? "Criando..." : "Criar Evento"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => navigate("/events/new")}>
+          <Plus className="mr-2 h-4 w-4" />
+          Novo Evento
+        </Button>
       </div>
       
       <Card>
