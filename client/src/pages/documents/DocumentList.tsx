@@ -283,7 +283,7 @@ export default function DocumentList() {
               </DropdownMenuItem>
               
               {isAdmin && (
-                <DropdownMenuItem onClick={() => navigate(`/documents/${document.id}`)}>
+                <DropdownMenuItem onClick={() => navigate(`/documents/${document.id}/edit`)}>
                   <Edit className="mr-2 h-4 w-4" />
                   Editar
                 </DropdownMenuItem>

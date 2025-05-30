@@ -49,6 +49,7 @@ function AuthenticatedApp() {
         <Route path="/activities/:id" component={ActivityDetails} />
         <Route path="/documents" component={DocumentList} />
         <Route path="/documents/new" component={DocumentForm} />
+        <Route path="/documents/:id/edit" component={DocumentForm} />
         <Route path="/documents/:id" component={DocumentForm} />
         <Route path="/committees" component={CommitteeList} />
         <Route path="/committees/new" component={CommitteeForm} />
