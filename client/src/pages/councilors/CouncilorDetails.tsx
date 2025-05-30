@@ -125,7 +125,7 @@ export default function CouncilorDetails() {
 
       <div className="min-h-screen bg-gray-50">
         {/* Header com informações do vereador */}
-        <div className="bg-gradient-to-r from-green-600 via-green-700 to-green-800 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-green-600 via-green-700 to-green-800 relative overflow-hidden rounded-2xl">
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative max-w-6xl mx-auto p-6">
             <div className="flex items-center gap-4 mb-6">
@@ -134,13 +134,13 @@ export default function CouncilorDetails() {
                 Voltar
               </Button>
               <Button variant="outline" size="sm" className="bg-white/20 border-white/30 text-white hover:bg-white/30 ml-auto">
-                LOGIN AS USER
+                Fale comigo!
               </Button>
             </div>
             
             <div className="flex items-center gap-6">
               <div className="relative">
-                <Avatar className="h-24 w-24 ring-4 ring-white/20 rounded-2xl">
+                <Avatar className="h-44 w-38 ring-2 ring-white/10 rounded-2xl">
                   <AvatarImage src={councilor?.profileImageUrl || undefined} alt={councilor?.name} className="rounded-2xl" />
                   <AvatarFallback className="text-2xl bg-white/10 text-white rounded-2xl">{councilor?.name ? getInitials(councilor.name) : "VR"}</AvatarFallback>
                 </Avatar>

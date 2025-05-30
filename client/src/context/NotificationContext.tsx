@@ -46,7 +46,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (isAuthenticated && user) {
       // Criar a conexão WebSocket
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws`;
+      const host = window.location.host || 'localhost:5000';
+      const wsUrl = `${protocol}//${host}/ws`;
+      
+      console.log('Tentando conectar ao WebSocket:', wsUrl);
+      
       const ws = new WebSocket(wsUrl);
       
       ws.onopen = () => {
@@ -97,8 +101,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         console.error('Erro na conexão WebSocket:', error);
       };
       
-      ws.onclose = () => {
-        console.log('Conexão WebSocket fechada');
+      ws.onclose = (event) => {
+        console.log('Conexão WebSocket fechada:', event.code, event.reason);
+        // Não tentar reconectar automaticamente para evitar loops
       };
       
       setSocket(ws);
