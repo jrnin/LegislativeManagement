@@ -208,7 +208,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               <Link href="/">
                 <button className="flex items-center space-x-3">
                   <img 
-                    src="/src/assets/logo.png" 
+                    src="@assets/logo.png" 
                     alt="Câmara Municipal de Jaíba" 
                     className="w-14 h-14 object-contain"
                   />
