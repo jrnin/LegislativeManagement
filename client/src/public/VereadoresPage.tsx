@@ -141,13 +141,13 @@ export default function VereadoresPage() {
                 </div>
 
                 {/* Filtro por partido */}
-                <Select value={partidoFilter} onValueChange={setPartidoFilter}>
+                <Select value={partidoFilter || "all"} onValueChange={(value) => setPartidoFilter(value === "all" ? "" : value)}>
                   <SelectTrigger className="w-full sm:w-[200px]">
                     <Filter className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Filtrar por partido" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos os partidos</SelectItem>
+                    <SelectItem value="all">Todos os partidos</SelectItem>
                     {uniquePartidos.map((partido) => (
                       <SelectItem key={partido} value={partido}>
                         {partido}
