@@ -16,8 +16,9 @@ interface Councilor {
   profileImageUrl?: string;
   email: string;
   role: string;
-  occupation?: string;
+  occupation?: string;  
   education?: string;
+  partido?: string;
 }
 
 // Componente para o cartão de perfil de vereador
@@ -33,10 +34,17 @@ const CouncilorCard = ({ councilor }: { councilor: Councilor }) => (
             </Avatar>
           </div>
           <CardTitle className="text-lg">{councilor.name}</CardTitle>
-          <CardDescription>{councilor.occupation || 'Vereador'}</CardDescription>
+          <CardDescription>{councilor.occupation || 'Vereador'}</CardDescription>          
         </CardHeader>
-        <CardContent>
-          <Badge variant="outline" className="mx-auto">{councilor.education || 'Legislatura Atual'}</Badge>
+        <CardContent className="space-y-2">
+          {councilor.partido && (
+            <Badge variant="default" className="mx-auto bg-green-600 hover:bg-green-700 text-white">
+              {councilor.partido}
+            </Badge>
+          )}
+          <div>
+            <Badge variant="outline" className="mx-auto">{councilor.education || 'Legislatura Atual'}</Badge>
+          </div>
         </CardContent>
       </Card>
     </a>
