@@ -183,7 +183,7 @@ export default function VereadorDetalhesModerno() {
         </div>
 
         {/* Botão voltar */}
-        <div className="absolute top-8 left-8 z-20">
+        <div className="absolute top-8 right-8 z-20">
           <Link href="/vereadores">
             <Button variant="ghost" className="text-white hover:bg-white/20 border border-white/30">
               <ArrowLeft className="h-4 w-4 mr-2" />

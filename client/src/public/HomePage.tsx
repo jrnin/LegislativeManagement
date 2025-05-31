@@ -811,7 +811,7 @@ export default function HomePage() {
                               {councilor.name}
                             </h4>
                             <p className="text-xs text-gray-600">
-                              {councilor.party || "Partido"}
+                              {councilor.partido || councilor.occupation || "Vereador"}
                             </p>
                           </div>
                         </div>
@@ -865,7 +865,7 @@ export default function HomePage() {
                               {councilor.name}
                             </h4>
                             <p className="text-xs text-gray-600">
-                              {councilor.party || "Partido"}
+                              {councilor.partido || councilor.occupation || "Vereador"}
                             </p>
                           </div>
                         </div>
