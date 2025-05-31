@@ -3,7 +3,7 @@ import { Switch, Route } from 'wouter';
 import PublicLayout from './PublicLayout';
 import HomePage from './HomePage';
 import VereadoresPage from './VereadoresPage';
-import VereadorDetailPage from './VereadorDetailPage';
+import VereadorDetalhesModerno from './VereadorDetalhesModerno';
 import DocumentosPage from './DocumentosPageBasic';
 import AtividadesPage from './AtividadesPage';
 import AtividadeDetailPage from './AtividadeDetailPage';
@@ -19,8 +19,8 @@ export default function PublicRoutes() {
         <Route path="/public/vereadores" component={VereadoresPage} />
         <Route path="/vereadores" component={VereadoresPage} />
         
-        <Route path="/public/vereadores/:id" component={VereadorDetailPage} />
-        <Route path="/vereadores/:id" component={VereadorDetailPage} />
+        <Route path="/public/vereadores/:id" component={VereadorDetalhesModerno} />
+        <Route path="/vereadores/:id" component={VereadorDetalhesModerno} />
         
         <Route path="/public/documentos" component={DocumentosPage} />
         <Route path="/documentos" component={DocumentosPage} />
