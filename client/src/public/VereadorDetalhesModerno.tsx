@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, Mail, Phone, MapPin, Calendar, GraduationCap, Briefcase, Award, FileText, Users, Building2 } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { Helmet } from 'react-helmet';
-import texturaUrl from '@/assets/textura.jpg';
+// Usando padrão geométrico CSS puro ao invés de imagem externa
 
 interface Councilor {
   id: string;
@@ -89,21 +89,36 @@ export default function VereadorDetalhesModerno() {
         <meta name="description" content={`Perfil do(a) vereador(a) ${councilor.name}. Conheça sua trajetória, proposições e trabalho em prol da cidade.`} />
       </Helmet>
 
-      {/* Hero Section com textura geométrica */}
+      {/* Hero Section com padrão geométrico CSS */}
       <div className="relative overflow-hidden">
-        {/* Background com textura */}
+        {/* Background com padrão geométrico inspirado na textura */}
         <div 
-          className="absolute inset-0 opacity-90"
+          className="absolute inset-0"
           style={{
-            backgroundImage: `url(${texturaUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
+            background: `
+              linear-gradient(45deg, #4a7c59 25%, transparent 25%), 
+              linear-gradient(-45deg, #4a7c59 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #4a7c59 75%), 
+              linear-gradient(-45deg, transparent 75%, #4a7c59 75%)`,
+            backgroundSize: '40px 40px',
+            backgroundPosition: '0 0, 0 20px, 20px -20px, -20px 0px',
+            backgroundColor: '#5a8a69'
+          }}
+        />
+        
+        {/* Padrão de círculos geométricos */}
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{
+            background: `
+              radial-gradient(circle at 25% 25%, #388e3c 2px, transparent 2px),
+              radial-gradient(circle at 75% 75%, #2e7d32 2px, transparent 2px)`,
+            backgroundSize: '60px 60px'
           }}
         />
         
         {/* Overlay gradiente */}
-        <div className="absolute inset-0 bg-gradient-to-br from-green-800/90 via-green-700/85 to-green-900/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-green-800/70 via-green-700/60 to-green-900/70" />
         
         {/* Formas geométricas decorativas */}
         <div className="absolute inset-0 overflow-hidden">
@@ -293,8 +308,11 @@ export default function VereadorDetalhesModerno() {
                     {documents.slice(0, 5).map((doc) => (
                       <div key={doc.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{doc.title}</h4>
-                          <p className="text-sm text-gray-600">{doc.type} • {new Date(doc.date).toLocaleDateString('pt-BR')}</p>
+                          <h4 className="font-medium text-gray-900">{doc.description || `Documento ${doc.documentNumber}`}</h4>
+                          <p className="text-sm text-gray-600">{doc.documentType} • {new Date(doc.documentDate).toLocaleDateString('pt-BR')}</p>
+                          {doc.fileName && (
+                            <p className="text-xs text-blue-600 mt-1">📎 {doc.fileName}</p>
+                          )}
                         </div>
                         <Badge variant={doc.status === 'aprovado' ? 'default' : 'secondary'} className="ml-4">
                           {doc.status}
@@ -303,7 +321,11 @@ export default function VereadorDetalhesModerno() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-600 text-center py-8">Nenhum documento encontrado</p>
+                  <div className="text-center py-8">
+                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">Este vereador ainda não possui documentos públicos cadastrados no sistema.</p>
+                    <p className="text-sm text-gray-500 mt-2">Documentos aprovados e arquivados aparecerão aqui quando disponíveis.</p>
+                  </div>
                 )}
               </CardContent>
             </Card>
