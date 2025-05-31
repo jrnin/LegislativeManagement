@@ -49,9 +49,13 @@ export default function VereadorDetalhesModerno() {
     queryKey: [`/api/public/councilors/${id}`],
   });
 
-  // Para a versão pública, vamos mostrar informações básicas sem documentos/atividades privadas
-  // que requerem autenticação
-  const documents: Document[] = [];
+  // Buscar documentos reais do vereador do banco de dados
+  const { data: documents = [] } = useQuery<Document[]>({
+    queryKey: [`/api/public/councilors/${id}/documents`],
+    enabled: !!id,
+  });
+
+  // Para atividades, mantemos vazio por enquanto já que não há API pública ainda
   const activities: Activity[] = [];
 
   if (isLoading) {

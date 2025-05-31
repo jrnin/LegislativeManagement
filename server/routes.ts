@@ -2934,6 +2934,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter documentos de um vereador específico (sem autenticação)
+  app.get('/api/public/councilors/:id/documents', async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Verificar se o vereador existe
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Verificar se é realmente um vereador
+      if (user.role !== 'councilor') {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Buscar documentos relacionados ao vereador usando o método do storage
+      const userDocuments = await storage.getDocumentsByUser(id);
+      
+      // Filtrar apenas documentos públicos ou aprovados para a visualização pública
+      const publicDocuments = userDocuments.filter(doc => 
+        doc.status === 'aprovado' || doc.status === 'publicado' || doc.status === 'arquivado'
+      );
+      
+      res.json(publicDocuments);
+    } catch (error) {
+      console.error("Erro ao buscar documentos do vereador:", error);
+      res.status(500).json({ message: "Erro ao buscar documentos", error: error.message });
+    }
+  });
+
   // Criar o servidor HTTP
   const httpServer = createServer(app);
   
