@@ -113,60 +113,69 @@ export default function VereadorDetalhesModerno() {
           <div className="absolute bottom-10 right-1/3 w-20 h-20 bg-white/5 rounded-lg rotate-12" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 py-20">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            {/* Avatar e informações principais */}
-            <div className="text-center lg:text-left">
-              <div className="mb-8">
-                <Avatar className="w-48 h-48 mx-auto lg:mx-0 border-8 border-white/30 shadow-2xl">
-                  <AvatarImage src={councilor.profileImageUrl} />
-                  <AvatarFallback className="bg-green-600 text-white text-4xl font-bold">
-                    {getInitials(councilor.name)}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              
-              <div className="space-y-4">
+        <div className="relative z-10 container mx-auto px-4 py-12">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+            {/* Avatar */}
+            <div className="flex-shrink-0">
+              <Avatar className="w-32 h-32 border-8 border-white/30 shadow-2xl">
+                <AvatarImage src={councilor.profileImageUrl} />
+                <AvatarFallback className="bg-green-600 text-white text-2xl font-bold">
+                  {getInitials(councilor.name)}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+            
+            {/* Informações básicas ao lado da imagem */}
+            <div className="flex-1 text-center lg:text-left">
+              <div className="space-y-3">
                 <div>
-                  <h1 className="text-4xl lg:text-5xl font-bold text-white mb-2">{councilor.name}</h1>
-                  <p className="text-xl text-green-100 font-medium">{councilor.role || 'Vereador'}</p>
+                  <h1 className="text-3xl lg:text-4xl font-bold text-white mb-1">{councilor.name}</h1>
+                  <p className="text-lg text-green-100 font-medium">{councilor.role || 'Vereador'}</p>
                 </div>
                 
-                {councilor.partido && (
-                  <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-2">
-                    {councilor.partido}
+                <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                  {councilor.partido && (
+                    <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                      {councilor.partido}
+                    </Badge>
+                  )}
+                  
+                  {councilor.occupation && (
+                    <Badge className="bg-white/15 text-white border-white/20 px-3 py-1">
+                      {councilor.occupation}
+                    </Badge>
+                  )}
+                  
+                  <Badge className={`px-3 py-1 ${councilor.active ? 'bg-green-500/30 text-green-100 border-green-300/30' : 'bg-gray-500/30 text-gray-100 border-gray-300/30'}`}>
+                    {councilor.active ? 'Ativo' : 'Inativo'}
                   </Badge>
-                )}
-                
-                {councilor.occupation && (
-                  <p className="text-lg text-green-100">{councilor.occupation}</p>
-                )}
+                </div>
               </div>
             </div>
 
             {/* Cards de estatísticas */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:ml-auto">
+            <div className="grid grid-cols-3 gap-4">
               <Card className="bg-white/20 backdrop-blur-sm border-white/30 text-center">
-                <CardContent className="p-6">
-                  <FileText className="h-8 w-8 text-white mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-white">{documents.length}</div>
-                  <div className="text-sm text-green-100">Documentos</div>
+                <CardContent className="p-4">
+                  <FileText className="h-6 w-6 text-white mx-auto mb-1" />
+                  <div className="text-xl font-bold text-white">{documents.length}</div>
+                  <div className="text-xs text-green-100">Documentos</div>
                 </CardContent>
               </Card>
               
               <Card className="bg-white/20 backdrop-blur-sm border-white/30 text-center">
-                <CardContent className="p-6">
-                  <Award className="h-8 w-8 text-white mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-white">{activities.length}</div>
-                  <div className="text-sm text-green-100">Atividades</div>
+                <CardContent className="p-4">
+                  <Award className="h-6 w-6 text-white mx-auto mb-1" />
+                  <div className="text-xl font-bold text-white">{activities.length}</div>
+                  <div className="text-xs text-green-100">Atividades</div>
                 </CardContent>
               </Card>
               
               <Card className="bg-white/20 backdrop-blur-sm border-white/30 text-center">
-                <CardContent className="p-6">
-                  <Users className="h-8 w-8 text-white mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-white">{councilor.active ? 'Ativo' : 'Inativo'}</div>
-                  <div className="text-sm text-green-100">Status</div>
+                <CardContent className="p-4">
+                  <Users className="h-6 w-6 text-white mx-auto mb-1" />
+                  <div className="text-xl font-bold text-white">{councilor.active ? 'Ativo' : 'Inativo'}</div>
+                  <div className="text-xs text-green-100">Status</div>
                 </CardContent>
               </Card>
             </div>
