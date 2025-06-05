@@ -571,39 +571,90 @@ export default function EventDetails() {
                 {activities.map((activity: any) => (
                   <AccordionItem key={activity.id} value={`item-${activity.id}`}>
                     <AccordionTrigger className="hover:no-underline">
-                      <div className="flex flex-col items-start text-left gap-1">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="font-normal">
-                            #{activity.activityNumber}
-                          </Badge>
-                          <span>{activity.type}</span>
+                      <div className="flex items-center justify-between w-full text-left">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline" className="font-normal">
+                              #{activity.activityNumber}
+                            </Badge>
+                            <Badge 
+                              variant="secondary" 
+                              className="bg-blue-100 text-blue-800 hover:bg-blue-200"
+                            >
+                              {activity.activityType || activity.type}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {format(new Date(activity.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                          </p>
+                          {activity.authors && activity.authors.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">Autores:</span>
+                              <div className="flex gap-1">
+                                {activity.authors.slice(0, 3).map((author: any) => (
+                                  <Badge key={author.id} variant="outline" className="text-xs">
+                                    {author.name}
+                                  </Badge>
+                                ))}
+                                {activity.authors.length > 3 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{activity.authors.length - 3} mais
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(activity.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                        </p>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
                       <div className="space-y-4">
-                        <p>{activity.description}</p>
-                        
-                        <div>
-                          <h4 className="text-sm font-medium mb-2">Autores:</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {activity.authors?.map((author: any) => (
-                              <div key={author.id} className="flex items-center gap-2 p-2 bg-muted rounded-md">
-                                <Avatar className="h-6 w-6">
-                                  <AvatarImage src={author.profileImageUrl || ""} />
-                                  <AvatarFallback>{author.name?.substring(0, 2)}</AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm">{author.name}</span>
-                              </div>
-                            ))}
+                        <div className="space-y-3">
+                          <div>
+                            <h4 className="text-sm font-semibold text-muted-foreground mb-1">Tipo da Atividade</h4>
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                              {activity.activityType || activity.type}
+                            </Badge>
+                          </div>
+                          
+                          <div>
+                            <h4 className="text-sm font-semibold text-muted-foreground mb-2">Descrição</h4>
+                            <p className="text-sm leading-relaxed">{activity.description}</p>
                           </div>
                         </div>
                         
+                        {activity.authors && activity.authors.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold text-muted-foreground mb-3">Autores da Atividade</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {activity.authors.map((author: any) => (
+                                <div key={author.id} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                                  <Avatar className="h-8 w-8">
+                                    <AvatarImage src={author.profileImageUrl || ""} />
+                                    <AvatarFallback className="text-xs">
+                                      {author.name?.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="text-sm font-medium truncate">{author.name}</span>
+                                    <span className="text-xs text-muted-foreground">{author.role}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {(!activity.authors || activity.authors.length === 0) && (
+                          <div className="flex items-center gap-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <span className="text-sm text-yellow-800">
+                              Nenhum autor cadastrado para esta atividade
+                            </span>
+                          </div>
+                        )}
+                        
                         {activity.filePath && (
-                          <div className="mt-4">
+                          <div className="pt-2 border-t">
                             <Button 
                               variant="outline" 
                               className="gap-2"

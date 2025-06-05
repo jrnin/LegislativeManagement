@@ -513,7 +513,10 @@ export default function HomePage() {
         <div className="absolute inset-0 w-full h-full z-0">
           <iframe
             className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-            style={{             
+            style={{
+              width: '120%',
+              height: '100%',
+              left: '-10%',
               transformOrigin: 'center center'
             }}
              src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
