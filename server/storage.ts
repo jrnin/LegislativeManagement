@@ -850,44 +850,61 @@ export class DatabaseStorage implements IStorage {
     pendingActivityCount: number;
     documentCount: number;
   }> {
-    // Get legislature count
-    const [{ count: legislatureCount }] = await db
-      .select({ count: count() })
-      .from(legislatures);
-    
-    // Get active event count
-    const [{ count: activeEventCount }] = await db
-      .select({ count: count() })
-      .from(events)
-      .where(
-        and(
-          eq(events.status, "Aberto"),
-          gte(events.eventDate, new Date())
-        )
-      );
-    
-    // Get pending activity count
-    const [{ count: pendingActivityCount }] = await db
-      .select({ count: count() })
-      .from(legislativeActivities)
-      .where(
-        and(
-          eq(legislativeActivities.needsApproval, true),
-          eq(legislativeActivities.approved, false)
-        )
-      );
-    
-    // Get document count
-    const [{ count: documentCount }] = await db
-      .select({ count: count() })
-      .from(documents);
-    
-    return {
-      legislatureCount,
-      activeEventCount,
-      pendingActivityCount,
-      documentCount
-    };
+    try {
+      // Get legislature count
+      const legislatureCountResult = await db
+        .select({ count: count() })
+        .from(legislatures);
+      const legislatureCount = legislatureCountResult[0]?.count || 0;
+      
+      // Get active event count
+      const activeEventCountResult = await db
+        .select({ count: count() })
+        .from(events)
+        .where(
+          and(
+            eq(events.status, "Aberto"),
+            gte(events.eventDate, new Date())
+          )
+        );
+      const activeEventCount = activeEventCountResult[0]?.count || 0;
+      
+      // Get pending activity count
+      const pendingActivityCountResult = await db
+        .select({ count: count() })
+        .from(legislativeActivities)
+        .where(
+          and(
+            eq(legislativeActivities.needsApproval, true),
+            or(
+              eq(legislativeActivities.approved, false),
+              isNull(legislativeActivities.approved)
+            )
+          )
+        );
+      const pendingActivityCount = pendingActivityCountResult[0]?.count || 0;
+      
+      // Get document count
+      const documentCountResult = await db
+        .select({ count: count() })
+        .from(documents);
+      const documentCount = documentCountResult[0]?.count || 0;
+      
+      return {
+        legislatureCount,
+        activeEventCount,
+        pendingActivityCount,
+        documentCount
+      };
+    } catch (error) {
+      console.error("Error in getDashboardStats:", error);
+      return {
+        legislatureCount: 0,
+        activeEventCount: 0,
+        pendingActivityCount: 0,
+        documentCount: 0
+      };
+    }
   }
 
   /**
