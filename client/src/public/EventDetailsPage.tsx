@@ -16,7 +16,7 @@ import {
   Users,
   Vote,
   Activity,
-  Timeline,
+  GitCommit,
   Download,
   Eye,
   CheckCircle,
@@ -235,7 +235,7 @@ export default function EventDetailsPage() {
                       Lista de Presença
                     </TabsTrigger>
                     <TabsTrigger value="timeline" className="flex items-center gap-2">
-                      <Timeline className="h-4 w-4" />
+                      <GitCommit className="h-4 w-4" />
                       Linha do Tempo
                     </TabsTrigger>
                   </TabsList>
