@@ -52,9 +52,9 @@ interface EventDocument {
 
 export default function SessoesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedLegislature, setSelectedLegislature] = useState('');
+  const [selectedType, setSelectedType] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedLegislature, setSelectedLegislature] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -91,9 +91,9 @@ export default function SessoesPage() {
         event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.location.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesType = selectedType === '' || event.category === selectedType;
-      const matchesStatus = selectedStatus === '' || event.status === selectedStatus;
-      const matchesLegislature = selectedLegislature === '' || 
+      const matchesType = selectedType === '' || selectedType === 'all' || event.category === selectedType;
+      const matchesStatus = selectedStatus === '' || selectedStatus === 'all' || event.status === selectedStatus;
+      const matchesLegislature = selectedLegislature === '' || selectedLegislature === 'all' || 
         event.legislatureId?.toString() === selectedLegislature;
 
       const eventDate = new Date(event.eventDate);
@@ -141,9 +141,9 @@ export default function SessoesPage() {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setSelectedType('');
-    setSelectedStatus('');
-    setSelectedLegislature('');
+    setSelectedType('all');
+    setSelectedStatus('all');
+    setSelectedLegislature('all');
     setStartDate('');
     setEndDate('');
   };
@@ -283,7 +283,7 @@ export default function SessoesPage() {
                       <SelectValue placeholder="Todos os tipos" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos os tipos</SelectItem>
+                      <SelectItem value="all">Todos os tipos</SelectItem>
                       {eventTypes.filter(type => type && type.trim()).map((type) => (
                         <SelectItem key={type} value={type}>
                           {type}
@@ -300,7 +300,7 @@ export default function SessoesPage() {
                       <SelectValue placeholder="Todos os status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos os status</SelectItem>
+                      <SelectItem value="all">Todos os status</SelectItem>
                       {eventStatuses.filter(status => status && status.trim()).map((status) => (
                         <SelectItem key={status} value={status}>
                           {status}
@@ -317,7 +317,7 @@ export default function SessoesPage() {
                       <SelectValue placeholder="Todas as legislaturas" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todas as legislaturas</SelectItem>
+                      <SelectItem value="all">Todas as legislaturas</SelectItem>
                       {legislatures.map((leg: any) => (
                         <SelectItem key={leg.id} value={leg.id.toString()}>
                           Legislatura {leg.number} ({leg.startDate?.slice(0, 4)} - {leg.endDate?.slice(0, 4)})
