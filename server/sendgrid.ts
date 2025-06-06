@@ -1,13 +1,9 @@
-import { MailService } from '@sendgrid/mail';
 import { User } from '@shared/schema';
 
-// Inicializar o serviço de e-mail do SendGrid
+// Verificar se a API key do SendGrid está configurada
 if (!process.env.SENDGRID_API_KEY) {
   throw new Error("SENDGRID_API_KEY environment variable must be set");
 }
-
-const mailService = new MailService();
-mailService.setApiKey(process.env.SENDGRID_API_KEY);
 
 // E-mail e nome de remetente para os e-mails do sistema
 const SENDER_EMAIL = 'noreply@em518.jaiba.mg.leg.br';
@@ -38,16 +34,29 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     console.log(`Assunto: ${params.subject}`);
     
     try {
-      await mailService.send({
-        to: params.to || '',
+      const emailData = {
+        personalizations: [{
+          to: [{ email: params.to || '' }]
+        }],
         from: {
           email: SENDER_EMAIL,
           name: SENDER_NAME
         },
         subject: params.subject,
-        text: params.text || '',
-        html: params.html || '',
-      });
+        content: [{
+          type: 'text/plain',
+          value: params.text || ''
+        }]
+      };
+
+      if (params.html) {
+        emailData.content.push({
+          type: 'text/html',
+          value: params.html
+        });
+      }
+
+      await mailService.send(emailData);
       console.log('Email enviado com sucesso!');
       return true;
     } catch (sendError: any) {
@@ -67,8 +76,8 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       console.log('SUBJECT:', params.subject);
       console.log('CONTENT:', params.text);
       
-      // Para ambiente de desenvolvimento, retornamos true para simular sucesso
-      return process.env.NODE_ENV === 'development';
+      // Para ambiente de desenvolvimento, retornamos false para não simular sucesso e ver o erro real
+      return false;
     }
   } catch (error) {
     console.error('Erro inesperado ao enviar e-mail:', error);
