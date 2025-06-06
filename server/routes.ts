@@ -1129,7 +1129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user is authorized (either admin or one of the authors)
-      const currentUser = await storage.getUser(req.user.claims.sub);
+      const currentUser = await storage.getUser(req.user.id);
       const isAdmin = currentUser?.role === "admin";
       const isAuthor = activity.authors?.some(author => author.id === currentUser?.id);
       
