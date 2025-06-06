@@ -668,6 +668,19 @@ export class DatabaseStorage implements IStorage {
     const [document] = await db.select().from(documents).where(eq(documents.id, id));
     return document;
   }
+
+  async getDocumentById(id: number): Promise<Document | undefined> {
+    return this.getDocument(id);
+  }
+
+  async getDocumentsByEventId(eventId: number): Promise<Document[]> {
+    try {
+      return await db.select().from(documents).where(eq(documents.eventId, eventId));
+    } catch (error) {
+      console.error("Error fetching documents by event ID:", error);
+      return [];
+    }
+  }
   
   async getAllDocuments(): Promise<Document[]> {
     return await db.select().from(documents).orderBy(desc(documents.documentDate));

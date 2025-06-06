@@ -3100,6 +3100,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter todos os eventos (sem autenticação)
+  app.get('/api/public/events/all', async (req, res) => {
+    try {
+      // Buscar todos os eventos do sistema
+      const allEvents = await storage.getAllEvents();
+      
+      if (!allEvents || allEvents.length === 0) {
+        return res.json([]);
+      }
+      
+      // Ordenar por data (mais próximos primeiro)
+      allEvents.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      
+      // Formatar eventos para o frontend público
+      const formattedEvents = allEvents.map(event => ({
+        id: event.id,
+        title: `${event.category} #${event.eventNumber}`,
+        date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
+        time: event.eventTime || '00:00',
+        location: event.location || 'Local não informado',
+        type: event.category,
+        status: event.status,
+        description: event.description,
+        eventNumber: event.eventNumber,
+        eventDate: event.eventDate,
+        eventTime: event.eventTime,
+        category: event.category,
+        legislatureId: event.legislatureId,
+        mapUrl: event.mapUrl
+      }));
+      
+      res.json(formattedEvents);
+    } catch (error) {
+      console.error("Erro ao buscar todos os eventos:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Rota pública para obter detalhes de um evento específico (sem autenticação)
   app.get('/api/public/events/:id', async (req, res) => {
     try {
@@ -3136,44 +3174,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(formattedEvent);
     } catch (error) {
       console.error("Erro ao buscar evento público:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
-    }
-  });
-
-  // Rota pública para obter todos os eventos (sem autenticação)
-  app.get('/api/public/events/all', async (req, res) => {
-    try {
-      // Buscar todos os eventos do sistema
-      const allEvents = await storage.getAllEvents();
-      
-      if (!allEvents || allEvents.length === 0) {
-        return res.json([]);
-      }
-      
-      // Ordenar por data (mais próximos primeiro)
-      allEvents.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
-      
-      // Formatar eventos para o frontend público
-      const formattedEvents = allEvents.map(event => ({
-        id: event.id,
-        title: `${event.category} #${event.eventNumber}`,
-        date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
-        time: event.eventTime || '00:00',
-        location: event.location || 'Local não informado',
-        type: event.category,
-        status: event.status,
-        description: event.description,
-        eventNumber: event.eventNumber,
-        eventDate: event.eventDate,
-        eventTime: event.eventTime,
-        category: event.category,
-        legislatureId: event.legislatureId,
-        mapUrl: event.mapUrl
-      }));
-      
-      res.json(formattedEvents);
-    } catch (error) {
-      console.error("Erro ao buscar todos os eventos:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
