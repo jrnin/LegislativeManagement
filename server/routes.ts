@@ -3079,8 +3079,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Verificar se o arquivo existe no sistema de arquivos
-      const fs = require('fs');
-      const path = require('path');
       const filePath = path.join(process.cwd(), activity.filePath);
       
       if (!fs.existsSync(filePath)) {
