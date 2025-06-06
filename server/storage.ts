@@ -1314,8 +1314,8 @@ export class DatabaseStorage implements IStorage {
       .where(eq(activityVotes.activityId, activityId));
     
     const totalVotes = votes.length;
-    const approveCount = votes.filter(v => v.vote === true).length;
-    const rejectCount = votes.filter(v => v.vote === false).length;
+    const approveCount = votes.filter(v => v.vote === true || v.vote === 't').length;
+    const rejectCount = votes.filter(v => v.vote === false || v.vote === 'f').length;
     
     // Garantir que os percentuais são calculados corretamente e somam 100%
     let approvePercentage = 0;
