@@ -56,7 +56,20 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
         });
       }
 
-      await mailService.send(emailData);
+      // Usar fetch diretamente para a API do SendGrid
+      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(emailData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`SendGrid API Error: ${response.status} - ${errorData}`);
+      }
       console.log('Email enviado com sucesso!');
       return true;
     } catch (sendError: any) {
