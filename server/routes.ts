@@ -50,20 +50,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
     try {
-      const userId = (req.session as any).userId;
+      let user = null;
       
-      if (!userId) {
-        return res.status(401).json({ message: "Unauthorized" });
+      // Check if authenticated via Replit first
+      if (req.isAuthenticated && req.isAuthenticated() && req.user) {
+        console.log("User authenticated via Replit:", req.user);
+        
+        // For Replit auth, try to find user in database by email or create if needed
+        if (req.user.email) {
+          user = await storage.getUserByEmail(req.user.email);
+          
+          // If user doesn't exist in database but is authenticated via Replit, create them
+          if (!user && req.user.name && req.user.email) {
+            console.log("Creating new user from Replit auth:", req.user.email);
+            try {
+              user = await storage.createUser({
+                name: req.user.name,
+                email: req.user.email,
+                role: 'user',
+                emailVerified: true, // Replit users are already verified
+                password: null // No password for Replit auth users
+              });
+            } catch (error) {
+              console.error("Error creating user from Replit auth:", error);
+            }
+          }
+        }
+        
+        // If still no user found, use Replit user data directly
+        if (!user) {
+          user = {
+            id: req.user.id || req.user.sub,
+            name: req.user.name,
+            email: req.user.email,
+            role: 'user',
+            emailVerified: true
+          };
+        }
+      } 
+      // Check if authenticated via session (email/password login)
+      else {
+        const userId = (req.session as any).userId;
+        
+        if (!userId) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+        
+        console.log("User authenticated via session, userId:", userId);
+        user = await storage.getUser(userId);
+        
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
       }
       
-      const user = await storage.getUser(userId);
-      
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(401).json({ message: "Unauthorized" });
       }
       
       // Remove sensitive information
       const { password, verificationToken, ...userData } = user;
+      console.log("Returning user data:", userData.email, userData.role);
       res.json(userData);
     } catch (error) {
       console.error("Error fetching user:", error);

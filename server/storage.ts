@@ -1347,13 +1347,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
   
-  /**
-   * Get all councilors
-   */
-  async getCouncilors(): Promise<User[]> {
-    const councilors = await db.select().from(users).where(eq(users.role, "councilor"));
-    return councilors;
-  }
+
   
   /**
    * Committee operations
