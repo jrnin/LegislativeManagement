@@ -10,7 +10,7 @@ const mailService = new MailService();
 mailService.setApiKey(process.env.SENDGRID_API_KEY);
 
 // E-mail e nome de remetente para os e-mails do sistema
-const SENDER_EMAIL = 'noreply@sistema-legislativo.com';
+const SENDER_EMAIL = 'noreply@em518.jaiba.mg.leg.br';
 const SENDER_NAME = 'Sistema de Gerenciamento Legislativo';
 
 /**
