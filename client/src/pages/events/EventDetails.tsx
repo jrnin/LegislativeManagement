@@ -968,6 +968,7 @@ export default function EventDetails() {
                       <TableHead>Data</TableHead>
                       <TableHead>Tipo</TableHead>
                       <TableHead>Descrição</TableHead>
+                      <TableHead>Estatísticas de Votação</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -980,6 +981,9 @@ export default function EventDetails() {
                         </TableCell>
                         <TableCell>{activity.activityType}</TableCell>
                         <TableCell className="max-w-xs truncate">{activity.description}</TableCell>
+                        <TableCell>
+                          <VotingStats activityId={activity.id} />
+                        </TableCell>
                         <TableCell className="text-right">
                           <Button 
                             variant="outline" 
@@ -1528,6 +1532,76 @@ export default function EventDetails() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// Componente para exibir estatísticas de votação
+function VotingStats({ activityId }: { activityId: number }) {
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["/api/activities", activityId, "votes/stats"],
+    queryFn: async () => {
+      const response = await apiRequest<{
+        totalVotes: number;
+        approveCount: number;
+        rejectCount: number;
+        approvePercentage: number;
+        rejectPercentage: number;
+      }>(`/api/activities/${activityId}/votes/stats`);
+      return response;
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-32 h-8">
+        <Loader2 className="w-4 h-4 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!stats || stats.totalVotes === 0) {
+    return (
+      <div className="text-sm text-muted-foreground">
+        Sem votos
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2 min-w-[200px]">
+      {/* Barra de progresso visual */}
+      <div className="flex h-2 bg-gray-200 rounded-full overflow-hidden">
+        {stats.approvePercentage > 0 && (
+          <div 
+            className="bg-green-500 h-full"
+            style={{ width: `${stats.approvePercentage}%` }}
+          />
+        )}
+        {stats.rejectPercentage > 0 && (
+          <div 
+            className="bg-red-500 h-full"
+            style={{ width: `${stats.rejectPercentage}%` }}
+          />
+        )}
+      </div>
+      
+      {/* Detalhes dos votos */}
+      <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center gap-1">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <span>{stats.approveCount} ({stats.approvePercentage}%)</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+          <span>{stats.rejectCount} ({stats.rejectPercentage}%)</span>
+        </div>
+      </div>
+      
+      {/* Total de votos */}
+      <div className="text-xs text-center text-muted-foreground">
+        Total: {stats.totalVotes} votos
+      </div>
     </div>
   );
 }
