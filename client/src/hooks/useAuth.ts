@@ -68,12 +68,29 @@ export function useAuth() {
     try {
       setLocalLoading(true);
       await apiRequest("GET", "/api/logout");
-      queryClient.clear(); // Limpar todo o cache
+      
+      // Limpar todo o cache do React Query
+      queryClient.clear();
+      
+      // Limpar dados locais do usuário
+      queryClient.setQueryData(["/api/auth/user"], null);
+      
+      // Forçar limpeza de cookies/sessão localmente
+      document.cookie.split(";").forEach((c) => {
+        const eqPos = c.indexOf("=");
+        const name = eqPos > -1 ? c.substr(0, eqPos) : c;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      });
+      
       setLocalLoading(false);
-      window.location.href = "/login";
+      
+      // Fazer redirecionamento completo da página
+      window.location.replace("/login");
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
       setLocalLoading(false);
+      // Mesmo em caso de erro, redirecionar para login
+      window.location.replace("/login");
     }
   };
 
