@@ -262,7 +262,7 @@ export default function SessoesPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">Todos os tipos</SelectItem>
-                      {eventTypes.map((type) => (
+                      {eventTypes.filter(type => type && type.trim()).map((type) => (
                         <SelectItem key={type} value={type}>
                           {type}
                         </SelectItem>
@@ -279,7 +279,7 @@ export default function SessoesPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">Todos os status</SelectItem>
-                      {eventStatuses.map((status) => (
+                      {eventStatuses.filter(status => status && status.trim()).map((status) => (
                         <SelectItem key={status} value={status}>
                           {status}
                         </SelectItem>

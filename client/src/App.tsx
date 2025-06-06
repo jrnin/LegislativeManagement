@@ -92,7 +92,9 @@ function App() {
                        location === "/" || 
                        location.startsWith("/documentos") || 
                        location.startsWith("/vereadores") || 
-                       location.startsWith("/atividades")) &&
+                       location.startsWith("/atividades") || 
+                       location.startsWith("/sessoes") || 
+                       location.startsWith("/eventos")) &&
                        !location.startsWith("/login") &&
                        !location.startsWith("/verify-email");
   
