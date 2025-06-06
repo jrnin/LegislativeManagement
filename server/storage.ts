@@ -857,16 +857,11 @@ export class DatabaseStorage implements IStorage {
         .from(legislatures);
       const legislatureCount = legislatureCountResult[0]?.count || 0;
       
-      // Get active event count
+      // Get active event count (events with status "Aberto")
       const activeEventCountResult = await db
         .select({ count: count() })
         .from(events)
-        .where(
-          and(
-            eq(events.status, "Aberto"),
-            gte(events.eventDate, new Date())
-          )
-        );
+        .where(eq(events.status, "Aberto"));
       const activeEventCount = activeEventCountResult[0]?.count || 0;
       
       // Get pending activity count
