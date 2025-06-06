@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Activity, Search, Filter, X, Calendar, User, Eye, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { Activity, Search, Filter, X, Calendar, User, Eye, FileText, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+import { useQuery } from '@tanstack/react-query';
 
 // Interface para atividade legislativa
 interface LegislativeActivity {
@@ -39,33 +40,49 @@ interface ActivitiesResponse {
 }
 
 export default function AtividadesPage() {
-  // Estados para filtros e dados
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [activities, setActivities] = useState<LegislativeActivity[]>([]);
-  const [filterOptions, setFilterOptions] = useState<{
-    activityTypes: string[];
-    statusTypes: string[];
-  }>({
-    activityTypes: [],
-    statusTypes: []
-  });
-  
   // Estados para filtros
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
-  const [totalActivities, setTotalActivities] = useState(0);
   
   // Construir query string para filtros
   const getQueryString = () => {
     const params = new URLSearchParams();
-    // Remover limite para mostrar todas as atividades
     if (search) params.append('search', search);
-    if (type) params.append('type', type);
+    if (type) params.append('activityType', type);
     if (status) params.append('status', status);
     return params.toString();
   };
+  
+  // Query para buscar atividades em tempo real
+  const { data: response, isLoading, error } = useQuery<ActivitiesResponse>({
+    queryKey: ['/api/public/legislative-activities', search, type, status],
+    queryFn: async () => {
+      const queryString = getQueryString();
+      const url = `/api/public/legislative-activities${queryString ? `?${queryString}` : ''}`;
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Erro ao carregar atividades: ${res.status}`);
+      }
+      
+      return res.json();
+    },
+    refetchInterval: 30000, // Atualizar a cada 30 segundos para dados em tempo real
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  
+  // Extrair dados da resposta
+  const activities = response?.activities || [];
+  const filterOptions = response?.filters || { activityTypes: [], statusTypes: [] };
+  const totalActivities = response?.pagination?.total || 0;
   
   // Formatar data para exibição
   const formatDate = (dateString: string) => {
@@ -78,43 +95,6 @@ export default function AtividadesPage() {
     setType('');
     setStatus('');
   };
-
-  // Função para carregar atividades com os filtros aplicados
-  const fetchActivities = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/public/legislative-activities?${getQueryString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Erro ao carregar atividades: ${response.status}`);
-      }
-      
-      const data: ActivitiesResponse = await response.json();
-      setActivities(data.activities || []);
-      setFilterOptions({
-        activityTypes: data.filters?.activityTypes || [],
-        statusTypes: data.filters?.statusTypes || []
-      });
-      setTotalActivities(data.pagination?.total || 0);
-      setError(null);
-    } catch (err) {
-      console.error('Erro ao buscar atividades:', err);
-      setError(err instanceof Error ? err : new Error('Erro desconhecido'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Efeito para carregar atividades na inicialização
-  useEffect(() => {
-    fetchActivities();
-  }, []);
 
   // Determinar cor do badge de status
   const getStatusBadgeClass = (status: string) => {

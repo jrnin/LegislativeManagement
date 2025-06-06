@@ -2960,58 +2960,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.setHeader('Content-Type', 'application/json');
     
     try {
-      // Dados mock baseados nos registros reais do banco
-      const mockActivities = [
-        {
-          id: 1,
-          title: "Pauta Nº 15",
-          description: "Pauta da sessão",
-          type: "Pauta",
-          status: "tramitando",
-          sessionDate: "2025-05-11T00:00:00.000Z",
-          authors: []
-        },
-        {
-          id: 2,
-          title: "Requerimento Nº 20",
-          description: "Requerimento",
-          type: "Requerimento",
-          status: "aprovada",
-          sessionDate: "2025-05-11T00:00:00.000Z",
-          authors: []
-        },
-        {
-          id: 3,
-          title: "Indicação Nº 56",
-          description: "Indicação de Limpeza",
-          type: "Indicação",
-          status: "aprovada",
-          sessionDate: "2025-05-12T00:00:00.000Z",
-          authors: []
-        }
-      ];
+      // Obter parâmetros de consulta
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const activityType = req.query.activityType as string;
+      const status = req.query.status as string;
+      const search = req.query.search as string;
+      
+      // Buscar todas as atividades aprovadas do banco de dados
+      const allActivities = await storage.getAllLegislativeActivities();
+      
+      // Filtrar apenas atividades aprovadas para exibição pública
+      let filteredActivities = allActivities.filter(activity => 
+        activity.approved === true || activity.approved === null
+      );
+      
+      // Aplicar filtros se fornecidos
+      if (activityType) {
+        filteredActivities = filteredActivities.filter(activity => 
+          activity.activityType === activityType
+        );
+      }
+      
+      if (status) {
+        filteredActivities = filteredActivities.filter(activity => {
+          // Mapear status baseado na aprovação
+          const activityStatus = activity.approved === true ? 'aprovada' : 
+                               activity.approved === false ? 'rejeitada' : 'pendente';
+          return activityStatus === status;
+        });
+      }
+      
+      if (search) {
+        const searchLower = search.toLowerCase();
+        filteredActivities = filteredActivities.filter(activity =>
+          activity.description.toLowerCase().includes(searchLower) ||
+          activity.activityType.toLowerCase().includes(searchLower)
+        );
+      }
+      
+      // Ordenar por data mais recente
+      filteredActivities.sort((a, b) => 
+        new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime()
+      );
+      
+      // Calcular paginação
+      const total = filteredActivities.length;
+      const pages = Math.ceil(total / limit);
+      const offset = (page - 1) * limit;
+      const paginatedActivities = filteredActivities.slice(offset, offset + limit);
+      
+      // Transformar dados para o formato esperado pelo frontend
+      const formattedActivities = paginatedActivities.map(activity => {
+        const year = new Date(activity.activityDate).getFullYear();
+        const activityStatus = activity.approved === true ? 'aprovada' : 
+                             activity.approved === false ? 'rejeitada' : 'pendente';
+        
+        return {
+          id: activity.id,
+          title: `${activity.activityType} Nº ${activity.activityNumber}/${year}`,
+          description: activity.description,
+          type: activity.activityType,
+          status: activityStatus,
+          sessionDate: activity.activityDate,
+          authors: activity.authors || []
+        };
+      });
+      
+      // Obter tipos únicos de atividade e status para filtros
+      const uniqueActivityTypes = [...new Set(allActivities.map(a => a.activityType))];
+      const uniqueStatusTypes = ['aprovada', 'pendente', 'rejeitada'];
       
       const response = {
-        activities: mockActivities,
+        activities: formattedActivities,
         pagination: {
-          total: mockActivities.length,
-          page: 1,
-          limit: mockActivities.length,
-          pages: 1
+          total,
+          page,
+          limit,
+          pages
         },
         filters: {
-          activityTypes: ["Pauta", "Requerimento", "Indicação"],
-          statusTypes: ["aprovada", "pendente", "rejeitada", "tramitando"]
+          activityTypes: uniqueActivityTypes,
+          statusTypes: uniqueStatusTypes
         }
       };
       
       res.json(response);
     } catch (error) {
-      console.error("Erro:", error);
+      console.error("Erro ao buscar atividades legislativas:", error);
       res.status(500).json({ 
         activities: [],
         pagination: { total: 0, page: 1, limit: 0, pages: 0 },
-        filters: { activityTypes: [], statusTypes: [] }
+        filters: { activityTypes: [], statusTypes: [] },
+        error: "Erro interno do servidor"
       });
     }
   });
