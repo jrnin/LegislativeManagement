@@ -3178,6 +3178,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter detalhes completos de um evento (atividades, documentos, presenças, linha do tempo)
+  app.get('/api/public/events/:id/details', async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      
+      if (isNaN(eventId)) {
+        return res.status(400).json({ message: "ID do evento inválido" });
+      }
+      
+      // Buscar evento com todos os detalhes usando o método completo
+      const eventWithDetails = await storage.getEventWithDetails(eventId);
+      
+      if (!eventWithDetails) {
+        return res.status(404).json({ message: "Evento não encontrado" });
+      }
+      
+      // Formatar dados para o frontend público
+      const formattedEvent = {
+        id: eventWithDetails.id,
+        title: `${eventWithDetails.category} #${eventWithDetails.eventNumber}`,
+        description: eventWithDetails.description,
+        status: eventWithDetails.status,
+        eventDate: eventWithDetails.eventDate,
+        eventTime: eventWithDetails.eventTime,
+        location: eventWithDetails.location,
+        mapUrl: eventWithDetails.mapUrl,
+        category: eventWithDetails.category,
+        eventNumber: eventWithDetails.eventNumber,
+        legislatureId: eventWithDetails.legislatureId,
+        createdAt: eventWithDetails.createdAt,
+        updatedAt: eventWithDetails.updatedAt,
+        
+        // Informações da legislatura
+        legislature: eventWithDetails.legislature,
+        
+        // Atividades legislativas com autores
+        activities: eventWithDetails.activities.map((activity: any) => ({
+          id: activity.id,
+          title: activity.title,
+          description: activity.description,
+          status: activity.status,
+          activityNumber: activity.activityNumber,
+          activityDate: activity.activityDate,
+          type: activity.type,
+          authors: activity.authors || []
+        })),
+        
+        // Documentos do evento
+        documents: eventWithDetails.documents.map((document: any) => ({
+          id: document.id,
+          fileName: document.fileName,
+          documentType: document.documentType,
+          status: document.status,
+          description: document.description,
+          documentNumber: document.documentNumber,
+          documentDate: document.documentDate,
+          filePath: document.filePath,
+          eventId: document.eventId
+        })),
+        
+        // Lista de presença
+        attendance: eventWithDetails.attendance.map((record: any) => ({
+          id: record.id,
+          status: record.status,
+          notes: record.notes,
+          registeredAt: record.registeredAt,
+          userId: record.userId,
+          user: record.user ? {
+            id: record.user.id,
+            name: record.user.name,
+            role: record.user.role,
+            profileImageUrl: record.user.profileImageUrl
+          } : null
+        }))
+      };
+      
+      res.json(formattedEvent);
+    } catch (error) {
+      console.error("Erro ao buscar detalhes completos do evento:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Rota pública para obter legislaturas (sem autenticação)
   app.get('/api/public/legislatures', async (req, res) => {
     try {
