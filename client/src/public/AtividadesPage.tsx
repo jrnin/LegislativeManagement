@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Search, Filter, X, Calendar, User, Eye, FileText, Loader2 } from 'lucide-react';
+import { Activity, Search, Filter, X, Calendar, User, Download, FileText, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,6 +94,45 @@ export default function AtividadesPage() {
     setSearch('');
     setType('');
     setStatus('');
+  };
+
+  // Função para fazer download do arquivo da atividade
+  const handleDownload = async (activityId: number, activityTitle: string) => {
+    try {
+      const response = await fetch(`/api/public/activities/${activityId}/download`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Arquivo não encontrado');
+      }
+      
+      // Obter o nome do arquivo do cabeçalho ou usar um padrão
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `${activityTitle.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/['"]/g, '');
+        }
+      }
+      
+      // Criar blob e fazer download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Erro ao fazer download:', error);
+      alert('Não foi possível fazer o download do arquivo. O arquivo pode não estar disponível.');
+    }
   };
 
   // Determinar cor do badge de status
@@ -378,11 +417,11 @@ export default function AtividadesPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => window.open(`/atividades/${activity.id}`, '_blank')}
-                              className="flex items-center gap-2"
+                              onClick={() => handleDownload(activity.id, activity.title)}
+                              className="flex items-center gap-2 hover:bg-green-50 hover:border-green-300"
                             >
-                              <Eye className="h-4 w-4" />
-                              Ver Detalhes
+                              <Download className="h-4 w-4" />
+                              Baixar
                             </Button>
                           </div>
                         </div>

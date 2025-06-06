@@ -3057,6 +3057,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para download de arquivo de atividade legislativa (sem autenticação)
+  app.get('/api/public/activities/:id/download', async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.id);
+      
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "ID da atividade inválido" });
+      }
+      
+      // Buscar a atividade no banco de dados
+      const activity = await storage.getLegislativeActivity(activityId);
+      
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Verificar se a atividade tem arquivo anexado
+      if (!activity.filePath || !activity.fileName) {
+        return res.status(404).json({ message: "Arquivo não encontrado para esta atividade" });
+      }
+      
+      // Verificar se o arquivo existe no sistema de arquivos
+      const fs = require('fs');
+      const path = require('path');
+      const filePath = path.join(process.cwd(), activity.filePath);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "Arquivo não encontrado no servidor" });
+      }
+      
+      // Definir o tipo de conteúdo baseado na extensão do arquivo
+      const ext = path.extname(activity.fileName).toLowerCase();
+      let contentType = 'application/octet-stream';
+      
+      switch (ext) {
+        case '.pdf':
+          contentType = 'application/pdf';
+          break;
+        case '.doc':
+          contentType = 'application/msword';
+          break;
+        case '.docx':
+          contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+          break;
+        case '.txt':
+          contentType = 'text/plain';
+          break;
+        default:
+          contentType = 'application/octet-stream';
+      }
+      
+      // Configurar cabeçalhos para download
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${activity.fileName}"`);
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      // Enviar o arquivo
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      
+      fileStream.on('error', (error) => {
+        console.error('Erro ao ler arquivo:', error);
+        if (!res.headersSent) {
+          res.status(500).json({ message: "Erro ao ler o arquivo" });
+        }
+      });
+      
+    } catch (error) {
+      console.error("Erro ao fazer download da atividade:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Rota pública para obter documentos de um vereador específico (sem autenticação)
   app.get('/api/public/councilors/:id/documents', async (req, res) => {
     try {
