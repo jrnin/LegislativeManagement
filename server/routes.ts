@@ -3140,6 +3140,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter todos os eventos (sem autenticação)
+  app.get('/api/public/events/all', async (req, res) => {
+    try {
+      // Buscar todos os eventos do sistema
+      const allEvents = await storage.getAllEvents();
+      
+      if (!allEvents || allEvents.length === 0) {
+        return res.json([]);
+      }
+      
+      // Ordenar por data (mais próximos primeiro)
+      allEvents.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      
+      // Formatar eventos para o frontend público
+      const formattedEvents = allEvents.map(event => ({
+        id: event.id,
+        title: `${event.category} #${event.eventNumber}`,
+        date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
+        time: event.eventTime || '00:00',
+        location: event.location || 'Local não informado',
+        type: event.category,
+        status: event.status,
+        description: event.description,
+        eventNumber: event.eventNumber,
+        eventDate: event.eventDate,
+        eventTime: event.eventTime,
+        category: event.category,
+        legislatureId: event.legislatureId,
+        mapUrl: event.mapUrl
+      }));
+      
+      res.json(formattedEvents);
+    } catch (error) {
+      console.error("Erro ao buscar todos os eventos:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Rota pública para obter legislaturas (sem autenticação)
+  app.get('/api/public/legislatures', async (req, res) => {
+    try {
+      const legislatures = await storage.getAllLegislatures();
+      res.json(legislatures || []);
+    } catch (error) {
+      console.error("Erro ao buscar legislaturas:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Rota pública para obter documentos de um evento (sem autenticação)
+  app.get('/api/public/events/:id/documents', async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      
+      if (isNaN(eventId)) {
+        return res.status(400).json({ error: "ID do evento inválido" });
+      }
+      
+      const documents = await storage.getDocumentsByEventId(eventId);
+      
+      // Filtrar apenas documentos com arquivo válido
+      const validDocuments = documents.filter(doc => doc.filePath && doc.fileName);
+      
+      res.json(validDocuments);
+    } catch (error) {
+      console.error("Erro ao buscar documentos do evento:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Rota pública para download de documentos (sem autenticação)
+  app.get('/api/public/documents/download/:id', async (req, res) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      
+      if (isNaN(documentId)) {
+        return res.status(400).json({ error: "ID do documento inválido" });
+      }
+      
+      const document = await storage.getDocumentById(documentId);
+      
+      if (!document || !document.filePath || !document.fileName) {
+        return res.status(404).json({ error: "Documento não encontrado ou sem arquivo" });
+      }
+      
+      const filePath = path.join(process.cwd(), document.filePath);
+      
+      // Verificar se o arquivo existe
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "Arquivo não encontrado no servidor" });
+      }
+      
+      // Definir headers para download
+      res.setHeader('Content-Disposition', `attachment; filename="${document.fileName}"`);
+      res.setHeader('Content-Type', 'application/octet-stream');
+      
+      // Enviar o arquivo
+      res.sendFile(filePath);
+    } catch (error) {
+      console.error("Erro ao fazer download do documento:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Rota pública para download de arquivo de atividade legislativa (sem autenticação)
   app.get('/api/public/activities/:id/download', async (req, res) => {
     try {
