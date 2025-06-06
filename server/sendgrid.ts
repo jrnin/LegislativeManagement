@@ -276,6 +276,71 @@ export async function sendAccountCreatedEmail(user: User, baseUrl: string, tempP
 }
 
 /**
+ * Enviar e-mail de notificação de novo evento para vereadores
+ */
+export async function sendEventNotificationEmail(councilor: User, event: any, baseUrl: string): Promise<boolean> {
+  const attendanceUrl = `${baseUrl}/events/${event.id}/attendance`;
+  
+  const subject = 'Novo Evento Legislativo Cadastrado';
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Novo Evento Legislativo Cadastrado</h2>
+      <p>Olá ${councilor.name || 'vereador(a)'},</p>
+      <p>Um novo evento legislativo foi cadastrado no sistema:</p>
+      <div style="background-color: #f9f9f9; border-left: 4px solid #99CD85; padding: 15px; margin: 15px 0;">
+        <p><strong>Evento Nº:</strong> ${event.eventNumber}</p>
+        <p><strong>Data:</strong> ${new Date(event.eventDate).toLocaleDateString('pt-BR')}</p>
+        <p><strong>Horário:</strong> ${event.eventTime}</p>
+        <p><strong>Local:</strong> ${event.location}</p>
+        <p><strong>Categoria:</strong> ${event.category}</p>
+        <p><strong>Descrição:</strong> ${event.description}</p>
+        <p><strong>Status:</strong> ${event.status}</p>
+      </div>
+      <p>Para registrar sua presença neste evento, clique no botão abaixo:</p>
+      <p style="margin: 25px 0;">
+        <a href="${attendanceUrl}" style="background-color: #99CD85; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+          Registrar Presença
+        </a>
+      </p>
+      <p>É importante confirmar sua presença para que possamos organizar adequadamente o evento.</p>
+      <p>Atenciosamente,<br>Equipe do Sistema de Gerenciamento Legislativo</p>
+    </div>
+  `;
+  
+  const text = `
+    Novo Evento Legislativo Cadastrado
+    
+    Olá ${councilor.name || 'vereador(a)'},
+    
+    Um novo evento legislativo foi cadastrado no sistema:
+    
+    Evento Nº: ${event.eventNumber}
+    Data: ${new Date(event.eventDate).toLocaleDateString('pt-BR')}
+    Horário: ${event.eventTime}
+    Local: ${event.location}
+    Categoria: ${event.category}
+    Descrição: ${event.description}
+    Status: ${event.status}
+    
+    Para registrar sua presença neste evento, acesse:
+    ${attendanceUrl}
+    
+    É importante confirmar sua presença para que possamos organizar adequadamente o evento.
+    
+    Atenciosamente,
+    Equipe do Sistema de Gerenciamento Legislativo
+  `;
+  
+  return sendEmail({
+    to: councilor.email || '',
+    subject,
+    html,
+    text
+  });
+}
+
+/**
  * Enviar e-mail de notificação de atividade para aprovação
  */
 export async function sendActivityApprovalRequest(admin: User, activity: any, baseUrl: string): Promise<boolean> {

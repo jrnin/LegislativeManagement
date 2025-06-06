@@ -4,7 +4,7 @@ import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth } from "./replitAuth";
 import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload } from "./middlewares";
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest } from "./sendgrid";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest, sendEventNotificationEmail } from "./sendgrid";
 import { z } from "zod";
 import crypto from "crypto";
 import fs from "fs";
@@ -836,6 +836,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validated,
         eventDate: new Date(validated.eventDate),
       });
+      
+      // Send email notification to all councilors
+      try {
+        const councilors = await storage.getCouncilors();
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        
+        console.log(`Enviando notificação de novo evento para ${councilors.length} vereadores`);
+        
+        // Send emails to all councilors asynchronously
+        const emailPromises = councilors.map(async (councilor) => {
+          try {
+            const success = await sendEventNotificationEmail(councilor, event, baseUrl);
+            if (success) {
+              console.log(`E-mail de notificação enviado com sucesso para: ${councilor.email}`);
+            } else {
+              console.error(`Falha ao enviar e-mail para: ${councilor.email}`);
+            }
+            return success;
+          } catch (emailError) {
+            console.error(`Erro ao enviar e-mail para ${councilor.email}:`, emailError);
+            return false;
+          }
+        });
+        
+        const emailResults = await Promise.allSettled(emailPromises);
+        const successCount = emailResults.filter(result => 
+          result.status === 'fulfilled' && result.value === true
+        ).length;
+        
+        console.log(`Notificações enviadas: ${successCount}/${councilors.length}`);
+        
+      } catch (emailError) {
+        console.error("Erro ao enviar notificações por e-mail:", emailError);
+        // Não falha a criação do evento se o e-mail falhar
+      }
       
       res.status(201).json(event);
     } catch (error) {
