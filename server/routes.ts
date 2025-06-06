@@ -3090,6 +3090,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter detalhes de um evento específico (sem autenticação)
+  app.get('/api/public/events/:id', async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      
+      if (isNaN(eventId)) {
+        return res.status(400).json({ message: "ID do evento inválido" });
+      }
+      
+      // Buscar evento no banco de dados
+      const event = await storage.getEvent(eventId);
+      
+      if (!event) {
+        return res.status(404).json({ message: "Evento não encontrado" });
+      }
+      
+      // Formatar evento para o frontend público
+      const formattedEvent = {
+        id: event.id,
+        title: `${event.category} #${event.eventNumber}`,
+        date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
+        time: event.eventTime || '00:00',
+        location: event.location || 'Local não informado',
+        mapUrl: event.mapUrl,
+        type: event.category,
+        status: event.status,
+        description: event.description,
+        eventDate: event.eventDate,
+        eventTime: event.eventTime,
+        eventNumber: event.eventNumber,
+        category: event.category
+      };
+      
+      res.json(formattedEvent);
+    } catch (error) {
+      console.error("Erro ao buscar evento público:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Rota pública para download de arquivo de atividade legislativa (sem autenticação)
   app.get('/api/public/activities/:id/download', async (req, res) => {
     try {
