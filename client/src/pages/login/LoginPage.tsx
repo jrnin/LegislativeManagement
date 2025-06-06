@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 
 // Schema de validação para login
 const loginSchema = z.object({
@@ -39,6 +40,15 @@ export default function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("login");
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const { user, isAuthenticated } = useAuth();
+
+  // Redirecionar se o usuário já estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setLocation("/dashboard");
+    }
+  }, [isAuthenticated, user, setLocation]);
 
   // Form de login
   const loginForm = useForm<LoginFormValues>({
@@ -80,8 +90,8 @@ export default function LoginPage() {
           description: "Você será redirecionado para o painel administrativo",
         });
         
-        // Redirecionar para o dashboard administrativo
-        window.location.href = "/dashboard";
+        // Usar navegação programática do wouter
+        setLocation("/dashboard");
       } else {
         toast({
           title: "Erro ao fazer login",
