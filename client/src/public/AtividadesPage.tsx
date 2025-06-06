@@ -250,10 +250,7 @@ export default function AtividadesPage() {
                 <span>Texto: {search}</span>
                 <X 
                   className="h-3 w-3 ml-1 cursor-pointer" 
-                  onClick={() => {
-                    setSearch('');
-                    applyFilters();
-                  }}
+                  onClick={() => setSearch('')}
                 />
               </Badge>
             )}
@@ -263,10 +260,7 @@ export default function AtividadesPage() {
                 <span>Tipo: {type}</span>
                 <X 
                   className="h-3 w-3 ml-1 cursor-pointer" 
-                  onClick={() => {
-                    setType('');
-                    applyFilters();
-                  }}
+                  onClick={() => setType('')}
                 />
               </Badge>
             )}
@@ -276,10 +270,7 @@ export default function AtividadesPage() {
                 <span>Situação: {status}</span>
                 <X 
                   className="h-3 w-3 ml-1 cursor-pointer" 
-                  onClick={() => {
-                    setStatus('');
-                    applyFilters();
-                  }}
+                  onClick={() => setStatus('')}
                 />
               </Badge>
             )}
