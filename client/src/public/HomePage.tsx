@@ -649,7 +649,7 @@ export default function HomePage() {
               <div className="bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
                   <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
-                  Próximos Eventos
+                  Eventos do Mês
                 </h3>
                 
                 {eventsLoading ? (

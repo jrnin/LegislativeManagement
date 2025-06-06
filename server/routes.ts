@@ -3058,21 +3058,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rota pública para obter próximos eventos (sem autenticação)
+  // Rota pública para obter eventos do mês atual (sem autenticação)
   app.get('/api/public/events', async (req, res) => {
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
       
-      // Buscar próximos eventos a partir de hoje
-      const upcomingEvents = await storage.getUpcomingEvents(10);
+      // Buscar todos os eventos do sistema
+      const allEvents = await storage.getAllEvents();
       
-      if (!upcomingEvents || upcomingEvents.length === 0) {
+      if (!allEvents || allEvents.length === 0) {
         return res.json([]);
       }
       
+      // Filtrar eventos do mês atual
+      const currentMonthEvents = allEvents.filter(event => {
+        const eventDate = new Date(event.eventDate);
+        return eventDate >= startOfMonth && eventDate <= endOfMonth;
+      });
+      
+      // Ordenar por data (mais próximos primeiro)
+      currentMonthEvents.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      
       // Formatar eventos para o frontend público
-      const formattedEvents = upcomingEvents.map(event => ({
+      const formattedEvents = currentMonthEvents.map(event => ({
         id: event.id,
         title: `${event.category} #${event.eventNumber}`,
         date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
