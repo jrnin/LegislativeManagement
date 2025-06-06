@@ -10,6 +10,7 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
+import { format } from "date-fns";
 import { WebSocketServer, WebSocket } from 'ws';
 import { 
   committees,
@@ -3054,6 +3055,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filters: { activityTypes: [], statusTypes: [] },
         error: "Erro interno do servidor"
       });
+    }
+  });
+
+  // Rota pública para obter próximos eventos (sem autenticação)
+  app.get('/api/public/events', async (req, res) => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Buscar próximos eventos a partir de hoje
+      const upcomingEvents = await storage.getUpcomingEvents(10);
+      
+      if (!upcomingEvents || upcomingEvents.length === 0) {
+        return res.json([]);
+      }
+      
+      // Formatar eventos para o frontend público
+      const formattedEvents = upcomingEvents.map(event => ({
+        id: event.id,
+        title: `${event.category} #${event.eventNumber}`,
+        date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
+        time: event.eventTime || '00:00',
+        location: event.location || 'Local não informado',
+        type: event.category,
+        status: event.status,
+        description: event.description
+      }));
+      
+      res.json(formattedEvents);
+    } catch (error) {
+      console.error("Erro ao buscar eventos públicos:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
 

@@ -283,29 +283,31 @@ interface EventCardProps {
 }
 
 const EventCard = ({ id, title, date, time, location, type }: EventCardProps) => (
-  <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg border-l-4" style={{borderLeftColor: '#7FA653'}}>
-    <CardContent className="p-4">
-      <div className="flex items-start justify-between mb-2">
-        <Badge variant="outline" className="text-xs" style={{borderColor: '#7FA653', color: '#63783D'}}>
-          {type}
-        </Badge>
-        <span className="text-xs text-gray-500">{time}</span>
-      </div>
-      <h3 className="font-semibold text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-        {title}
-      </h3>
-      <div className="space-y-1 text-xs text-gray-600">
-        <div className="flex items-center">
-          <Calendar size={12} className="mr-1" />
-          {date}
+  <Link href={`/public/eventos/${id}`}>
+    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg border-l-4" style={{borderLeftColor: '#7FA653'}}>
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-2">
+          <Badge variant="outline" className="text-xs" style={{borderColor: '#7FA653', color: '#63783D'}}>
+            {type}
+          </Badge>
+          <span className="text-xs text-gray-500">{time}</span>
         </div>
-        <div className="flex items-center">
-          <Building size={12} className="mr-1" />
-          {location}
+        <h3 className="font-semibold text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+          {title}
+        </h3>
+        <div className="space-y-1 text-xs text-gray-600">
+          <div className="flex items-center">
+            <Calendar size={12} className="mr-1" />
+            {date}
+          </div>
+          <div className="flex items-center">
+            <Building size={12} className="mr-1" />
+            {location}
+          </div>
         </div>
-      </div>
-    </CardContent>
-  </Card>
+      </CardContent>
+    </Card>
+  </Link>
 );
 
 // Dados mockados para serviços rápidos
@@ -472,11 +474,10 @@ const mockEvents = [
 ];
 
 export default function HomePage() {
-  // Simulando consultas à API para obter dados
-  const { data: events = mockEvents } = useQuery({
+  // Consulta real à API para obter dados de eventos
+  const { data: events = [], isLoading: eventsLoading } = useQuery({
     queryKey: ['/api/public/events'],
-    enabled: false,
-    initialData: mockEvents
+    refetchInterval: 30000 // Atualizar a cada 30 segundos
   });
 
   const { data: councilors = [], isLoading: councilorLoading } = useQuery({
@@ -651,23 +652,39 @@ export default function HomePage() {
                   Próximos Eventos
                 </h3>
                 
-                <div className="space-y-4">
-                  {events.slice(0, 4).map((event) => (
-                    <EventCard
-                      key={event.id}
-                      id={event.id}
-                      title={event.title}
-                      date={event.date}
-                      time={event.time}
-                      location={event.location}
-                      type={event.type}
-                    />
-                  ))}
-                </div>
+                {eventsLoading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
+                  </div>
+                ) : events.length > 0 ? (
+                  <div className="space-y-4">
+                    {events.slice(0, 4).map((event) => (
+                      <EventCard
+                        key={event.id}
+                        id={event.id}
+                        title={event.title}
+                        date={event.date}
+                        time={event.time}
+                        location={event.location}
+                        type={event.type}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Calendar className="mx-auto mb-2 h-12 w-12 text-gray-300" />
+                    <p className="text-sm">Nenhum evento próximo</p>
+                  </div>
+                )}
                 
-                <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
-                  Ver agenda completa
-                </Button>
+                {events.length > 0 && (
+                  <Link href="/public/eventos">
+                    <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
+                      Ver agenda completa
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
               </div>
            
             
