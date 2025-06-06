@@ -3079,7 +3079,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Verificar se o arquivo existe no sistema de arquivos
-      const filePath = path.join(process.cwd(), activity.filePath);
+      let filePath;
+      
+      // Se o filePath já é absoluto, use-o diretamente
+      if (path.isAbsolute(activity.filePath)) {
+        filePath = activity.filePath;
+      } else {
+        // Se é relativo, combine com o diretório de trabalho
+        filePath = path.join(process.cwd(), activity.filePath);
+      }
       
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ message: "Arquivo não encontrado no servidor" });
