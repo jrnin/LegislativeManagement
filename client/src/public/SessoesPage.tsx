@@ -184,6 +184,14 @@ export default function SessoesPage() {
     }
   };
 
+  // Debug logging
+  console.log('SessoesPage render:', { 
+    eventsLoading, 
+    eventsError, 
+    allEventsCount: allEvents.length,
+    filteredEventsCount: filteredEvents.length
+  });
+
   if (eventsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -196,12 +204,26 @@ export default function SessoesPage() {
   }
 
   if (eventsError) {
+    console.error('Events error:', eventsError);
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Erro ao carregar sessões</h1>
           <p className="text-gray-600">Não foi possível carregar as sessões. Tente novamente mais tarde.</p>
+          <p className="text-xs text-gray-500 mt-2">Erro: {eventsError.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!allEvents || allEvents.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <AlertCircle className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Nenhuma sessão encontrada</h1>
+          <p className="text-gray-600">Não há sessões cadastradas no momento.</p>
         </div>
       </div>
     );
