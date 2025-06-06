@@ -222,7 +222,8 @@ export default function ActivityForm() {
     "Moção", 
     "Projeto de Lei",
     "Projeto de Resolução",
-    "Projeto de Emenda"
+    "Projeto de Emenda",
+    "Ata"
   ];
 
   if (activityLoading) {
