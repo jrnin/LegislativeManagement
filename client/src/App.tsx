@@ -96,8 +96,13 @@ function App() {
                        !location.startsWith("/login") &&
                        !location.startsWith("/verify-email");
   
-  // Só usar hook de auth se não for rota pública
-  const { isLoading, isAuthenticated } = isPublicRoute ? { isLoading: false, isAuthenticated: false } : useAuth();
+  // Sempre chamar useAuth para evitar erro de hooks
+  const authResult = useAuth();
+  
+  // Se for rota pública, sobrescrever os valores de auth
+  const { isLoading, isAuthenticated } = isPublicRoute 
+    ? { isLoading: false, isAuthenticated: false } 
+    : authResult;
   
   // Renderizar o app com base no estado de autenticação e rota
   const renderApp = () => {
