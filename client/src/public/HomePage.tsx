@@ -1056,6 +1056,171 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Seção Central de Serviços */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{backgroundColor: '#48654e'}}>
+                  <Building className="h-6 w-6 text-white" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold" style={{color: '#2d3748'}}>
+                  Central de Serviços
+                </h2>
+              </div>
+            </div>
+            
+            <div className="flex justify-center space-x-8 mb-8">
+              <div className="text-center">
+                <span className="text-sm font-medium text-gray-600">Exibir:</span>
+              </div>
+              <div className="flex space-x-6">
+                <button className="text-sm font-medium text-blue-600 border-b-2 border-blue-600 pb-1">
+                  Serviços
+                </button>
+                <button className="text-sm font-medium text-purple-600 hover:text-purple-800">
+                  Acesso Rápido
+                </button>
+                <button className="text-sm font-medium text-yellow-600 hover:text-yellow-800">
+                  Servidor
+                </button>
+                <button className="text-sm font-medium text-blue-400 hover:text-blue-600">
+                  Empresas
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Agendamento eletrônico - ITBI */}
+            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">
+                    Agendamento eletrônico - ITBI
+                  </h3>
+                </div>
+              </div>
+            </Card>
+
+            {/* Agendamento eletrônico - Tesourinha */}
+            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">
+                    Agendamento eletrônico - Tesourinha
+                  </h3>
+                </div>
+              </div>
+            </Card>
+
+            {/* Cartão Estacionamento Idoso - PCD */}
+            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">
+                    Cartão Estacionamento Idoso - PCD
+                  </h3>
+                </div>
+              </div>
+            </Card>
+
+            {/* Consulta de Multas */}
+            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                  <FileSearch className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">
+                    Consulta de Multas
+                  </h3>
+                </div>
+              </div>
+            </Card>
+
+            {/* Consulta de Processos Físicos */}
+            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">
+                    Consulta de Processos Físicos
+                  </h3>
+                </div>
+              </div>
+            </Card>
+
+            {/* Diário Oficial */}
+            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">
+                    Diário Oficial
+                  </h3>
+                </div>
+              </div>
+            </Card>
+
+            {/* Editais da Cultura */}
+            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+                  <Building className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">
+                    Editais da Cultura
+                  </h3>
+                </div>
+              </div>
+            </Card>
+
+            {/* Emendas Parlamentares */}
+            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                  <Gavel className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">
+                    Emendas Parlamentares
+                  </h3>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-2 hover:bg-gray-50 transition-all duration-300"
+              style={{borderColor: '#48654e', color: '#48654e'}}
+            >
+              <Building className="mr-3" size={20} />
+              Ver Todos os Serviços
+              <ArrowRight className="ml-2" size={16} />
+            </Button>
+          </div>
+        </div>
+      </section>
+
     
     </>
   );
