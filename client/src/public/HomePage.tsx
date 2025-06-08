@@ -919,6 +919,109 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Seção de Vídeos da Câmara Municipal */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{color: '#48654e'}}>
+              Vídeos da Câmara Municipal
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Acompanhe as sessões, eventos e atividades da Câmara Municipal de Jaíba
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {/* Vídeo 1 - Sessão Ordinária */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="relative aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/l7VAs92qEXA"
+                  title="Vista Aérea da Cidade de Jaíba"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-lg mb-2" style={{color: '#48654e'}}>
+                  Vista Aérea da Cidade de Jaíba
+                </h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Conheça a bela vista aérea da cidade de Jaíba, mostrando o desenvolvimento e a beleza natural da região.
+                </p>
+                <div className="flex items-center text-sm text-gray-500">
+                  <Calendar className="h-4 w-4 mr-1" />
+                  <span>Publicado recentemente</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vídeo 2 - Placeholder para sessões futuras */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="relative aspect-video bg-gray-200 flex items-center justify-center">
+                <div className="text-center">
+                  <Youtube className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-500">Próximo vídeo em breve</p>
+                </div>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-lg mb-2" style={{color: '#48654e'}}>
+                  Sessões Ordinárias
+                </h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Acompanhe as sessões ordinárias da Câmara Municipal com as deliberações e votações importantes.
+                </p>
+                <div className="flex items-center text-sm text-gray-500">
+                  <Clock className="h-4 w-4 mr-1" />
+                  <span>Em breve</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vídeo 3 - Placeholder para eventos */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="relative aspect-video bg-gray-200 flex items-center justify-center">
+                <div className="text-center">
+                  <Youtube className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-500">Próximo vídeo em breve</p>
+                </div>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-lg mb-2" style={{color: '#48654e'}}>
+                  Eventos Especiais
+                </h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Eventos especiais, audiências públicas e cerimônias importantes da Câmara Municipal.
+                </p>
+                <div className="flex items-center text-sm text-gray-500">
+                  <Clock className="h-4 w-4 mr-1" />
+                  <span>Em breve</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Link para o canal completo */}
+          <div className="text-center">
+            <a 
+              href="https://www.youtube.com/@C%C3%A2maraMunicipaldeJa%C3%ADba" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center"
+            >
+              <Button size="lg" className="text-white hover:opacity-90 transition-all duration-300"
+                      style={{backgroundColor: '#48654e'}}>
+                <Youtube className="mr-3" size={20} />
+                Ver Canal Completo no YouTube
+                <ArrowRight className="ml-2" size={16} />
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
     
     </>
   );
