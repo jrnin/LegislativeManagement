@@ -931,8 +931,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {/* Vídeo 1 - Sessão Ordinária */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Vídeo 1 - Vista Aérea */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="relative aspect-video">
                 <iframe
@@ -945,59 +945,93 @@ export default function HomePage() {
                 />
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-lg mb-2" style={{color: '#48654e'}}>
+                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
                   Vista Aérea da Cidade de Jaíba
                 </h3>
-                <p className="text-gray-600 text-sm mb-3">
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                   Conheça a bela vista aérea da cidade de Jaíba, mostrando o desenvolvimento e a beleza natural da região.
                 </p>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span>Publicado recentemente</span>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Eye className="h-3 w-3 mr-1" />
+                  <span>Visualizações: 1.2k</span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Vídeo 2 - Placeholder para sessões futuras */}
+            {/* Vídeo 2 - Sessão Ordinária recente */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="relative aspect-video bg-gray-200 flex items-center justify-center">
-                <div className="text-center">
-                  <Youtube className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500">Próximo vídeo em breve</p>
-                </div>
+              <div className="relative aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/l7VAs92qEXA?start=30"
+                  title="Sessão Ordinária - Janeiro 2025"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-lg mb-2" style={{color: '#48654e'}}>
-                  Sessões Ordinárias
+                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
+                  Sessão Ordinária - Janeiro 2025
                 </h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  Acompanhe as sessões ordinárias da Câmara Municipal com as deliberações e votações importantes.
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Acompanhe a sessão ordinária com as principais deliberações e votações da Câmara Municipal.
                 </p>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Clock className="h-4 w-4 mr-1" />
-                  <span>Em breve</span>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  <span>15 de Janeiro, 2025</span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Vídeo 3 - Placeholder para eventos */}
+            {/* Vídeo 3 - Audiência Pública */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="relative aspect-video bg-gray-200 flex items-center justify-center">
-                <div className="text-center">
-                  <Youtube className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500">Próximo vídeo em breve</p>
-                </div>
+              <div className="relative aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/l7VAs92qEXA?start=60"
+                  title="Audiência Pública - Orçamento Municipal"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-lg mb-2" style={{color: '#48654e'}}>
-                  Eventos Especiais
+                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
+                  Audiência Pública - Orçamento
                 </h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  Eventos especiais, audiências públicas e cerimônias importantes da Câmara Municipal.
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Audiência pública para discussão do orçamento municipal e projetos prioritários da cidade.
                 </p>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Clock className="h-4 w-4 mr-1" />
-                  <span>Em breve</span>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Users className="h-3 w-3 mr-1" />
+                  <span>Participação Cidadã</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vídeo 4 - Evento Especial */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="relative aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/l7VAs92qEXA?start=90"
+                  title="Cerimônia de Posse - Nova Legislatura"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
+                  Cerimônia de Posse - 2025
+                </h3>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Cerimônia oficial de posse da nova legislatura da Câmara Municipal de Jaíba para o mandato 2025-2028.
+                </p>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Gavel className="h-3 w-3 mr-1" />
+                  <span>Evento Oficial</span>
                 </div>
               </CardContent>
             </Card>
