@@ -97,7 +97,7 @@ const LegislativeActivitiesWidget = () => {
 
   return (
     <div className="space-y-4">
-      {activities?.slice(0, 6).map((activity: any) => (
+      {activities?.slice(0, 3).map((activity: any) => (
         <Link key={activity.id} href={`/public/atividades/${activity.id}`}>
           <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-4 border-l-green-500">
             <CardContent className="p-4">
@@ -512,20 +512,23 @@ export default function HomePage() {
       <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
         {/* Vídeo de fundo */}
         <div className="absolute inset-0 w-full h-full z-0">
-          <iframe
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-            style={{
-              width: '120%',
-              height: '100%',
-              left: '-10%',
-              transformOrigin: 'center center'
-            }}
-             src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
-            title="Vídeo de fundo da Câmara Municipal"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          <div className="w-full h-full flex items-center justify-center">
+            <iframe
+              className="pointer-events-none"
+              style={{
+                width: '100vw',
+                height: '56.25vw', // 16:9 aspect ratio (9/16 = 0.5625)
+                minHeight: '100vh',
+                minWidth: '177.78vh', // 16:9 aspect ratio (16/9 = 1.7778)
+                objectFit: 'cover'
+              }}
+              src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
+              title="Vídeo de fundo da Câmara Municipal"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
         </div>        
                 
               
