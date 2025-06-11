@@ -1298,7 +1298,7 @@ export default function HomePage() {
             <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Gavel className="h-6 w-6 text-white" />
+                  <Edit className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-1">
