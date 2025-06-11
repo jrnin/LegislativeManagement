@@ -3059,6 +3059,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter posts do Facebook (sem autenticação)
+  app.get('/api/public/facebook-posts', getFacebookFeed);
+
   // Rota pública para obter eventos do mês atual (sem autenticação)
   app.get('/api/public/events', async (req, res) => {
     try {
