@@ -5,7 +5,6 @@ import { storage } from "./storage";
 import { setupAuth } from "./replitAuth";
 import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload } from "./middlewares";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest, sendEventNotificationEmail } from "./sendgrid";
-import { getFacebookFeed } from "./facebook";
 import { z } from "zod";
 import crypto from "crypto";
 import fs from "fs";
@@ -3059,8 +3058,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rota pública para obter posts do Facebook (sem autenticação)
-  app.get('/api/public/facebook-posts', getFacebookFeed);
+
 
   // Rota pública para obter eventos do mês atual (sem autenticação)
   app.get('/api/public/events', async (req, res) => {

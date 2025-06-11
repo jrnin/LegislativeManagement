@@ -42,115 +42,7 @@ const getInitials = (name: string) => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase();
 };
 
-// Componente para exibir posts do Facebook
-const FacebookPostsWidget = () => {
-  const { data: posts, isLoading } = useQuery({
-    queryKey: ['/api/public/facebook-posts'],
-    select: (data: any) => data?.posts || []
-  });
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    try {
-      return format(new Date(dateString), "dd 'de' MMMM", { locale: ptBR });
-    } catch {
-      return '';
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-16 bg-gray-200 rounded"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {posts?.slice(0, 3).map((post: any) => (
-        <Card key={post.id} className="hover:shadow-md transition-shadow duration-200 border-l-4 border-l-blue-500">
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-2">
-                  <Facebook size={16} className="text-blue-600" />
-                  <span className="text-sm font-medium text-blue-600">Câmara Municipal</span>
-                </div>
-                <span className="text-xs text-gray-500">{formatDate(post.created_time)}</span>
-              </div>
-              
-              {post.message && (
-                <p className="text-sm text-gray-700 line-clamp-3">
-                  {post.message.length > 150 ? `${post.message.substring(0, 150)}...` : post.message}
-                </p>
-              )}
-              
-              {post.picture && (
-                <div className="mt-3">
-                  <img 
-                    src={post.picture} 
-                    alt="Post do Facebook" 
-                    className="w-full h-32 object-cover rounded-lg"
-                  />
-                </div>
-              )}
-              
-              <div className="flex items-center justify-between text-xs text-gray-500">
-                <div className="flex items-center space-x-4">
-                  {post.reactions && (
-                    <span>👍 {post.reactions.summary?.total_count || 0}</span>
-                  )}
-                  {post.comments && (
-                    <span>💬 {post.comments.summary?.total_count || 0}</span>
-                  )}
-                </div>
-                <a 
-                  href={post.permalink_url || `https://facebook.com/${post.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  Ver no Facebook
-                </a>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-      
-      {(!posts || posts.length === 0) && (
-        <div className="text-center py-8 text-gray-500">
-          <Facebook size={32} className="mx-auto mb-2 opacity-50" />
-          <p className="text-sm">Nenhuma publicação encontrada</p>
-        </div>
-      )}
-      
-      <div className="text-center mt-6">
-        <a 
-          href="https://www.facebook.com/share/1YKbR5Mppj/?mibextid=wwXIfr"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button variant="outline" size="sm" className="text-sm">
-            Ver todas as publicações
-            <ArrowRight size={14} className="ml-2" />
-          </Button>
-        </a>
-      </div>
-    </div>
-  );
-};
 
 // Componente para exibir as últimas atividades legislativas
 const LegislativeActivitiesWidget = () => {
@@ -1012,17 +904,10 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Coluna da Direita - Atividades Legislativas e Facebook (1/3 do espaço) */}
-            <div className="lg:col-span-1 space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold mb-6" style={{color: '#48654e'}}>Últimas Atividades Legislativas</h3>
-                <LegislativeActivitiesWidget />
-              </div>
-              
-              <div>
-                <h3 className="text-2xl font-bold mb-6" style={{color: '#48654e'}}>Facebook</h3>
-                <FacebookPostsWidget />
-              </div>
+            {/* Coluna da Direita - Atividades Legislativas (1/3 do espaço) */}
+            <div className="lg:col-span-1">
+              <h3 className="text-2xl font-bold mb-6" style={{color: '#48654e'}}>Últimas Atividades Legislativas</h3>
+              <LegislativeActivitiesWidget />
             </div>
           </div>
         </div>
