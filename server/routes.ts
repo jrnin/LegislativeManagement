@@ -3438,6 +3438,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter atividades legislativas de um vereador específico (sem autenticação)
+  app.get('/api/public/councilors/:id/activities', async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Verificar se o vereador existe
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Verificar se é realmente um vereador
+      if (user.role !== 'councilor') {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      console.log(`Buscando atividades legislativas para o usuário ${id}`);
+      
+      // Buscar atividades legislativas do vereador
+      const activities = await storage.getLegislativeActivitiesByAuthor(id);
+      
+      console.log(`Encontradas ${activities.length} atividades para o usuário ${id}`);
+      
+      res.json(activities);
+    } catch (error) {
+      console.error("Erro ao buscar atividades do vereador:", error);
+      res.status(500).json({ message: "Erro ao buscar atividades", error: error.message });
+    }
+  });
+
+  // Rota pública para obter comissões de um vereador específico (sem autenticação)
+  app.get('/api/public/councilors/:id/committees', async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Verificar se o vereador existe
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Verificar se é realmente um vereador
+      if (user.role !== 'councilor') {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Buscar comissões do vereador
+      const committees = await storage.getCommitteesByMember(id);
+      
+      console.log(`Usuário ${id} ${committees.length > 0 ? 'é membro de' : 'não é membro de nenhuma'} ${committees.length > 0 ? committees.length + ' comissões' : 'comissão'}`);
+      
+      res.json(committees);
+    } catch (error) {
+      console.error("Erro ao buscar comissões do vereador:", error);
+      res.status(500).json({ message: "Erro ao buscar comissões", error: error.message });
+    }
+  });
+
   // Criar o servidor HTTP
   const httpServer = createServer(app);
   
