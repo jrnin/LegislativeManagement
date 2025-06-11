@@ -133,7 +133,7 @@ const LegislativeActivitiesWidget = () => {
   return (
     <div className="space-y-4">
       {activities?.slice(0, 3).map((activity: any) => (
-        <Link key={activity.id} href={`/public/atividade/${activity.id}`}>
+        <Link key={activity.id} href={`/atividades/${activity.id}`}>
           <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-4 border-l-green-500">
             <CardContent className="p-4">
               <div className="space-y-3">
