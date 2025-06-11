@@ -2954,6 +2954,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter detalhes de uma atividade legislativa específica
+  app.get('/api/public/legislative-activities/:id', async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.id);
+      const activity = await storage.getLegislativeActivity(activityId);
+      
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Verificar se a atividade está aprovada para exibição pública
+      if (activity.approved === false) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      res.json(activity);
+    } catch (error) {
+      console.error(`Erro ao buscar atividade ${req.params.id}:`, error);
+      res.status(500).json({ message: "Erro ao buscar atividade" });
+    }
+  });
+
   // Rota pública para obter atividades legislativas (sem autenticação)
   app.get('/api/public/legislative-activities', async (req, res) => {
     console.log("API de atividades legislativas chamada");

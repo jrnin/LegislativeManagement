@@ -72,7 +72,16 @@ const getInitials = (name: string) => {
 const LegislativeActivitiesWidget = () => {
   const { data: activities, isLoading } = useQuery({
     queryKey: ['/api/public/legislative-activities'],
-    select: (data: any) => data?.activities || []
+    select: (data: any) => {
+      const rawActivities = data?.activities || [];
+      return rawActivities.map((activity: any) => ({
+        ...activity,
+        title: `${activity.activityType} Nº ${activity.activityNumber}/${new Date(activity.activityDate).getFullYear()}`,
+        type: activity.activityType,
+        status: activity.approved ? 'aprovado' : 'em_tramitacao',
+        date: activity.activityDate
+      }));
+    }
   });
 
   const formatDate = (dateString: string) => {
@@ -124,7 +133,7 @@ const LegislativeActivitiesWidget = () => {
   return (
     <div className="space-y-4">
       {activities?.slice(0, 3).map((activity: any) => (
-        <Link key={activity.id} href={`/public/atividades/${activity.id}`}>
+        <Link key={activity.id} href={`/public/atividade/${activity.id}`}>
           <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-4 border-l-green-500">
             <CardContent className="p-4">
               <div className="space-y-3">
@@ -800,7 +809,7 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>  
-                {/* Widget de Assuntos em Alta - Nuvem de Tags */}
+                {/* Widget de Assuntos em Alta - Nuvem de Tags 
                 <div className="bg-white rounded-lg shadow-md p-4 mt-6">
                   <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
                     <Zap className="mr-2" style={{color: '#7FA653'}} size={20} />
@@ -827,7 +836,7 @@ export default function HomePage() {
                       </button>
                     ))}
                   </div>                
-                </div>
+                </div>   */}
 
                 {/* Widget de Dados Demográficos - Jaíba/MG */}
                 <div className="bg-white rounded-lg shadow-md p-4 mt-6">

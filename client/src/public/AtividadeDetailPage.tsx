@@ -97,75 +97,41 @@ export default function AtividadeDetailPage() {
       try {
         setIsLoading(true);
         
-        // Dados baseados nos registros reais do banco
-        const activities = [
-          {
-            id: 1,
-            title: "Pauta Nº 15",
-            description: "Pauta da sessão ordinária do dia 11 de maio de 2025. Contém os itens a serem discutidos durante a sessão, incluindo projetos de lei em tramitação, requerimentos pendentes e outras questões de interesse municipal.",
-            type: "Pauta",
-            status: "tramitando",
-            sessionDate: "2025-05-11T00:00:00.000Z",
-            activityNumber: 15,
-            filePath: "/uploads/1746929829062-3384ca2ee29a.pdf",
-            fileName: "Edição nº 406 - São João de Iracema.pdf",
-            event: {
-              id: 1,
-              name: "Sessão Ordinária de Maio",
-              eventDate: "2025-05-11T00:00:00.000Z"
-            },
-            authors: [
-              { id: "mesa-diretora", name: "Mesa Diretora", avatarUrl: undefined }
-            ]
-          },
-          {
-            id: 2,
-            title: "Requerimento Nº 20",
-            description: "Requerimento solicitando informações sobre obras de infraestrutura na região central da cidade. O documento visa obter esclarecimentos sobre cronograma, orçamento e impactos no trânsito local.",
-            type: "Requerimento",
-            status: "aprovada",
-            sessionDate: "2025-05-11T00:00:00.000Z",
-            activityNumber: 20,
-            filePath: "/uploads/1746929890216-620f5f045cc4.pdf",
-            fileName: "Aviso Leilão Eletrônico 002.2025.pdf",
-            event: {
-              id: 1,
-              name: "Sessão Ordinária de Maio",
-              eventDate: "2025-05-11T00:00:00.000Z"
-            },
-            authors: [
-              { id: "vereador-1", name: "Vereador Silva", avatarUrl: undefined }
-            ]
-          },
-          {
-            id: 3,
-            title: "Indicação Nº 56",
-            description: "Indicação de Limpeza dos logradouros públicos e manutenção de áreas verdes. Proposta visa melhorar a qualidade de vida dos munícipes através da manutenção adequada dos espaços públicos da cidade.",
-            type: "Indicação",
-            status: "aprovada",
-            sessionDate: "2025-05-12T00:00:00.000Z",
-            activityNumber: 56,
-            filePath: "/uploads/1747008323502-ccdd312ddb04.pdf",
-            fileName: "AVISO_LICITACAO_SEGURO_FROTA.pdf",
-            event: {
-              id: 1,
-              name: "Sessão Ordinária de Maio",
-              eventDate: "2025-05-12T00:00:00.000Z"
-            },
-            authors: [
-              { id: "vereador-2", name: "Vereadora Santos", avatarUrl: undefined }
-            ]
-          }
-        ];
-
-        const foundActivity = activities.find(a => a.id === parseInt(params.id));
+        const response = await fetch(`/api/public/legislative-activities/${params.id}`);
         
-        if (foundActivity) {
-          setActivity(foundActivity);
-        } else {
-          setError('Atividade não encontrada');
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError('Atividade não encontrada');
+          } else {
+            setError('Erro ao carregar detalhes da atividade');
+          }
+          return;
         }
+        
+        const activityData = await response.json();
+        
+        // Transform the API response to match our interface
+        const transformedActivity = {
+          id: activityData.id,
+          title: `${activityData.activityType} Nº ${activityData.activityNumber}/${new Date(activityData.activityDate).getFullYear()}`,
+          description: activityData.description,
+          type: activityData.activityType,
+          status: activityData.approved ? 'aprovada' : 'tramitando',
+          sessionDate: activityData.activityDate,
+          activityNumber: activityData.activityNumber,
+          filePath: activityData.filePath,
+          fileName: activityData.fileName,
+          event: activityData.event ? {
+            id: activityData.event.id,
+            name: activityData.event.name,
+            eventDate: activityData.event.startDate
+          } : undefined,
+          authors: activityData.authors || []
+        };
+        
+        setActivity(transformedActivity);
       } catch (err) {
+        console.error('Error fetching activity:', err);
         setError('Erro ao carregar detalhes da atividade');
       } finally {
         setIsLoading(false);
