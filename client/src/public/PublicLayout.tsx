@@ -101,7 +101,22 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     { name: 'Sessões', href: '/sessoes' },
     { name: 'Documentos', href: '/documentos' },
     { name: 'Atividades Legislativas', href: '/atividades' },
-    { name: 'Transparência', href: '/transparencia' },
+    { 
+      name: 'Transparência', 
+      href: '/transparencia',
+      submenu: [
+        { 
+          name: 'Licitações', 
+          href: 'http://cidadesmg.com.br/portaltransparencia/faces/user/licitacao.xhtml?Param=CamJaiba',
+          external: true
+        },
+        { 
+          name: 'Recursos Humanos', 
+          href: 'http://cidadesmg.com.br/portaltransparencia/faces/user/folha/FFolhaPagamento.xhtml?Param=CamJaiba',
+          external: true
+        }
+      ]
+    },
     { name: 'Notícias', href: '/noticias' },
     { name: 'Contato', href: '/contato' },
   ];
@@ -246,26 +261,59 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               {/* Menu para desktop */}
               <nav className="hidden lg:flex items-center space-x-1">
                 {mainMenuLinks.map((link) => (
-                  <Link key={link.href} href={link.href}>
-                    <button className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                      location === link.href 
-                        ? 'text-white' 
-                        : location === '/public' && !isScrolled
-                          ? 'text-white hover:bg-white/20'
-                          : isDarkMode 
-                            ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
-                            : 'hover:opacity-80'
-                    }`} style={location === link.href ? {backgroundColor: '#48654e'} : {color: '#253529'}}>
-                      {link.name}
-                    </button>
-                  </Link>
+                  link.submenu ? (
+                    <DropdownMenu key={link.name}>
+                      <DropdownMenuTrigger asChild>
+                        <button className={`px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer flex items-center ${
+                          location === link.href 
+                            ? 'text-white' 
+                            : location === '/public' && !isScrolled
+                              ? 'text-white hover:bg-white/20'
+                              : isDarkMode 
+                                ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                                : 'hover:opacity-80'
+                        }`} style={location === link.href ? {backgroundColor: '#48654e'} : {color: '#253529'}}>
+                          {link.name}
+                          <ChevronDown className="ml-1 h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="rounded-[10px]">
+                        {link.submenu.map((subItem) => (
+                          <DropdownMenuItem key={subItem.name} className="rounded-[10px]">
+                            <a 
+                              href={subItem.href}
+                              target={subItem.external ? "_blank" : "_self"}
+                              rel={subItem.external ? "noopener noreferrer" : undefined}
+                              className="w-full"
+                            >
+                              {subItem.name}
+                            </a>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Link key={link.href} href={link.href}>
+                      <button className={`px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer ${
+                        location === link.href 
+                          ? 'text-white' 
+                          : location === '/public' && !isScrolled
+                            ? 'text-white hover:bg-white/20'
+                            : isDarkMode 
+                              ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                              : 'hover:opacity-80'
+                      }`} style={location === link.href ? {backgroundColor: '#48654e'} : {color: '#253529'}}>
+                        {link.name}
+                      </button>
+                    </Link>
+                  )
                 ))}
                 
                 <div className="ml-2">
                   <Button 
                     variant={location === '/public' && !isScrolled ? "secondary" : "outline"} 
                     size="sm"
-                    className="text-white hover:opacity-90"
+                    className="text-white hover:opacity-90 rounded-[10px]"
                     style={{backgroundColor: '#48654e', borderColor: '#48654e'}}
                     onClick={() => window.location.href = "/login"}
                   >
@@ -312,19 +360,54 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                       
                       <nav className="flex flex-col space-y-1 py-4">
                         {mainMenuLinks.map((link) => (
-                          <Link key={link.href} href={link.href}>
-                            <SheetClose asChild>
-                              <button className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                                location === link.href 
-                                  ? 'bg-blue-600 text-white' 
-                                  : isDarkMode 
-                                    ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
-                                    : 'text-gray-700 hover:bg-gray-100'
-                              }`}>
-                                {link.name}
-                              </button>
-                            </SheetClose>
-                          </Link>
+                          link.submenu ? (
+                            <div key={link.name} className="space-y-1">
+                              <Link href={link.href}>
+                                <SheetClose asChild>
+                                  <button className={`px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                                    location === link.href 
+                                      ? 'text-white' 
+                                      : isDarkMode 
+                                        ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                                        : 'text-gray-700 hover:bg-gray-100'
+                                  }`} style={location === link.href ? {backgroundColor: '#48654e'} : {}}>
+                                    {link.name}
+                                  </button>
+                                </SheetClose>
+                              </Link>
+                              <div className="pl-4 space-y-1">
+                                {link.submenu.map((subItem) => (
+                                  <a 
+                                    key={subItem.name}
+                                    href={subItem.href}
+                                    target={subItem.external ? "_blank" : "_self"}
+                                    rel={subItem.external ? "noopener noreferrer" : undefined}
+                                    className={`block px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer ${
+                                      isDarkMode 
+                                        ? 'text-gray-400 hover:bg-slate-700 hover:text-white' 
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                    }`}
+                                  >
+                                    {subItem.name}
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <Link key={link.href} href={link.href}>
+                              <SheetClose asChild>
+                                <button className={`px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                                  location === link.href 
+                                    ? 'text-white' 
+                                    : isDarkMode 
+                                      ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                                      : 'text-gray-700 hover:bg-gray-100'
+                                }`} style={location === link.href ? {backgroundColor: '#48654e'} : {}}>
+                                  {link.name}
+                                </button>
+                              </SheetClose>
+                            </Link>
+                          )
                         ))}
                       </nav>
                       

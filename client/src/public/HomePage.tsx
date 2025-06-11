@@ -542,15 +542,8 @@ export default function HomePage() {
       </section>
 
       {/* Seção de Serviços Rápidos */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4" style={{color: '#48654e'}}>Acesso Rápido</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Encontre rapidamente as informações que você precisa sobre a Câmara Municipal
-            </p>
-          </div>
-          
+      <section className="py-4 px-2 bg-white">
+        <div className="container mx-auto">     
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickServices.slice(0, 8).map((service, index) => (
               <QuickServiceCard
@@ -936,8 +929,9 @@ export default function HomePage() {
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="relative aspect-video">
                 <iframe
-                  src="https://www.youtube.com/embed/l7VAs92qEXA"
-                  title="Vista Aérea da Cidade de Jaíba"
+                  src="https://www.youtube.com/watch?v=aZNrMCohdRw"
+                  title="10ª Reunião Ordinária 02/06/2025
+"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -946,10 +940,10 @@ export default function HomePage() {
               </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
-                  Vista Aérea da Cidade de Jaíba
+                  10ª Reunião Ordinária 02/06/2025
                 </h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  Conheça a bela vista aérea da cidade de Jaíba, mostrando o desenvolvimento e a beleza natural da região.
+                  Acompanhe a sessão ordinária com as principais deliberações e votações da Câmara Municipal.
                 </p>
                 <div className="flex items-center text-xs text-gray-500">
                   <Eye className="h-3 w-3 mr-1" />
@@ -962,7 +956,7 @@ export default function HomePage() {
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="relative aspect-video">
                 <iframe
-                  src="https://www.youtube.com/embed/l7VAs92qEXA?start=30"
+                  src="https://www.youtube.com/watch?v=hcESKWXjRdY&pp=0gcJCbIJAYcqIYzv"
                   title="Sessão Ordinária - Janeiro 2025"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -988,7 +982,7 @@ export default function HomePage() {
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="relative aspect-video">
                 <iframe
-                  src="https://www.youtube.com/embed/l7VAs92qEXA?start=60"
+                  src="https://www.youtube.com/watch?v=RUL_vTIvUPQ"
                   title="Audiência Pública - Orçamento Municipal"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1014,7 +1008,7 @@ export default function HomePage() {
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="relative aspect-video">
                 <iframe
-                  src="https://www.youtube.com/embed/l7VAs92qEXA?start=90"
+                  src="https://www.youtube.com/watch?v=pwBTK7Xw00Q"
                   title="Cerimônia de Posse - Nova Legislatura"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
