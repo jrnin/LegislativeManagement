@@ -337,6 +337,20 @@ export default function VereadorDetalhesPage() {
                               <TableCell>
                                 {activity.date ? formatDate(activity.date) : 'Data não informada'}
                               </TableCell>
+                              <TableCell>
+                                {(activity.filePath || activity.file) && (
+                                  <a 
+                                    href={`/api/public/activities/${activity.id}/download`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <Button variant="outline" size="sm">
+                                      <Download className="h-4 w-4 mr-2" />
+                                      Download
+                                    </Button>
+                                  </a>
+                                )}
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
