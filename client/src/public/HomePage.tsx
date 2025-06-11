@@ -74,13 +74,20 @@ const LegislativeActivitiesWidget = () => {
     queryKey: ['/api/public/legislative-activities'],
     select: (data: any) => {
       const rawActivities = data?.activities || [];
-      return rawActivities.map((activity: any) => ({
-        ...activity,
-        title: `${activity.activityType} Nº ${activity.activityNumber}/${new Date(activity.activityDate).getFullYear()}`,
-        type: activity.activityType,
-        status: activity.approved ? 'aprovado' : 'em_tramitacao',
-        date: activity.activityDate
-      }));
+      console.log('Raw activities data:', rawActivities[0]);
+      return rawActivities.map((activity: any) => {
+        const transformedActivity = {
+          ...activity,
+          title: activity.activityType && activity.activityNumber && activity.activityDate 
+            ? `${activity.activityType} Nº ${activity.activityNumber}/${new Date(activity.activityDate).getFullYear()}`
+            : activity.title || 'Atividade Legislativa',
+          type: activity.activityType || activity.type || 'Atividade',
+          status: activity.approved ? 'aprovado' : 'em_tramitacao',
+          date: activity.activityDate || activity.date || activity.createdAt
+        };
+        console.log('Transformed activity:', transformedActivity);
+        return transformedActivity;
+      });
     }
   });
 
