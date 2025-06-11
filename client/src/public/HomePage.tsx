@@ -74,19 +74,19 @@ const LegislativeActivitiesWidget = () => {
     queryKey: ['/api/public/legislative-activities'],
     select: (data: any) => {
       const rawActivities = data?.activities || [];
-      console.log('Raw activities data:', rawActivities[0]);
       return rawActivities.map((activity: any) => {
-        const transformedActivity = {
+        // Use fallback values and ensure proper date handling
+        const activityType = activity.activityType || 'Atividade';
+        const activityNumber = activity.activityNumber || 1;
+        const year = activity.activityDate ? new Date(activity.activityDate).getFullYear() : new Date().getFullYear();
+        
+        return {
           ...activity,
-          title: activity.activityType && activity.activityNumber && activity.activityDate 
-            ? `${activity.activityType} Nº ${activity.activityNumber}/${new Date(activity.activityDate).getFullYear()}`
-            : activity.title || 'Atividade Legislativa',
-          type: activity.activityType || activity.type || 'Atividade',
-          status: activity.approved ? 'aprovado' : 'em_tramitacao',
-          date: activity.activityDate || activity.date || activity.createdAt
+          title: `${activityType} Nº ${activityNumber}/${year}`,
+          type: activityType,
+          status: activity.approved === true ? 'aprovado' : 'em_tramitacao',
+          date: activity.activityDate || activity.createdAt
         };
-        console.log('Transformed activity:', transformedActivity);
-        return transformedActivity;
       });
     }
   });
@@ -1106,18 +1106,24 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Vídeo 1 - Vista Aérea */}
+            {/* Vídeo 1 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="relative aspect-video">
-                <iframe
-                  src="https://www.youtube.com/watch?v=aZNrMCohdRw"
-                  title="10ª Reunião Ordinária 02/06/2025
-"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=aZNrMCohdRw', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/aZNrMCohdRw/maxresdefault.jpg"
+                  alt="10ª Reunião Ordinária"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/aZNrMCohdRw/hqdefault.jpg";
+                  }}
                 />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
@@ -1133,17 +1139,24 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Vídeo 2 - Sessão Ordinária recente */}
+            {/* Vídeo 2 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="relative aspect-video">
-                <iframe
-                  src="https://www.youtube.com/watch?v=hcESKWXjRdY&pp=0gcJCbIJAYcqIYzv"
-                  title="Sessão Ordinária - Janeiro 2025"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=hcESKWXjRdY', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/hcESKWXjRdY/maxresdefault.jpg"
+                  alt="Sessão Ordinária Janeiro"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/hcESKWXjRdY/hqdefault.jpg";
+                  }}
                 />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
@@ -1159,17 +1172,24 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Vídeo 3 - Audiência Pública */}
+            {/* Vídeo 3 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="relative aspect-video">
-                <iframe
-                  src="https://www.youtube.com/watch?v=RUL_vTIvUPQ"
-                  title="Audiência Pública - Orçamento Municipal"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=RUL_vTIvUPQ', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/RUL_vTIvUPQ/maxresdefault.jpg"
+                  alt="Audiência Pública Orçamento"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/RUL_vTIvUPQ/hqdefault.jpg";
+                  }}
                 />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
@@ -1185,17 +1205,24 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Vídeo 4 - Evento Especial */}
+            {/* Vídeo 4 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="relative aspect-video">
-                <iframe
-                  src="https://www.youtube.com/watch?v=pwBTK7Xw00Q"
-                  title="Cerimônia de Posse - Nova Legislatura"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=pwBTK7Xw00Q', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/pwBTK7Xw00Q/maxresdefault.jpg"
+                  alt="Cerimônia de Posse"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/pwBTK7Xw00Q/hqdefault.jpg";
+                  }}
                 />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
