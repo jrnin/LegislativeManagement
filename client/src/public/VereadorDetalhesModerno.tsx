@@ -49,14 +49,23 @@ export default function VereadorDetalhesModerno() {
     queryKey: [`/api/public/councilors/${id}`],
   });
 
-  // Buscar documentos reais do vereador do banco de dados
-  const { data: documents = [] } = useQuery<Document[]>({
+  // Buscar documentos relacionados ao vereador
+  const { data: documents = [], isLoading: isDocumentsLoading } = useQuery({
     queryKey: [`/api/public/councilors/${id}/documents`],
     enabled: !!id,
   });
 
-  // Para atividades, mantemos vazio por enquanto já que não há API pública ainda
-  const activities: Activity[] = [];
+  // Buscar atividades legislativas do vereador
+  const { data: activities = [], isLoading: isActivitiesLoading } = useQuery({
+    queryKey: [`/api/public/councilors/${id}/activities`],
+    enabled: !!id,
+  });
+
+  // Buscar comissões do vereador
+  const { data: commissions = [], isLoading: isCommissionsLoading } = useQuery({
+    queryKey: [`/api/public/councilors/${id}/committees`],
+    enabled: !!id,
+  });
 
   if (isLoading) {
     return (
@@ -146,9 +155,7 @@ export default function VereadorDetalhesModerno() {
                     </Badge>
                   )}
                   
-                  <Badge className={`px-3 py-1 ${councilor.active ? 'bg-green-500/30 text-green-100 border-green-300/30' : 'bg-gray-500/30 text-gray-100 border-gray-300/30'}`}>
-                    {councilor.active ? 'Ativo' : 'Inativo'}
-                  </Badge>
+
                 </div>
               </div>
             </div>
@@ -174,8 +181,8 @@ export default function VereadorDetalhesModerno() {
               <Card className="bg-white/20 backdrop-blur-sm border-white/30 text-center">
                 <CardContent className="p-4">
                   <Users className="h-6 w-6 text-white mx-auto mb-1" />
-                  <div className="text-xl font-bold text-white">{councilor.active ? 'Ativo' : 'Inativo'}</div>
-                  <div className="text-xs text-green-100">Status</div>
+                  <div className="text-xl font-bold text-white">{commissions.length}</div>
+                  <div className="text-xs text-green-100">Comissões</div>
                 </CardContent>
               </Card>
             </div>
@@ -299,15 +306,18 @@ export default function VereadorDetalhesModerno() {
               <CardContent>
                 {documents.length > 0 ? (
                   <div className="space-y-3">
-                    {documents.slice(0, 5).map((doc) => (
+                    {documents.slice(0, 5).map((doc: any) => (
                       <div key={doc.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{doc.title}</h4>
-                          <p className="text-sm text-gray-600">{doc.type} • {new Date(doc.date).toLocaleDateString('pt-BR')}</p>
+                          <h4 className="font-medium text-gray-900">{doc.description || doc.title}</h4>
+                          <p className="text-sm text-gray-600">
+                            {doc.documentType || doc.type} • {
+                              (doc.documentDate || doc.date) ? 
+                              new Date(doc.documentDate || doc.date).toLocaleDateString('pt-BR') : 
+                              'Data não informada'
+                            }
+                          </p>
                         </div>
-                        <Badge variant={doc.status === 'aprovado' ? 'default' : 'secondary'} className="ml-4">
-                          {doc.status}
-                        </Badge>
                       </div>
                     ))}
                   </div>
@@ -326,13 +336,23 @@ export default function VereadorDetalhesModerno() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {activities.length > 0 ? (
+                {isActivitiesLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Carregando atividades...</p>
+                  </div>
+                ) : activities.length > 0 ? (
                   <div className="space-y-4">
-                    {activities.slice(0, 5).map((activity) => (
+                    {activities.slice(0, 5).map((activity: any) => (
                       <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3">
-                        <h4 className="font-medium text-gray-900">{activity.title}</h4>
-                        <p className="text-sm text-gray-600 mb-2">{activity.type} • {new Date(activity.date).toLocaleDateString('pt-BR')}</p>
-                        <p className="text-sm text-gray-700">{activity.description}</p>
+                        <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {activity.type} • {
+                            activity.date ? 
+                            new Date(activity.date).toLocaleDateString('pt-BR') : 
+                            'Data não informada'
+                          }
+                        </p>
                       </div>
                     ))}
                   </div>
