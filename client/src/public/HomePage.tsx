@@ -29,7 +29,13 @@ import {
   Thermometer,
   Loader2,
   Clock,
-  Eye
+  Eye,
+  Users2,
+  MapPin,
+  Home,
+  GraduationCap,
+  Heart,
+  Briefcase
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -636,6 +642,18 @@ export default function HomePage() {
                         category={item.category}
                       />
                     ))}
+
+                    {news.slice(2, 7).map((item) => (
+                      <NewsCard
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        excerpt={item.excerpt}
+                        date={formatDate(item.date)}
+                        imageUrl={item.imageUrl}
+                        category={item.category}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -745,7 +763,89 @@ export default function HomePage() {
                       </button>
                     ))}
                   </div>                
-                </div>  
+                </div>
+
+                {/* Widget de Dados Demográficos - Jaíba/MG */}
+                <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
+                    <Building className="mr-2" style={{color: '#7FA653'}} size={20} />
+                    Jaíba em Números
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* População */}
+                    <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Users2 size={20} className="text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">População</p>
+                        <p className="text-lg font-bold text-blue-700">37.000</p>
+                      </div>
+                    </div>
+
+                    {/* Área */}
+                    <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <MapPin size={20} className="text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Área</p>
+                        <p className="text-lg font-bold text-green-700">1.182 km²</p>
+                      </div>
+                    </div>
+
+                    {/* IDH */}
+                    <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                        <Heart size={20} className="text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">IDH</p>
+                        <p className="text-lg font-bold text-purple-700">0.681</p>
+                      </div>
+                    </div>
+
+                    {/* PIB per capita */}
+                    <div className="flex items-center space-x-3 p-3 bg-yellow-50 rounded-lg">
+                      <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <Briefcase size={20} className="text-yellow-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">PIB per capita</p>
+                        <p className="text-lg font-bold text-yellow-700">R$ 28.450</p>
+                      </div>
+                    </div>
+
+                    {/* Escolaridade */}
+                    <div className="flex items-center space-x-3 p-3 bg-red-50 rounded-lg">
+                      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                        <GraduationCap size={20} className="text-red-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Taxa Alfabetização</p>
+                        <p className="text-lg font-bold text-red-700">89.2%</p>
+                      </div>
+                    </div>
+
+                    {/* Densidade */}
+                    <div className="flex items-center space-x-3 p-3 bg-teal-50 rounded-lg">
+                      <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
+                        <Home size={20} className="text-teal-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Densidade</p>
+                        <p className="text-lg font-bold text-teal-700">31.3 hab/km²</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <p className="text-xs text-gray-500 text-center">
+                      Fonte: IBGE - Censo 2022 e estimativas atuais
+                    </p>
+                  </div>
+                </div>
                 
               </div>
               
