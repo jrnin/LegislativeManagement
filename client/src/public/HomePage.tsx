@@ -35,7 +35,15 @@ import {
   Home,
   GraduationCap,
   Heart,
-  Briefcase
+  Briefcase,
+  Scissors,
+  Car,
+  CreditCard,
+  AlertTriangle,
+  FolderOpen,
+  Newspaper,
+  Theater,
+  Edit
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1206,7 +1214,7 @@ export default function HomePage() {
             <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Calendar className="h-6 w-6 text-white" />
+                  <Scissors className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-1">
@@ -1220,7 +1228,7 @@ export default function HomePage() {
             <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Users className="h-6 w-6 text-white" />
+                  <Car className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-1">
@@ -1234,7 +1242,7 @@ export default function HomePage() {
             <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-                  <FileSearch className="h-6 w-6 text-white" />
+                  <CreditCard className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-1">
@@ -1248,7 +1256,7 @@ export default function HomePage() {
             <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <FileText className="h-6 w-6 text-white" />
+                  <FolderOpen className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-1">
@@ -1262,7 +1270,7 @@ export default function HomePage() {
             <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <FileText className="h-6 w-6 text-white" />
+                  <Newspaper className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-1">
@@ -1276,7 +1284,7 @@ export default function HomePage() {
             <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                  <Building className="h-6 w-6 text-white" />
+                  <Theater className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-1">
