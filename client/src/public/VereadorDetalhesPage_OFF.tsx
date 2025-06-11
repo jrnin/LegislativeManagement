@@ -324,6 +324,7 @@ export default function VereadorDetalhesPage() {
                             <TableHead>Tipo</TableHead>
                             <TableHead>Descrição</TableHead>
                             <TableHead>Data</TableHead>
+                            <TableHead>Ações</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -390,10 +391,16 @@ export default function VereadorDetalhesPage() {
                               </TableCell>
                               <TableCell>
                                 {(document.filePath || document.file) && (
-                                  <Button variant="outline" size="sm">
-                                    <Download className="h-4 w-4 mr-2" />
-                                    Download
-                                  </Button>
+                                  <a 
+                                    href={`/api/public/documents/${document.id}/download`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <Button variant="outline" size="sm">
+                                      <Download className="h-4 w-4 mr-2" />
+                                      Download
+                                    </Button>
+                                  </a>
                                 )}
                               </TableCell>
                             </TableRow>

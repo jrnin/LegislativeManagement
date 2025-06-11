@@ -5,7 +5,7 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Mail, Phone, MapPin, Calendar, GraduationCap, Briefcase, Award, FileText, Users, Building2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Mail, Phone, MapPin, Calendar, GraduationCap, Briefcase, Award, FileText, Users, Building2, Download, ExternalLink } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { Helmet } from 'react-helmet';
 import texturaUrl from '@/assets/textura.jpg';
@@ -318,6 +318,19 @@ export default function VereadorDetalhesModerno() {
                             }
                           </p>
                         </div>
+                        {(doc.filePath || doc.file) && (
+                          <a 
+                            href={`/api/public/documents/${doc.id}/download`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-4"
+                          >
+                            <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50">
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </Button>
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -344,15 +357,30 @@ export default function VereadorDetalhesModerno() {
                 ) : activities.length > 0 ? (
                   <div className="space-y-4">
                     {activities.slice(0, 5).map((activity: any) => (
-                      <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3">
-                        <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
-                        <p className="text-sm text-gray-600 mb-2">
-                          {activity.type} • {
-                            activity.date ? 
-                            new Date(activity.date).toLocaleDateString('pt-BR') : 
-                            'Data não informada'
-                          }
-                        </p>
+                      <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3 flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {activity.type} • {
+                              activity.date ? 
+                              new Date(activity.date).toLocaleDateString('pt-BR') : 
+                              'Data não informada'
+                            }
+                          </p>
+                        </div>
+                        {(activity.filePath || activity.file) && (
+                          <a 
+                            href={`/api/public/activities/${activity.id}/download`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-4"
+                          >
+                            <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50">
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </Button>
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>
