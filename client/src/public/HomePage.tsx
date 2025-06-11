@@ -43,7 +43,17 @@ import {
   FolderOpen,
   Newspaper,
   Theater,
-  Edit
+  Edit,
+  Shield,
+  FileCheck,
+  DollarSign,
+  CreditCard as Payment,
+  UserCheck,
+  Clock as Time,
+  Globe,
+  Building2,
+  FileBarChart,
+  TrendingUp
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -489,7 +499,53 @@ const mockEvents = [
   }
 ];
 
+// Dados dos serviços por categoria
+const servicesData = {
+  servicos: [
+    { title: "Agendamento eletrônico - ITBI", icon: Calendar, color: "bg-blue-600" },
+    { title: "Agendamento eletrônico - Tesourinha", icon: Scissors, color: "bg-blue-600" },
+    { title: "Cartão Estacionamento Idoso - PCD", icon: Car, color: "bg-blue-600" },
+    { title: "Consulta de Multas", icon: CreditCard, color: "bg-green-600" },
+    { title: "Consulta de Processos Físicos", icon: FolderOpen, color: "bg-blue-600" },
+    { title: "Diário Oficial", icon: Newspaper, color: "bg-blue-600" },
+    { title: "Editais da Cultura", icon: Theater, color: "bg-purple-600" },
+    { title: "Emendas Parlamentares", icon: Edit, color: "bg-blue-600" }
+  ],
+  acessoRapido: [
+    { title: "Portal da Transparência", icon: Eye, color: "bg-green-600" },
+    { title: "Consulta Pública", icon: FileCheck, color: "bg-blue-600" },
+    { title: "Ouvidoria Municipal", icon: Users, color: "bg-orange-600" },
+    { title: "E-SIC - Informações", icon: Shield, color: "bg-purple-600" },
+    { title: "Licitações e Contratos", icon: FileBarChart, color: "bg-red-600" },
+    { title: "Portal do Cidadão", icon: UserCheck, color: "bg-teal-600" },
+    { title: "Agenda de Eventos", icon: Calendar, color: "bg-indigo-600" },
+    { title: "Notícias Municipais", icon: Newspaper, color: "bg-yellow-600" }
+  ],
+  servidor: [
+    { title: "Portal do Servidor", icon: UserCheck, color: "bg-blue-700" },
+    { title: "Contracheque Online", icon: DollarSign, color: "bg-green-700" },
+    { title: "Férias e Licenças", icon: Time, color: "bg-orange-700" },
+    { title: "Benefícios", icon: Heart, color: "bg-red-700" },
+    { title: "Treinamentos", icon: GraduationCap, color: "bg-purple-700" },
+    { title: "Avaliação de Desempenho", icon: TrendingUp, color: "bg-teal-700" },
+    { title: "Protocolo Interno", icon: FileText, color: "bg-indigo-700" },
+    { title: "Suporte Técnico", icon: Building2, color: "bg-gray-700" }
+  ],
+  empresas: [
+    { title: "Alvará de Funcionamento", icon: Building2, color: "bg-blue-800" },
+    { title: "CNPJ - Consulta", icon: FileSearch, color: "bg-green-800" },
+    { title: "Tributos Empresariais", icon: Payment, color: "bg-orange-800" },
+    { title: "Licenciamento Ambiental", icon: Globe, color: "bg-teal-800" },
+    { title: "Nota Fiscal Eletrônica", icon: FileBarChart, color: "bg-purple-800" },
+    { title: "Cadastro de Fornecedores", icon: Building, color: "bg-red-800" },
+    { title: "Parcelamento de Débitos", icon: DollarSign, color: "bg-yellow-800" },
+    { title: "Certidões Negativas", icon: Shield, color: "bg-indigo-800" }
+  ]
+};
+
 export default function HomePage() {
+  const [activeServiceTab, setActiveServiceTab] = useState('servicos');
+  
   // Consulta real à API para obter dados de eventos
   const { data: events = [], isLoading: eventsLoading } = useQuery({
     queryKey: ['/api/public/events'],
@@ -1179,16 +1235,44 @@ export default function HomePage() {
                 <span className="text-sm font-medium text-gray-600">Exibir:</span>
               </div>
               <div className="flex space-x-6">
-                <button className="text-sm font-medium text-blue-600 border-b-2 border-blue-600 pb-1">
+                <button 
+                  onClick={() => setActiveServiceTab('servicos')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'servicos' 
+                      ? 'text-blue-600 border-b-2 border-blue-600' 
+                      : 'text-gray-500 hover:text-blue-600'
+                  }`}
+                >
                   Serviços
                 </button>
-                <button className="text-sm font-medium text-purple-600 hover:text-purple-800">
+                <button 
+                  onClick={() => setActiveServiceTab('acessoRapido')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'acessoRapido' 
+                      ? 'text-purple-600 border-b-2 border-purple-600' 
+                      : 'text-gray-500 hover:text-purple-600'
+                  }`}
+                >
                   Acesso Rápido
                 </button>
-                <button className="text-sm font-medium text-yellow-600 hover:text-yellow-800">
+                <button 
+                  onClick={() => setActiveServiceTab('servidor')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'servidor' 
+                      ? 'text-yellow-600 border-b-2 border-yellow-600' 
+                      : 'text-gray-500 hover:text-yellow-600'
+                  }`}
+                >
                   Servidor
                 </button>
-                <button className="text-sm font-medium text-blue-400 hover:text-blue-600">
+                <button 
+                  onClick={() => setActiveServiceTab('empresas')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'empresas' 
+                      ? 'text-blue-400 border-b-2 border-blue-400' 
+                      : 'text-gray-500 hover:text-blue-400'
+                  }`}
+                >
                   Empresas
                 </button>
               </div>
@@ -1196,117 +1280,23 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Agendamento eletrônico - ITBI */}
-            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Calendar className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    Agendamento eletrônico - ITBI
-                  </h3>
-                </div>
-              </div>
-            </Card>
-
-            {/* Agendamento eletrônico - Tesourinha */}
-            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Scissors className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    Agendamento eletrônico - Tesourinha
-                  </h3>
-                </div>
-              </div>
-            </Card>
-
-            {/* Cartão Estacionamento Idoso - PCD */}
-            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Car className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    Cartão Estacionamento Idoso - PCD
-                  </h3>
-                </div>
-              </div>
-            </Card>
-
-            {/* Consulta de Multas */}
-            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-                  <CreditCard className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    Consulta de Multas
-                  </h3>
-                </div>
-              </div>
-            </Card>
-
-            {/* Consulta de Processos Físicos */}
-            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <FolderOpen className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    Consulta de Processos Físicos
-                  </h3>
-                </div>
-              </div>
-            </Card>
-
-            {/* Diário Oficial */}
-            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Newspaper className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    Diário Oficial
-                  </h3>
-                </div>
-              </div>
-            </Card>
-
-            {/* Editais da Cultura */}
-            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                  <Theater className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    Editais da Cultura
-                  </h3>
-                </div>
-              </div>
-            </Card>
-
-            {/* Emendas Parlamentares */}
-            <Card className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Edit className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">
-                    Emendas Parlamentares
-                  </h3>
-                </div>
-              </div>
-            </Card>
+            {servicesData[activeServiceTab as keyof typeof servicesData].map((service, index) => {
+              const IconComponent = service.icon;
+              return (
+                <Card key={index} className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50 cursor-pointer">
+                  <div className="flex items-start space-x-4">
+                    <div className={`w-12 h-12 rounded-full ${service.color} flex items-center justify-center flex-shrink-0`}>
+                      <IconComponent className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 mb-1">
+                        {service.title}
+                      </h3>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
 
           <div className="text-center mt-12">
