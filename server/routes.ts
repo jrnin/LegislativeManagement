@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { setupAuth } from "./replitAuth";
 import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload } from "./middlewares";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest, sendEventNotificationEmail } from "./sendgrid";
+import { getFacebookFeed } from "./facebook";
 import { z } from "zod";
 import crypto from "crypto";
 import fs from "fs";

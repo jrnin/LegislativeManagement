@@ -139,7 +139,7 @@ export default function VereadorDetalhesModerno() {
               <div className="space-y-3">
                 <div>
                   <h1 className="text-3xl lg:text-4xl font-bold text-white mb-1">{councilor.name}</h1>
-                  <p className="text-lg text-green-100 font-medium">{councilor.role || 'Vereador'}</p>
+                  
                 </div>
                 
                 <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
@@ -185,19 +185,29 @@ export default function VereadorDetalhesModerno() {
                   <div className="text-xs text-green-100">Comissões</div>
                 </CardContent>
               </Card>
+              <Link href="/vereadores">
+                <Button variant="ghost" className="text-white hover:bg-white/20 border border-white/30">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Voltar
+                </Button>
+              </Link>
+              
             </div>
           </div>
         </div>
 
-        {/* Botão voltar */}
-        <div className="absolute top-8 right-8 z-20">
+        {/* Botão voltar 
+        <div className="absolute top-2 right-8 z-20">
           <Link href="/vereadores">
             <Button variant="ghost" className="text-white hover:bg-white/20 border border-white/30">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar
             </Button>
           </Link>
-        </div>
+        </div>  */}
+
+
+        
       </div>
 
       {/* Conteúdo principal */}
@@ -240,7 +250,7 @@ export default function VereadorDetalhesModerno() {
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <MapPin className="h-5 w-5 text-green-600" />
                     <div>
-                      <p className="text-sm text-gray-600">Gabinete</p>
+                      <p className="text-sm text-gray-600">Endereço</p>
                       <p className="text-gray-900 font-medium">{councilor.address}</p>
                     </div>
                   </div>
@@ -283,7 +293,7 @@ export default function VereadorDetalhesModerno() {
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <Briefcase className="h-5 w-5 text-blue-600" />
                     <div>
-                      <p className="text-sm text-gray-600">Profissão</p>
+                      <p className="text-sm text-gray-600">Ocupação</p>
                       <p className="text-gray-900 font-medium">{councilor.occupation}</p>
                     </div>
                   </div>

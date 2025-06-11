@@ -43,9 +43,7 @@ const CouncilorCard = ({ councilor }: { councilor: Councilor }) => (
             {councilor.partido}
           </Badge>
         )}
-        <div>
-          <Badge variant="outline" className="mx-auto">{councilor.education || 'Legislatura Atual'}</Badge>
-        </div>
+       
       </CardContent>
     </Card>
   </Link>
