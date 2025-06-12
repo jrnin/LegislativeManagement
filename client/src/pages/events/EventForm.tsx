@@ -250,8 +250,8 @@ export default function EventForm() {
                     <FormItem>
                       <FormLabel>Legislatura</FormLabel>
                       <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
+                        onValueChange={(value) => field.onChange(Number(value))} 
+                        defaultValue={field.value?.toString()}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -261,7 +261,7 @@ export default function EventForm() {
                         <SelectContent>
                           {legislatures.map((legislature) => (
                             <SelectItem key={legislature.id} value={legislature.id.toString()}>
-                              {legislature.number}ª Legislatura ({legislature.startDate.split('T')[0]} - {legislature.endDate.split('T')[0]})
+                              {legislature.number}ª Legislatura ({new Date(legislature.startDate).toISOString().split('T')[0]} - {new Date(legislature.endDate).toISOString().split('T')[0]})
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -348,6 +348,23 @@ export default function EventForm() {
                   )}
                 />
               </div>
+              
+              <FormField
+                control={form.control}
+                name="videoUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Link do Vídeo no YouTube</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://youtube.com/watch?v=..." {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Link do YouTube para o vídeo da sessão (opcional)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
               <div className="space-y-2">
                 <h3 className="text-lg font-medium">Detalhes</h3>

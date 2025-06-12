@@ -77,6 +77,20 @@ export default function EventDetailsPage() {
     }
   };
 
+  const getYouTubeEmbedUrl = (url: string): string | undefined => {
+    if (!url) return undefined;
+    
+    // Extract video ID from various YouTube URL formats
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    
+    if (match && match[2].length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}`;
+    }
+    
+    return undefined;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -199,7 +213,7 @@ export default function EventDetailsPage() {
 
                 {/* Description */}
                 {event.description && (
-                  <div>
+                  <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-3" style={{color: '#48654e'}}>
                       Descrição
                     </h3>
@@ -207,6 +221,25 @@ export default function EventDetailsPage() {
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                         {event.description}
                       </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Video */}
+                {event.videoUrl && getYouTubeEmbedUrl(event.videoUrl) && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3" style={{color: '#48654e'}}>
+                      Vídeo da Sessão
+                    </h3>
+                    <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                      <iframe
+                        src={getYouTubeEmbedUrl(event.videoUrl) || undefined}
+                        title="Vídeo da Sessão"
+                        className="w-full h-full"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
                     </div>
                   </div>
                 )}
