@@ -430,6 +430,20 @@ export default function EventDetails() {
       default: return "bg-gray-100 text-gray-800";
     }
   };
+
+  const getYouTubeEmbedUrl = (url: string): string | undefined => {
+    if (!url) return undefined;
+    
+    // Extract video ID from various YouTube URL formats
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    
+    if (match && match[2].length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}`;
+    }
+    
+    return undefined;
+  };
   
   const getUserVoteForDocument = (documentId: number) => {
     return userVotes?.find((v: any) => v.documentId === documentId);
@@ -504,6 +518,23 @@ export default function EventDetails() {
                 {event.description}
               </p>
             </div>
+
+            {/* Video Section */}
+            {event.videoUrl && (
+              <div>
+                <h3 className="mb-2 text-lg font-medium">Vídeo da Sessão</h3>
+                <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                  <iframe
+                    src={getYouTubeEmbedUrl(event.videoUrl)}
+                    title="Vídeo da Sessão"
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            )}
             
             {!userAttendance && isAuthenticated && event.status === "Aberto" && (
               <div className="flex justify-end pt-4">
