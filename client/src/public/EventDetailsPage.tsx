@@ -233,7 +233,7 @@ export default function EventDetailsPage() {
                     </h3>
                     <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
                       <iframe
-                        src={getYouTubeEmbedUrl(event.videoUrl) || undefined}
+                        src={getYouTubeEmbedUrl(event.videoUrl)}
                         title="Vídeo da Sessão"
                         className="w-full h-full"
                         frameBorder="0"
