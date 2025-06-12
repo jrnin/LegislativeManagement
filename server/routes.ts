@@ -3299,6 +3299,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         eventTime: eventWithDetails.eventTime,
         location: eventWithDetails.location,
         mapUrl: eventWithDetails.mapUrl,
+        videoUrl: eventWithDetails.videoUrl,
         category: eventWithDetails.category,
         eventNumber: eventWithDetails.eventNumber,
         legislatureId: eventWithDetails.legislatureId,
