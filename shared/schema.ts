@@ -99,6 +99,7 @@ export const events = pgTable("events", {
   eventTime: varchar("event_time").notNull(),
   location: varchar("location").notNull(),
   mapUrl: varchar("map_url"),
+  videoUrl: varchar("video_url"), // YouTube video link
   category: varchar("category").notNull(), // "Sessão Ordinária" or "Sessão Extraordinária"
   legislatureId: integer("legislature_id").notNull(),
   description: text("description").notNull(),
@@ -398,6 +399,7 @@ export const insertEventSchema = createInsertSchema(events).pick({
   eventTime: true,
   location: true,
   mapUrl: true,
+  videoUrl: true,
   category: true,
   legislatureId: true,
   description: true,

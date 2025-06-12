@@ -24,6 +24,7 @@ const formSchema = z.object({
   eventTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: "Formato de horário inválido. Use HH:MM" }),
   location: z.string().min(3, { message: "Local é obrigatório" }),
   mapUrl: z.string().url({ message: "URL inválida" }).optional().or(z.literal("")),
+  videoUrl: z.string().url({ message: "URL do YouTube inválida" }).optional().or(z.literal("")),
   category: z.enum(["Sessão Ordinária", "Sessão Extraordinária"], { 
     message: "Selecione uma categoria válida" 
   }),
@@ -61,6 +62,7 @@ export default function EventForm() {
       eventTime: "",
       location: "",
       mapUrl: "",
+      videoUrl: "",
       category: "Sessão Ordinária",
       legislatureId: undefined,
       description: "",
@@ -72,10 +74,11 @@ export default function EventForm() {
     if (event) {
       form.reset({
         eventNumber: event.eventNumber,
-        eventDate: event.eventDate ? event.eventDate.split('T')[0] : "",
+        eventDate: event.eventDate ? new Date(event.eventDate).toISOString().split('T')[0] : "",
         eventTime: event.eventTime || "",
         location: event.location || "",
         mapUrl: event.mapUrl || "",
+        videoUrl: event.videoUrl || "",
         category: event.category as "Sessão Ordinária" | "Sessão Extraordinária",
         legislatureId: event.legislatureId,
         description: event.description || "",
