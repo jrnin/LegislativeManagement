@@ -178,13 +178,13 @@ const NoticiaDetalhePage = () => {
 
   const nextGalleryImage = () => {
     if (article.gallery && article.gallery.length > 0) {
-      setCurrentGalleryImage((prev) => (prev + 1) % article.gallery.length);
+      setCurrentGalleryImage((prev) => (prev + 1) % article.gallery!.length);
     }
   };
 
   const prevGalleryImage = () => {
     if (article.gallery && article.gallery.length > 0) {
-      setCurrentGalleryImage((prev) => (prev - 1 + article.gallery.length) % article.gallery.length);
+      setCurrentGalleryImage((prev) => (prev - 1 + article.gallery!.length) % article.gallery!.length);
     }
   };
 

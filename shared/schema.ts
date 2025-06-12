@@ -160,6 +160,53 @@ export const legislativeActivitiesAuthors = pgTable(
   }),
 );
 
+// News Articles table
+export const newsArticles = pgTable("news_articles", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 500 }).notNull(),
+  slug: varchar("slug", { length: 500 }).unique().notNull(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(),
+  authorId: varchar("author_id").notNull(),
+  categoryId: integer("category_id").notNull(),
+  publishedAt: timestamp("published_at"),
+  status: varchar("status", { length: 20 }).notNull().default("draft"), // draft, published, archived
+  featured: boolean("featured").default(false),
+  views: integer("views").default(0),
+  likes: integer("likes").default(0),
+  imageUrl: varchar("image_url"),
+  metaTitle: varchar("meta_title", { length: 255 }),
+  metaDescription: text("meta_description"),
+  tags: text("tags").array(), // Array of tag strings
+  gallery: text("gallery").array(), // Array of image URLs
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// News Categories table
+export const newsCategories = pgTable("news_categories", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  color: varchar("color", { length: 7 }).default("#6B7280"), // Hex color code
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// News Comments table
+export const newsComments = pgTable("news_comments", {
+  id: serial("id").primaryKey(),
+  articleId: integer("article_id").notNull(),
+  authorName: varchar("author_name", { length: 255 }).notNull(),
+  authorEmail: varchar("author_email", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("pending"), // pending, approved, rejected
+  parentId: integer("parent_id"), // For nested comments
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const legislativeActivitiesAuthorsRelations = relations(
   legislativeActivitiesAuthors,
   ({ one }) => ({
@@ -401,6 +448,89 @@ export const insertDocumentVoteSchema = createInsertSchema(documentVotes).pick({
   vote: true,
   comment: true,
 });
+
+// News Articles Relations
+export const newsArticlesRelations = relations(newsArticles, ({ one, many }) => ({
+  author: one(users, {
+    fields: [newsArticles.authorId],
+    references: [users.id],
+  }),
+  category: one(newsCategories, {
+    fields: [newsArticles.categoryId],
+    references: [newsCategories.id],
+  }),
+  comments: many(newsComments),
+}));
+
+// News Categories Relations
+export const newsCategoriesRelations = relations(newsCategories, ({ many }) => ({
+  articles: many(newsArticles),
+}));
+
+// News Comments Relations
+export const newsCommentsRelations = relations(newsComments, ({ one, many }) => ({
+  article: one(newsArticles, {
+    fields: [newsComments.articleId],
+    references: [newsArticles.id],
+  }),
+  parent: one(newsComments, {
+    fields: [newsComments.parentId],
+    references: [newsComments.id],
+  }),
+  replies: many(newsComments),
+}));
+
+// News schemas
+export const insertNewsArticleSchema = createInsertSchema(newsArticles).pick({
+  title: true,
+  slug: true,
+  excerpt: true,
+  content: true,
+  authorId: true,
+  categoryId: true,
+  status: true,
+  featured: true,
+  imageUrl: true,
+  metaTitle: true,
+  metaDescription: true,
+  tags: true,
+  gallery: true,
+});
+
+export const insertNewsCategorySchema = createInsertSchema(newsCategories).pick({
+  name: true,
+  slug: true,
+  description: true,
+  color: true,
+});
+
+export const insertNewsCommentSchema = createInsertSchema(newsComments).pick({
+  articleId: true,
+  authorName: true,
+  authorEmail: true,
+  content: true,
+  parentId: true,
+});
+
+// News type definitions
+export type InsertNewsArticle = z.infer<typeof insertNewsArticleSchema>;
+export type NewsArticle = typeof newsArticles.$inferSelect & {
+  author?: User;
+  category?: NewsCategory;
+  comments?: NewsComment[];
+};
+
+export type InsertNewsCategory = z.infer<typeof insertNewsCategorySchema>;
+export type NewsCategory = typeof newsCategories.$inferSelect & {
+  articles?: NewsArticle[];
+};
+
+export type InsertNewsComment = z.infer<typeof insertNewsCommentSchema>;
+export type NewsComment = typeof newsComments.$inferSelect & {
+  article?: NewsArticle;
+  parent?: NewsComment;
+  replies?: NewsComment[];
+};
 export type InsertDocumentVote = z.infer<typeof insertDocumentVoteSchema>;
 export type DocumentVote = typeof documentVotes.$inferSelect;
 

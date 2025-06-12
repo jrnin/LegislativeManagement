@@ -11,6 +11,9 @@ import {
   activityVotes,
   committees,
   committeeMembers,
+  newsArticles,
+  newsCategories,
+  newsComments,
   type User,
   type Legislature,
   type Event,
@@ -21,7 +24,13 @@ import {
   type ActivityTimeline,
   type ActivityVote,
   type Committee,
-  type CommitteeMember
+  type CommitteeMember,
+  type NewsArticle,
+  type NewsCategory,
+  type NewsComment,
+  type InsertNewsArticle,
+  type InsertNewsCategory,
+  type InsertNewsComment
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or } from "drizzle-orm";
