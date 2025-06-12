@@ -1930,6 +1930,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // NEWS API ENDPOINTS
+  
+  // Get all news articles (public)
+  app.get('/api/public/news', async (req, res) => {
+    try {
+      const { 
+        category, 
+        featured, 
+        search, 
+        page = '1', 
+        limit = '12' 
+      } = req.query;
+
+      const pageNum = parseInt(page as string, 10) || 1;
+      const limitNum = parseInt(limit as string, 10) || 12;
+      const offset = (pageNum - 1) * limitNum;
+
+      const filters = {
+        category: category as string,
+        featured: featured === 'true' ? true : undefined,
+        search: search as string,
+        limit: limitNum,
+        offset: offset
+      };
+
+      const articles = await storage.getPublishedNewsArticles(filters);
+      
+      res.json({
+        articles,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          hasMore: articles.length === limitNum
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching news articles:", error);
+      res.status(500).json({ message: "Erro ao buscar notícias" });
+    }
+  });
+
+  // Get single news article by slug (public)
+  app.get('/api/public/news/:slug', async (req, res) => {
+    try {
+      const article = await storage.getNewsArticleBySlug(req.params.slug);
+      
+      if (!article || article.status !== 'published') {
+        return res.status(404).json({ message: "Notícia não encontrada" });
+      }
+
+      // Increment view count
+      await storage.incrementNewsViews(article.id);
+      
+      res.json(article);
+    } catch (error) {
+      console.error("Error fetching news article:", error);
+      res.status(500).json({ message: "Erro ao buscar notícia" });
+    }
+  });
+
+  // Get news categories (public)
+  app.get('/api/public/news/categories', async (req, res) => {
+    try {
+      const categories = await storage.getAllNewsCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching news categories:", error);
+      res.status(500).json({ message: "Erro ao buscar categorias" });
+    }
+  });
+
   // EVENT ATTENDANCE ROUTES
   
   // Get attendance for an event

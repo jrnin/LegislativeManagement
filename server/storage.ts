@@ -171,6 +171,44 @@ export interface IStorage {
   
   // Search operations
   searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
+  
+  // News operations
+  getNewsArticle(id: number): Promise<NewsArticle | undefined>;
+  getNewsArticleBySlug(slug: string): Promise<NewsArticle | undefined>;
+  getAllNewsArticles(filters?: {
+    category?: string;
+    status?: string;
+    featured?: boolean;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<NewsArticle[]>;
+  getPublishedNewsArticles(filters?: {
+    category?: string;
+    featured?: boolean;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<NewsArticle[]>;
+  createNewsArticle(articleData: InsertNewsArticle): Promise<NewsArticle>;
+  updateNewsArticle(id: number, articleData: Partial<NewsArticle>): Promise<NewsArticle | undefined>;
+  deleteNewsArticle(id: number): Promise<boolean>;
+  incrementNewsViews(id: number): Promise<void>;
+  
+  // News Categories operations
+  getNewsCategory(id: number): Promise<NewsCategory | undefined>;
+  getNewsCategoryBySlug(slug: string): Promise<NewsCategory | undefined>;
+  getAllNewsCategories(): Promise<NewsCategory[]>;
+  createNewsCategory(categoryData: InsertNewsCategory): Promise<NewsCategory>;
+  updateNewsCategory(id: number, categoryData: Partial<NewsCategory>): Promise<NewsCategory | undefined>;
+  deleteNewsCategory(id: number): Promise<boolean>;
+  
+  // News Comments operations
+  getNewsComment(id: number): Promise<NewsComment | undefined>;
+  getNewsCommentsByArticleId(articleId: number): Promise<NewsComment[]>;
+  createNewsComment(commentData: InsertNewsComment): Promise<NewsComment>;
+  updateNewsComment(id: number, commentData: Partial<NewsComment>): Promise<NewsComment | undefined>;
+  deleteNewsComment(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1798,6 +1836,256 @@ export class DatabaseStorage implements IStorage {
       
       return 0;
     });
+  }
+
+  /**
+   * News operations
+   */
+  async getNewsArticle(id: number): Promise<NewsArticle | undefined> {
+    const [article] = await db
+      .select()
+      .from(newsArticles)
+      .leftJoin(users, eq(newsArticles.authorId, users.id))
+      .leftJoin(newsCategories, eq(newsArticles.categoryId, newsCategories.id))
+      .where(eq(newsArticles.id, id));
+    
+    if (!article) return undefined;
+    
+    return {
+      ...article.news_articles,
+      author: article.users || undefined,
+      category: article.news_categories || undefined,
+    };
+  }
+
+  async getNewsArticleBySlug(slug: string): Promise<NewsArticle | undefined> {
+    const [article] = await db
+      .select()
+      .from(newsArticles)
+      .leftJoin(users, eq(newsArticles.authorId, users.id))
+      .leftJoin(newsCategories, eq(newsArticles.categoryId, newsCategories.id))
+      .where(eq(newsArticles.slug, slug));
+    
+    if (!article) return undefined;
+    
+    return {
+      ...article.news_articles,
+      author: article.users || undefined,
+      category: article.news_categories || undefined,
+    };
+  }
+
+  async getAllNewsArticles(filters?: {
+    category?: string;
+    status?: string;
+    featured?: boolean;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<NewsArticle[]> {
+    let query = db
+      .select()
+      .from(newsArticles)
+      .leftJoin(users, eq(newsArticles.authorId, users.id))
+      .leftJoin(newsCategories, eq(newsArticles.categoryId, newsCategories.id));
+
+    const conditions = [];
+    if (filters?.category) {
+      conditions.push(eq(newsCategories.slug, filters.category));
+    }
+    if (filters?.status) {
+      conditions.push(eq(newsArticles.status, filters.status));
+    }
+    if (filters?.featured !== undefined) {
+      conditions.push(eq(newsArticles.featured, filters.featured));
+    }
+    if (filters?.search) {
+      const searchTerm = `%${filters.search.toLowerCase()}%`;
+      conditions.push(
+        or(
+          like(sql`LOWER(${newsArticles.title})`, searchTerm),
+          like(sql`LOWER(${newsArticles.content})`, searchTerm),
+          like(sql`LOWER(${newsArticles.excerpt})`, searchTerm)
+        )
+      );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    const articles = await query
+      .orderBy(desc(newsArticles.publishedAt))
+      .limit(filters?.limit || 50)
+      .offset(filters?.offset || 0);
+
+    return articles.map(article => ({
+      ...article.news_articles,
+      author: article.users || undefined,
+      category: article.news_categories || undefined,
+    }));
+  }
+
+  async getPublishedNewsArticles(filters?: {
+    category?: string;
+    featured?: boolean;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<NewsArticle[]> {
+    return this.getAllNewsArticles({
+      ...filters,
+      status: 'published',
+    });
+  }
+
+  async createNewsArticle(articleData: InsertNewsArticle): Promise<NewsArticle> {
+    const [article] = await db
+      .insert(newsArticles)
+      .values({
+        ...articleData,
+        publishedAt: articleData.status === 'published' ? new Date() : null,
+      })
+      .returning();
+    
+    return article;
+  }
+
+  async updateNewsArticle(id: number, articleData: Partial<NewsArticle>): Promise<NewsArticle | undefined> {
+    const updateData = { ...articleData };
+    
+    // Set publishedAt when status changes to published
+    if (articleData.status === 'published' && !articleData.publishedAt) {
+      updateData.publishedAt = new Date();
+    }
+    
+    const [article] = await db
+      .update(newsArticles)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(newsArticles.id, id))
+      .returning();
+    
+    return article;
+  }
+
+  async deleteNewsArticle(id: number): Promise<boolean> {
+    const result = await db
+      .delete(newsArticles)
+      .where(eq(newsArticles.id, id));
+    
+    return result.rowCount > 0;
+  }
+
+  async incrementNewsViews(id: number): Promise<void> {
+    await db
+      .update(newsArticles)
+      .set({ views: sql`${newsArticles.views} + 1` })
+      .where(eq(newsArticles.id, id));
+  }
+
+  /**
+   * News Categories operations
+   */
+  async getNewsCategory(id: number): Promise<NewsCategory | undefined> {
+    const [category] = await db
+      .select()
+      .from(newsCategories)
+      .where(eq(newsCategories.id, id));
+    
+    return category;
+  }
+
+  async getNewsCategoryBySlug(slug: string): Promise<NewsCategory | undefined> {
+    const [category] = await db
+      .select()
+      .from(newsCategories)
+      .where(eq(newsCategories.slug, slug));
+    
+    return category;
+  }
+
+  async getAllNewsCategories(): Promise<NewsCategory[]> {
+    return await db
+      .select()
+      .from(newsCategories)
+      .orderBy(newsCategories.name);
+  }
+
+  async createNewsCategory(categoryData: InsertNewsCategory): Promise<NewsCategory> {
+    const [category] = await db
+      .insert(newsCategories)
+      .values(categoryData)
+      .returning();
+    
+    return category;
+  }
+
+  async updateNewsCategory(id: number, categoryData: Partial<NewsCategory>): Promise<NewsCategory | undefined> {
+    const [category] = await db
+      .update(newsCategories)
+      .set({ ...categoryData, updatedAt: new Date() })
+      .where(eq(newsCategories.id, id))
+      .returning();
+    
+    return category;
+  }
+
+  async deleteNewsCategory(id: number): Promise<boolean> {
+    const result = await db
+      .delete(newsCategories)
+      .where(eq(newsCategories.id, id));
+    
+    return result.rowCount > 0;
+  }
+
+  /**
+   * News Comments operations
+   */
+  async getNewsComment(id: number): Promise<NewsComment | undefined> {
+    const [comment] = await db
+      .select()
+      .from(newsComments)
+      .where(eq(newsComments.id, id));
+    
+    return comment;
+  }
+
+  async getNewsCommentsByArticleId(articleId: number): Promise<NewsComment[]> {
+    return await db
+      .select()
+      .from(newsComments)
+      .where(and(
+        eq(newsComments.articleId, articleId),
+        eq(newsComments.status, 'approved')
+      ))
+      .orderBy(newsComments.createdAt);
+  }
+
+  async createNewsComment(commentData: InsertNewsComment): Promise<NewsComment> {
+    const [comment] = await db
+      .insert(newsComments)
+      .values(commentData)
+      .returning();
+    
+    return comment;
+  }
+
+  async updateNewsComment(id: number, commentData: Partial<NewsComment>): Promise<NewsComment | undefined> {
+    const [comment] = await db
+      .update(newsComments)
+      .set({ ...commentData, updatedAt: new Date() })
+      .where(eq(newsComments.id, id))
+      .returning();
+    
+    return comment;
+  }
+
+  async deleteNewsComment(id: number): Promise<boolean> {
+    const result = await db
+      .delete(newsComments)
+      .where(eq(newsComments.id, id));
+    
+    return result.rowCount > 0;
   }
 }
 
