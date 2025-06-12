@@ -9,6 +9,8 @@ import AtividadesPage from './AtividadesPage';
 import AtividadeDetailPage from './AtividadeDetailPage';
 import EventDetailsPage from './EventDetailsPage';
 import SessoesPage from './SessoesPage';
+import NoticiasPage from './NoticiasPage';
+import NoticiaDetalhePage from './NoticiaDetalhePage';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
@@ -41,6 +43,12 @@ export default function PublicRoutes() {
         
         <Route path="/public/sessoes" component={SessoesPage} />
         <Route path="/sessoes" component={SessoesPage} />
+        
+        <Route path="/public/noticias" component={NoticiasPage} />
+        <Route path="/noticias" component={NoticiasPage} />
+        
+        <Route path="/public/noticias/:id" component={NoticiaDetalhePage} />
+        <Route path="/noticias/:id" component={NoticiaDetalhePage} />
         
         {/* Adicionar outras rotas públicas aqui */}
         <Route component={NotFound} />
