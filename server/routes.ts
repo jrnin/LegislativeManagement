@@ -1971,6 +1971,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get news categories (public) - must come before slug route
+  app.get('/api/public/news/categories', async (req, res) => {
+    try {
+      const categories = await storage.getAllNewsCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching news categories:", error);
+      res.status(500).json({ message: "Erro ao buscar categorias" });
+    }
+  });
+
   // Get single news article by slug (public)
   app.get('/api/public/news/:slug', async (req, res) => {
     try {
@@ -1987,17 +1998,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching news article:", error);
       res.status(500).json({ message: "Erro ao buscar notícia" });
-    }
-  });
-
-  // Get news categories (public)
-  app.get('/api/public/news/categories', async (req, res) => {
-    try {
-      const categories = await storage.getAllNewsCategories();
-      res.json(categories);
-    } catch (error) {
-      console.error("Error fetching news categories:", error);
-      res.status(500).json({ message: "Erro ao buscar categorias" });
     }
   });
 
