@@ -1620,7 +1620,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }).optional(),
         description: z.string().min(5, "Descrição deve ter pelo menos 5 caracteres").optional(),
         type: z.string().min(3, "Tipo deve ter pelo menos 3 caracteres").optional(),
-        members: z.array(z.string()).optional(),
+        members: z.array(z.object({
+          userId: z.string(),
+          role: z.string(),
+        })).optional(),
       });
       
       const validated = schema.parse(req.body);

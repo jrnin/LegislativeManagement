@@ -115,9 +115,12 @@ export default function CommitteeEditModal({
 
   useEffect(() => {
     if (committeeMembers && committeeMembers.length > 0 && committee) {
-      const memberIds = committeeMembers.map((member: any) => member.userId);
-      setSelectedMembers(memberIds);
-      form.setValue("members", memberIds);
+      const members = committeeMembers.map((member: any) => ({
+        userId: member.userId,
+        role: member.role || "Membro"
+      }));
+      setSelectedMembers(members);
+      form.setValue("members", members);
     }
   }, [committeeMembers, form, committee]);
 
@@ -277,32 +280,66 @@ export default function CommitteeEditModal({
                           Selecione os membros da comissão ({selectedMembers.length} selecionados)
                         </div>
                         <ScrollArea className="h-48">
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             {Array.isArray(councilors) && councilors.length > 0 ? (
-                              councilors.map((councilor: User) => (
-                                <div key={councilor.id} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`councilor-${councilor.id}`}
-                                    checked={selectedMembers.includes(councilor.id)}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        setSelectedMembers([...selectedMembers, councilor.id]);
-                                        form.setValue("members", [...selectedMembers, councilor.id]);
-                                      } else {
-                                        const newMembers = selectedMembers.filter(id => id !== councilor.id);
-                                        setSelectedMembers(newMembers);
-                                        form.setValue("members", newMembers);
-                                      }
-                                    }}
-                                  />
-                                  <label
-                                    htmlFor={`councilor-${councilor.id}`}
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                  >
-                                    {councilor.name}
-                                  </label>
-                                </div>
-                              ))
+                              councilors.map((councilor: User) => {
+                                const memberData = selectedMembers.find(m => m.userId === councilor.id);
+                                const isSelected = !!memberData;
+                                
+                                return (
+                                  <div key={councilor.id} className="border rounded p-3 bg-gray-50">
+                                    <div className="flex items-center space-x-2 mb-2">
+                                      <Checkbox
+                                        id={`councilor-${councilor.id}`}
+                                        checked={isSelected}
+                                        onCheckedChange={(checked) => {
+                                          if (checked) {
+                                            const newMember = { userId: councilor.id, role: "Membro" };
+                                            const newMembers = [...selectedMembers, newMember];
+                                            setSelectedMembers(newMembers);
+                                            form.setValue("members", newMembers);
+                                          } else {
+                                            const newMembers = selectedMembers.filter(m => m.userId !== councilor.id);
+                                            setSelectedMembers(newMembers);
+                                            form.setValue("members", newMembers);
+                                          }
+                                        }}
+                                      />
+                                      <label
+                                        htmlFor={`councilor-${councilor.id}`}
+                                        className="text-sm font-medium leading-none cursor-pointer flex-1"
+                                      >
+                                        {councilor.name}
+                                      </label>
+                                    </div>
+                                    {isSelected && (
+                                      <div className="ml-6">
+                                        <Select
+                                          value={memberData.role}
+                                          onValueChange={(value) => {
+                                            const newMembers = selectedMembers.map(m => 
+                                              m.userId === councilor.id ? { ...m, role: value } : m
+                                            );
+                                            setSelectedMembers(newMembers);
+                                            form.setValue("members", newMembers);
+                                          }}
+                                        >
+                                          <SelectTrigger className="w-full h-8">
+                                            <SelectValue placeholder="Selecione a função" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {COMMITTEE_ROLES.map((role) => (
+                                              <SelectItem key={role} value={role}>
+                                                {role}
+                                              </SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })
                             ) : (
                               <div className="text-sm text-muted-foreground">
                                 {councilors ? "Nenhum vereador encontrado" : "Erro ao carregar vereadores"}
