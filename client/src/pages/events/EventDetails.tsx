@@ -527,30 +527,61 @@ export default function EventDetails() {
                 </CardHeader>
                 <CardContent>
                   <div className="max-w-md">
-                    <div className="aspect-video rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                      <div className="text-center p-6">
-                        <div className="mb-4">
-                          <svg className="w-16 h-16 mx-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 4.236L16 8.5V17H4V8.5l6-4.264z"/>
-                            <path d="M8 10l4 2.5L8 15V10z"/>
-                          </svg>
+                    <div 
+                      className="aspect-video rounded-lg overflow-hidden relative cursor-pointer group"
+                      style={{
+                        background: 'linear-gradient(135deg, #48654e 0%, #7FA653 100%)'
+                      }}
+                      onClick={() => window.open(event.videoUrl, '_blank')}
+                    >
+                      {/* Background overlay */}
+                      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                      
+                      {/* Content */}
+                      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white p-6">
+                        {/* Brasão/Logo placeholder */}
+                        <div className="mb-3">
+                          <div className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                            <svg className="w-10 h-10 text-green-700" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                          </div>
                         </div>
-                        <p className="text-gray-700 font-medium mb-2">Vídeo da Sessão Disponível</p>
-                        <p className="text-sm text-gray-600 mb-4">
-                          O vídeo não pode ser reproduzido diretamente aqui, mas você pode assistir no YouTube.
-                        </p>
-                        <a 
-                          href={event.videoUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                        >
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                          </svg>
-                          Assistir no YouTube
-                        </a>
+                        
+                        {/* Play button */}
+                        <div className="mb-4">
+                          <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                            <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                          </div>
+                        </div>
+                        
+                        {/* Session info */}
+                        <div className="text-center">
+                          <div className="bg-black bg-opacity-60 px-4 py-2 rounded-lg mb-2">
+                            <p className="text-sm font-medium uppercase tracking-wider">
+                              SESSÃO ORDINÁRIA
+                            </p>
+                            <p className="text-lg font-bold">
+                              CÂMARA MUNICIPAL DE JAÍBA
+                            </p>
+                          </div>
+                          <p className="text-sm opacity-90">
+                            {formattedDate}
+                          </p>
+                        </div>
                       </div>
+                    </div>
+                    
+                    {/* Event title below */}
+                    <div className="mt-3 text-center">
+                      <h4 className="font-semibold text-gray-800">
+                        {event.category} #{event.eventNumber} - {formattedDate}
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {event.description}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
