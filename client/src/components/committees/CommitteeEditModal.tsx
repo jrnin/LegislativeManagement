@@ -31,10 +31,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  MultiSelect,
-  MultiSelectItem,
-} from "@/components/ui/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const committeeSchema = z.object({
   name: z.string().min(3, "Nome da comissão deve ter pelo menos 3 caracteres"),
@@ -99,6 +97,8 @@ export default function CommitteeEditModal({
       });
     }
   }, [committee, form, open]);
+
+
 
   useEffect(() => {
     if (committeeMembers && committeeMembers.length > 0 && committee) {
@@ -259,25 +259,45 @@ export default function CommitteeEditModal({
                         <span className="ml-2 text-sm text-muted-foreground">Carregando vereadores...</span>
                       </div>
                     ) : (
-                      <MultiSelect
-                        placeholder="Selecione os membros da comissão"
-                        values={selectedMembers}
-                        onValuesChange={handleMemberChange}
-                      >
-                        {Array.isArray(councilors) && councilors.length > 0 ? (
-                          councilors.map((councilor: User) => (
-                            <MultiSelectItem
-                              key={councilor.id}
-                              value={councilor.id}
-                              text={councilor.name}
-                            />
-                          ))
-                        ) : (
-                          <div className="p-2 text-muted-foreground text-sm">
-                            {councilors ? "Nenhum vereador encontrado" : "Erro ao carregar vereadores"}
+                      <div className="border rounded-md p-4">
+                        <div className="text-sm font-medium mb-3">
+                          Selecione os membros da comissão ({selectedMembers.length} selecionados)
+                        </div>
+                        <ScrollArea className="h-48">
+                          <div className="space-y-2">
+                            {Array.isArray(councilors) && councilors.length > 0 ? (
+                              councilors.map((councilor: User) => (
+                                <div key={councilor.id} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`councilor-${councilor.id}`}
+                                    checked={selectedMembers.includes(councilor.id)}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        setSelectedMembers([...selectedMembers, councilor.id]);
+                                        form.setValue("members", [...selectedMembers, councilor.id]);
+                                      } else {
+                                        const newMembers = selectedMembers.filter(id => id !== councilor.id);
+                                        setSelectedMembers(newMembers);
+                                        form.setValue("members", newMembers);
+                                      }
+                                    }}
+                                  />
+                                  <label
+                                    htmlFor={`councilor-${councilor.id}`}
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                  >
+                                    {councilor.name}
+                                  </label>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="text-sm text-muted-foreground">
+                                {councilors ? "Nenhum vereador encontrado" : "Erro ao carregar vereadores"}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </MultiSelect>
+                        </ScrollArea>
+                      </div>
                     )}
                   </FormControl>
                   <FormMessage />
