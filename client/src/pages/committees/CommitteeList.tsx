@@ -31,12 +31,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Plus, Search, Trash2, Edit, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Committee } from "@shared/schema";
+import CommitteeEditModal from "@/components/committees/CommitteeEditModal";
 
 export default function CommitteeList() {
   const [location, setLocation] = useLocation();
@@ -46,6 +53,7 @@ export default function CommitteeList() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
 
   const { data: committees = [], isLoading } = useQuery({
@@ -244,9 +252,10 @@ export default function CommitteeList() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() =>
-                                    setLocation(`/committees/edit/${committee.id}`)
-                                  }
+                                  onClick={() => {
+                                    setSelectedCommittee(committee);
+                                    setEditDialogOpen(true);
+                                  }}
                                   title="Editar"
                                 >
                                   <Edit className="h-4 w-4" />
@@ -325,6 +334,12 @@ export default function CommitteeList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CommitteeEditModal
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        committee={selectedCommittee}
+      />
     </div>
   );
 }
