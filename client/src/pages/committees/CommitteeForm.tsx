@@ -283,13 +283,19 @@ export default function CommitteeForm() {
                         values={selectedMembers}
                         onValuesChange={handleMemberChange}
                       >
-                        {councilors.map((councilor: User) => (
-                          <MultiSelectItem
-                            key={councilor.id}
-                            value={councilor.id}
-                            text={councilor.name}
-                          />
-                        ))}
+                        {councilors && councilors.length > 0 ? (
+                          councilors.map((councilor: User) => (
+                            <MultiSelectItem
+                              key={councilor.id}
+                              value={councilor.id}
+                              text={councilor.name}
+                            />
+                          ))
+                        ) : (
+                          <div className="p-2 text-muted-foreground text-sm">
+                            Nenhum vereador encontrado
+                          </div>
+                        )}
                       </MultiSelect>
                     </FormControl>
                     <FormMessage />
