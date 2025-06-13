@@ -150,20 +150,20 @@ export default function CommitteeDetails() {
             </Button>
             <Badge
               variant={
-                isCommitteeActive(committee.endDate.toString())
+                committee.endDate && isCommitteeActive(committee.endDate.toString())
                   ? "default"
                   : "outline"
               }
             >
-              {isCommitteeActive(committee.endDate.toString())
+              {committee.endDate && isCommitteeActive(committee.endDate.toString())
                 ? "Vigente"
                 : "Encerrada"}
             </Badge>
           </div>
           <h1 className="text-3xl font-bold">{committee.name}</h1>
           <p className="text-muted-foreground">
-            {committee.type} • Período: {formatDate(committee.startDate.toString())} a{" "}
-            {formatDate(committee.endDate.toString())}
+            {committee.type} • Período: {committee.startDate ? formatDate(committee.startDate.toString()) : 'Data não informada'} a{" "}
+            {committee.endDate ? formatDate(committee.endDate.toString()) : 'Data não informada'}
           </p>
         </div>
         {user?.role === "admin" && (
@@ -203,20 +203,20 @@ export default function CommitteeDetails() {
                 <dt className="text-sm font-medium text-muted-foreground">
                   Data de Início
                 </dt>
-                <dd>{formatDate(committee.startDate.toString())}</dd>
+                <dd>{committee.startDate ? formatDate(committee.startDate.toString()) : 'Data não informada'}</dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-muted-foreground">
                   Data de Término
                 </dt>
-                <dd>{formatDate(committee.endDate.toString())}</dd>
+                <dd>{committee.endDate ? formatDate(committee.endDate.toString()) : 'Data não informada'}</dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-muted-foreground">
                   Status
                 </dt>
                 <dd>
-                  {isCommitteeActive(committee.endDate.toString())
+                  {committee.endDate && isCommitteeActive(committee.endDate.toString())
                     ? "Vigente"
                     : "Encerrada"}
                 </dd>
