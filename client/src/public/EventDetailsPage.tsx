@@ -230,7 +230,7 @@ export default function EventDetailsPage() {
             </Card>
 
             {/* Video Card */}
-            {event.videoUrl && getYouTubeEmbedUrl(event.videoUrl) && (
+            {event.videoUrl && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg" style={{color: '#48654e'}}>
@@ -238,27 +238,32 @@ export default function EventDetailsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-video max-w-md rounded-lg overflow-hidden bg-gray-100">
-                    <iframe
-                      src={getYouTubeEmbedUrl(event.videoUrl)}
-                      title="Vídeo da Sessão"
-                      className="w-full h-full"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  </div>
-                  <div className="mt-3 text-sm text-gray-600">
-                    <p>Se o vídeo não carregar, você pode{" "}
-                      <a 
-                        href={event.videoUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline"
-                      >
-                        assistir diretamente no YouTube
-                      </a>
-                    </p>
+                  <div className="max-w-md">
+                    <div className="aspect-video rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                      <div className="text-center p-6">
+                        <div className="mb-4">
+                          <svg className="w-16 h-16 mx-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 4.236L16 8.5V17H4V8.5l6-4.264z"/>
+                            <path d="M8 10l4 2.5L8 15V10z"/>
+                          </svg>
+                        </div>
+                        <p className="text-gray-700 font-medium mb-2">Vídeo da Sessão Disponível</p>
+                        <p className="text-sm text-gray-600 mb-4">
+                          O vídeo não pode ser reproduzido diretamente aqui, mas você pode assistir no YouTube.
+                        </p>
+                        <a 
+                          href={event.videoUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                          </svg>
+                          Assistir no YouTube
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
