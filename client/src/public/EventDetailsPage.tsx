@@ -248,6 +248,18 @@ export default function EventDetailsPage() {
                       allowFullScreen
                     />
                   </div>
+                  <div className="mt-3 text-sm text-gray-600">
+                    <p>Se o vídeo não carregar, você pode{" "}
+                      <a 
+                        href={event.videoUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        assistir diretamente no YouTube
+                      </a>
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             )}
