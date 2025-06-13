@@ -583,7 +583,7 @@ export const committeeMembers = pgTable(
   {
     committeeId: integer("committee_id").notNull(),
     userId: varchar("user_id").notNull(),
-    role: varchar("role").default("member"), // "presidente", "secretário", "member"
+    role: varchar("role").default("Membro"), // "Presidente", "Vice-Presidente", "Relator", "1º Suplente", "2º Suplente", "3° Suplente", "Membro"
     addedAt: timestamp("added_at").defaultNow(),
   },
   (table) => ({

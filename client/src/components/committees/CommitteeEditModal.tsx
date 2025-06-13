@@ -44,8 +44,21 @@ const committeeSchema = z.object({
   }),
   description: z.string().min(5, "Descrição deve ter pelo menos 5 caracteres"),
   type: z.string().min(1, "Tipo da comissão é obrigatório"),
-  members: z.array(z.string()).optional(),
+  members: z.array(z.object({
+    userId: z.string(),
+    role: z.string(),
+  })).optional(),
 });
+
+const COMMITTEE_ROLES = [
+  "Presidente",
+  "Vice-Presidente", 
+  "Relator",
+  "1º Suplente",
+  "2º Suplente", 
+  "3° Suplente",
+  "Membro"
+];
 
 type CommitteeFormValues = z.infer<typeof committeeSchema>;
 
@@ -61,7 +74,7 @@ export default function CommitteeEditModal({
   committee,
 }: CommitteeEditModalProps) {
   const { toast } = useToast();
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<{userId: string, role: string}[]>([]);
 
   const { data: councilors = [], isLoading: isLoadingCouncilors } = useQuery({
     queryKey: ["/api/councilors"],
