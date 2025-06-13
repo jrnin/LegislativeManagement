@@ -65,7 +65,7 @@ export default function CommitteeEditModal({
   const { toast } = useToast();
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
-  const { data: councilors = [] } = useQuery({
+  const { data: councilors = [], isLoading: isLoadingCouncilors } = useQuery({
     queryKey: ["/api/councilors"],
     enabled: open,
   });
@@ -253,25 +253,32 @@ export default function CommitteeEditModal({
                 <FormItem>
                   <FormLabel>Membros da Comissão</FormLabel>
                   <FormControl>
-                    <MultiSelect
-                      placeholder="Selecione os membros da comissão"
-                      values={selectedMembers}
-                      onValuesChange={handleMemberChange}
-                    >
-                      {councilors && councilors.length > 0 ? (
-                        councilors.map((councilor: User) => (
-                          <MultiSelectItem
-                            key={councilor.id}
-                            value={councilor.id}
-                            text={councilor.name}
-                          />
-                        ))
-                      ) : (
-                        <div className="p-2 text-muted-foreground text-sm">
-                          Nenhum vereador encontrado
-                        </div>
-                      )}
-                    </MultiSelect>
+                    {isLoadingCouncilors ? (
+                      <div className="flex items-center justify-center p-4">
+                        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
+                        <span className="ml-2 text-sm text-muted-foreground">Carregando vereadores...</span>
+                      </div>
+                    ) : (
+                      <MultiSelect
+                        placeholder="Selecione os membros da comissão"
+                        values={selectedMembers}
+                        onValuesChange={handleMemberChange}
+                      >
+                        {Array.isArray(councilors) && councilors.length > 0 ? (
+                          councilors.map((councilor: User) => (
+                            <MultiSelectItem
+                              key={councilor.id}
+                              value={councilor.id}
+                              text={councilor.name}
+                            />
+                          ))
+                        ) : (
+                          <div className="p-2 text-muted-foreground text-sm">
+                            {councilors ? "Nenhum vereador encontrado" : "Erro ao carregar vereadores"}
+                          </div>
+                        )}
+                      </MultiSelect>
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
