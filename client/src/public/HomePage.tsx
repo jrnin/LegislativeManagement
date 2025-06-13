@@ -1108,25 +1108,21 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Vídeo 1 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="aspect-video bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <div className="text-center p-4">
-                  <div className="mb-3">
-                    <svg className="w-12 h-12 mx-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 4.236L16 8.5V17H4V8.5l6-4.264z"/>
-                      <path d="M8 10l4 2.5L8 15V10z"/>
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=aZNrMCohdRw', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/aZNrMCohdRw/maxresdefault.jpg"
+                  alt="10ª Reunião Ordinária"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/aZNrMCohdRw/hqdefault.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
                     </svg>
                   </div>
-                  <a 
-                    href="https://www.youtube.com/watch?v=aZNrMCohdRw" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                    Ver no YouTube
-                  </a>
                 </div>
               </div>
               <CardContent className="p-4">
@@ -1145,25 +1141,21 @@ export default function HomePage() {
 
             {/* Vídeo 2 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="aspect-video bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <div className="text-center p-4">
-                  <div className="mb-3">
-                    <svg className="w-12 h-12 mx-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 4.236L16 8.5V17H4V8.5l6-4.264z"/>
-                      <path d="M8 10l4 2.5L8 15V10z"/>
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=hcESKWXjRdY', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/hcESKWXjRdY/maxresdefault.jpg"
+                  alt="Sessão Ordinária Janeiro"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/hcESKWXjRdY/hqdefault.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
                     </svg>
                   </div>
-                  <a 
-                    href="https://www.youtube.com/watch?v=hcESKWXjRdY" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                    Ver no YouTube
-                  </a>
                 </div>
               </div>
               <CardContent className="p-4">
@@ -1182,25 +1174,21 @@ export default function HomePage() {
 
             {/* Vídeo 3 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="aspect-video bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <div className="text-center p-4">
-                  <div className="mb-3">
-                    <svg className="w-12 h-12 mx-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 4.236L16 8.5V17H4V8.5l6-4.264z"/>
-                      <path d="M8 10l4 2.5L8 15V10z"/>
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=RUL_vTIvUPQ', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/RUL_vTIvUPQ/maxresdefault.jpg"
+                  alt="Audiência Pública Orçamento"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/RUL_vTIvUPQ/hqdefault.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
                     </svg>
                   </div>
-                  <a 
-                    href="https://www.youtube.com/watch?v=RUL_vTIvUPQ" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                    Ver no YouTube
-                  </a>
                 </div>
               </div>
               <CardContent className="p-4">
@@ -1219,25 +1207,21 @@ export default function HomePage() {
 
             {/* Vídeo 4 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="aspect-video bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <div className="text-center p-4">
-                  <div className="mb-3">
-                    <svg className="w-12 h-12 mx-auto text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 4.236L16 8.5V17H4V8.5l6-4.264z"/>
-                      <path d="M8 10l4 2.5L8 15V10z"/>
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=pwBTK7Xw00Q', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/pwBTK7Xw00Q/maxresdefault.jpg"
+                  alt="Cerimônia de Posse"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/pwBTK7Xw00Q/hqdefault.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
                     </svg>
                   </div>
-                  <a 
-                    href="https://www.youtube.com/watch?v=pwBTK7Xw00Q" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                    Ver no YouTube
-                  </a>
                 </div>
               </div>
               <CardContent className="p-4">
