@@ -28,10 +28,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  MultiSelect,
-  MultiSelectItem,
-} from "@/components/ui/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const committeeSchema = z.object({
   name: z.string().min(3, "Nome da comissão deve ter pelo menos 3 caracteres"),
@@ -43,8 +41,21 @@ const committeeSchema = z.object({
   }),
   description: z.string().min(5, "Descrição deve ter pelo menos 5 caracteres"),
   type: z.string().min(1, "Tipo da comissão é obrigatório"),
-  members: z.array(z.string()).optional(),
+  members: z.array(z.object({
+    userId: z.string(),
+    role: z.string(),
+  })).optional(),
 });
+
+const COMMITTEE_ROLES = [
+  "Presidente",
+  "Vice-Presidente", 
+  "Relator",
+  "1º Suplente",
+  "2º Suplente", 
+  "3° Suplente",
+  "Membro"
+];
 
 type CommitteeFormValues = z.infer<typeof committeeSchema>;
 
@@ -53,7 +64,7 @@ export default function CommitteeForm() {
   const isEditing = Boolean(id);
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<{userId: string, role: string}[]>([]);
 
   const { data: committee, isLoading } = useQuery({
     queryKey: ["/api/committees", id],
@@ -140,9 +151,25 @@ export default function CommitteeForm() {
     }
   };
 
-  const handleMemberChange = (selectedValues: string[]) => {
-    setSelectedMembers(selectedValues);
-    form.setValue("members", selectedValues);
+  const handleMemberToggle = (userId: string, checked: boolean) => {
+    if (checked) {
+      const newMember = { userId, role: "Membro" };
+      const updatedMembers = [...selectedMembers, newMember];
+      setSelectedMembers(updatedMembers);
+      form.setValue("members", updatedMembers);
+    } else {
+      const updatedMembers = selectedMembers.filter(m => m.userId !== userId);
+      setSelectedMembers(updatedMembers);
+      form.setValue("members", updatedMembers);
+    }
+  };
+
+  const handleRoleChange = (userId: string, role: string) => {
+    const updatedMembers = selectedMembers.map(member =>
+      member.userId === userId ? { ...member, role } : member
+    );
+    setSelectedMembers(updatedMembers);
+    form.setValue("members", updatedMembers);
   };
 
   if (isLoading && isEditing) {
@@ -278,32 +305,69 @@ export default function CommitteeForm() {
                   <FormItem>
                     <FormLabel>Membros da Comissão</FormLabel>
                     <FormControl>
-                      {isLoadingCouncilors ? (
-                        <div className="flex items-center justify-center p-4">
-                          <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
-                          <span className="ml-2 text-sm text-muted-foreground">Carregando vereadores...</span>
-                        </div>
-                      ) : (
-                        <MultiSelect
-                          placeholder="Selecione os membros da comissão"
-                          values={selectedMembers}
-                          onValuesChange={handleMemberChange}
-                        >
-                          {Array.isArray(councilors) && councilors.length > 0 ? (
-                            councilors.map((councilor: User) => (
-                              <MultiSelectItem
-                                key={councilor.id}
-                                value={councilor.id}
-                                text={councilor.name}
-                              />
-                            ))
-                          ) : (
-                            <div className="p-2 text-muted-foreground text-sm">
-                              {councilors ? "Nenhum vereador encontrado" : "Erro ao carregar vereadores"}
+                        {isLoadingCouncilors ? (
+                          <div className="flex items-center justify-center p-4">
+                            <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
+                            <span className="ml-2 text-sm text-muted-foreground">Carregando vereadores...</span>
+                          </div>
+                        ) : (
+                          <div className="border rounded-lg p-4 space-y-4">
+                            <div className="text-sm text-muted-foreground mb-2">
+                              Selecione os vereadores e defina suas funções na comissão:
                             </div>
-                          )}
-                        </MultiSelect>
-                      )}
+                            <ScrollArea className="h-64">
+                              <div className="space-y-3">
+                                {Array.isArray(councilors) && councilors.length > 0 ? (
+                                  councilors.map((councilor: User) => {
+                                    const isSelected = selectedMembers.some(m => m.userId === councilor.id);
+                                    const member = selectedMembers.find(m => m.userId === councilor.id);
+                                    
+                                    return (
+                                      <div key={councilor.id} className="flex items-center space-x-3 p-2 border rounded">
+                                        <Checkbox
+                                          id={`member-${councilor.id}`}
+                                          checked={isSelected}
+                                          onCheckedChange={(checked) => 
+                                            handleMemberToggle(councilor.id, checked as boolean)
+                                          }
+                                        />
+                                        <div className="flex-1">
+                                          <label
+                                            htmlFor={`member-${councilor.id}`}
+                                            className="text-sm font-medium cursor-pointer"
+                                          >
+                                            {councilor.name}
+                                          </label>
+                                        </div>
+                                        {isSelected && (
+                                          <Select
+                                            value={member?.role || "Membro"}
+                                            onValueChange={(value) => handleRoleChange(councilor.id, value)}
+                                          >
+                                            <SelectTrigger className="w-40">
+                                              <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              {COMMITTEE_ROLES.map((role) => (
+                                                <SelectItem key={role} value={role}>
+                                                  {role}
+                                                </SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                        )}
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="p-2 text-muted-foreground text-sm text-center">
+                                    {councilors ? "Nenhum vereador encontrado" : "Erro ao carregar vereadores"}
+                                  </div>
+                                )}
+                              </div>
+                            </ScrollArea>
+                          </div>
+                        )}
                     </FormControl>
                     <FormMessage />
                   </FormItem>

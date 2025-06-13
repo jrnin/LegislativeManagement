@@ -1560,7 +1560,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }),
         description: z.string().min(5, "Descrição deve ter pelo menos 5 caracteres"),
         type: z.string().min(3, "Tipo deve ter pelo menos 3 caracteres"),
-        members: z.array(z.string()).optional(),
+        members: z.array(z.object({
+          userId: z.string(),
+          role: z.string(),
+        })).optional(),
       });
       
       const validated = schema.parse(req.body);
@@ -1573,9 +1576,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: validated.type,
       };
       
-      const memberIds = validated.members || [];
+      const members = validated.members || [];
       
-      const committee = await storage.createCommittee(committeeData, memberIds);
+      const committee = await storage.createCommittee(committeeData, members);
       
       // Notificar usuários sobre a criação da nova comissão
       sendNotification("all", {
