@@ -1415,7 +1415,30 @@ export class DatabaseStorage implements IStorage {
       .from(committees)
       .where(eq(committees.id, id));
     
-    return committee;
+    if (!committee) {
+      return undefined;
+    }
+
+    // Fetch committee members with user details
+    const members = await db
+      .select({
+        userId: committeeMembers.userId,
+        role: committeeMembers.role,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+        }
+      })
+      .from(committeeMembers)
+      .innerJoin(users, eq(committeeMembers.userId, users.id))
+      .where(eq(committeeMembers.committeeId, id));
+
+    return {
+      ...committee,
+      members
+    };
   }
   
   async getAllCommittees(): Promise<Committee[]> {
