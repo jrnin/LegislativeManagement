@@ -225,26 +225,32 @@ export default function EventDetailsPage() {
                   </div>
                 )}
 
-                {/* Video */}
-                {event.videoUrl && getYouTubeEmbedUrl(event.videoUrl) && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3" style={{color: '#48654e'}}>
-                      Vídeo da Sessão
-                    </h3>
-                    <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
-                      <iframe
-                        src={getYouTubeEmbedUrl(event.videoUrl)}
-                        title="Vídeo da Sessão"
-                        className="w-full h-full"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                      />
-                    </div>
-                  </div>
-                )}
+
               </CardContent>
             </Card>
+
+            {/* Video Card */}
+            {event.videoUrl && getYouTubeEmbedUrl(event.videoUrl) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg" style={{color: '#48654e'}}>
+                    Vídeo da Sessão
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="aspect-video max-w-md rounded-lg overflow-hidden bg-gray-100">
+                    <iframe
+                      src={getYouTubeEmbedUrl(event.videoUrl)}
+                      title="Vídeo da Sessão"
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Detailed Information Tabs */}
             <Card>

@@ -519,21 +519,25 @@ export default function EventDetails() {
               </p>
             </div>
 
-            {/* Video Section */}
+            {/* Video Card Section */}
             {event.videoUrl && (
-              <div>
-                <h3 className="mb-2 text-lg font-medium">Vídeo da Sessão</h3>
-                <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
-                  <iframe
-                    src={getYouTubeEmbedUrl(event.videoUrl)}
-                    title="Vídeo da Sessão"
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                </div>
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Vídeo da Sessão</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="aspect-video max-w-md rounded-lg overflow-hidden bg-gray-100">
+                    <iframe
+                      src={getYouTubeEmbedUrl(event.videoUrl)}
+                      title="Vídeo da Sessão"
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                </CardContent>
+              </Card>
             )}
             
             {!userAttendance && isAuthenticated && event.status === "Aberto" && (
