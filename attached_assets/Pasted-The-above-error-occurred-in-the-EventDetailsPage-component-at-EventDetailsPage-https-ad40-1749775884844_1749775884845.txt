@@ -1,0 +1,19 @@
+The above error occurred in the <EventDetailsPage> component:
+
+    at EventDetailsPage (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/src/public/EventDetailsPage.tsx:49:18)
+    at Route (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ce91548a:206:16)
+    at Switch (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ce91548a:262:17)
+    at main
+    at div
+    at PublicLayout (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/src/public/PublicLayout.tsx:50:40)
+    at PublicRoutes
+    at Provider (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U27FYV5Z.js?v=ce91548a:38:15)
+    at TooltipProvider (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=ce91548a:64:5)
+    at Provider (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U27FYV5Z.js?v=ce91548a:38:15)
+    at TooltipProvider (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=ce91548a:64:5)
+    at App (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/src/App.tsx?v=pWsQT9ot_D0gEiA7vTuW2:224:22)
+    at ThemeProvider (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/src/context/ThemeProvider.tsx:25:3)
+    at QueryClientProvider (https://ad405bb0-2381-4a9c-8f6a-f7eb900f9bd8-00-2ute594oeu4o5.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=ce91548a:2909:3)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.

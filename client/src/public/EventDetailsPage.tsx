@@ -280,7 +280,7 @@ export default function EventDetailsPage() {
                             </p>
                           </div>
                           <p className="text-sm opacity-90">
-                            {formattedDate}
+                            {formatEventDate(event.eventDate)}
                           </p>
                         </div>
                       </div>
@@ -289,7 +289,7 @@ export default function EventDetailsPage() {
                     {/* Event title below */}
                     <div className="mt-3 text-center">
                       <h4 className="font-semibold text-gray-800">
-                        {event.category} #{event.eventNumber} - {formattedDate}
+                        {event.category} #{event.eventNumber} - {formatEventDate(event.eventDate)}
                       </h4>
                       <p className="text-sm text-gray-600 mt-1">
                         {event.description}
