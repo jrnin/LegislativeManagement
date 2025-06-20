@@ -153,7 +153,7 @@ function App() {
     <TooltipProvider>
       <Toaster />
       {renderApp()}
-      <VLibras position="bottom-right" showControls={true} />
+      <VLibras />
     </TooltipProvider>
   );
 }
