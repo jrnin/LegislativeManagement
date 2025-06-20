@@ -227,138 +227,140 @@ export default function EventDetailsPage() {
               </CardContent>
             </Card>
 
-            {/* Video and Gallery Card */}
+            {/* Video and Gallery Section - Separate Cards */}
             {event.videoUrl && (
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle className="text-lg" style={{color: '#48654e'}}>
-                    Vídeo da Sessão
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Video Column - Left */}
-                    <div>
-                      <div 
-                        className="aspect-video rounded-lg overflow-hidden relative cursor-pointer group"
-                        style={{
-                          background: 'linear-gradient(135deg, #48654e 0%, #7FA653 100%)'
-                        }}
-                        onClick={() => window.open(event.videoUrl, '_blank')}
-                      >
-                        {/* Background overlay */}
-                        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {/* Video Card - Left */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg" style={{color: '#48654e'}}>
+                      Vídeo da Sessão
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div 
+                      className="aspect-video rounded-lg overflow-hidden relative cursor-pointer group"
+                      style={{
+                        background: 'linear-gradient(135deg, #48654e 0%, #7FA653 100%)'
+                      }}
+                      onClick={() => window.open(event.videoUrl, '_blank')}
+                    >
+                      {/* Background overlay */}
+                      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                      
+                      {/* Content */}
+                      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white p-6">
+                        {/* Brasão/Logo placeholder */}
+                        <div className="mb-3">
+                          <div className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                            <svg className="w-10 h-10 text-green-700" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                          </div>
+                        </div>
                         
-                        {/* Content */}
-                        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white p-6">
-                          {/* Brasão/Logo placeholder */}
-                          <div className="mb-3">
-                            <div className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
-                              <svg className="w-10 h-10 text-green-700" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                              </svg>
-                            </div>
+                        {/* Play button */}
+                        <div className="mb-4">
+                          <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                            <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
                           </div>
-                          
-                          {/* Play button */}
-                          <div className="mb-4">
-                            <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                              <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z"/>
-                              </svg>
-                            </div>
-                          </div>
-                          
-                          {/* Session info */}
-                          <div className="text-center">
-                            <div className="bg-black bg-opacity-60 px-4 py-2 rounded-lg mb-2">
-                              <p className="text-sm font-medium uppercase tracking-wider">
-                                SESSÃO ORDINÁRIA
-                              </p>
-                              <p className="text-lg font-bold">
-                                CÂMARA MUNICIPAL DE JAÍBA
-                              </p>
-                            </div>
-                            <p className="text-sm opacity-90">
-                              {formatEventDate(event.eventDate)}
+                        </div>
+                        
+                        {/* Session info */}
+                        <div className="text-center">
+                          <div className="bg-black bg-opacity-60 px-4 py-2 rounded-lg mb-2">
+                            <p className="text-sm font-medium uppercase tracking-wider">
+                              SESSÃO ORDINÁRIA
+                            </p>
+                            <p className="text-lg font-bold">
+                              CÂMARA MUNICIPAL DE JAÍBA
                             </p>
                           </div>
+                          <p className="text-sm opacity-90">
+                            {formatEventDate(event.eventDate)}
+                          </p>
                         </div>
                       </div>
-                      
-                      {/* Event title below video */}
-                      <div className="mt-3 text-center">
-                        <h4 className="font-semibold text-gray-800">
-                          {event.category} #{event.eventNumber} - {formatEventDate(event.eventDate)}
-                        </h4>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {event.description}
-                        </p>
-                      </div>
                     </div>
-
-                    {/* Gallery Column - Right */}
-                    <div>
-                      <h4 className="text-lg font-semibold mb-4" style={{color: '#48654e'}}>
-                        Galeria de Imagens
+                    
+                    {/* Event title below video */}
+                    <div className="mt-3 text-center">
+                      <h4 className="font-semibold text-gray-800">
+                        {event.category} #{event.eventNumber} - {formatEventDate(event.eventDate)}
                       </h4>
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* Sample gallery images - these would come from the event data */}
-                        <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 group-hover:from-gray-300 group-hover:to-gray-400 transition-all duration-300">
-                            <div className="text-center">
-                              <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-                              </svg>
-                              <p className="text-xs text-gray-500">Plenário</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-100 to-green-200 group-hover:from-green-200 group-hover:to-green-300 transition-all duration-300">
-                            <div className="text-center">
-                              <svg className="w-8 h-8 mx-auto mb-2 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                              </svg>
-                              <p className="text-xs text-green-600">Mesa</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300">
-                            <div className="text-center">
-                              <svg className="w-8 h-8 mx-auto mb-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
-                              </svg>
-                              <p className="text-xs text-blue-600">Galeria</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-200 group-hover:from-purple-200 group-hover:to-purple-300 transition-all duration-300">
-                            <div className="text-center">
-                              <svg className="w-8 h-8 mx-auto mb-2 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9H19V1h-2v1H7V1H5v1H4.5C3.67 2 3 2.67 3 3.5V5h18V3.5C21 2.67 20.33 2 19.5 2z"/>
-                              </svg>
-                              <p className="text-xs text-purple-600">Exterior</p>
-                            </div>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {event.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Gallery Card - Right */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg" style={{color: '#48654e'}}>
+                      Galeria de Imagens
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      {/* Sample gallery images */}
+                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 group-hover:from-gray-300 group-hover:to-gray-400 transition-all duration-300">
+                          <div className="text-center">
+                            <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                            </svg>
+                            <p className="text-xs text-gray-500">Plenário</p>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Gallery description */}
-                      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm text-gray-600">
-                          Imagens da sessão capturadas durante o evento. Clique nas imagens para ampliar e visualizar os detalhes da sessão legislativa.
-                        </p>
+                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-100 to-green-200 group-hover:from-green-200 group-hover:to-green-300 transition-all duration-300">
+                          <div className="text-center">
+                            <svg className="w-8 h-8 mx-auto mb-2 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            <p className="text-xs text-green-600">Mesa</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300">
+                          <div className="text-center">
+                            <svg className="w-8 h-8 mx-auto mb-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                            </svg>
+                            <p className="text-xs text-blue-600">Galeria</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer">
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-200 group-hover:from-purple-200 group-hover:to-purple-300 transition-all duration-300">
+                          <div className="text-center">
+                            <svg className="w-8 h-8 mx-auto mb-2 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9H19V1h-2v1H7V1H5v1H4.5C3.67 2 3 2.67 3 3.5V5h18V3.5C21 2.67 20.33 2 19.5 2z"/>
+                            </svg>
+                            <p className="text-xs text-purple-600">Exterior</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    
+                    {/* Gallery description */}
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="text-sm text-gray-600">
+                        Imagens da sessão capturadas durante o evento. Clique nas imagens para ampliar e visualizar os detalhes da sessão legislativa.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             )}
 
             {/* Detailed Information Tabs */}
