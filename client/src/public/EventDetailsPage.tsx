@@ -214,24 +214,23 @@ export default function EventDetailsPage() {
                 {/* Description */}
                 {event.description && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3" style={{color: '#48654e'}}>
+          <h3 className="text-lg font-semibold mb-3" style={{color: '#48654e'}}>
                       Descrição
-                    </h3>
-                    <div className="prose max-w-none">
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+            </h3>
+            <div className="prose max-w-none">
+             <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                         {event.description}
                       </p>
                     </div>
                   </div>
                 )}
-
-
               </CardContent>
             </Card>
 
             {/* Video Card */}
             {event.videoUrl && (
               <Card>
+                
                 <CardHeader>
                   <CardTitle className="text-lg" style={{color: '#48654e'}}>
                     Vídeo da Sessão
@@ -297,6 +296,7 @@ export default function EventDetailsPage() {
                     </div>
                   </div>
                 </CardContent>
+                  
               </Card>
             )}
 
