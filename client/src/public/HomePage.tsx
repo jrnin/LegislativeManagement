@@ -65,9 +65,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 const getInitials = (name: string) => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase();
 };
-
-
-
 // Componente para exibir as últimas atividades legislativas
 const LegislativeActivitiesWidget = () => {
   const { data: activities, isLoading } = useQuery({
@@ -209,10 +206,10 @@ interface QuickServiceCardProps {
 
 const QuickServiceCard = ({ title, description, icon: Icon, href }: QuickServiceCardProps) => (
   <Link href={href}>
-    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 border-0 bg-white/80 backdrop-blur-sm">
+    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-95 border-0 bg-white/80 backdrop-blur-sm">
       <CardContent className="p-6">
         <div className="flex items-start space-x-4">
-          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#253529'}}>
+          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#007825'}}>
             <Icon size={24} style={{color: '#e4e6da'}} />
           </div>
           <div className="flex-1">
@@ -223,7 +220,7 @@ const QuickServiceCard = ({ title, description, icon: Icon, href }: QuickService
               {description}
             </p>
           </div>
-          <ChevronRight size={20} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
+          <ChevronRight size={20} className="text-gray-400 group-hover:text-green-600 transition-colors" />
         </div>
       </CardContent>
     </Card>
@@ -939,7 +936,7 @@ export default function HomePage() {
 
       {/* Seção de Vereadores e Atividades Legislativas - Layout em Duas Colunas */}
       <section className="py-20 px-4 bg-white">
-        <div className="container mx-auto">
+        <div className="container mx-auto"> {/*
           <div className="text-center mb-16">
             <div className="flex items-center justify-center mb-6">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#48654e'}}>
@@ -950,7 +947,7 @@ export default function HomePage() {
                 <p className="text-gray-500 text-sm">2025-2028</p>
               </div>
             </div>
-          </div>
+          </div>*/}
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Coluna da Esquerda - Vereadores (2/3 do espaço) */}
@@ -989,7 +986,7 @@ export default function HomePage() {
                               </div>
                             )}
                             
-                            <div className="w-24 h-32 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
+                            <div className="w-280 h-370 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
                               {councilor.profileImageUrl ? (
                                 <img 
                                   src={councilor.profileImageUrl} 
@@ -1043,7 +1040,7 @@ export default function HomePage() {
                               </div>
                             )}
                             
-                            <div className="w-24 h-32 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
+                            <div className="w-280 h-370 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
                               {councilor.profileImageUrl ? (
                                 <img 
                                   src={councilor.profileImageUrl} 
@@ -1076,7 +1073,7 @@ export default function HomePage() {
               <div className="text-center mt-8">
                 <Link href="/public/vereadores">
                   <Button size="lg" className="text-white hover:opacity-90 transition-all duration-300"
-                          style={{backgroundColor: '#48654e'}}>
+                          style={{backgroundColor: '#007825'}}>
                     <Users className="mr-3" size={20} />
                     Ver Todos os Vereadores
                   </Button>

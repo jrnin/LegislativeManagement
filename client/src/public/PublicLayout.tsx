@@ -96,11 +96,24 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
   // Links do menu principal
   const mainMenuLinks = [
-    { name: 'Home', href: '/' },
+    { name: 'Início', href: '/' },
     { name: 'Vereadores', href: '/vereadores' },
-    { name: 'Sessões', href: '/sessoes' },
-    { name: 'Documentos', href: '/documentos' },
-    { name: 'Atividades Legislativas', href: '/atividades' },
+    { name: 
+      'Atividades Legislativas',
+      href: '/atividades',
+    submenu: [
+      {
+        name: 'Sessões Legislativas', 
+        href: '/sessoes',
+          external: true
+      },
+      {
+        name: 'Documentos', 
+        href: '/documentos',
+          external: true
+      }
+    ]
+    },
     { 
       name: 'Transparência', 
       href: '/transparencia',
@@ -111,6 +124,11 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           external: true
         },
         { 
+          name: 'Radar da Transparência', 
+          href: 'https://radardatransparencia.atricon.org.br/',
+          external: true
+        },
+        { 
           name: 'Recursos Humanos', 
           href: 'http://cidadesmg.com.br/portaltransparencia/faces/user/folha/FFolhaPagamento.xhtml?Param=CamJaiba',
           external: true
@@ -118,7 +136,9 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       ]
     },
     { name: 'Notícias', href: '/noticias' },
-    { name: 'Contato', href: '/contato' },
+    { name: 'Contato', href: '/contato'
+    
+    },
   ];
 
   // Serviços de acesso rápido
@@ -144,8 +164,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       <div className="w-full py-4 px-6 text-white text-sm" style={{backgroundColor: '#253529'}}>
         <div className="container mx-auto flex flex-wrap justify-between items-center">
           <div className="flex items-center space-x-6">
-            <div className="flex items-center">
-              <span className="mr-2 font-medium">Acessibilidade:</span>
+            <div className="flex items-center space-x-2">
+              <span className="mr-2 font-medium ">Acessibilidade:</span>
               <button 
                 onClick={toggleDarkMode} 
                 className="p-1 rounded-md hover:opacity-80" 
@@ -160,7 +180,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
                 aria-label="Aumentar fonte"
               >
-                A+
+                Fonte maior
               </button>
               <button 
                 onClick={decreaseFontSize} 
@@ -168,7 +188,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
                 aria-label="Diminuir fonte"
               >
-                A-
+                Fonte menor
               </button>
               <button 
                 onClick={resetFontSize} 
@@ -176,7 +196,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
                 aria-label="Resetar fonte"
               >
-                A
+                Fonte normal
               </button>
             </div>
           </div>
@@ -264,13 +284,14 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   link.submenu ? (
                     <DropdownMenu key={link.name}>
                       <DropdownMenuTrigger asChild>
-                        <button className={`px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer flex items-center ${
+                        <button className={`px-3 py-2 rounded-[10px] text-base
+ font-medium transition-colors cursor-pointer flex items-center ${
                           location === link.href 
                             ? 'text-white' 
                             : location === '/public' && !isScrolled
                               ? 'text-white hover:bg-white/20'
                               : isDarkMode 
-                                ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                                ? 'text-gray-300 hover:bg-slate-400 hover:text-white' 
                                 : 'hover:opacity-80'
                         }`} style={location === link.href ? {backgroundColor: '#48654e'} : {color: '#253529'}}>
                           {link.name}
@@ -279,7 +300,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="rounded-[10px]">
                         {link.submenu.map((subItem) => (
-                          <DropdownMenuItem key={subItem.name} className="rounded-[10px]">
+                          <DropdownMenuItem key={subItem.name} className="text-base rounded-[10px]">
                             <a 
                               href={subItem.href}
                               target={subItem.external ? "_blank" : "_self"}
@@ -294,7 +315,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                     </DropdownMenu>
                   ) : (
                     <Link key={link.href} href={link.href}>
-                      <button className={`px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer ${
+                      <button className={`px-3 py-2 rounded-[10px] text-base font-medium transition-colors cursor-pointer ${
                         location === link.href 
                           ? 'text-white' 
                           : location === '/public' && !isScrolled
@@ -302,7 +323,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                             : isDarkMode 
                               ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
                               : 'hover:opacity-80'
-                      }`} style={location === link.href ? {backgroundColor: '#48654e'} : {color: '#253529'}}>
+                      }`} style={location === link.href ? {backgroundColor: '#007825'} : {color: '#253529'}}>
                         {link.name}
                       </button>
                     </Link>
@@ -313,7 +334,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   <Button 
                     variant={location === '/public' && !isScrolled ? "secondary" : "outline"} 
                     size="sm"
-                    className="text-white hover:opacity-90 rounded-[10px]"
+                    className="text-white hover:opacity-100 rounded-[10px]"
                     style={{backgroundColor: '#48654e', borderColor: '#48654e'}}
                     onClick={() => window.location.href = "/login"}
                   >
