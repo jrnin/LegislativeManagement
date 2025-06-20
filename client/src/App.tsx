@@ -27,6 +27,7 @@ import PublicRoutes from "@/public/PublicRoutes";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationProvider } from "@/context/NotificationContext";
 import NotificationToast from "@/components/ui/notifications/NotificationToast";
+import VLibras from "@/components/VLibras";
 
 function AuthenticatedApp() {
   return (
@@ -152,6 +153,7 @@ function App() {
     <TooltipProvider>
       <Toaster />
       {renderApp()}
+      <VLibras position="bottom-right" showControls={true} />
     </TooltipProvider>
   );
 }

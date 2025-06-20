@@ -48,6 +48,37 @@
   100% { transform: scale(1); }
 }
 
+/* Estilos para VLibras - Acessibilidade */
+[vw-plugin] {
+  z-index: 9999 !important;
+}
+
+[vw-plugin] .vw-plugin-div {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Garantir que o VLibras não sobreponha conteúdo importante */
+[vw-plugin] .vw-plugin-div {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+}
+
+/* Melhorar a acessibilidade do botão do VLibras */
+[vw-plugin] .vw-plugin-div button {
+  transition: all 0.3s ease !important;
+}
+
+[vw-plugin] .vw-plugin-div button:hover {
+  transform: scale(1.05) !important;
+}
+
+[vw-plugin] .vw-plugin-div button:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-in-out;
 }
