@@ -3397,6 +3397,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contact form API endpoint (public)
+  app.post('/api/public/contato', async (req, res) => {
+    try {
+      const schema = z.object({
+        nome: z.string().min(1, "Nome é obrigatório"),
+        email: z.string().email("E-mail inválido"),
+        estado: z.string().min(1, "Estado é obrigatório"),
+        cidade: z.string().min(1, "Cidade é obrigatória"),
+        mensagem: z.string().min(1, "Mensagem é obrigatória")
+      });
+
+      const validated = schema.parse(req.body);
+
+      // Import the sendEmail function
+      const { sendEmail } = await import('./sendgrid');
+
+      // Prepare email content
+      const emailContent = {
+        to: 'contato@jaiba.mg.leg.br',
+        subject: `Novo contato do site - ${validated.nome}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <h2 style="color: #48654e; border-bottom: 2px solid #48654e; padding-bottom: 10px;">
+              Nova Mensagem de Contato
+            </h2>
+            
+            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #48654e; margin-top: 0;">Dados do Remetente:</h3>
+              <p><strong>Nome:</strong> ${validated.nome}</p>
+              <p><strong>E-mail:</strong> ${validated.email}</p>
+              <p><strong>Estado:</strong> ${validated.estado}</p>
+              <p><strong>Cidade:</strong> ${validated.cidade}</p>
+            </div>
+            
+            <div style="background-color: #fff; padding: 20px; border-left: 4px solid #48654e; margin: 20px 0;">
+              <h3 style="color: #48654e; margin-top: 0;">Mensagem:</h3>
+              <p style="white-space: pre-line;">${validated.mensagem}</p>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 15px; background-color: #e8f5e8; border-radius: 5px;">
+              <p style="margin: 0; font-size: 14px; color: #666;">
+                <strong>Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}
+              </p>
+              <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">
+                Esta mensagem foi enviada através do formulário de contato do site da Câmara Municipal de Jaíba.
+              </p>
+            </div>
+          </div>
+        `,
+        text: `
+Nova Mensagem de Contato
+
+Dados do Remetente:
+Nome: ${validated.nome}
+E-mail: ${validated.email}
+Estado: ${validated.estado}
+Cidade: ${validated.cidade}
+
+Mensagem:
+${validated.mensagem}
+
+Data/Hora: ${new Date().toLocaleString('pt-BR')}
+Esta mensagem foi enviada através do formulário de contato do site da Câmara Municipal de Jaíba.
+        `
+      };
+
+      // Send email
+      const emailSent = await sendEmail(emailContent);
+
+      if (emailSent) {
+        console.log(`Mensagem de contato enviada de: ${validated.email}`);
+        res.json({ 
+          success: true, 
+          message: "Mensagem enviada com sucesso!" 
+        });
+      } else {
+        throw new Error('Falha ao enviar e-mail');
+      }
+
+    } catch (error) {
+      console.error("Erro ao processar formulário de contato:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          success: false, 
+          message: error.errors[0].message 
+        });
+      }
+      
+      res.status(500).json({ 
+        success: false, 
+        message: "Erro interno do servidor. Tente novamente mais tarde." 
+      });
+    }
+  });
+
   // Rota pública para download de documentos (sem autenticação)
   app.get('/api/public/documents/download/:id', async (req, res) => {
     try {
