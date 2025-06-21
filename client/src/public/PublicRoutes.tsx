@@ -12,7 +12,7 @@ import SessoesPage from './SessoesPage';
 import NoticiasPage from './NoticiasPage';
 import NoticiaDetalhePage from './NoticiaDetalhePage';
 import ContatoPage from './ContatoPageFunctional';
-import ComissoesPage from './ComissoesPage';
+import ComissoesPage from './ComissoesPageSimple';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
