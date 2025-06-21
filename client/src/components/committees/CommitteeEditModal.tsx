@@ -153,9 +153,9 @@ export default function CommitteeEditModal({
     }
   };
 
-  const handleMemberChange = (selectedValues: string[]) => {
-    setSelectedMembers(selectedValues);
-    form.setValue("members", selectedValues);
+  const handleMemberChange = (members: {userId: string, role: string}[]) => {
+    setSelectedMembers(members);
+    form.setValue("members", members);
   };
 
   return (

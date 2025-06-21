@@ -1508,7 +1508,7 @@ export class DatabaseStorage implements IStorage {
     return committee;
   }
   
-  async updateCommittee(id: number, committeeData: Partial<Committee>, memberIds?: string[]): Promise<Committee | undefined> {
+  async updateCommittee(id: number, committeeData: Partial<Committee>, members?: Array<{userId: string, role: string}>): Promise<Committee | undefined> {
     // Verificar se a comissão existe
     const committee = await this.getCommittee(id);
     
@@ -1527,18 +1527,18 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     // Atualizar membros se fornecidos
-    if (memberIds) {
+    if (members) {
       // Remover todos os membros atuais
       await db
         .delete(committeeMembers)
         .where(eq(committeeMembers.committeeId, id));
       
-      // Adicionar novos membros
-      if (memberIds.length > 0) {
-        const memberValues = memberIds.map(userId => ({
+      // Adicionar novos membros com suas funções específicas
+      if (members.length > 0) {
+        const memberValues = members.map(member => ({
           committeeId: id,
-          userId,
-          role: "member", // Papel padrão
+          userId: member.userId,
+          role: member.role || "Membro", // Função específica ou padrão
           addedAt: new Date()
         }));
         

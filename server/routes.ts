@@ -1642,6 +1642,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const committeeId = parseInt(req.params.id);
       
+      console.log(`[COMMITTEE UPDATE] ID: ${committeeId}, Body:`, JSON.stringify(req.body, null, 2));
+      
       if (isNaN(committeeId)) {
         return res.status(400).json({ message: "ID da comissão inválido" });
       }
@@ -1663,6 +1665,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const validated = schema.parse(req.body);
+      console.log(`[COMMITTEE UPDATE] Validated data:`, JSON.stringify(validated, null, 2));
       
       const committeeData: any = {};
       
@@ -1672,27 +1675,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (validated.description) committeeData.description = validated.description;
       if (validated.type) committeeData.type = validated.type;
       
+      console.log(`[COMMITTEE UPDATE] Committee data:`, JSON.stringify(committeeData, null, 2));
+      
+      const members = validated.members || [];
+      console.log(`[COMMITTEE UPDATE] Members:`, JSON.stringify(members, null, 2));
+      
+      // Validar funções dos membros
+      const validRoles = ["Presidente", "Vice-Presidente", "Relator", "1º Suplente", "2º Suplente", "3º Suplente", "Membro"];
+      for (const member of members) {
+        if (!validRoles.includes(member.role)) {
+          return res.status(400).json({ 
+            message: `Função inválida: ${member.role}. Funções válidas: ${validRoles.join(", ")}` 
+          });
+        }
+      }
+      
       const updatedCommittee = await storage.updateCommittee(
         committeeId, 
         committeeData, 
-        validated.members
+        members
       );
+      
+      console.log(`[COMMITTEE UPDATE] Updated committee:`, JSON.stringify(updatedCommittee, null, 2));
       
       if (!updatedCommittee) {
         return res.status(404).json({ message: "Comissão não encontrada" });
       }
       
+      // Notificar membros sobre a atualização da comissão
+      for (const member of members) {
+        try {
+          sendNotification(member.userId, {
+            type: "committee_updated",
+            title: "Comissão Atualizada",
+            message: `A comissão "${updatedCommittee.name}" foi atualizada. Sua função: ${member.role}.`,
+            data: {
+              committeeId: updatedCommittee.id,
+              committeeName: updatedCommittee.name,
+              role: member.role,
+            },
+            createdAt: new Date(),
+          });
+        } catch (notificationError) {
+          console.error("Erro ao enviar notificação para membro:", notificationError);
+        }
+      }
+      
       // Notificar usuários sobre a atualização da comissão
-      sendNotification("all", {
-        type: "committee_updated",
-        title: "Comissão Atualizada",
-        message: `A comissão "${updatedCommittee.name}" foi atualizada.`,
-        data: {
-          committeeId: updatedCommittee.id,
-          committeeName: updatedCommittee.name,
-        },
-        createdAt: new Date(),
-      });
+      try {
+        sendNotification("all", {
+          type: "committee_updated",
+          title: "Comissão Atualizada",
+          message: `A comissão "${updatedCommittee.name}" foi atualizada.`,
+          data: {
+            committeeId: updatedCommittee.id,
+            committeeName: updatedCommittee.name,
+          },
+          createdAt: new Date(),
+        });
+      } catch (notificationError) {
+        console.error("Erro ao enviar notificação geral:", notificationError);
+      }
       
       res.json(updatedCommittee);
     } catch (error) {
@@ -2845,43 +2888,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update an existing committee
-  app.put('/api/committees/:id', requireAuth, requireAdmin, async (req, res) => {
-    try {
-      const committeeId = parseInt(req.params.id);
-      if (isNaN(committeeId)) {
-        return res.status(400).json({ message: "ID da comissão inválido" });
-      }
 
-      const committeeData = {
-        name: req.body.name,
-        description: req.body.description,
-        type: req.body.type,
-        startDate: new Date(req.body.startDate),
-        endDate: new Date(req.body.endDate),
-      };
-
-      const memberIds = req.body.members || [];
-
-      const updatedCommittee = await storage.updateCommittee(committeeId, committeeData, memberIds);
-      if (!updatedCommittee) {
-        return res.status(404).json({ message: "Comissão não encontrada" });
-      }
-
-      // Notificar usuários sobre a atualização da comissão
-      sendNotification('all', {
-        type: 'COMMITTEE_UPDATED',
-        title: 'Comissão Atualizada',
-        message: `A comissão "${committeeData.name}" foi atualizada.`,
-        data: updatedCommittee
-      });
-
-      res.json(updatedCommittee);
-    } catch (error) {
-      console.error("Error updating committee:", error);
-      res.status(500).json({ message: "Erro ao atualizar comissão" });
-    }
-  });
 
   // Delete a committee
   app.delete('/api/committees/:id', requireAuth, requireAdmin, async (req, res) => {
