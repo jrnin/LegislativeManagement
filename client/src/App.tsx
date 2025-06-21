@@ -66,26 +66,7 @@ function AuthenticatedApp() {
 }
 
 function UnauthenticatedApp() {
-  return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={PublicHome} />
-        <Route path="/vereadores" component={PublicCouncilorList} />
-        <Route path="/vereadores/:id" component={PublicCouncilorDetails} />
-        <Route path="/documentos" component={PublicDocumentList} />
-        <Route path="/atividades" component={PublicActivityList} />
-        <Route path="/sessoes" component={PublicEventList} />
-        <Route path="/eventos" component={PublicEventList} />
-        <Route path="/eventos/:id" component={PublicEventDetails} />
-        <Route path="/committees" component={CommitteeList} />
-        <Route path="/committees/:id" component={CommitteeDetails} />
-        <Route path="/contato" component={ContactPage} />
-        <Route path="/login" component={LoginPage} />
-        <Route path="/verify-email" component={EmailVerificationPage} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
-  );
+  return <PublicRoutes />;
 }
 
 function App() {
