@@ -11,7 +11,7 @@ import EventDetailsPage from './EventDetailsPage';
 import SessoesPage from './SessoesPage';
 import NoticiasPage from './NoticiasPage';
 import NoticiaDetalhePage from './NoticiaDetalhePage';
-import ContatoPage from './ContatoPageSimple';
+import ContatoPage from './ContatoPageTest';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
