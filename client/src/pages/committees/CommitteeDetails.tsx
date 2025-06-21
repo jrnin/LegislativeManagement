@@ -40,7 +40,7 @@ export default function CommitteeDetails() {
   const { id } = useParams();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuth(false); // Don't require authentication for public access
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<{
     userId: string;
@@ -50,7 +50,7 @@ export default function CommitteeDetails() {
   const [newRole, setNewRole] = useState("");
 
   const { data: committee, isLoading } = useQuery({
-    queryKey: ["/api/committees", id],
+    queryKey: ["/api/public/committees", id],
   });
 
   if (isLoading) {

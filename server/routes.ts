@@ -1979,6 +1979,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // COMMITTEE PUBLIC API ENDPOINTS
+  
+  // Get all committees (public)
+  app.get('/api/public/committees', async (req, res) => {
+    try {
+      const committees = await storage.getAllCommittees();
+      res.json(committees);
+    } catch (error) {
+      console.error("Error fetching public committees:", error);
+      res.status(500).json({ message: "Erro ao buscar comissões" });
+    }
+  });
+
+  // Get committee details (public)
+  app.get('/api/public/committees/:id', async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.id);
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+
+      const committee = await storage.getCommitteeWithMembers(committeeId);
+      if (!committee) {
+        return res.status(404).json({ message: "Comissão não encontrada" });
+      }
+
+      res.json(committee);
+    } catch (error) {
+      console.error("Error fetching public committee details:", error);
+      res.status(500).json({ message: "Erro ao buscar detalhes da comissão" });
+    }
+  });
+
   // Get news categories (public) - must come before slug route
   app.get('/api/public/news/categories', async (req, res) => {
     try {

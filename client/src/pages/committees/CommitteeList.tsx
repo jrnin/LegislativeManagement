@@ -48,7 +48,7 @@ import CommitteeEditModal from "@/components/committees/CommitteeEditModal";
 export default function CommitteeList() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuth(false); // Don't require authentication for public access
   const isAdmin = user?.role === "admin";
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,7 +57,7 @@ export default function CommitteeList() {
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
 
   const { data: committees = [], isLoading } = useQuery({
-    queryKey: ["/api/committees"],
+    queryKey: ["/api/public/committees"],
   });
 
   const filteredCommittees = committees.filter((committee: Committee) =>
