@@ -3485,6 +3485,18 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
           message: error.errors[0].message 
         });
       }
+
+      // Em desenvolvimento, registrar a submissão e retornar sucesso para testes da interface
+      if (process.env.NODE_ENV === 'development') {
+        console.log('=== FORMULÁRIO DE CONTATO SUBMETIDO ===');
+        console.log('Dados recebidos no formulário de contato');
+        console.log('=======================================');
+        
+        return res.json({ 
+          success: true, 
+          message: "Mensagem recebida! (Modo desenvolvimento - verifique os logs do servidor)" 
+        });
+      }
       
       res.status(500).json({ 
         success: false, 

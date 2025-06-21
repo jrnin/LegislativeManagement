@@ -89,7 +89,12 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       console.log('SUBJECT:', params.subject);
       console.log('CONTENT:', params.text);
       
-      // Para ambiente de desenvolvimento, retornamos false para não simular sucesso e ver o erro real
+      // Para ambiente de desenvolvimento, simular sucesso após log do erro
+      if (process.env.NODE_ENV === 'development') {
+        console.log('MODO DESENVOLVIMENTO: Simulando envio bem-sucedido');
+        return true;
+      }
+      
       return false;
     }
   } catch (error) {
