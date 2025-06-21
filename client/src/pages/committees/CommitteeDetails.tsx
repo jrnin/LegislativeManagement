@@ -49,9 +49,16 @@ export default function CommitteeDetails() {
   } | null>(null);
   const [newRole, setNewRole] = useState("");
 
-  const { data: committee, isLoading } = useQuery({
-    queryKey: ["/api/committees", id],
+  const { data: committee, isLoading, error } = useQuery({
+    queryKey: [`/api/committees/${id}`],
+    enabled: !!id,
   });
+
+  // Debug logging
+  console.log("Committee data:", committee);
+  console.log("Loading state:", isLoading);
+  console.log("Error:", error);
+  console.log("Committee ID:", id);
 
   if (isLoading) {
     return (
