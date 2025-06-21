@@ -53,7 +53,7 @@ const COMMITTEE_ROLES = [
   "Relator",
   "1º Suplente",
   "2º Suplente", 
-  "3° Suplente",
+  "3º Suplente",
   "Membro"
 ];
 
@@ -107,9 +107,12 @@ export default function CommitteeForm() {
 
   useEffect(() => {
     if (committeeMembers && committeeMembers.length > 0 && isEditing) {
-      const memberIds = committeeMembers.map((member: any) => member.userId);
-      setSelectedMembers(memberIds);
-      form.setValue("members", memberIds);
+      const membersWithRoles = committeeMembers.map((member: any) => ({
+        userId: member.userId,
+        role: member.role || "Membro"
+      }));
+      setSelectedMembers(membersWithRoles);
+      form.setValue("members", membersWithRoles);
     }
   }, [committeeMembers, form, isEditing]);
 

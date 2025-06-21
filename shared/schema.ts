@@ -577,13 +577,26 @@ export const committees = pgTable("committees", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Committee Member Roles enum
+export const committeeRoles = [
+  "Presidente",
+  "Vice-Presidente", 
+  "Relator",
+  "1º Suplente",
+  "2º Suplente",
+  "3º Suplente",
+  "Membro"
+] as const;
+
+export type CommitteeRole = typeof committeeRoles[number];
+
 // Committee Members (Membros das Comissões) - many-to-many
 export const committeeMembers = pgTable(
   "committee_members",
   {
     committeeId: integer("committee_id").notNull(),
     userId: varchar("user_id").notNull(),
-    role: varchar("role").default("Membro"), // "Presidente", "Vice-Presidente", "Relator", "1º Suplente", "2º Suplente", "3° Suplente", "Membro"
+    role: varchar("role").default("Membro").notNull(), // "Presidente", "Vice-Presidente", "Relator", "1º Suplente", "2º Suplente", "3º Suplente", "Membro"
     addedAt: timestamp("added_at").defaultNow(),
   },
   (table) => ({
@@ -625,11 +638,13 @@ export const insertCommitteeSchema = createInsertSchema(committees).pick({
 export type InsertCommittee = z.infer<typeof insertCommitteeSchema>;
 export type Committee = typeof committees.$inferSelect;
 
-// Insert schema for committee members
+// Insert schema for committee members with role validation
 export const insertCommitteeMemberSchema = createInsertSchema(committeeMembers).pick({
   committeeId: true,
   userId: true,
   role: true,
+}).extend({
+  role: z.enum(committeeRoles).default("Membro"),
 });
 
 export type InsertCommitteeMember = z.infer<typeof insertCommitteeMemberSchema>;

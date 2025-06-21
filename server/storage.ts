@@ -1476,7 +1476,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
   
-  async createCommittee(committeeData: Partial<Committee>, memberIds: string[]): Promise<Committee> {
+  async createCommittee(committeeData: Partial<Committee>, members: Array<{userId: string, role: string}>): Promise<Committee> {
     // Criar a comissão
     const [committee] = await db
       .insert(committees)
@@ -1491,12 +1491,12 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     
-    // Adicionar membros à comissão
-    if (memberIds.length > 0) {
-      const memberValues = memberIds.map(userId => ({
+    // Adicionar membros à comissão com suas funções específicas
+    if (members.length > 0) {
+      const memberValues = members.map(member => ({
         committeeId: committee.id,
-        userId,
-        role: "member", // Papel padrão
+        userId: member.userId,
+        role: member.role || "Membro", // Função específica ou padrão
         addedAt: new Date()
       }));
       

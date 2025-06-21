@@ -1578,19 +1578,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const members = validated.members || [];
       
+      // Validar funções dos membros
+      const validRoles = ["Presidente", "Vice-Presidente", "Relator", "1º Suplente", "2º Suplente", "3º Suplente", "Membro"];
+      for (const member of members) {
+        if (!validRoles.includes(member.role)) {
+          return res.status(400).json({ 
+            message: `Função inválida: ${member.role}. Funções válidas: ${validRoles.join(", ")}` 
+          });
+        }
+      }
+      
       const committee = await storage.createCommittee(committeeData, members);
       
+      // Notificar membros sobre sua inclusão na comissão
+      for (const member of members) {
+        try {
+          sendNotification(member.userId, {
+            type: "committee_member_added",
+            title: "Adicionado à Comissão",
+            message: `Você foi adicionado à comissão "${committee.name}" como ${member.role}.`,
+            data: {
+              committeeId: committee.id,
+              committeeName: committee.name,
+              role: member.role,
+            },
+            createdAt: new Date(),
+          });
+        } catch (notificationError) {
+          console.error("Erro ao enviar notificação para membro:", notificationError);
+        }
+      }
+      
       // Notificar usuários sobre a criação da nova comissão
-      sendNotification("all", {
-        type: "committee_created",
-        title: "Nova Comissão Criada",
-        message: `A comissão "${committee.name}" foi criada.`,
-        data: {
-          committeeId: committee.id,
-          committeeName: committee.name,
-        },
-        createdAt: new Date(),
-      });
+      try {
+        sendNotification("all", {
+          type: "committee_created",
+          title: "Nova Comissão Criada",
+          message: `A comissão "${committee.name}" foi criada.`,
+          data: {
+            committeeId: committee.id,
+            committeeName: committee.name,
+          },
+          createdAt: new Date(),
+        });
+      } catch (notificationError) {
+        console.error("Erro ao enviar notificação geral:", notificationError);
+      }
       
       res.status(201).json(committee);
     } catch (error) {

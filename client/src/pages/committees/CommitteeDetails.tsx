@@ -107,20 +107,15 @@ export default function CommitteeDetails() {
     if (!selectedMember || !newRole) return;
 
     try {
-      await apiRequest(
-        `/api/committees/${id}/members/${selectedMember.userId}`,
-        {
-          method: "PUT",
-          data: { role: newRole },
-        }
-      );
+      await apiRequest("PUT", `/api/committees/${id}/members/${selectedMember.userId}`, {
+        role: newRole,
+      });
 
       queryClient.invalidateQueries({ queryKey: ["/api/committees", id] });
 
       toast({
         title: "Função atualizada",
         description: `A função de ${selectedMember.name} foi atualizada para ${newRole}.`,
-        variant: "success",
       });
     } catch (error) {
       console.error("Erro ao atualizar função:", error);
@@ -315,11 +310,13 @@ export default function CommitteeDetails() {
               <SelectValue placeholder="Selecione a função" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="presidente">Presidente</SelectItem>
-              <SelectItem value="vice-presidente">Vice-Presidente</SelectItem>
-              <SelectItem value="secretário">Secretário</SelectItem>
-              <SelectItem value="relator">Relator</SelectItem>
-              <SelectItem value="member">Membro</SelectItem>
+              <SelectItem value="Presidente">Presidente</SelectItem>
+              <SelectItem value="Vice-Presidente">Vice-Presidente</SelectItem>
+              <SelectItem value="Relator">Relator</SelectItem>
+              <SelectItem value="1º Suplente">1º Suplente</SelectItem>
+              <SelectItem value="2º Suplente">2º Suplente</SelectItem>
+              <SelectItem value="3º Suplente">3º Suplente</SelectItem>
+              <SelectItem value="Membro">Membro</SelectItem>
             </SelectContent>
           </Select>
           <DialogFooter>
