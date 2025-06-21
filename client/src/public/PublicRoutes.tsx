@@ -40,8 +40,8 @@ export default function PublicRoutes() {
         <Route path="/public/atividades/:id" component={AtividadeDetailPage} />
         <Route path="/atividades/:id" component={AtividadeDetailPage} />
         
-        <Route path="/public/comissoes" component={ComissoesPage} />
         <Route path="/comissoes" component={ComissoesPage} />
+        <Route path="/public/comissoes" component={ComissoesPage} />
         
         <Route path="/public/eventos/:id" component={EventDetailsPage} />
         <Route path="/eventos/:id" component={EventDetailsPage} />
