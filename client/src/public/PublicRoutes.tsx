@@ -14,6 +14,7 @@ import NoticiaDetalhePage from './NoticiaDetalhePage';
 import ContatoPage from './ContatoPageFunctional';
 import CommitteesPage from './CommitteesPage';
 import CommitteeDetailsPage from './CommitteeDetailsPage';
+import LoginPage from './LoginPage';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
@@ -64,7 +65,7 @@ export default function PublicRoutes() {
         <Route path="/committees/:id" component={CommitteeDetailsPage} />
         
         {/* Login routes */}
-        <Route path="/login" component={() => <div>Página de login em construção</div>} />
+        <Route path="/login" component={LoginPage} />
         <Route path="/verify-email" component={() => <div>Verificação de email em construção</div>} />
         
         {/* Adicionar outras rotas públicas aqui */}
