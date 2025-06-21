@@ -3,8 +3,8 @@ import { User } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
 
-export function useAuth() {
-  const [localLoading, setLocalLoading] = useState(true);
+export function useAuth(shouldFetch: boolean = true) {
+  const [localLoading, setLocalLoading] = useState(shouldFetch);
   const queryClient = useQueryClient();
   
   const { 
@@ -20,14 +20,18 @@ export function useAuth() {
   });
 
   useEffect(() => {
-    // Executar a consulta apenas uma vez na montagem do componente
-    const checkAuth = async () => {
-      await refetch();
+    // Executar a consulta apenas se shouldFetch for true
+    if (shouldFetch) {
+      const checkAuth = async () => {
+        await refetch();
+        setLocalLoading(false);
+      };
+      
+      checkAuth();
+    } else {
       setLocalLoading(false);
-    };
-    
-    checkAuth();
-  }, [refetch]);
+    }
+  }, [refetch, shouldFetch]);
 
   // Função para fazer login
   const login = async (email: string, password: string) => {

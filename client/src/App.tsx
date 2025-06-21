@@ -95,14 +95,15 @@ function App() {
                        location.startsWith("/vereadores") || 
                        location.startsWith("/atividades") || 
                        location.startsWith("/sessoes") || 
-                       location.startsWith("/eventos")) &&
+                       location.startsWith("/eventos") ||
+                       location.startsWith("/contato")) &&
                        !location.startsWith("/login") &&
                        !location.startsWith("/verify-email");
   
-  // Sempre chamar useAuth para evitar erro de hooks
-  const authResult = useAuth();
+  // Chamar useAuth apenas quando necessário para rotas privadas
+  const authResult = useAuth(!isPublicRoute);
   
-  // Se for rota pública, sobrescrever os valores de auth
+  // Definir valores de auth baseado na rota
   const { isLoading, isAuthenticated } = isPublicRoute 
     ? { isLoading: false, isAuthenticated: false } 
     : authResult;
