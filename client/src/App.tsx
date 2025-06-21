@@ -67,7 +67,7 @@ function AuthenticatedApp() {
 
 function UnauthenticatedApp() {
   return (
-    <PublicLayout>
+    <Layout>
       <Switch>
         <Route path="/" component={PublicHome} />
         <Route path="/vereadores" component={PublicCouncilorList} />
@@ -84,7 +84,7 @@ function UnauthenticatedApp() {
         <Route path="/verify-email" component={EmailVerificationPage} />
         <Route component={NotFound} />
       </Switch>
-    </PublicLayout>
+    </Layout>
   );
 }
 
