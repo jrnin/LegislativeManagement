@@ -1458,7 +1458,7 @@ export class DatabaseStorage implements IStorage {
       return undefined;
     }
     
-    const committeeMembers = await db
+    const membersData = await db
       .select({
         committeeId: committeeMembers.committeeId,
         userId: committeeMembers.userId,
@@ -1472,7 +1472,7 @@ export class DatabaseStorage implements IStorage {
     
     return {
       ...committee,
-      members: committeeMembers
+      members: membersData
     };
   }
   

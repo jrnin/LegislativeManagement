@@ -54,11 +54,7 @@ export default function CommitteeDetails() {
     enabled: !!id,
   });
 
-  // Debug logging
-  console.log("Committee data:", committee);
-  console.log("Loading state:", isLoading);
-  console.log("Error:", error);
-  console.log("Committee ID:", id);
+
 
   if (isLoading) {
     return (
