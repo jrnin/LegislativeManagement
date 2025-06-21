@@ -12,9 +12,6 @@ import SessoesPage from './SessoesPage';
 import NoticiasPage from './NoticiasPage';
 import NoticiaDetalhePage from './NoticiaDetalhePage';
 import ContatoPage from './ContatoPageFunctional';
-import CommitteesPage from './CommitteesPage';
-import CommitteeDetailsPage from './CommitteeDetailsPage';
-import LoginPage from './LoginPage';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
@@ -56,17 +53,6 @@ export default function PublicRoutes() {
         
         <Route path="/public/contato" component={ContatoPage} />
         <Route path="/contato" component={ContatoPage} />
-        
-        {/* Committee routes */}
-        <Route path="/public/committees" component={CommitteesPage} />
-        <Route path="/committees" component={CommitteesPage} />
-        
-        <Route path="/public/committees/:id" component={CommitteeDetailsPage} />
-        <Route path="/committees/:id" component={CommitteeDetailsPage} />
-        
-        {/* Login routes */}
-        <Route path="/login" component={LoginPage} />
-        <Route path="/verify-email" component={() => <div>Verificação de email em construção</div>} />
         
         {/* Adicionar outras rotas públicas aqui */}
         <Route component={NotFound} />

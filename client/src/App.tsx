@@ -66,7 +66,18 @@ function AuthenticatedApp() {
 }
 
 function UnauthenticatedApp() {
-  return <PublicRoutes />;
+  return (
+    <Switch>
+      <Route path="/login" component={LoginPage} />
+      <Route path="/verify-email" component={EmailVerificationPage} />
+      <Route>
+        {() => {
+          window.location.href = "/login";
+          return null;
+        }}
+      </Route>
+    </Switch>
+  );
 }
 
 function App() {
