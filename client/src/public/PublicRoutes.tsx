@@ -12,6 +12,7 @@ import SessoesPage from './SessoesPage';
 import NoticiasPage from './NoticiasPage';
 import NoticiaDetalhePage from './NoticiaDetalhePage';
 import ContatoPage from './ContatoPageFunctional';
+import ComissoesPage from './pages/ComissoesPage';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
@@ -38,6 +39,9 @@ export default function PublicRoutes() {
         
         <Route path="/public/atividades/:id" component={AtividadeDetailPage} />
         <Route path="/atividades/:id" component={AtividadeDetailPage} />
+        
+        <Route path="/public/comissoes" component={ComissoesPage} />
+        <Route path="/comissoes" component={ComissoesPage} />
         
         <Route path="/public/eventos/:id" component={EventDetailsPage} />
         <Route path="/eventos/:id" component={EventDetailsPage} />

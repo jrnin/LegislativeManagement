@@ -111,6 +111,11 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         name: 'Documentos', 
         href: '/documentos',
           external: true
+      },
+      {
+        name: 'Comissões', 
+        href: '/comissoes',
+          external: true
       }
     ]
     },

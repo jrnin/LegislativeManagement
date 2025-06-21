@@ -3416,6 +3416,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter comissões (sem autenticação)
+  app.get('/api/public/committees', async (req, res) => {
+    try {
+      const committees = await storage.getAllCommittees();
+      
+      // Buscar membros para cada comissão
+      const committeesWithMembers = await Promise.all(
+        committees.map(async (committee) => {
+          const fullCommittee = await storage.getCommitteeWithMembers(committee.id);
+          return fullCommittee || committee;
+        })
+      );
+      
+      res.json(committeesWithMembers);
+    } catch (error) {
+      console.error("Erro ao buscar comissões:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Rota pública para obter documentos de um evento (sem autenticação)
   app.get('/api/public/events/:id/documents', async (req, res) => {
     try {
