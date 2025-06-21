@@ -263,15 +263,16 @@ export default function CommitteeDetails() {
                       <TableCell>
                         <Badge
                           variant={
-                            member.role === "presidente"
+                            member.role === "Presidente"
                               ? "default"
-                              : member.role === "vice-presidente"
+                              : member.role === "Vice-Presidente"
+                              ? "secondary"
+                              : member.role === "Relator"
                               ? "secondary"
                               : "outline"
                           }
                         >
-                          {member.role.charAt(0).toUpperCase() +
-                            member.role.slice(1)}
+                          {member.role}
                         </Badge>
                       </TableCell>
                       {user?.role === "admin" && (
