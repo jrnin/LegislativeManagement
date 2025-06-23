@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, FileText, Search } from "lucide-react";
+import { Users, Calendar, FileText, Search, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Link } from "wouter";
 import { useState } from "react";
 
 interface CommitteeMember {
@@ -140,49 +141,62 @@ export default function ComissoesPageBasic() {
         {filteredCommittees.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredCommittees.map((committee: Committee) => (
-              <Card key={committee.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-xl text-gray-900">
-                      {committee.name}
-                    </CardTitle>
-                    <Badge variant={committee.status === 'ativa' ? 'default' : 'secondary'}>
-                      {committee.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">{committee.description}</p>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Users className="h-4 w-4 mr-2" />
-                      {committee.members.length} membros
-                    </div>
-                    
-                    {committee.members.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-2">Membros:</h4>
-                        <div className="space-y-1">
-                          {committee.members.map((member) => (
-                            <div key={member.id} className="flex justify-between items-center text-sm">
-                              <span className="text-gray-700">{member.name}</span>
-                              <Badge variant="outline" className="text-xs">
-                                {member.role}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
+              <Link key={committee.id} href={`/comissoes/${committee.id}`}>
+                <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer hover:border-green-300">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-xl text-gray-900 group-hover:text-green-700">
+                        {committee.name}
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={committee.status === 'ativa' ? 'default' : 'secondary'}>
+                          {committee.status}
+                        </Badge>
+                        <ChevronRight className="h-4 w-4 text-gray-400" />
                       </div>
-                    )}
-                    
-                    <div className="flex items-center text-sm text-gray-500 pt-2 border-t">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Criada em {new Date(committee.createdAt).toLocaleDateString('pt-BR')}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600 mb-4">{committee.description}</p>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Users className="h-4 w-4 mr-2" />
+                        {committee.members.length} membros
+                      </div>
+                      
+                      {committee.members.length > 0 && (
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-2">Principais Membros:</h4>
+                          <div className="space-y-1">
+                            {committee.members.slice(0, 3).map((member) => (
+                              <div key={member.id} className="flex justify-between items-center text-sm">
+                                <span className="text-gray-700">{member.user?.name || member.name}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {member.role}
+                                </Badge>
+                              </div>
+                            ))}
+                            {committee.members.length > 3 && (
+                              <p className="text-xs text-gray-500 mt-2">
+                                +{committee.members.length - 3} outros membros
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t">
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Criada em {new Date(committee.createdAt).toLocaleDateString('pt-BR')}
+                        </div>
+                        <span className="text-green-600 font-medium">Ver detalhes →</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         ) : (
