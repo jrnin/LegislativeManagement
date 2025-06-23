@@ -108,7 +108,16 @@ This is a comprehensive legislative management system built with a modern full-s
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- **June 23, 2025**: Implemented complete public committees system
+  - Created comprehensive committees listing page with search functionality
+  - Added individual committee details pages with member hierarchy
+  - Integrated committee member management with specific roles (Presidente, Vice-Presidente, Relator, 1º/2º/3º Suplente, Membro)
+  - Fixed critical routing issue for public pages (/comissoes route not recognized)
+  - Implemented clickable navigation between committees list and detail views
+  - Added responsive design with statistics cards and member information display
+
 ## Changelog
 
-Changelog:
 - June 23, 2025. Initial setup
