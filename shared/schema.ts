@@ -100,7 +100,7 @@ export const events = pgTable("events", {
   location: varchar("location").notNull(),
   mapUrl: varchar("map_url"),
   videoUrl: varchar("video_url"), // YouTube video link
-  category: varchar("category").notNull(), // "Sessão Ordinária" or "Sessão Extraordinária"
+  category: varchar("category").notNull(), // "Sessão Ordinária", "Sessão Extraordinária", or "Reunião Comissão"
   legislatureId: integer("legislature_id").notNull(),
   description: text("description").notNull(),
   status: varchar("status").notNull(), // "Aberto", "Andamento", "Concluido", "Cancelado"

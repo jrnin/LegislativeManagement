@@ -25,7 +25,7 @@ const formSchema = z.object({
   location: z.string().min(3, { message: "Local é obrigatório" }),
   mapUrl: z.string().url({ message: "URL inválida" }).optional().or(z.literal("")),
   videoUrl: z.string().url({ message: "URL do YouTube inválida" }).optional().or(z.literal("")),
-  category: z.enum(["Sessão Ordinária", "Sessão Extraordinária"], { 
+  category: z.enum(["Sessão Ordinária", "Sessão Extraordinária", "Reunião Comissão"], { 
     message: "Selecione uma categoria válida" 
   }),
   legislatureId: z.coerce.number().int().positive({ message: "Legislatura é obrigatória" }),
@@ -236,6 +236,7 @@ export default function EventForm() {
                         <SelectContent>
                           <SelectItem value="Sessão Ordinária">Sessão Ordinária</SelectItem>
                           <SelectItem value="Sessão Extraordinária">Sessão Extraordinária</SelectItem>
+                          <SelectItem value="Reunião Comissão">Reunião Comissão</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
