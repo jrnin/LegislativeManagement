@@ -96,6 +96,8 @@ function App() {
                        location.startsWith("/atividades") || 
                        location.startsWith("/sessoes") || 
                        location.startsWith("/eventos") ||
+                       location.startsWith("/comissoes") ||
+                       location.startsWith("/noticias") ||
                        location.startsWith("/contato")) &&
                        !location.startsWith("/login") &&
                        !location.startsWith("/verify-email");
