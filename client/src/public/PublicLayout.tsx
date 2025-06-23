@@ -306,14 +306,20 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                       <DropdownMenuContent className="rounded-[10px]">
                         {link.submenu.map((subItem) => (
                           <DropdownMenuItem key={subItem.name} className="text-base rounded-[10px]">
-                            <a 
-                              href={subItem.href}
-                              target={subItem.external ? "_blank" : "_self"}
-                              rel={subItem.external ? "noopener noreferrer" : undefined}
-                              className="w-full"
-                            >
-                              {subItem.name}
-                            </a>
+                            {subItem.external ? (
+                              <a 
+                                href={subItem.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full"
+                              >
+                                {subItem.name}
+                              </a>
+                            ) : (
+                              <Link href={subItem.href} className="w-full">
+                                {subItem.name}
+                              </Link>
+                            )}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
@@ -403,19 +409,33 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                               </Link>
                               <div className="pl-4 space-y-1">
                                 {link.submenu.map((subItem) => (
-                                  <a 
-                                    key={subItem.name}
-                                    href={subItem.href}
-                                    target={subItem.external ? "_blank" : "_self"}
-                                    rel={subItem.external ? "noopener noreferrer" : undefined}
-                                    className={`block px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer ${
-                                      isDarkMode 
-                                        ? 'text-gray-400 hover:bg-slate-700 hover:text-white' 
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                    }`}
-                                  >
-                                    {subItem.name}
-                                  </a>
+                                  subItem.external ? (
+                                    <a 
+                                      key={subItem.name}
+                                      href={subItem.href}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className={`block px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer ${
+                                        isDarkMode 
+                                          ? 'text-gray-400 hover:bg-slate-700 hover:text-white' 
+                                          : 'text-gray-600 hover:bg-gray-100'
+                                      }`}
+                                    >
+                                      {subItem.name}
+                                    </a>
+                                  ) : (
+                                    <Link key={subItem.name} href={subItem.href}>
+                                      <SheetClose asChild>
+                                        <button className={`block px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                                          isDarkMode 
+                                            ? 'text-gray-400 hover:bg-slate-700 hover:text-white' 
+                                            : 'text-gray-600 hover:bg-gray-100'
+                                        }`}>
+                                          {subItem.name}
+                                        </button>
+                                      </SheetClose>
+                                    </Link>
+                                  )
                                 ))}
                               </div>
                             </div>
