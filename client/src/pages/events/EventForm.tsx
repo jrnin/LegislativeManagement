@@ -14,8 +14,9 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/useAuth";
-import { Event, Legislature } from "@shared/schema";
+import { Event, Legislature, Committee } from "@shared/schema";
 import { MapPin } from "lucide-react";
 
 const formSchema = z.object({
@@ -28,6 +29,7 @@ const formSchema = z.object({
   category: z.enum(["Sessão Ordinária", "Sessão Extraordinária", "Reunião Comissão"], { 
     message: "Selecione uma categoria válida" 
   }),
+  committeeIds: z.array(z.coerce.number()).optional(),
   legislatureId: z.coerce.number().int().positive({ message: "Legislatura é obrigatória" }),
   description: z.string().min(3, { message: "Descrição é obrigatória" }),
   status: z.enum(["Aberto", "Andamento", "Concluido", "Cancelado"], { 
@@ -54,6 +56,10 @@ export default function EventForm() {
     queryKey: ["/api/legislatures"],
   });
 
+  const { data: committees = [] } = useQuery<Committee[]>({
+    queryKey: ["/api/committees"],
+  });
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,6 +70,7 @@ export default function EventForm() {
       mapUrl: "",
       videoUrl: "",
       category: "Sessão Ordinária",
+      committeeIds: [],
       legislatureId: undefined,
       description: "",
       status: "Aberto",
@@ -243,6 +250,47 @@ export default function EventForm() {
                     </FormItem>
                   )}
                 />
+                
+                {/* Conditional Committee Selection for "Reunião Comissão" */}
+                {form.watch("category") === "Reunião Comissão" && (
+                  <FormField
+                    control={form.control}
+                    name="committeeIds"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Comissões</FormLabel>
+                        <FormDescription>
+                          Selecione uma ou mais comissões para esta reunião
+                        </FormDescription>
+                        <div className="grid grid-cols-2 gap-2 p-4 border rounded-md">
+                          {committees.map((committee) => (
+                            <div key={committee.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`committee-${committee.id}`}
+                                checked={(field.value || []).includes(committee.id)}
+                                onCheckedChange={(checked) => {
+                                  const currentIds = field.value || [];
+                                  if (checked) {
+                                    field.onChange([...currentIds, committee.id]);
+                                  } else {
+                                    field.onChange(currentIds.filter(id => id !== committee.id));
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={`committee-${committee.id}`}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {committee.name}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 
                 <FormField
                   control={form.control}

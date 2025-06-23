@@ -11,6 +11,7 @@ import {
   activityVotes,
   committees,
   committeeMembers,
+  eventCommittees,
   newsArticles,
   newsCategories,
   newsComments,
@@ -25,6 +26,7 @@ import {
   type ActivityVote,
   type Committee,
   type CommitteeMember,
+  type EventCommittee,
   type NewsArticle,
   type NewsCategory,
   type NewsComment,
@@ -168,6 +170,11 @@ export interface IStorage {
   addCommitteeMember(committeeId: number, userId: string, role?: string): Promise<CommitteeMember>;
   updateCommitteeMemberRole(committeeId: number, userId: string, role: string): Promise<CommitteeMember | undefined>;
   removeCommitteeMember(committeeId: number, userId: string): Promise<boolean>;
+  
+  // Event-Committee operations
+  addEventCommittees(eventId: number, committeeIds: number[]): Promise<void>;
+  removeEventCommittees(eventId: number): Promise<void>;
+  getEventCommittees(eventId: number): Promise<Committee[]>;
   
   // Search operations
   searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
@@ -1677,6 +1684,48 @@ export class DatabaseStorage implements IStorage {
       );
     
     return result.rowCount > 0;
+  }
+  
+  /**
+   * Event-Committee operations
+   */
+  async addEventCommittees(eventId: number, committeeIds: number[]): Promise<void> {
+    if (committeeIds.length === 0) return;
+    
+    const eventCommitteeValues = committeeIds.map(committeeId => ({
+      eventId,
+      committeeId,
+      addedAt: new Date()
+    }));
+    
+    await db
+      .insert(eventCommittees)
+      .values(eventCommitteeValues);
+  }
+  
+  async removeEventCommittees(eventId: number): Promise<void> {
+    await db
+      .delete(eventCommittees)
+      .where(eq(eventCommittees.eventId, eventId));
+  }
+  
+  async getEventCommittees(eventId: number): Promise<Committee[]> {
+    const result = await db
+      .select({
+        id: committees.id,
+        name: committees.name,
+        startDate: committees.startDate,
+        endDate: committees.endDate,
+        description: committees.description,
+        type: committees.type,
+        createdAt: committees.createdAt,
+        updatedAt: committees.updatedAt,
+      })
+      .from(eventCommittees)
+      .innerJoin(committees, eq(eventCommittees.committeeId, committees.id))
+      .where(eq(eventCommittees.eventId, eventId));
+    
+    return result;
   }
   
   /**

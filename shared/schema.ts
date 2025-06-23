@@ -115,6 +115,7 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
   }),
   activities: many(legislativeActivities),
   documents: many(documents, { relationName: "event_documents" }),
+  committees: many(eventCommittees),
 }));
 
 // Legislative Activities table
@@ -604,9 +605,10 @@ export const committeeMembers = pgTable(
   }),
 );
 
-// Relations for committees
+// Relations for committees  
 export const committeesRelations = relations(committees, ({ many }) => ({
   members: many(committeeMembers),
+  events: many(eventCommittees),
 }));
 
 // Relations for committee members
@@ -618,6 +620,31 @@ export const committeeMembersRelations = relations(committeeMembers, ({ one }) =
   user: one(users, {
     fields: [committeeMembers.userId],
     references: [users.id],
+  }),
+}));
+
+// Event Committees (Eventos e Comissões) - many-to-many
+export const eventCommittees = pgTable(
+  "event_committees",
+  {
+    eventId: integer("event_id").notNull(),
+    committeeId: integer("committee_id").notNull(),
+    addedAt: timestamp("added_at").defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.eventId, table.committeeId] }),
+  }),
+);
+
+// Relations for event committees
+export const eventCommitteesRelations = relations(eventCommittees, ({ one }) => ({
+  event: one(events, {
+    fields: [eventCommittees.eventId],
+    references: [events.id],
+  }),
+  committee: one(committees, {
+    fields: [eventCommittees.committeeId],
+    references: [committees.id],
   }),
 }));
 
@@ -649,3 +676,12 @@ export const insertCommitteeMemberSchema = createInsertSchema(committeeMembers).
 
 export type InsertCommitteeMember = z.infer<typeof insertCommitteeMemberSchema>;
 export type CommitteeMember = typeof committeeMembers.$inferSelect;
+
+// Insert schema for event committees
+export const insertEventCommitteeSchema = createInsertSchema(eventCommittees).pick({
+  eventId: true,
+  committeeId: true,
+});
+
+export type InsertEventCommittee = z.infer<typeof insertEventCommitteeSchema>;
+export type EventCommittee = typeof eventCommittees.$inferSelect;

@@ -826,6 +826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mapUrl: z.string().optional(),
         videoUrl: z.string().optional(),
         category: z.string(),
+        committeeIds: z.array(z.number()).optional(),
         legislatureId: z.number().int().positive(),
         description: z.string(),
         status: z.string(),
@@ -838,6 +839,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validated,
         eventDate: new Date(validated.eventDate),
       });
+      
+      // Handle committee associations for "Reunião Comissão" events
+      if (validated.category === "Reunião Comissão" && validated.committeeIds && validated.committeeIds.length > 0) {
+        await storage.addEventCommittees(event.id, validated.committeeIds);
+      }
       
       // Send email notification to all councilors
       try {
@@ -899,6 +905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mapUrl: z.string().optional(),
         videoUrl: z.string().optional(),
         category: z.string().optional(),
+        committeeIds: z.array(z.number()).optional(),
         legislatureId: z.number().int().positive().optional(),
         description: z.string().optional(),
         status: z.string().optional(),
@@ -911,6 +918,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validated,
         eventDate: validated.eventDate ? new Date(validated.eventDate) : undefined,
       });
+      
+      // Handle committee associations for "Reunião Comissão" events
+      if (validated.category === "Reunião Comissão" && validated.committeeIds !== undefined) {
+        // Remove existing committee associations
+        await storage.removeEventCommittees(eventId);
+        // Add new committee associations
+        if (validated.committeeIds.length > 0) {
+          await storage.addEventCommittees(eventId, validated.committeeIds);
+        }
+      } else if (validated.category && validated.category !== "Reunião Comissão") {
+        // If changing from "Reunião Comissão" to another category, remove committee associations
+        await storage.removeEventCommittees(eventId);
+      }
       
       if (!updatedEvent) {
         return res.status(404).json({ message: "Evento não encontrado" });
