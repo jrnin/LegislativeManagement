@@ -110,7 +110,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **June 23, 2025**: Implemented complete public committees system
+- **June 23, 2025**: Implemented committee integration for event management
+  - Added "Reunião Comissão" as new event category option in database and forms
+  - Created event_committees junction table for many-to-many relationships between events and committees
+  - Implemented conditional committee selection field that appears when "Reunião Comissão" category is selected
+  - Added multi-select checkbox interface for selecting multiple committees per event
+  - Updated API endpoints to handle committee associations during event creation and updates
+  - Enhanced event management workflow to support committee-specific meetings
   - Created comprehensive committees listing page with search functionality
   - Added individual committee details pages with member hierarchy
   - Integrated committee member management with specific roles (Presidente, Vice-Presidente, Relator, 1º/2º/3º Suplente, Membro)
