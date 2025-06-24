@@ -161,8 +161,8 @@ export interface IStorage {
   getCommittee(id: number): Promise<Committee | undefined>;
   getAllCommittees(): Promise<Committee[]>;
   getCommitteeWithMembers(id: number): Promise<(Committee & { members: (CommitteeMember & { user: User })[] }) | undefined>;
-  createCommittee(committeeData: Partial<Committee>, members: Array<{userId: string, role: string}>): Promise<Committee>;
-  updateCommittee(id: number, committeeData: Partial<Committee>, members?: Array<{userId: string, role: string}>): Promise<Committee | undefined>;
+  createCommittee(committeeData: Partial<Committee>, memberIds: string[]): Promise<Committee>;
+  updateCommittee(id: number, committeeData: Partial<Committee>, memberIds?: string[]): Promise<Committee | undefined>;
   deleteCommittee(id: number): Promise<boolean>;
   
   // Committee Members operations
@@ -1453,14 +1453,14 @@ export class DatabaseStorage implements IStorage {
    * Get committee events
    */
   async getCommitteeEvents(committeeId: number): Promise<Event[]> {
-    const eventsResult = await db
+    const events = await db
       .select()
       .from(events)
       .innerJoin(eventCommittees, eq(events.id, eventCommittees.eventId))
       .where(eq(eventCommittees.committeeId, committeeId))
       .orderBy(desc(events.eventDate));
     
-    return eventsResult.map(result => result.events);
+    return events.map(event => event.events);
   }
 
   /**
