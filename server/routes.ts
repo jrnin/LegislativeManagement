@@ -1020,7 +1020,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: z.string(),
         eventId: z.number().int().positive(),
         activityType: z.string(),
-        needsApproval: z.boolean().optional(),
+        approvalType: z.enum(["", "councilors", "committees"]).optional(),
         authorIds: z.array(z.string()).min(1, "Pelo menos um autor deve ser selecionado"),
       });
       
@@ -1029,7 +1029,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         activityNumber: Number(req.body.activityNumber),
         eventId: Number(req.body.eventId),
-        needsApproval: req.body.needsApproval === 'true',
+        approvalType: req.body.approvalType || "",
         authorIds: Array.isArray(req.body.authorIds) ? req.body.authorIds : [req.body.authorIds],
       };
       
@@ -1057,19 +1057,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       // If activity needs approval, send emails to authorized persons
-      if (validated.needsApproval) {
-        // Get admins to notify
-        const admins = await storage.getAllUsers();
-        const adminUsers = admins.filter(user => user.role === "admin");
-        
-        // Generate base URL
+      if (validated.approvalType && validated.approvalType !== "") {
+        // Get users to notify based on approval type
         const host = req.headers.host || "";
         const protocol = req.headers["x-forwarded-proto"] || req.protocol;
         const baseUrl = `${protocol}://${host}`;
         
-        // Send emails
-        for (const admin of adminUsers) {
-          await sendActivityApprovalRequest(admin, activity, baseUrl);
+        if (validated.approvalType === "councilors") {
+          // Notify all councilors
+          const allUsers = await storage.getAllUsers();
+          const councilors = allUsers.filter(user => user.role === "councilor");
+          
+          for (const councilor of councilors) {
+            await sendActivityApprovalRequest(councilor, activity, baseUrl);
+          }
+        } else if (validated.approvalType === "committees") {
+          // Notify admins for committee approval management
+          const allUsers = await storage.getAllUsers();
+          const adminUsers = allUsers.filter(user => user.role === "admin");
+          
+          for (const admin of adminUsers) {
+            await sendActivityApprovalRequest(admin, activity, baseUrl);
+          }
         }
       }
       

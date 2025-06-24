@@ -27,7 +27,7 @@ const formSchema = z.object({
   description: z.string().min(3, { message: "Descrição é obrigatória" }),
   eventId: z.coerce.number().int().positive({ message: "Evento é obrigatório" }),
   activityType: z.string().min(1, { message: "Tipo de atividade é obrigatório" }),
-  needsApproval: z.boolean().default(false),
+  approvalType: z.enum(["", "councilors", "committees"]).optional(),
   authorIds: z.array(z.string()).min(1, { message: "Pelo menos um autor deve ser selecionado" }),
   file: z.any().optional(),
 });
@@ -71,7 +71,7 @@ export default function ActivityForm() {
       description: "",
       eventId: 0,
       activityType: "",
-      needsApproval: false,
+      approvalType: "",
       authorIds: [],
       file: undefined,
     }
@@ -370,21 +370,28 @@ export default function ActivityForm() {
                 
                 <FormField
                   control={form.control}
-                  name="needsApproval"
+                  name="approvalType"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>Requer Aprovação</FormLabel>
-                        <FormDescription>
-                          Marque esta opção se a atividade necessita ser aprovada pelos vereadores
-                        </FormDescription>
-                      </div>
+                    <FormItem>
+                      <FormLabel>Tipo de Aprovação</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o tipo de aprovação" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="">Não requer aprovação</SelectItem>
+                          <SelectItem value="councilors">Aprovação dos Vereadores</SelectItem>
+                          <SelectItem value="committees">Aprovação das Comissões</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Escolha "Aprovação dos Vereadores" para permitir que todos os vereadores votem, ou "Aprovação das Comissões" para votação restrita aos membros das comissões.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

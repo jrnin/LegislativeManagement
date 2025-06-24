@@ -129,7 +129,7 @@ export const legislativeActivities = pgTable("legislative_activities", {
   filePath: varchar("file_path"),
   fileName: varchar("file_name"),
   fileType: varchar("file_type"),
-  needsApproval: boolean("needs_approval").default(false),
+  approvalType: varchar("approval_type"), // "councilors", "committees", null (no approval needed)
   approved: boolean("approved"),
   approvedBy: varchar("approved_by"),
   approvedAt: timestamp("approved_at"),
@@ -148,6 +148,7 @@ export const legislativeActivitiesRelations = relations(legislativeActivities, (
     relationName: "activity_documents",
   }),
   votes: many(activityVotes),
+  committeeApprovals: many(committeeActivityApprovals),
 }));
 
 // Legislative Activities Authors (many-to-many)
@@ -360,6 +361,34 @@ export const activityVotesRelations = relations(activityVotes, ({ one }) => ({
   }),
 }));
 
+// Committee Activity Approvals table - For committee members to approve activities in committee meetings
+export const committeeActivityApprovals = pgTable("committee_activity_approvals", {
+  id: serial("id").primaryKey(),
+  activityId: integer("activity_id").notNull(),
+  committeeId: integer("committee_id").notNull(),
+  userId: varchar("user_id").notNull(), // Committee member who voted
+  vote: varchar("vote").notNull(), // "Aprovado" or "Reprovado"
+  votedAt: timestamp("voted_at").defaultNow(),
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const committeeActivityApprovalsRelations = relations(committeeActivityApprovals, ({ one }) => ({
+  activity: one(legislativeActivities, {
+    fields: [committeeActivityApprovals.activityId],
+    references: [legislativeActivities.id],
+  }),
+  committee: one(committees, {
+    fields: [committeeActivityApprovals.committeeId],
+    references: [committees.id],
+  }),
+  user: one(users, {
+    fields: [committeeActivityApprovals.userId],
+    references: [users.id],
+  }),
+}));
+
 // Dashboard Stats View (for quick dashboard data retrieval)
 export type DashboardStats = {
   legislatureCount: number;
@@ -413,7 +442,7 @@ export const insertLegislativeActivitySchema = createInsertSchema(legislativeAct
   description: true,
   eventId: true,
   activityType: true,
-  needsApproval: true,
+  approvalType: true,
 });
 
 export const insertDocumentSchema = createInsertSchema(documents).pick({

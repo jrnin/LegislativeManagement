@@ -35,7 +35,7 @@ import {
   type InsertNewsComment
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or } from "drizzle-orm";
+import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or, not } from "drizzle-orm";
 import crypto from "crypto";
 
 // Interface for storage operations
@@ -380,7 +380,7 @@ export class DatabaseStorage implements IStorage {
       userData.emailVerificationSentAt = new Date();
     }
     
-    const [user] = await db.insert(users).values(userData).returning();
+    const [user] = await db.insert(users).values([userData]).returning();
     return user;
   }
   
@@ -470,7 +470,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createLegislature(legislatureData: Partial<Legislature>): Promise<Legislature> {
-    const [legislature] = await db.insert(legislatures).values(legislatureData).returning();
+    const [legislature] = await db.insert(legislatures).values([legislatureData]).returning();
     return legislature;
   }
   
@@ -521,7 +521,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createEvent(eventData: Partial<Event>): Promise<Event> {
-    const [event] = await db.insert(events).values(eventData).returning();
+    const [event] = await db.insert(events).values([eventData]).returning();
     return event;
   }
   
@@ -626,7 +626,7 @@ export class DatabaseStorage implements IStorage {
   
   async createLegislativeActivity(activityData: Partial<LegislativeActivity>, authorIds: string[]): Promise<LegislativeActivity> {
     // First, create the activity
-    const [activity] = await db.insert(legislativeActivities).values(activityData).returning();
+    const [activity] = await db.insert(legislativeActivities).values([activityData]).returning();
     
     // Then, add authors
     if (authorIds && authorIds.length > 0) {
@@ -883,7 +883,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createDocument(documentData: Partial<Document>): Promise<Document> {
-    const [document] = await db.insert(documents).values(documentData).returning();
+    const [document] = await db.insert(documents).values([documentData]).returning();
     return document;
   }
   
@@ -937,7 +937,8 @@ export class DatabaseStorage implements IStorage {
         .from(legislativeActivities)
         .where(
           and(
-            eq(legislativeActivities.needsApproval, true),
+            isNotNull(legislativeActivities.approvalType),
+            not(eq(legislativeActivities.approvalType, "")),
             or(
               eq(legislativeActivities.approved, false),
               isNull(legislativeActivities.approved)
@@ -994,7 +995,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createEventAttendance(attendanceData: Partial<EventAttendance>): Promise<EventAttendance> {
-    const [newAttendance] = await db.insert(eventAttendance).values(attendanceData).returning();
+    const [newAttendance] = await db.insert(eventAttendance).values([attendanceData]).returning();
     return newAttendance;
   }
   
@@ -1078,7 +1079,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     // Create new vote
-    const [newVote] = await db.insert(documentVotes).values(voteData).returning();
+    const [newVote] = await db.insert(documentVotes).values([voteData]).returning();
     return newVote;
   }
   
@@ -1126,7 +1127,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createActivityTimeline(timelineData: Partial<ActivityTimeline>): Promise<ActivityTimeline> {
-    const [newTimelineEvent] = await db.insert(activityTimeline).values(timelineData).returning();
+    const [newTimelineEvent] = await db.insert(activityTimeline).values([timelineData]).returning();
     return newTimelineEvent;
   }
   
