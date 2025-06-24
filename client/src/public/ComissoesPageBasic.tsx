@@ -7,15 +7,9 @@ import { Link } from "wouter";
 import { useState } from "react";
 
 interface CommitteeMember {
-  userId: string;
+  id: string;
+  name: string;
   role: string;
-  addedAt: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
 }
 
 interface Committee {
@@ -176,8 +170,8 @@ export default function ComissoesPageBasic() {
                           <h4 className="font-medium text-gray-900 mb-2">Principais Membros:</h4>
                           <div className="space-y-1">
                             {committee.members.slice(0, 3).map((member) => (
-                              <div key={member.userId} className="flex justify-between items-center text-sm">
-                                <span className="text-gray-700">{member.user.name}</span>
+                              <div key={member.id} className="flex justify-between items-center text-sm">
+                                <span className="text-gray-700">{member.user?.name || member.name}</span>
                                 <Badge variant="outline" className="text-xs">
                                   {member.role}
                                 </Badge>

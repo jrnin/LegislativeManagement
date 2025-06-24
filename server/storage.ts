@@ -1448,39 +1448,6 @@ export class DatabaseStorage implements IStorage {
       members
     };
   }
-
-  /**
-   * Get committee events
-   */
-  async getCommitteeEvents(committeeId: number): Promise<Event[]> {
-    const events = await db
-      .select()
-      .from(events)
-      .innerJoin(eventCommittees, eq(events.id, eventCommittees.eventId))
-      .where(eq(eventCommittees.committeeId, committeeId))
-      .orderBy(desc(events.eventDate));
-    
-    return events.map(event => event.events);
-  }
-
-  /**
-   * Get committee voting activities (legislative activities with committee approval type)
-   */
-  async getCommitteeVotingActivities(committeeId: number): Promise<LegislativeActivity[]> {
-    // Get activities that require committee approval and have documents
-    const activities = await db
-      .select()
-      .from(legislativeActivities)
-      .where(
-        and(
-          eq(legislativeActivities.approvalType, 'committees'),
-          isNotNull(legislativeActivities.filePath)
-        )
-      )
-      .orderBy(desc(legislativeActivities.activityDate));
-    
-    return activities;
-  }
   
   async getAllCommittees(): Promise<Committee[]> {
     return await db

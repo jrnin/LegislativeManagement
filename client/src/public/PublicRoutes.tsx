@@ -13,7 +13,6 @@ import NoticiasPage from './NoticiasPage';
 import NoticiaDetalhePage from './NoticiaDetalhePage';
 import ContatoPage from './ContatoPageFunctional';
 import ComissoesPage from './ComissoesPageBasic';
-import CommitteeDetailsPage from './CommitteeDetailsPage';
 import ComissaoDetalhePage from './ComissaoDetalhePage';
 import NotFound from '@/pages/not-found';
 
@@ -45,8 +44,8 @@ export default function PublicRoutes() {
         <Route path="/comissoes" component={ComissoesPage} />
         <Route path="/public/comissoes" component={ComissoesPage} />
         
-        <Route path="/comissoes/:id" component={CommitteeDetailsPage} />
-        <Route path="/public/comissoes/:id" component={CommitteeDetailsPage} />
+        <Route path="/comissoes/:id" component={ComissaoDetalhePage} />
+        <Route path="/public/comissoes/:id" component={ComissaoDetalhePage} />
         
         <Route path="/public/eventos/:id" component={EventDetailsPage} />
         <Route path="/eventos/:id" component={EventDetailsPage} />
