@@ -71,7 +71,7 @@ export default function ActivityForm() {
       description: "",
       eventId: 0,
       activityType: "",
-      approvalType: "",
+      approvalType: "none",
       authorIds: [],
       file: undefined,
     }
@@ -87,7 +87,7 @@ export default function ActivityForm() {
         description: activity.description || "",
         eventId: activity.eventId,
         activityType: activity.activityType || "",
-        needsApproval: activity.needsApproval || false,
+        approvalType: activity.approvalType || "none",
         authorIds: activity.authors ? activity.authors.map(author => author.id) : [],
         file: undefined,
       });
@@ -104,7 +104,7 @@ export default function ActivityForm() {
       formData.append("description", data.description);
       formData.append("eventId", data.eventId.toString());
       formData.append("activityType", data.activityType);
-      formData.append("needsApproval", data.needsApproval.toString());
+      formData.append("approvalType", data.approvalType);
       
       // Append authors
       data.authorIds.forEach(authorId => {
@@ -156,7 +156,7 @@ export default function ActivityForm() {
       if (data.description) formData.append("description", data.description);
       if (data.eventId) formData.append("eventId", data.eventId.toString());
       if (data.activityType) formData.append("activityType", data.activityType);
-      formData.append("needsApproval", data.needsApproval.toString());
+      formData.append("approvalType", data.approvalType);
       
       // Append authors
       data.authorIds.forEach(authorId => {
@@ -384,7 +384,7 @@ export default function ActivityForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Não requer aprovação</SelectItem>
+                          <SelectItem value="none">Não requer aprovação</SelectItem>
                           <SelectItem value="councilors">Aprovação dos Vereadores</SelectItem>
                           <SelectItem value="committees">Aprovação das Comissões</SelectItem>
                         </SelectContent>
