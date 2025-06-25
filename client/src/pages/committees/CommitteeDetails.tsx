@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { EditIcon, ArrowLeft, Users, AlertTriangle, Calendar, MapPin, Clock, ExternalLink } from "lucide-react";
+import { EditIcon, ArrowLeft, Users, AlertTriangle, Calendar, MapPin, Clock, ExternalLink, Eye, FileText, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Committee, User } from "@shared/schema";
 import {
@@ -48,6 +48,8 @@ export default function CommitteeDetails() {
     role: string;
   } | null>(null);
   const [newRole, setNewRole] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [eventDetailsOpen, setEventDetailsOpen] = useState(false);
 
   const { data: committee, isLoading, error } = useQuery({
     queryKey: [`/api/committees/${id}`],
@@ -57,6 +59,11 @@ export default function CommitteeDetails() {
   const { data: committeeEvents, isLoading: isLoadingEvents } = useQuery({
     queryKey: [`/api/committees/${id}/events`],
     enabled: !!id,
+  });
+
+  const { data: eventDetails, isLoading: isLoadingEventDetails } = useQuery({
+    queryKey: [`/api/events/${selectedEvent?.id}`],
+    enabled: !!selectedEvent?.id,
   });
 
 
@@ -136,6 +143,11 @@ export default function CommitteeDetails() {
       setRoleDialogOpen(false);
       setSelectedMember(null);
     }
+  };
+
+  const handleEventClick = (event: any) => {
+    setSelectedEvent(event);
+    setEventDetailsOpen(true);
   };
 
   return (
@@ -335,7 +347,7 @@ export default function CommitteeDetails() {
               ) : (
                 <div className="space-y-4">
                   {committeeEvents.map((event: any) => (
-                    <div key={event.id} className="border rounded-lg p-4">
+                    <div key={event.id} className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => handleEventClick(event)}>
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h3 className="font-semibold text-lg">
@@ -378,11 +390,23 @@ export default function CommitteeDetails() {
                       )}
                       
                       <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEventClick(event);
+                          }}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Ver Detalhes
+                        </Button>
                         {event.videoUrl && (
                           <Button
                             variant="outline"
                             size="sm"
                             asChild
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <a href={event.videoUrl} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-4 w-4 mr-1" />
@@ -395,6 +419,7 @@ export default function CommitteeDetails() {
                             variant="outline"
                             size="sm"
                             asChild
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <a href={event.mapUrl} target="_blank" rel="noopener noreferrer">
                               <MapPin className="h-4 w-4 mr-1" />
@@ -443,6 +468,169 @@ export default function CommitteeDetails() {
             </Button>
             <Button onClick={updateMemberRole}>Salvar</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Event Details Dialog */}
+      <Dialog open={eventDetailsOpen} onOpenChange={setEventDetailsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedEvent && `Reunião ${selectedEvent.eventNumber} - ${committee.name}`}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedEvent && format(new Date(selectedEvent.eventDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })} às {selectedEvent?.eventTime}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {isLoadingEventDetails ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Carregando detalhes do evento...</p>
+            </div>
+          ) : eventDetails ? (
+            <div className="space-y-6">
+              {/* Event Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Informações do Evento</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span>{format(new Date(selectedEvent.eventDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>{selectedEvent.eventTime}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{selectedEvent.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          selectedEvent.status === "Concluido"
+                            ? "secondary"
+                            : selectedEvent.status === "Andamento"
+                            ? "default"
+                            : selectedEvent.status === "Cancelado"
+                            ? "destructive"
+                            : "outline"
+                        }
+                      >
+                        {selectedEvent.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Descrição</h3>
+                  <p className="text-sm text-gray-600">{selectedEvent.description}</p>
+                </div>
+              </div>
+
+              {/* Activities */}
+              {eventDetails.activities && eventDetails.activities.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Atividades da Reunião ({eventDetails.activities.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {eventDetails.activities.map((activity: any) => (
+                      <div key={activity.id} className="border rounded-lg p-3">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-medium">{activity.activityType} #{activity.activityNumber}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
+                          </div>
+                          <Badge variant="outline">
+                            {activity.approved ? "Aprovado" : "Pendente"}
+                          </Badge>
+                        </div>
+                        {activity.authors && activity.authors.length > 0 && (
+                          <div className="text-xs text-gray-500">
+                            Autores: {activity.authors.map((author: any) => author.user.name).join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Documents */}
+              {eventDetails.documents && eventDetails.documents.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Documentos ({eventDetails.documents.length})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {eventDetails.documents.map((document: any) => (
+                      <div key={document.id} className="border rounded-lg p-3">
+                        <div className="flex items-start gap-3">
+                          <FileText className="h-5 w-5 text-blue-600 mt-1" />
+                          <div className="flex-1">
+                            <h4 className="font-medium text-sm">{document.title}</h4>
+                            <p className="text-xs text-gray-600 mt-1">{document.description}</p>
+                            {document.filePath && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="mt-2"
+                                asChild
+                              >
+                                <a href={`/api/documents/${document.id}/download`} target="_blank">
+                                  Download
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Attendance */}
+              {eventDetails.attendance && eventDetails.attendance.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                    <UserCheck className="h-5 w-5" />
+                    Presença ({eventDetails.attendance.length})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {eventDetails.attendance.map((attendance: any) => (
+                      <div key={attendance.userId} className="flex items-center gap-3 p-2 border rounded">
+                        <div className="flex-1">
+                          <span className="font-medium">{attendance.user.name}</span>
+                        </div>
+                        <Badge
+                          variant={
+                            attendance.status === "Presente"
+                              ? "default"
+                              : attendance.status === "Ausente"
+                              ? "destructive"
+                              : "secondary"
+                          }
+                        >
+                          {attendance.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Não foi possível carregar os detalhes do evento.</p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
