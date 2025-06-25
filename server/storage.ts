@@ -1757,6 +1757,74 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
   
+  async getCommitteeLegislativeActivities(committeeId: number, activityType?: string): Promise<any[]> {
+    // Get events associated with this committee
+    const committeeEventIds = await db
+      .select({ eventId: eventCommittees.eventId })
+      .from(eventCommittees)
+      .where(eq(eventCommittees.committeeId, committeeId));
+    
+    if (committeeEventIds.length === 0) {
+      return [];
+    }
+    
+    const eventIds = committeeEventIds.map(row => row.eventId);
+    
+    // Build query for legislative activities
+    let query = db
+      .select({
+        id: legislativeActivities.id,
+        activityNumber: legislativeActivities.activityNumber,
+        activityDate: legislativeActivities.activityDate,
+        description: legislativeActivities.description,
+        eventId: legislativeActivities.eventId,
+        activityType: legislativeActivities.activityType,
+        filePath: legislativeActivities.filePath,
+        fileName: legislativeActivities.fileName,
+        fileType: legislativeActivities.fileType,
+        approvalType: legislativeActivities.approvalType,
+        approved: legislativeActivities.approved,
+        approvedBy: legislativeActivities.approvedBy,
+        approvedAt: legislativeActivities.approvedAt,
+        approvalComment: legislativeActivities.approvalComment,
+        createdAt: legislativeActivities.createdAt,
+        updatedAt: legislativeActivities.updatedAt,
+      })
+      .from(legislativeActivities)
+      .where(inArray(legislativeActivities.eventId, eventIds));
+    
+    // Filter by activity type if specified
+    if (activityType) {
+      query = query.where(and(
+        inArray(legislativeActivities.eventId, eventIds),
+        eq(legislativeActivities.activityType, activityType)
+      ));
+    }
+    
+    const activities = await query.orderBy(desc(legislativeActivities.activityDate));
+    
+    // Get authors for each activity
+    const activitiesWithAuthors = await Promise.all(
+      activities.map(async (activity) => {
+        const authors = await db
+          .select({
+            userId: legislativeActivitiesAuthors.userId,
+            user: users
+          })
+          .from(legislativeActivitiesAuthors)
+          .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
+          .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
+        
+        return {
+          ...activity,
+          authors
+        };
+      })
+    );
+    
+    return activitiesWithAuthors;
+  }
+  
   /**
    * Search across all entities
    */

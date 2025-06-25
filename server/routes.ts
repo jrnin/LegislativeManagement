@@ -2875,6 +2875,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get committee legislative activities
+  app.get('/api/committees/:id/activities', requireAuth, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.id);
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+
+      const activityType = req.query.type as string;
+      const activities = await storage.getCommitteeLegislativeActivities(committeeId, activityType);
+      res.json(activities);
+    } catch (error) {
+      console.error("Error fetching committee activities:", error);
+      res.status(500).json({ message: "Erro ao buscar atividades da comissão" });
+    }
+  });
+
   // Create a new committee
   app.post('/api/committees', requireAuth, requireAdmin, async (req, res) => {
     try {
