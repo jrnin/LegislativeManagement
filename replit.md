@@ -124,10 +124,10 @@ Preferred communication style: Simple, everyday language.
   - Implemented clickable navigation between committees list and detail views
   - Added responsive design with statistics cards and member information display
 
-- **June 25, 2025**: Enhanced committee dashboard with commission meeting events
+- **June 25, 2025**: Enhanced committee dashboard with commission meeting events and legislative activities
   - Added commission meeting events display in committee details page
   - Created new API endpoint `/api/committees/:id/events` to fetch committee-specific events
-  - Implemented tabbed interface with "Membros da Comissão" and "Reuniões" tabs
+  - Implemented tabbed interface with "Membros da Comissão", "Reuniões", and "Projetos de Lei" tabs
   - Added clickable event cards showing date, time, location, and status information
   - Created detailed event modal with comprehensive information including:
     - Complete event information (date, time, location, status)
@@ -136,6 +136,11 @@ Preferred communication style: Simple, everyday language.
     - Attendance tracking for committee members
   - Enhanced user experience with hover effects and smooth interactions
   - Integrated event details fetching using existing event API endpoints
+  - Added "Projetos de Lei" tab displaying bill projects associated with committee
+  - Created API endpoint `/api/committees/:id/activities` with activity type filtering
+  - Implemented database method `getCommitteeLegislativeActivities()` to fetch activities by committee
+  - Added comprehensive bill display showing approval status, authors, descriptions, and documents
+  - Integrated download functionality and detailed view links for each bill project
 
 ## Changelog
 
