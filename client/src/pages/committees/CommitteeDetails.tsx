@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { EditIcon, ArrowLeft, Users, AlertTriangle } from "lucide-react";
+import { EditIcon, ArrowLeft, Users, AlertTriangle, Calendar, MapPin, Clock, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Committee, User } from "@shared/schema";
 import {
@@ -51,6 +51,11 @@ export default function CommitteeDetails() {
 
   const { data: committee, isLoading, error } = useQuery({
     queryKey: [`/api/committees/${id}`],
+    enabled: !!id,
+  });
+
+  const { data: committeeEvents, isLoading: isLoadingEvents } = useQuery({
+    queryKey: [`/api/committees/${id}/events`],
     enabled: !!id,
   });
 
@@ -230,7 +235,14 @@ export default function CommitteeDetails() {
         </Card>
       </div>
 
-      <Card>
+      <Tabs defaultValue="members" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="members">Membros da Comissão</TabsTrigger>
+          <TabsTrigger value="events">Reuniões</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="members" className="mt-6">
+          <Card>
         <CardHeader>
           <CardTitle>Membros da Comissão</CardTitle>
         </CardHeader>
@@ -297,6 +309,108 @@ export default function CommitteeDetails() {
           )}
         </CardContent>
       </Card>
+        </TabsContent>
+        
+        <TabsContent value="events" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reuniões da Comissão</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoadingEvents ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Carregando reuniões...</p>
+                </div>
+              ) : !committeeEvents || committeeEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <Calendar className="mx-auto h-12 w-12 text-muted-foreground" />
+                  <h3 className="mt-2 text-lg font-semibold">
+                    Nenhuma reunião encontrada
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Esta comissão ainda não possui reuniões agendadas.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {committeeEvents.map((event: any) => (
+                    <div key={event.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-semibold text-lg">
+                            Reunião {event.eventNumber}
+                          </h3>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {format(new Date(event.eventDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {event.eventTime}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-4 w-4" />
+                              {event.location}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge
+                          variant={
+                            event.status === "Concluido"
+                              ? "secondary"
+                              : event.status === "Andamento"
+                              ? "default"
+                              : event.status === "Cancelado"
+                              ? "destructive"
+                              : "outline"
+                          }
+                        >
+                          {event.status}
+                        </Badge>
+                      </div>
+                      
+                      {event.description && (
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          {event.description}
+                        </p>
+                      )}
+                      
+                      <div className="flex gap-2">
+                        {event.videoUrl && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                          >
+                            <a href={event.videoUrl} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4 mr-1" />
+                              Assistir
+                            </a>
+                          </Button>
+                        )}
+                        {event.mapUrl && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                          >
+                            <a href={event.mapUrl} target="_blank" rel="noopener noreferrer">
+                              <MapPin className="h-4 w-4 mr-1" />
+                              Localização
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
         <DialogContent>

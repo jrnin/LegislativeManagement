@@ -1729,6 +1729,34 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
   
+  async getCommitteeEvents(committeeId: number): Promise<any[]> {
+    const result = await db
+      .select({
+        id: events.id,
+        eventNumber: events.eventNumber,
+        eventDate: events.eventDate,
+        eventTime: events.eventTime,
+        location: events.location,
+        mapUrl: events.mapUrl,
+        videoUrl: events.videoUrl,
+        category: events.category,
+        legislatureId: events.legislatureId,
+        description: events.description,
+        status: events.status,
+        createdAt: events.createdAt,
+        updatedAt: events.updatedAt,
+      })
+      .from(eventCommittees)
+      .innerJoin(events, eq(eventCommittees.eventId, events.id))
+      .where(and(
+        eq(eventCommittees.committeeId, committeeId),
+        eq(events.category, "Reunião Comissão")
+      ))
+      .orderBy(desc(events.eventDate));
+    
+    return result;
+  }
+  
   /**
    * Search across all entities
    */

@@ -2859,6 +2859,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get committee events
+  app.get('/api/committees/:id/events', requireAuth, async (req, res) => {
+    try {
+      const committeeId = parseInt(req.params.id);
+      if (isNaN(committeeId)) {
+        return res.status(400).json({ message: "ID da comissão inválido" });
+      }
+
+      const events = await storage.getCommitteeEvents(committeeId);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching committee events:", error);
+      res.status(500).json({ message: "Erro ao buscar eventos da comissão" });
+    }
+  });
+
   // Create a new committee
   app.post('/api/committees', requireAuth, requireAdmin, async (req, res) => {
     try {
