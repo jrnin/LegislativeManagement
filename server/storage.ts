@@ -1825,48 +1825,6 @@ export class DatabaseStorage implements IStorage {
     return activitiesWithAuthors;
   }
   
-  async updateLegislativeActivityStatus(
-    activityId: number,
-    status: string,
-    updatedBy: string,
-    comment?: string
-  ): Promise<any> {
-    try {
-      const [updatedActivity] = await db
-        .update(legislativeActivities)
-        .set({
-          status,
-          statusUpdatedBy: updatedBy,
-          statusUpdatedAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .where(eq(legislativeActivities.id, activityId))
-        .returning();
-
-      // If there's a comment, add it to the timeline
-      if (comment) {
-        await db.insert(activityTimeline).values({
-          activityId,
-          action: "status_update",
-          description: `Status alterado para: ${status}. Comentário: ${comment}`,
-          createdBy: updatedBy,
-        });
-      } else {
-        await db.insert(activityTimeline).values({
-          activityId,
-          action: "status_update",
-          description: `Status alterado para: ${status}`,
-          createdBy: updatedBy,
-        });
-      }
-
-      return updatedActivity;
-    } catch (error) {
-      console.error("Error updating activity status:", error);
-      throw error;
-    }
-  }
-  
   /**
    * Search across all entities
    */

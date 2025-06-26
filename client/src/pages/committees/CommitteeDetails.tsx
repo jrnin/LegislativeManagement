@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { EditIcon, ArrowLeft, Users, AlertTriangle, Calendar, MapPin, Clock, ExternalLink, Eye, FileText, UserCheck, Gavel, Download, Edit3 } from "lucide-react";
+import { EditIcon, ArrowLeft, Users, AlertTriangle, Calendar, MapPin, Clock, ExternalLink, Eye, FileText, UserCheck, Gavel, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Committee, User } from "@shared/schema";
 import {
@@ -50,10 +50,6 @@ export default function CommitteeDetails() {
   const [newRole, setNewRole] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [eventDetailsOpen, setEventDetailsOpen] = useState(false);
-  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
-  const [selectedBill, setSelectedBill] = useState<any>(null);
-  const [newStatus, setNewStatus] = useState("");
-  const [statusComment, setStatusComment] = useState("");
 
   const { data: committee, isLoading, error } = useQuery({
     queryKey: [`/api/committees/${id}`],
@@ -162,64 +158,6 @@ export default function CommitteeDetails() {
   const handleEventClick = (event: any) => {
     setSelectedEvent(event);
     setEventDetailsOpen(true);
-  };
-
-  const statusOptions = [
-    "Aguardando Análise",
-    "Análise de Parecer", 
-    "Aguardando Deliberação",
-    "Aguardando Despacho do Presidente",
-    "Aguardando Envio ao Executivo",
-    "Devolvida ao Autor",
-    "Pronta para Pauta",
-    "Tramitando em Conjunto",
-    "Tramitação Finalizada",
-    "Vetado"
-  ];
-
-  const updateStatusMutation = useMutation({
-    mutationFn: async (data: { activityId: number; status: string; comment?: string }) => {
-      return apiRequest(`/api/activities/${data.activityId}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: data.status, comment: data.comment }),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/committees/${id}/activities?type=Projeto de Lei`] });
-      setIsStatusDialogOpen(false);
-      setSelectedBill(null);
-      setNewStatus("");
-      setStatusComment("");
-      toast({
-        title: "Status atualizado",
-        description: "O status do projeto de lei foi atualizado com sucesso.",
-      });
-    },
-    onError: (error: any) => {
-      console.error('Erro ao atualizar status:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar status do projeto de lei.",
-        variant: "destructive",
-      });
-    }
-  });
-
-  const handleStatusUpdate = () => {
-    if (!newStatus || !selectedBill) return;
-    
-    updateStatusMutation.mutate({
-      activityId: selectedBill.id,
-      status: newStatus,
-      comment: statusComment || undefined
-    });
-  };
-
-  const openStatusDialog = (bill: any) => {
-    setSelectedBill(bill);
-    setNewStatus(bill.status || "Aguardando Análise");
-    setStatusComment("");
-    setIsStatusDialogOpen(true);
   };
 
   return (
@@ -547,22 +485,6 @@ export default function CommitteeDetails() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-2">
-                          <div className="flex items-center gap-2">
-                            <Badge
-                              variant="secondary"
-                              className="bg-gray-100"
-                            >
-                              {bill.status || "Aguardando Análise"}
-                            </Badge>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={() => openStatusDialog(bill)}
-                            >
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
-                          </div>
                           <Badge
                             variant={
                               bill.approved === true
@@ -835,55 +757,6 @@ export default function CommitteeDetails() {
               <p className="text-gray-600">Não foi possível carregar os detalhes do evento.</p>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Status Update Dialog */}
-      <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Alterar Status do Projeto de Lei</DialogTitle>
-            <DialogDescription>
-              {selectedBill && `Projeto de Lei #${selectedBill.activityNumber}`}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="status">Novo Status</Label>
-              <Select value={newStatus} onValueChange={setNewStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="comment">Comentário (opcional)</Label>
-              <Textarea
-                id="comment"
-                placeholder="Adicione um comentário sobre a mudança de status..."
-                value={statusComment}
-                onChange={(e) => setStatusComment(e.target.value)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsStatusDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleStatusUpdate}
-              disabled={!newStatus || updateStatusMutation.isPending}
-            >
-              {updateStatusMutation.isPending ? 'Atualizando...' : 'Atualizar Status'}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

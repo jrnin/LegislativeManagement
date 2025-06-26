@@ -126,7 +126,6 @@ export const legislativeActivities = pgTable("legislative_activities", {
   description: text("description").notNull(),
   eventId: integer("event_id").notNull(),
   activityType: varchar("activity_type").notNull(), // "Pauta", "Indicação", "Requerimento", "Resolução", "Mensagem", "Moção", "Projeto de Lei"
-  status: varchar("status").default("Aguardando Análise").notNull(), // New status field
   filePath: varchar("file_path"),
   fileName: varchar("file_name"),
   fileType: varchar("file_type"),
@@ -135,8 +134,6 @@ export const legislativeActivities = pgTable("legislative_activities", {
   approvedBy: varchar("approved_by"),
   approvedAt: timestamp("approved_at"),
   approvalComment: text("approval_comment"),
-  statusUpdatedBy: varchar("status_updated_by"), // User who last updated the status
-  statusUpdatedAt: timestamp("status_updated_at"), // When status was last updated
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -446,24 +443,6 @@ export const insertLegislativeActivitySchema = createInsertSchema(legislativeAct
   eventId: true,
   activityType: true,
   approvalType: true,
-  status: true,
-});
-
-// Status update schema
-export const updateActivityStatusSchema = z.object({
-  status: z.enum([
-    "Aguardando Análise",
-    "Análise de Parecer", 
-    "Aguardando Deliberação",
-    "Aguardando Despacho do Presidente",
-    "Aguardando Envio ao Executivo",
-    "Devolvida ao Autor",
-    "Pronta para Pauta",
-    "Tramitando em Conjunto",
-    "Tramitação Finalizada",
-    "Vetado"
-  ]),
-  comment: z.string().optional(),
 });
 
 export const insertDocumentSchema = createInsertSchema(documents).pick({
