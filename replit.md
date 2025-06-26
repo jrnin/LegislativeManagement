@@ -142,6 +142,15 @@ Preferred communication style: Simple, everyday language.
   - Added comprehensive bill display showing approval status, authors, descriptions, and documents
   - Integrated download functionality and detailed view links for each bill project
 
+- **June 26, 2025**: Updated legislative activity status system with comprehensive situation tracking
+  - Replaced simplified status options with detailed legislative workflow statuses
+  - Updated situation options to reflect real legislative process: Arquivado, Aguardando Análise, Análise de Parecer, Aguardando Deliberação, Aguardando Despacho do Presidente, Aguardando Envio ao Executivo, Devolvida ao Autor, Pronta para Pauta, Tramitando em Conjunto, Tramitação Finalizada, Vetado
+  - Modified database schema to set "Aguardando Análise" as default status for new activities
+  - Updated all existing records from "Em Tramitação" to "Aguardando Análise" to maintain data consistency
+  - Enhanced frontend forms with comprehensive situation selection dropdown
+  - Updated backend API routes to process new situation field in creation and editing workflows
+  - Integrated situation validation across all legislative activity endpoints
+
 ## Changelog
 
 - June 23, 2025. Initial setup

@@ -232,11 +232,16 @@ export default function ActivityForm() {
   ];
 
   const situacaoOptions = [
-    "Em Tramitação",
-    "Aprovado",
-    "Rejeitado",
     "Arquivado",
-    "Retirado",
+    "Aguardando Análise",
+    "Análise de Parecer",
+    "Aguardando Deliberação",
+    "Aguardando Despacho do Presidente",
+    "Aguardando Envio ao Executivo",
+    "Devolvida ao Autor",
+    "Pronta para Pauta",
+    "Tramitando em Conjunto",
+    "Tramitação Finalizada",
     "Vetado"
   ];
 
