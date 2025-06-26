@@ -27,6 +27,7 @@ const formSchema = z.object({
   description: z.string().min(3, { message: "Descrição é obrigatória" }),
   eventId: z.coerce.number().int().positive({ message: "Evento é obrigatório" }),
   activityType: z.string().min(1, { message: "Tipo de atividade é obrigatório" }),
+  situacao: z.string().min(1, { message: "Situação é obrigatória" }),
   approvalType: z.enum(["", "councilors", "committees"]).optional(),
   authorIds: z.array(z.string()).min(1, { message: "Pelo menos um autor deve ser selecionado" }),
   file: z.any().optional(),
@@ -71,6 +72,7 @@ export default function ActivityForm() {
       description: "",
       eventId: 0,
       activityType: "",
+      situacao: "Em Tramitação",
       approvalType: "none",
       authorIds: [],
       file: undefined,
@@ -87,6 +89,7 @@ export default function ActivityForm() {
         description: activity.description || "",
         eventId: activity.eventId,
         activityType: activity.activityType || "",
+        situacao: activity.situacao || "Em Tramitação",
         approvalType: activity.approvalType || "none",
         authorIds: activity.authors ? activity.authors.map(author => author.id) : [],
         file: undefined,
@@ -104,6 +107,7 @@ export default function ActivityForm() {
       formData.append("description", data.description);
       formData.append("eventId", data.eventId.toString());
       formData.append("activityType", data.activityType);
+      formData.append("situacao", data.situacao);
       formData.append("approvalType", data.approvalType);
       
       // Append authors
@@ -156,6 +160,7 @@ export default function ActivityForm() {
       if (data.description) formData.append("description", data.description);
       if (data.eventId) formData.append("eventId", data.eventId.toString());
       if (data.activityType) formData.append("activityType", data.activityType);
+      if (data.situacao) formData.append("situacao", data.situacao);
       formData.append("approvalType", data.approvalType);
       
       // Append authors
@@ -226,6 +231,15 @@ export default function ActivityForm() {
     "Ata"
   ];
 
+  const situacaoOptions = [
+    "Em Tramitação",
+    "Aprovado",
+    "Rejeitado",
+    "Arquivado",
+    "Retirado",
+    "Vetado"
+  ];
+
   if (activityLoading) {
     return <div className="flex justify-center items-center h-96">Carregando...</div>;
   }
@@ -258,7 +272,7 @@ export default function ActivityForm() {
                 <Separator />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="activityNumber"
@@ -306,6 +320,34 @@ export default function ActivityForm() {
                           {activityTypes.map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="situacao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Situação</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a situação" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {situacaoOptions.map((situacao) => (
+                            <SelectItem key={situacao} value={situacao}>
+                              {situacao}
                             </SelectItem>
                           ))}
                         </SelectContent>
