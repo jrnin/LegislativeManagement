@@ -2892,6 +2892,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update legislative activity status
+  app.patch('/api/activities/:id/status', requireAuth, async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.id);
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "ID da atividade inválido" });
+      }
+
+      const { updateActivityStatusSchema } = await import("@shared/schema");
+      const validated = updateActivityStatusSchema.parse(req.body);
+      
+      const user = req.user as any;
+      const updatedActivity = await storage.updateLegislativeActivityStatus(
+        activityId,
+        validated.status,
+        user.id,
+        validated.comment
+      );
+
+      res.json(updatedActivity);
+    } catch (error) {
+      console.error("Error updating activity status:", error);
+      res.status(500).json({ message: "Erro ao atualizar status da atividade" });
+    }
+  });
+
   // Create a new committee
   app.post('/api/committees', requireAuth, requireAdmin, async (req, res) => {
     try {
