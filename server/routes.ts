@@ -2772,6 +2772,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Erro ao buscar voto do usuário" });
     }
   });
+
+  // Admin route for batch voting - allows administrator to register votes for multiple councilors
+  app.post('/api/activities/:activityId/votes/admin', requireAdmin, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      const { votes } = req.body; // Expected format: [{ userId: string, vote: boolean, comment?: string }]
+      
+      // Validar entrada
+      if (!Array.isArray(votes) || votes.length === 0) {
+        return res.status(400).json({ message: "Lista de votos é obrigatória e deve conter pelo menos um voto" });
+      }
+      
+      // Verificar se a atividade existe
+      const activity = await storage.getLegislativeActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Validar esquema de cada voto
+      const voteSchema = z.object({
+        userId: z.string().min(1, "ID do usuário é obrigatório"),
+        vote: z.boolean(),
+        comment: z.string().optional()
+      });
+      
+      const validatedVotes = votes.map((vote, index) => {
+        try {
+          return voteSchema.parse(vote);
+        } catch (error) {
+          throw new Error(`Voto ${index + 1} inválido: ${error instanceof z.ZodError ? error.errors[0].message : 'Formato inválido'}`);
+        }
+      });
+      
+      // Verificar se todos os usuários existem e são vereadores
+      for (const voteData of validatedVotes) {
+        const user = await storage.getUser(voteData.userId);
+        if (!user) {
+          return res.status(400).json({ message: `Usuário ${voteData.userId} não encontrado` });
+        }
+        if (user.role !== "councilor") {
+          return res.status(400).json({ message: `Usuário ${user.name} não é um vereador` });
+        }
+      }
+      
+      // Registrar todos os votos
+      const savedVotes = [];
+      const adminUser = await storage.getUser(req.user?.claims?.sub || req.user?.id || (req as any).userId);
+      
+      for (const voteData of validatedVotes) {
+        const savedVote = await storage.createActivityVote({
+          activityId,
+          userId: voteData.userId,
+          vote: voteData.vote,
+          comment: voteData.comment || null,
+          votedAt: new Date()
+        });
+        
+        savedVotes.push(savedVote);
+        
+        // Registrar no timeline da atividade
+        const voter = await storage.getUser(voteData.userId);
+        await storage.createActivityTimeline({
+          activityId,
+          description: `Voto ${voteData.vote ? 'favorável' : 'contrário'} registrado por administrador para ${voter?.name || voteData.userId}`,
+          eventType: "admin_vote",
+          createdBy: adminUser?.id || "system",
+          eventDate: new Date(),
+          metadata: {
+            voteId: savedVote.id,
+            voterId: voteData.userId,
+            voterName: voter?.name,
+            vote: voteData.vote,
+            comment: voteData.comment || null,
+            registeredByAdmin: true,
+            adminId: adminUser?.id,
+            adminName: adminUser?.name
+          }
+        });
+      }
+      
+      // Buscar estatísticas atualizadas
+      const stats = await storage.getActivityVotesStats(activityId);
+      
+      // Buscar dados completos da atividade
+      const activityDetails = await storage.getLegislativeActivity(activityId);
+      
+      // Enviar notificação via WebSocket para votação administrativa
+      if (typeof sendNotification === 'function' && activityDetails) {
+        sendNotification('all', {
+          type: 'admin_batch_vote',
+          activityId,
+          activity: {
+            id: activityId,
+            title: `${activityDetails.activityType} Nº ${activityDetails.activityNumber}`,
+            description: activityDetails.description
+          },
+          adminName: adminUser?.name || 'Administrador',
+          votesCount: savedVotes.length,
+          stats: stats,
+          message: `${adminUser?.name || 'Administrador'} registrou ${savedVotes.length} votos para a atividade ${activityDetails.activityType} Nº ${activityDetails.activityNumber}`,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      res.json({
+        message: `${savedVotes.length} votos registrados com sucesso`,
+        votes: savedVotes,
+        stats
+      });
+    } catch (error) {
+      console.error("Error submitting admin batch votes:", error);
+      res.status(500).json({ 
+        message: "Erro ao registrar votos administrativos",
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
+    }
+  });
   
   // Obter o histórico de eventos da atividade (timeline)
   app.get('/api/activities/:activityId/timeline', requireAuth, async (req, res) => {

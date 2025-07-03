@@ -18,7 +18,11 @@ import {
   Activity,
   ThumbsUp,
   ThumbsDown,
-  MessageSquare
+  MessageSquare,
+  Vote,
+  Plus,
+  Check,
+  X
 } from "lucide-react";
 import {
   Card,
@@ -50,6 +54,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/utils/formatters";
 import { Textarea } from "@/components/ui/textarea";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ActivityDetails() {
   const { id } = useParams<{ id: string }>();
@@ -61,6 +76,10 @@ export default function ActivityDetails() {
   const [activityVote, setActivityVote] = useState<boolean | null>(null);
   const [voteComment, setVoteComment] = useState("");
   const [showVoteDialog, setShowVoteDialog] = useState(false);
+  const [showAdminVoteDialog, setShowAdminVoteDialog] = useState(false);
+  const [selectedCouncilors, setSelectedCouncilors] = useState<{
+    [userId: string]: { selected: boolean; vote: boolean | null; comment: string }
+  }>({});
   const fileViewerRef = useRef<HTMLIFrameElement>(null);
 
   interface ActivityType {
@@ -177,6 +196,18 @@ export default function ActivityDetails() {
     enabled: !isNaN(activityId) && isAuthenticated && !!activity
   });
 
+  // Buscar todos os usuários (para votação administrativa)
+  const {
+    data: allUsers = [],
+    isLoading: loadingUsers
+  } = useQuery<Array<{ id: string; name: string; role: string; profileImageUrl?: string }>>({
+    queryKey: ["/api/users"],
+    enabled: user?.role === "admin"
+  });
+
+  // Filtrar apenas vereadores
+  const councilors = allUsers.filter(u => u.role === "councilor");
+
   // Mutação para excluir atividade
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -231,6 +262,71 @@ export default function ActivityDetails() {
       });
     }
   });
+
+  // Mutation para votação administrativa
+  const adminVoteMutation = useMutation({
+    mutationFn: async (votes: Array<{ userId: string; vote: boolean; comment?: string }>) => {
+      return await apiRequest("POST", `/api/activities/${activityId}/votes/admin`, { 
+        votes 
+      });
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Votos registrados",
+        description: `${data.count || 0} votos foram registrados com sucesso.`
+      });
+      setShowAdminVoteDialog(false);
+      setSelectedCouncilors({});
+      
+      // Recarregar dados
+      queryClient.invalidateQueries({ queryKey: [`/api/activities/${activityId}/votes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/activities/${activityId}/votes/stats`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/activities/${activityId}/timeline`] });
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao registrar votos",
+        description: error.message
+      });
+    }
+  });
+
+  // Função para registrar votos administrativos
+  const handleAdminVote = () => {
+    const votesToSubmit = Object.entries(selectedCouncilors)
+      .filter(([_, data]) => data.selected && data.vote !== null)
+      .map(([userId, data]) => ({
+        userId,
+        vote: data.vote!,
+        comment: data.comment || undefined
+      }));
+
+    if (votesToSubmit.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Nenhum voto selecionado",
+        description: "Selecione pelo menos um vereador e defina o voto."
+      });
+      return;
+    }
+
+    adminVoteMutation.mutate(votesToSubmit);
+  };
+
+  // Função para atualizar seleção de vereador
+  const updateCouncilorSelection = (userId: string, field: string, value: any) => {
+    setSelectedCouncilors(prev => ({
+      ...prev,
+      [userId]: {
+        selected: false,
+        vote: null,
+        comment: "",
+        ...prev[userId],
+        [field]: value
+      }
+    }));
+  };
 
   // Verificar se o usuário pode editar a atividade
   const canEdit = () => {
@@ -341,6 +437,147 @@ export default function ActivityDetails() {
                 Excluir
               </Button>
             </>
+          )}
+          {user?.role === "admin" && (
+            <Dialog open={showAdminVoteDialog} onOpenChange={setShowAdminVoteDialog}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="secondary"
+                  className="bg-purple-100 text-purple-700 hover:bg-purple-200"
+                >
+                  <Vote className="mr-2 h-4 w-4" />
+                  Registrar Votos
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Registrar Votos dos Vereadores</DialogTitle>
+                  <DialogDescription>
+                    Selecione os vereadores e registre seus votos para esta atividade legislativa.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4 py-4">
+                  {councilors.length === 0 ? (
+                    <p className="text-center text-gray-500 py-8">
+                      Nenhum vereador cadastrado no sistema.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {councilors.map((councilor) => {
+                        const current = selectedCouncilors[councilor.id] || { 
+                          selected: false, 
+                          vote: null, 
+                          comment: "" 
+                        };
+                        
+                        // Verificar se o vereador já votou
+                        const existingVote = votes.find(v => v.userId === councilor.id);
+                        
+                        return (
+                          <div key={councilor.id} className="border rounded-lg p-4 space-y-3">
+                            <div className="flex items-center space-x-3">
+                              <Checkbox
+                                checked={current.selected}
+                                onCheckedChange={(checked) => 
+                                  updateCouncilorSelection(councilor.id, 'selected', checked)
+                                }
+                                disabled={!!existingVote}
+                              />
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={councilor.profileImageUrl} />
+                                <AvatarFallback>
+                                  {councilor.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <p className="font-medium">{councilor.name}</p>
+                                {existingVote && (
+                                  <p className="text-sm text-gray-500">
+                                    Já votou: {existingVote.vote ? 'Aprovado' : 'Rejeitado'}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {current.selected && !existingVote && (
+                              <div className="ml-11 space-y-3">
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant={current.vote === true ? "default" : "outline"}
+                                    onClick={() => updateCouncilorSelection(councilor.id, 'vote', true)}
+                                    className={current.vote === true ? "bg-green-600 hover:bg-green-700" : ""}
+                                  >
+                                    <ThumbsUp className="mr-1 h-3 w-3" />
+                                    Aprovado
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant={current.vote === false ? "default" : "outline"}
+                                    onClick={() => updateCouncilorSelection(councilor.id, 'vote', false)}
+                                    className={current.vote === false ? "bg-red-600 hover:bg-red-700" : ""}
+                                  >
+                                    <ThumbsDown className="mr-1 h-3 w-3" />
+                                    Rejeitado
+                                  </Button>
+                                </div>
+                                
+                                <div className="space-y-1">
+                                  <Label htmlFor={`comment-${councilor.id}`} className="text-xs text-gray-600">
+                                    Comentário (opcional)
+                                  </Label>
+                                  <Textarea
+                                    id={`comment-${councilor.id}`}
+                                    placeholder="Comentário do vereador..."
+                                    value={current.comment}
+                                    onChange={(e) => updateCouncilorSelection(councilor.id, 'comment', e.target.value)}
+                                    rows={2}
+                                    className="text-sm"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowAdminVoteDialog(false);
+                      setSelectedCouncilors({});
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleAdminVote}
+                    disabled={
+                      adminVoteMutation.isPending ||
+                      Object.values(selectedCouncilors).filter(c => c.selected && c.vote !== null).length === 0
+                    }
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    {adminVoteMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Registrando...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="mr-2 h-4 w-4" />
+                        Registrar Votos
+                      </>
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
       </div>
