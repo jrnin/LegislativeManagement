@@ -319,10 +319,7 @@ export default function ActivityDetails() {
     setSelectedCouncilors(prev => ({
       ...prev,
       [userId]: {
-        selected: false,
-        vote: null,
-        comment: "",
-        ...prev[userId],
+        ...(prev[userId] || { selected: false, vote: null, comment: "" }),
         [field]: value
       }
     }));

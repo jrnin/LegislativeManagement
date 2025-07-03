@@ -151,6 +151,18 @@ Preferred communication style: Simple, everyday language.
   - Updated backend API routes to process new situation field in creation and editing workflows
   - Integrated situation validation across all legislative activity endpoints
 
+- **July 3, 2025**: Implemented administrative voting system for legislative activities
+  - Created new backend endpoint `/api/activities/:activityId/votes/admin` for batch voting functionality
+  - Implemented administrative interface allowing admins to register votes on behalf of councilors
+  - Added comprehensive councilor selection with checkboxes and vote type buttons (Aprovado/Rejeitado)
+  - Integrated existing vote validation to prevent duplicate voting
+  - Added optional comment field for each vote registration
+  - Enhanced UI with councilor avatars, names, and existing vote status display
+  - Implemented real-time vote statistics updates and timeline integration
+  - Added purple-themed "Registrar Votos" button visible only to administrators
+  - Created responsive dialog interface with scrollable councilor list
+  - Integrated loading states and success/error handling with toast notifications
+
 ## Changelog
 
 - June 23, 2025. Initial setup
