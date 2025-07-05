@@ -137,7 +137,10 @@ export default function DocumentList() {
       "Decreto": "bg-green-100 text-green-800",
       "Decreto Legislativo": "bg-purple-100 text-purple-800",
       "Lei Complementar": "bg-red-100 text-red-800",
-      "Oficio": "bg-yellow-100 text-yellow-800"
+      "Oficio": "bg-yellow-100 text-yellow-800",
+      "Parecer": "bg-orange-100 text-orange-800",
+      "Ata": "bg-indigo-100 text-indigo-800",
+      "Lista de Presença": "bg-teal-100 text-teal-800"
     };
     
     return typeColors[type] || "bg-gray-100 text-gray-800";

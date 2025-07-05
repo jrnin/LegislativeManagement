@@ -265,7 +265,10 @@ export default function DocumentForm() {
     "Decreto", 
     "Decreto Legislativo", 
     "Lei Complementar", 
-    "Oficio"
+    "Oficio",
+    "Parecer",
+    "Ata",
+    "Lista de Presença"
   ];
 
   const authorTypes = [

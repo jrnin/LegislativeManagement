@@ -179,6 +179,11 @@ Preferred communication style: Simple, everyday language.
   - Changed "Status" column to "Situação" displaying actual legislative workflow status
   - Added comprehensive color coding for all legislative situations (Arquivado, Aguardando Análise, etc.)
   - Fixed status display to reflect database 'situacao' field instead of just approval status
+  - Removed event detail modal in favor of direct navigation to event details page (/events/{id})
+  - Enhanced document type system with three new document types: "Parecer", "Ata", and "Lista de Presença"
+  - Updated document type options in DocumentForm.tsx to include new document types
+  - Added color coding for new document types in DocumentList.tsx with distinct visual badges
+  - Improved document categorization system to support legislative meeting documentation needs
 
 ## Changelog
 
