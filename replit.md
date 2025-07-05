@@ -172,6 +172,9 @@ Preferred communication style: Simple, everyday language.
   - Enhanced user experience with hover effects and responsive design
   - Implemented proper event data fetching with loading states and empty state handling
   - Added event detail viewing functionality with organized information sections
+  - Fixed critical date formatting issue in legislative activities where dates were displaying one day earlier
+  - Updated formatDate and formatDateTime functions to handle timezone issues correctly
+  - Implemented proper date parsing to avoid UTC conversion problems with database dates
 
 ## Changelog
 
