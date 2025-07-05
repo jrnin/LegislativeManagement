@@ -40,10 +40,26 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Plus, Search, Trash2, Edit, Eye } from "lucide-react";
+import { Plus, Search, Trash2, Edit, Eye, Calendar, Clock, MapPin, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Committee } from "@shared/schema";
 import CommitteeEditModal from "@/components/committees/CommitteeEditModal";
+
+interface CommitteeEvent {
+  id: number;
+  eventNumber: number;
+  title: string;
+  description: string;
+  eventDate: string;
+  eventTime: string;
+  location: string;
+  category: string;
+  status: string;
+  committees: Array<{
+    id: number;
+    name: string;
+  }>;
+}
 
 export default function CommitteeList() {
   const [location, setLocation] = useLocation();
@@ -58,6 +74,14 @@ export default function CommitteeList() {
 
   const { data: committees = [], isLoading } = useQuery({
     queryKey: ["/api/committees"],
+  });
+
+  // Buscar eventos de reunião de comissão
+  const { data: committeeEvents = [], isLoading: loadingEvents } = useQuery<CommitteeEvent[]>({
+    queryKey: ["/api/events", { category: "Reunião Comissão" }],
+    queryFn: async () => {
+      return await apiRequest("GET", "/api/events?category=Reunião Comissão");
+    }
   });
 
   const filteredCommittees = committees.filter((committee: Committee) =>
@@ -169,7 +193,11 @@ export default function CommitteeList() {
         </CardContent>
       </Card>
 
-      <Card>
+      {/* Layout com duas colunas */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Coluna principal - Lista de Comissões */}
+        <div className="lg:col-span-2">
+          <Card>
         <CardHeader className="pb-3">
           <CardTitle>Lista de Comissões</CardTitle>
         </CardHeader>
@@ -311,7 +339,99 @@ export default function CommitteeList() {
             </>
           )}
         </CardContent>
-      </Card>
+          </Card>
+        </div>
+
+        {/* Coluna lateral - Widget de Eventos de Reunião de Comissão */}
+        <div className="lg:col-span-1">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Reuniões de Comissão
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingEvents ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="p-3 border rounded-lg">
+                      <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : committeeEvents.length > 0 ? (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {committeeEvents.slice(0, 5).map((event) => (
+                    <div key={event.id} className="p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-sm truncate">
+                          {event.title || `Reunião #${event.eventNumber}`}
+                        </h4>
+                        <Badge variant="outline" className="text-xs">
+                          #{event.eventNumber}
+                        </Badge>
+                      </div>
+                      
+                      <div className="space-y-1 text-xs text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          <span>{format(new Date(event.eventDate), "dd/MM/yyyy", { locale: ptBR })}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>{event.eventTime}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          <span className="truncate">{event.location}</span>
+                        </div>
+                        {event.committees && event.committees.length > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            <span className="truncate">
+                              {event.committees.map(c => c.name).join(", ")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="mt-2">
+                        <Badge 
+                          variant={event.status === "Programado" ? "default" : "secondary"}
+                          className="text-xs"
+                        >
+                          {event.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {committeeEvents.length > 5 && (
+                    <div className="text-center pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setLocation("/events")}
+                      >
+                        Ver todos os eventos
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Calendar className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600">
+                    Nenhuma reunião de comissão agendada
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

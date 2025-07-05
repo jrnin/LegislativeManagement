@@ -746,8 +746,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all events
   app.get('/api/events', requireAuth, async (req, res) => {
     try {
+      const { category } = req.query;
       const events = await storage.getAllEvents();
-      res.json(events);
+      
+      // Filtrar por categoria se especificada
+      let filteredEvents = events;
+      if (category && typeof category === 'string') {
+        filteredEvents = events.filter(event => event.category === category);
+      }
+      
+      // Para eventos de reunião de comissão, incluir as comissões associadas
+      if (category === "Reunião Comissão") {
+        const eventsWithCommittees = await Promise.all(filteredEvents.map(async (event) => {
+          let committees = [];
+          try {
+            committees = await storage.getEventCommittees(event.id);
+          } catch (error) {
+            console.error(`Erro ao buscar comissões para evento ${event.id}:`, error);
+          }
+          return { ...event, committees: committees || [] };
+        }));
+        res.json(eventsWithCommittees);
+      } else {
+        res.json(filteredEvents);
+      }
     } catch (error) {
       console.error("Error fetching events:", error);
       res.status(500).json({ message: "Erro ao buscar eventos" });
