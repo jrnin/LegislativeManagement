@@ -163,6 +163,16 @@ Preferred communication style: Simple, everyday language.
   - Created responsive dialog interface with scrollable councilor list
   - Integrated loading states and success/error handling with toast notifications
 
+- **July 5, 2025**: Enhanced committee dashboard with committee meeting events widget
+  - Added committee meeting events widget to dashboard committees page in two-column layout
+  - Implemented event filtering by category "Reunião Comissão" using existing backend endpoints
+  - Created clickable event cards displaying event number, date, time, location, and status
+  - Added comprehensive event detail modal showing complete event information
+  - Integrated committee associations display for committee-specific meetings
+  - Enhanced user experience with hover effects and responsive design
+  - Implemented proper event data fetching with loading states and empty state handling
+  - Added event detail viewing functionality with organized information sections
+
 ## Changelog
 
 - June 23, 2025. Initial setup
