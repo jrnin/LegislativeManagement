@@ -3427,6 +3427,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota pública para obter todos os eventos (sem autenticação)
   app.get('/api/public/events/all', async (req, res) => {
     try {
+      const { category } = req.query;
+      
       // Buscar todos os eventos do sistema
       const allEvents = await storage.getAllEvents();
       
@@ -3434,25 +3436,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json([]);
       }
       
-      // Ordenar por data (mais próximos primeiro)
-      allEvents.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      // Filtrar por categoria se especificada
+      let filteredEvents = allEvents;
+      if (category && typeof category === 'string') {
+        filteredEvents = allEvents.filter(event => event.category === category);
+      }
       
-      // Formatar eventos para o frontend público
-      const formattedEvents = allEvents.map(event => ({
-        id: event.id,
-        title: `${event.category} #${event.eventNumber}`,
-        date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
-        time: event.eventTime || '00:00',
-        location: event.location || 'Local não informado',
-        type: event.category,
-        status: event.status,
-        description: event.description,
-        eventNumber: event.eventNumber,
-        eventDate: event.eventDate,
-        eventTime: event.eventTime,
-        category: event.category,
-        legislatureId: event.legislatureId,
-        mapUrl: event.mapUrl
+      // Ordenar por data (mais próximos primeiro)
+      filteredEvents.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      
+      // Formatar eventos para o frontend público incluindo comissões
+      const formattedEvents = await Promise.all(filteredEvents.map(async (event) => {
+        let committees = [];
+        try {
+          // Buscar comissões associadas ao evento se for do tipo "Reunião Comissão"
+          if (event.category === "Reunião Comissão") {
+            committees = await storage.getEventCommittees(event.id);
+          }
+        } catch (error) {
+          console.error(`Erro ao buscar comissões para evento ${event.id}:`, error);
+        }
+
+        return {
+          id: event.id,
+          title: `${event.category} #${event.eventNumber}`,
+          date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
+          time: event.eventTime || '00:00',
+          location: event.location || 'Local não informado',
+          type: event.category,
+          status: event.status,
+          description: event.description,
+          eventNumber: event.eventNumber,
+          eventDate: event.eventDate,
+          eventTime: event.eventTime,
+          category: event.category,
+          legislatureId: event.legislatureId,
+          mapUrl: event.mapUrl,
+          committees: committees || []
+        };
       }));
       
       res.json(formattedEvents);

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Users, Calendar, FileText, ChevronRight } from "lucide-react";
+import { Search, Users, Calendar, FileText, ChevronRight, Clock, MapPin, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface Committee {
   id: number;
@@ -34,12 +42,42 @@ interface Committee {
   }>;
 }
 
+interface CommitteeEvent {
+  id: number;
+  eventNumber: number;
+  title: string;
+  description: string;
+  eventDate: string;
+  eventTime: string;
+  location: string;
+  category: string;
+  status: string;
+  legislatureId: number;
+  committees: Array<{
+    id: number;
+    name: string;
+  }>;
+}
+
 export default function ComissoesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [selectedEvent, setSelectedEvent] = useState<CommitteeEvent | null>(null);
 
   const { data: committees = [], isLoading } = useQuery<Committee[]>({
     queryKey: ["/api/public/committees"],
+  });
+
+  // Buscar eventos de reunião de comissão
+  const { data: committeeEvents = [], isLoading: loadingEvents } = useQuery<CommitteeEvent[]>({
+    queryKey: ["/api/public/events/all", { category: "Reunião Comissão" }],
+    queryFn: async () => {
+      const response = await fetch("/api/public/events/all?category=Reunião Comissão");
+      if (!response.ok) {
+        throw new Error("Erro ao buscar eventos");
+      }
+      return response.json();
+    }
   });
 
   const filteredCommittees = committees.filter((committee: Committee) => {
@@ -198,6 +236,157 @@ export default function ComissoesPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Reuniões de Comissão */}
+        <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+            Reuniões de Comissão
+          </h2>
+          
+          {loadingEvents ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="h-48">
+                  <CardHeader>
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : committeeEvents.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {committeeEvents.map((event) => (
+                <Card key={event.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                          {event.title}
+                        </CardTitle>
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          <Badge variant="secondary" className="text-xs">
+                            Evento #{event.eventNumber}
+                          </Badge>
+                          <Badge 
+                            variant={event.status === "Programado" ? "default" : "outline"}
+                            className="text-xs"
+                          >
+                            {event.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>{format(new Date(event.eventDate), "dd/MM/yyyy", { locale: ptBR })}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        <span>{event.eventTime}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        <span>{event.location}</span>
+                      </div>
+                      {event.committees && event.committees.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {event.committees.map((committee) => (
+                            <Badge key={committee.id} variant="outline" className="text-xs">
+                              {committee.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-4">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => setSelectedEvent(event)}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Ver Detalhes
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle className="text-xl font-bold">
+                              {event.title}
+                            </DialogTitle>
+                            <DialogDescription>
+                              Detalhes da reunião de comissão
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm font-medium text-gray-700">Data</label>
+                                <p className="text-sm text-gray-600">
+                                  {format(new Date(event.eventDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                                </p>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium text-gray-700">Horário</label>
+                                <p className="text-sm text-gray-600">{event.eventTime}</p>
+                              </div>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-gray-700">Local</label>
+                              <p className="text-sm text-gray-600">{event.location}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-gray-700">Status</label>
+                              <p className="text-sm text-gray-600">{event.status}</p>
+                            </div>
+                            {event.committees && event.committees.length > 0 && (
+                              <div>
+                                <label className="text-sm font-medium text-gray-700">Comissões Envolvidas</label>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                  {event.committees.map((committee) => (
+                                    <Badge key={committee.id} variant="secondary">
+                                      {committee.name}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            <div>
+                              <label className="text-sm font-medium text-gray-700">Descrição</label>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {event.description || "Sem descrição disponível."}
+                              </p>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Nenhuma reunião de comissão agendada
+              </h3>
+              <p className="text-gray-600">
+                Não há reuniões de comissão programadas no momento.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Estatísticas */}
