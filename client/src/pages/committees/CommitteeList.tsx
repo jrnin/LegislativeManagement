@@ -78,10 +78,7 @@ export default function CommitteeList() {
 
   // Buscar eventos de reunião de comissão
   const { data: committeeEvents = [], isLoading: loadingEvents } = useQuery<CommitteeEvent[]>({
-    queryKey: ["/api/events", { category: "Reunião Comissão" }],
-    queryFn: async () => {
-      return await apiRequest("GET", "/api/events?category=Reunião Comissão");
-    }
+    queryKey: ["/api/events?category=Reunião Comissão"],
   });
 
   const filteredCommittees = committees.filter((committee: Committee) =>
