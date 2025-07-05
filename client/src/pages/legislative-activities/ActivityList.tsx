@@ -181,6 +181,24 @@ export default function ActivityList() {
     }
   };
 
+  const getSituationBadge = (situacao: string) => {
+    const situationColors: Record<string, string> = {
+      "Arquivado": "bg-gray-100 text-gray-800",
+      "Aguardando Análise": "bg-blue-100 text-blue-800",
+      "Análise de Parecer": "bg-orange-100 text-orange-800",
+      "Aguardando Deliberação": "bg-purple-100 text-purple-800",
+      "Aguardando Despacho do Presidente": "bg-yellow-100 text-yellow-800",
+      "Aguardando Envio ao Executivo": "bg-indigo-100 text-indigo-800",
+      "Devolvida ao Autor": "bg-red-100 text-red-800",
+      "Pronta para Pauta": "bg-green-100 text-green-800",
+      "Tramitando em Conjunto": "bg-cyan-100 text-cyan-800",
+      "Tramitação Finalizada": "bg-emerald-100 text-emerald-800",
+      "Vetado": "bg-rose-100 text-rose-800"
+    };
+    
+    return situationColors[situacao] || "bg-gray-100 text-gray-800";
+  };
+
   const columns: ColumnDef<LegislativeActivity>[] = [
     {
       accessorKey: "activityNumber",
@@ -274,11 +292,16 @@ export default function ActivityList() {
       },
     },
     {
-      accessorKey: "status",
-      header: "Status",
+      accessorKey: "situacao",
+      header: "Situação",
       cell: ({ row }) => {
         const activity = row.original;
-        return getApprovalStatusBadge(activity);
+        const situacao = activity.situacao || "Aguardando Análise";
+        return (
+          <Badge className={getSituationBadge(situacao)}>
+            {situacao}
+          </Badge>
+        );
       },
     },
     {
