@@ -175,6 +175,10 @@ Preferred communication style: Simple, everyday language.
   - Fixed critical date formatting issue in legislative activities where dates were displaying one day earlier
   - Updated formatDate and formatDateTime functions to handle timezone issues correctly
   - Implemented proper date parsing to avoid UTC conversion problems with database dates
+  - Corrected legislative activity status display system to show proper 'situacao' field
+  - Changed "Status" column to "Situação" displaying actual legislative workflow status
+  - Added comprehensive color coding for all legislative situations (Arquivado, Aguardando Análise, etc.)
+  - Fixed status display to reflect database 'situacao' field instead of just approval status
 
 ## Changelog
 
