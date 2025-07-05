@@ -15,7 +15,21 @@ export function formatDate(
   if (!dateString) return "";
   
   try {
-    const date = new Date(dateString);
+    // Para datas que vêm do banco como "YYYY-MM-DD HH:MM:SS" ou "YYYY-MM-DD",
+    // vamos criar a data tratando como horário local para evitar problemas de fuso horário
+    let date: Date;
+    
+    if (dateString.includes('T') || dateString.includes(' ')) {
+      // Se tem horário, extrair apenas a parte da data
+      const datePart = dateString.split('T')[0].split(' ')[0];
+      const [year, month, day] = datePart.split('-').map(Number);
+      date = new Date(year, month - 1, day); // mês é zero-indexado
+    } else {
+      // Se é apenas data (YYYY-MM-DD)
+      const [year, month, day] = dateString.split('-').map(Number);
+      date = new Date(year, month - 1, day); // mês é zero-indexado
+    }
+    
     return date.toLocaleDateString("pt-BR", options);
   } catch (error) {
     console.error("Error formatting date:", error);
@@ -33,7 +47,20 @@ export function formatDateTime(dateString: string, timeString?: string): string 
   if (!dateString) return "";
   
   try {
-    const date = new Date(dateString);
+    // Usar a mesma lógica da formatDate para evitar problemas de fuso horário
+    let date: Date;
+    
+    if (dateString.includes('T') || dateString.includes(' ')) {
+      // Se tem horário, extrair apenas a parte da data
+      const datePart = dateString.split('T')[0].split(' ')[0];
+      const [year, month, day] = datePart.split('-').map(Number);
+      date = new Date(year, month - 1, day); // mês é zero-indexado
+    } else {
+      // Se é apenas data (YYYY-MM-DD)
+      const [year, month, day] = dateString.split('-').map(Number);
+      date = new Date(year, month - 1, day); // mês é zero-indexado
+    }
+    
     const formattedDate = date.toLocaleDateString("pt-BR");
     
     if (timeString) {
