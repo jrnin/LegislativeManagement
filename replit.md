@@ -184,6 +184,10 @@ Preferred communication style: Simple, everyday language.
   - Updated document type options in DocumentForm.tsx to include new document types
   - Added color coding for new document types in DocumentList.tsx with distinct visual badges
   - Improved document categorization system to support legislative meeting documentation needs
+  - Fixed committee member count display in /committees page by modifying getAllCommittees() function
+  - Updated backend storage layer to include member data with user information in committee listings
+  - Resolved issue where member count was showing "0 membros" instead of actual database values
+  - Improved committee data structure to properly display member statistics in admin interface
 
 ## Changelog
 
