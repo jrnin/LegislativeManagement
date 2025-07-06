@@ -1449,11 +1449,35 @@ export class DatabaseStorage implements IStorage {
     };
   }
   
-  async getAllCommittees(): Promise<Committee[]> {
-    return await db
+  async getAllCommittees(): Promise<(Committee & { members: (CommitteeMember & { user: User })[] })[]> {
+    const committeesData = await db
       .select()
       .from(committees)
       .orderBy(desc(committees.startDate));
+    
+    // Para cada comissão, buscar seus membros
+    const committeesWithMembers = await Promise.all(
+      committeesData.map(async (committee) => {
+        const membersData = await db
+          .select({
+            committeeId: committeeMembers.committeeId,
+            userId: committeeMembers.userId,
+            role: committeeMembers.role,
+            addedAt: committeeMembers.addedAt,
+            user: users
+          })
+          .from(committeeMembers)
+          .innerJoin(users, eq(committeeMembers.userId, users.id))
+          .where(eq(committeeMembers.committeeId, committee.id));
+        
+        return {
+          ...committee,
+          members: membersData
+        };
+      })
+    );
+    
+    return committeesWithMembers;
   }
   
   async getCommitteeWithMembers(id: number): Promise<(Committee & { members: (CommitteeMember & { user: User })[] }) | undefined> {

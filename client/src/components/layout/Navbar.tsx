@@ -54,12 +54,7 @@ export default function Navbar({ setSidebarOpen }: NavbarProps) {
         </div>
         
         <div className="ml-4 flex items-center md:ml-6 space-x-4">
-          {/* Messages button */}
-          <button className="relative p-1.5 rounded-full text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/30">
-            <span className="sr-only">Ver mensagens</span>
-            <Mail className="h-5 w-5" />
-            <Badge className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-primary hover:bg-primary">3</Badge>
-          </button>
+         
           
           {/* Notifications dropdown */}
           <NotificationPanel />

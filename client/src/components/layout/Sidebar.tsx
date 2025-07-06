@@ -110,16 +110,8 @@ export default function Sidebar() {
       {user && (
         <div className="flex-shrink-0 p-4 pt-2 border-t border-slate-200">
           <div className="flex items-center justify-between mb-2">
-            <Link href="/settings">
-              <a className="text-slate-500 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 transition-colors">
-                <Settings className="h-4 w-4" />
-              </a>
-            </Link>
-            <Link href="/api/logout">
-              <a className="text-slate-500 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 transition-colors">
-                <LogOut className="h-4 w-4" />
-              </a>
-            </Link>
+            
+            
           </div>
           
           <div className="flex items-center p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
