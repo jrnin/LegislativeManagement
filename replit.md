@@ -189,6 +189,16 @@ Preferred communication style: Simple, everyday language.
   - Resolved issue where member count was showing "0 membros" instead of actual database values
   - Improved committee data structure to properly display member statistics in admin interface
 
+- **July 6, 2025**: Enhanced voting display in event details with comprehensive legislative activity voting statistics
+  - Modified "Votações" tab in event details to display all legislative activities instead of only approval-pending ones
+  - Enhanced voting statistics display with visual progress bars showing approve/reject percentages
+  - Improved VotingStats component with detailed vote counts and percentages for each activity
+  - Added comprehensive activity information including activity number, date, type, and description
+  - Implemented better visual design with badges and color-coded information for easier reading
+  - Changed button text from "Analisar" to "Ver Votações" for better user understanding
+  - Updated tab header to "Votações das Atividades Legislativas" with activity count badge
+  - Enhanced user experience with proper loading states and empty state handling
+
 ## Changelog
 
 - June 23, 2025. Initial setup
