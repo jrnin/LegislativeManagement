@@ -1021,25 +1021,21 @@ export default function EventDetails() {
         <TabsContent value="approvals" className="pt-4">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Votações</h2>
+              <h2 className="text-xl font-bold">Votações das Atividades Legislativas</h2>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
-                  <AlertCircle className="w-3.5 h-3.5 mr-1" />
-                  Pendentes
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+                  <Vote className="w-3.5 h-3.5 mr-1" />
+                  {activities.length} {activities.length === 1 ? 'Atividade' : 'Atividades'}
                 </Badge>
               </div>
             </div>
             
-            {loadingApprovalActivities ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-              </div>
-            ) : activitiesRequiringApproval?.length === 0 ? (
+            {activities.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <Vote className="w-12 h-12 mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium">Sem atividades para votação</h3>
+                <h3 className="text-lg font-medium">Nenhuma atividade no evento</h3>
                 <p className="text-sm text-muted-foreground max-w-md">
-                  Não há atividades legislativas que necessitam de aprovação neste evento.
+                  Este evento não possui atividades legislativas para exibir votações.
                 </p>
               </div>
             ) : (
@@ -1056,14 +1052,32 @@ export default function EventDetails() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {activitiesRequiringApproval?.map((activity: any) => (
+                    {activities.map((activity: any) => (
                       <TableRow key={activity.id}>
-                        <TableCell className="font-medium">{activity.activityNumber}</TableCell>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <span>#{activity.activityNumber}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {activity.activityType || activity.type}
+                            </Badge>
+                          </div>
+                        </TableCell>
                         <TableCell>
                           {format(new Date(activity.activityDate), "dd/MM/yyyy")}
                         </TableCell>
-                        <TableCell>{activity.activityType}</TableCell>
-                        <TableCell className="max-w-xs truncate">{activity.description}</TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant="secondary" 
+                            className="bg-blue-100 text-blue-800"
+                          >
+                            {activity.activityType || activity.type}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          <div className="truncate" title={activity.description}>
+                            {activity.description}
+                          </div>
+                        </TableCell>
                         <TableCell>
                           <VotingStats activityId={activity.id} />
                         </TableCell>
@@ -1075,7 +1089,7 @@ export default function EventDetails() {
                               setSelectedActivity(activity);
                               setSelectedActivityId(activity.id);
                               setApprovalComment("");
-                              setActivityVote(null); // Reset o estado do voto
+                              setActivityVote(null);
                               setIsApprovalDialogOpen(true);
                               
                               // Buscar o voto do usuário para esta atividade se estiver autenticado
@@ -1091,7 +1105,7 @@ export default function EventDetails() {
                             }}
                           >
                             <Vote className="w-4 h-4 mr-1" />
-                            Analisar
+                            Ver Votações
                           </Button>
                         </TableCell>
                       </TableRow>
