@@ -58,9 +58,9 @@ export default function BoardForm({ boardId, isEditing = false }: BoardFormProps
   });
 
   const { data: users } = useQuery({
-    queryKey: ['/api/users/councilors'],
+    queryKey: ['/api/councilors'],
     queryFn: async () => {
-      const response = await fetch('/api/users/councilors');
+      const response = await fetch('/api/councilors');
       if (!response.ok) throw new Error('Failed to fetch users');
       return response.json() as Promise<User[]>;
     },
