@@ -11,6 +11,26 @@ import { type Board } from '@shared/schema';
 export default function BoardDetails() {
   const { id } = useParams<{ id: string }>();
   
+  // Check if id is a valid number - if not, redirect to 404
+  if (!id || isNaN(Number(id))) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <FileText className="h-12 w-12 text-gray-400 mb-4" />
+            <p className="text-gray-600 text-center">Mesa Diretora não encontrada</p>
+            <Button asChild className="mt-4">
+              <Link href="/boards">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Voltar à Lista
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
   const { data: board, isLoading } = useQuery({
     queryKey: ['/api/boards', Number(id)],
     queryFn: async () => {
