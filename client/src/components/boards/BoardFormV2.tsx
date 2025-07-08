@@ -109,10 +109,7 @@ export default function BoardFormV2({ boardId, isEditing = false, onSuccess }: B
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: BoardFormData & { members: BoardMember[] }) => {
-      return apiRequest('/api/boards', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('POST', '/api/boards', data);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/boards'] });
@@ -138,10 +135,7 @@ export default function BoardFormV2({ boardId, isEditing = false, onSuccess }: B
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: BoardFormData & { members: BoardMember[] }) => {
-      return apiRequest(`/api/boards/${boardId}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('PUT', `/api/boards/${boardId}`, data);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/boards'] });
