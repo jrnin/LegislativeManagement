@@ -81,18 +81,24 @@ export default function BoardForm({ boardId, isEditing = false, onSuccess }: Boa
   // Set form values when board data is loaded
   useEffect(() => {
     if (board) {
-      form.reset({
+      console.log('Board data loaded:', board);
+      const formData = {
         name: board.name,
         legislatureId: board.legislatureId,
         startDate: board.startDate,
         endDate: board.endDate,
         description: board.description || '',
-      });
+      };
+      console.log('Setting form data:', formData);
+      form.reset(formData);
+      
       if (board.members) {
-        setSelectedMembers(board.members.map(member => ({
+        const memberData = board.members.map(member => ({
           userId: member.userId,
           role: member.role,
-        })));
+        }));
+        console.log('Setting members:', memberData);
+        setSelectedMembers(memberData);
       }
     }
   }, [board, form]);
@@ -155,10 +161,15 @@ export default function BoardForm({ boardId, isEditing = false, onSuccess }: Boa
   });
 
   const onSubmit = (data: BoardFormData) => {
+    console.log('Form submitted with data:', data);
+    console.log('Selected members:', selectedMembers);
+    
     const payload = {
       ...data,
       members: selectedMembers,
     };
+
+    console.log('Final payload:', payload);
 
     if (isEditing) {
       updateMutation.mutate(payload);
