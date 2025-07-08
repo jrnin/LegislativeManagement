@@ -17,7 +17,8 @@ import {
   committeeMembers, 
   documents as documentsTable,
   legislativeActivities,
-  legislativeActivitiesAuthors
+  legislativeActivitiesAuthors,
+  insertBoardSchema
 } from "@shared/schema";
 import { eq, and, inArray } from 'drizzle-orm';
 
