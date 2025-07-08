@@ -23,6 +23,10 @@ import CommitteeForm from "@/pages/committees/CommitteeForm";
 import CommitteeDetails from "@/pages/committees/CommitteeDetails";
 import CouncilorList from "@/pages/councilors/CouncilorList";
 import CouncilorDetails from "@/pages/councilors/CouncilorDetails";
+import BoardsPage from "@/pages/boards/BoardsPage";
+import CreateBoardPage from "@/pages/boards/CreateBoardPage";
+import EditBoardPage from "@/pages/boards/EditBoardPage";
+import BoardDetails from "@/pages/boards/BoardDetails";
 import PublicRoutes from "@/public/PublicRoutes";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationProvider } from "@/context/NotificationContext";
@@ -59,6 +63,10 @@ function AuthenticatedApp() {
         <Route path="/committees/:id" component={CommitteeDetails} />
         <Route path="/councilors" component={CouncilorList} />
         <Route path="/councilors/:id" component={CouncilorDetails} />
+        <Route path="/boards" component={BoardsPage} />
+        <Route path="/boards/new" component={CreateBoardPage} />
+        <Route path="/boards/:id/edit" component={EditBoardPage} />
+        <Route path="/boards/:id" component={BoardDetails} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

@@ -15,6 +15,8 @@ import {
   newsArticles,
   newsCategories,
   newsComments,
+  boards,
+  boardMembers,
   type User,
   type Legislature,
   type Event,
@@ -32,7 +34,11 @@ import {
   type NewsComment,
   type InsertNewsArticle,
   type InsertNewsCategory,
-  type InsertNewsComment
+  type InsertNewsComment,
+  type Board,
+  type BoardMember,
+  type InsertBoard,
+  type InsertBoardMember
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or, not } from "drizzle-orm";
@@ -216,6 +222,13 @@ export interface IStorage {
   createNewsComment(commentData: InsertNewsComment): Promise<NewsComment>;
   updateNewsComment(id: number, commentData: Partial<NewsComment>): Promise<NewsComment | undefined>;
   deleteNewsComment(id: number): Promise<boolean>;
+  
+  // Board Management operations
+  getAllBoards(): Promise<Board[]>;
+  getBoardById(id: number): Promise<Board | undefined>;
+  createBoard(boardData: InsertBoard, members: InsertBoardMember[]): Promise<Board>;
+  updateBoard(id: number, boardData: Partial<InsertBoard>, members?: InsertBoardMember[]): Promise<Board | undefined>;
+  deleteBoard(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1849,6 +1862,110 @@ export class DatabaseStorage implements IStorage {
     return activitiesWithAuthors;
   }
   
+  // Board Management
+  async getAllBoards(): Promise<Board[]> {
+    const boardsResult = await db.select().from(boards).leftJoin(legislatures, eq(boards.legislatureId, legislatures.id));
+    
+    const boardsWithDetails = await Promise.all(boardsResult.map(async (boardResult) => {
+      const board = boardResult.boards;
+      const legislature = boardResult.legislatures;
+      
+      // Get board members
+      const membersResult = await db.select()
+        .from(boardMembers)
+        .leftJoin(users, eq(boardMembers.userId, users.id))
+        .where(eq(boardMembers.boardId, board.id));
+      
+      const members = membersResult.map(memberResult => ({
+        ...memberResult.board_members,
+        user: memberResult.users
+      }));
+      
+      return {
+        ...board,
+        legislature,
+        members
+      };
+    }));
+    
+    return boardsWithDetails;
+  }
+
+  async getBoardById(id: number): Promise<Board | undefined> {
+    const [boardResult] = await db.select()
+      .from(boards)
+      .leftJoin(legislatures, eq(boards.legislatureId, legislatures.id))
+      .where(eq(boards.id, id));
+    
+    if (!boardResult) return undefined;
+    
+    const board = boardResult.boards;
+    const legislature = boardResult.legislatures;
+    
+    // Get board members
+    const membersResult = await db.select()
+      .from(boardMembers)
+      .leftJoin(users, eq(boardMembers.userId, users.id))
+      .where(eq(boardMembers.boardId, board.id));
+    
+    const members = membersResult.map(memberResult => ({
+      ...memberResult.board_members,
+      user: memberResult.users
+    }));
+    
+    return {
+      ...board,
+      legislature,
+      members
+    };
+  }
+
+  async createBoard(boardData: InsertBoard, members: InsertBoardMember[]): Promise<Board> {
+    const [createdBoard] = await db.insert(boards).values(boardData).returning();
+    
+    if (members.length > 0) {
+      await db.insert(boardMembers).values(
+        members.map(member => ({
+          ...member,
+          boardId: createdBoard.id
+        }))
+      );
+    }
+    
+    return this.getBoardById(createdBoard.id)!;
+  }
+
+  async updateBoard(id: number, boardData: Partial<InsertBoard>, members?: InsertBoardMember[]): Promise<Board | undefined> {
+    const [updatedBoard] = await db.update(boards)
+      .set({ ...boardData, updatedAt: new Date() })
+      .where(eq(boards.id, id))
+      .returning();
+    
+    if (!updatedBoard) return undefined;
+    
+    if (members) {
+      // Remove existing members
+      await db.delete(boardMembers).where(eq(boardMembers.boardId, id));
+      
+      // Add new members
+      if (members.length > 0) {
+        await db.insert(boardMembers).values(
+          members.map(member => ({
+            ...member,
+            boardId: id
+          }))
+        );
+      }
+    }
+    
+    return this.getBoardById(id);
+  }
+
+  async deleteBoard(id: number): Promise<boolean> {
+    const result = await db.delete(boards).where(eq(boards.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+
   /**
    * Search across all entities
    */

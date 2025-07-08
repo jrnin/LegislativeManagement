@@ -716,3 +716,83 @@ export const insertEventCommitteeSchema = createInsertSchema(eventCommittees).pi
 
 export type InsertEventCommittee = z.infer<typeof insertEventCommitteeSchema>;
 export type EventCommittee = typeof eventCommittees.$inferSelect;
+
+// Mesa Diretora (Board) - Tabela principal
+export const boards = pgTable("boards", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  legislatureId: integer("legislature_id").references(() => legislatures.id).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Definir os cargos disponíveis para Mesa Diretora
+export const boardRoles = [
+  "Presidente",
+  "Vice-Presidente", 
+  "1º Secretário(a)",
+  "2º Secretário(a)"
+] as const;
+
+// Membros da Mesa Diretora - Tabela de relacionamento
+export const boardMembers = pgTable("board_members", {
+  id: serial("id").primaryKey(),
+  boardId: integer("board_id").references(() => boards.id, { onDelete: "cascade" }).notNull(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  role: varchar("role", { length: 50 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Relações da Mesa Diretora
+export const boardsRelations = relations(boards, ({ one, many }) => ({
+  legislature: one(legislatures, {
+    fields: [boards.legislatureId],
+    references: [legislatures.id],
+  }),
+  members: many(boardMembers),
+}));
+
+export const boardMembersRelations = relations(boardMembers, ({ one }) => ({
+  board: one(boards, {
+    fields: [boardMembers.boardId],
+    references: [boards.id],
+  }),
+  user: one(users, {
+    fields: [boardMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+// Esquemas de inserção para Mesa Diretora
+export const insertBoardSchema = createInsertSchema(boards).pick({
+  name: true,
+  startDate: true,
+  endDate: true,
+  legislatureId: true,
+  description: true,
+});
+
+export const insertBoardMemberSchema = createInsertSchema(boardMembers).pick({
+  boardId: true,
+  userId: true,
+  role: true,
+}).extend({
+  role: z.enum(boardRoles),
+});
+
+// Tipos para Mesa Diretora
+export type InsertBoard = z.infer<typeof insertBoardSchema>;
+export type Board = typeof boards.$inferSelect & {
+  legislature?: Legislature;
+  members?: (BoardMember & { user?: User })[];
+};
+
+export type InsertBoardMember = z.infer<typeof insertBoardMemberSchema>;
+export type BoardMember = typeof boardMembers.$inferSelect & {
+  board?: Board;
+  user?: User;
+};

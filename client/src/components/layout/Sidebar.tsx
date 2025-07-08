@@ -9,7 +9,8 @@ import {
   LogOut,
   PieChart,
   Settings,
-  UsersRound
+  UsersRound,
+  Shield
 } from "lucide-react";
 import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -29,6 +30,7 @@ export default function Sidebar() {
     { name: "Atividades Legislativas", href: "/activities", icon: FileText, badge: "Novo" },
     { name: "Documentos", href: "/documents", icon: Files },
     { name: "Comissões", href: "/committees", icon: UsersRound, badge: "Novo" },
+    { name: "Mesa Diretora", href: "/boards", icon: Shield },
   ];
 
   const getInitials = (name: string) => {

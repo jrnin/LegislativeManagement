@@ -4112,5 +4112,74 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
   // Expor apenas o servidor WebSocket globalmente para uso em outros módulos
   (global as any).wss = wss;
   
+  // Mesa Diretora routes
+  app.get('/api/boards', async (req, res) => {
+    try {
+      const boards = await storage.getAllBoards();
+      res.json(boards);
+    } catch (error) {
+      console.error('Error fetching boards:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/boards/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const board = await storage.getBoardById(Number(id));
+      if (!board) {
+        return res.status(404).json({ error: 'Board not found' });
+      }
+      res.json(board);
+    } catch (error) {
+      console.error('Error fetching board:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/boards', async (req, res) => {
+    try {
+      const validationResult = insertBoardSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ error: validationResult.error.issues });
+      }
+
+      const { members, ...boardData } = req.body;
+      const board = await storage.createBoard(boardData, members || []);
+      res.status(201).json(board);
+    } catch (error) {
+      console.error('Error creating board:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.put('/api/boards/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validationResult = insertBoardSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ error: validationResult.error.issues });
+      }
+
+      const { members, ...boardData } = req.body;
+      const board = await storage.updateBoard(Number(id), boardData, members);
+      res.json(board);
+    } catch (error) {
+      console.error('Error updating board:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.delete('/api/boards/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteBoard(Number(id));
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting board:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   return httpServer;
 }
