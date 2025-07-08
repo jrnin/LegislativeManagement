@@ -5,12 +5,15 @@ import { Plus, Users, Calendar, Edit, Trash2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 import { type Board } from '@shared/schema';
 import { queryClient } from '@/lib/queryClient';
+import BoardForm from './BoardForm';
 
 export default function BoardsPage() {
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const { data: boards, isLoading } = useQuery({
     queryKey: ['/api/boards'],
@@ -86,12 +89,20 @@ export default function BoardsPage() {
           <h1 className="text-2xl font-bold">Mesa Diretora</h1>
           <p className="text-gray-600">Gerencie a composição da Mesa Diretora</p>
         </div>
-        <Button asChild>
-          <Link href="/boards/create">
-            <Plus className="mr-2 h-4 w-4" />
-            Nova Mesa Diretora
-          </Link>
-        </Button>
+        <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nova Mesa Diretora
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Nova Mesa Diretora</DialogTitle>
+            </DialogHeader>
+            <BoardForm onSuccess={() => setIsCreateModalOpen(false)} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {boards && boards.length === 0 ? (
@@ -101,11 +112,9 @@ export default function BoardsPage() {
             <p className="text-gray-600 text-center mb-4">
               Nenhuma Mesa Diretora encontrada
             </p>
-            <Button asChild>
-              <Link href="/boards/create">
-                <Plus className="mr-2 h-4 w-4" />
-                Criar primeira Mesa Diretora
-              </Link>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Criar primeira Mesa Diretora
             </Button>
           </CardContent>
         </Card>

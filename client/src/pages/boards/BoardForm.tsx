@@ -31,9 +31,10 @@ type BoardFormData = z.infer<typeof boardFormSchema>;
 interface BoardFormProps {
   boardId?: number;
   isEditing?: boolean;
+  onSuccess?: () => void;
 }
 
-export default function BoardForm({ boardId, isEditing = false }: BoardFormProps) {
+export default function BoardForm({ boardId, isEditing = false, onSuccess }: BoardFormProps) {
   const [, setLocation] = useLocation();
   const [selectedMembers, setSelectedMembers] = useState<Array<{ userId: string; role: string }>>([]);
 
@@ -109,7 +110,11 @@ export default function BoardForm({ boardId, isEditing = false }: BoardFormProps
         description: 'Mesa Diretora criada com sucesso.',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/boards'] });
-      setLocation('/boards');
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        setLocation('/boards');
+      }
     },
     onError: () => {
       toast({
@@ -134,7 +139,11 @@ export default function BoardForm({ boardId, isEditing = false }: BoardFormProps
       });
       queryClient.invalidateQueries({ queryKey: ['/api/boards'] });
       queryClient.invalidateQueries({ queryKey: ['/api/boards', boardId] });
-      setLocation('/boards');
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        setLocation('/boards');
+      }
     },
     onError: () => {
       toast({
