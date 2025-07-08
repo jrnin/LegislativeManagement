@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from '@/hooks/use-toast';
 import { type Board } from '@shared/schema';
 import { queryClient } from '@/lib/queryClient';
-import BoardForm from './BoardForm';
+import BoardFormV2 from '../../components/boards/BoardFormV2';
 
 export default function BoardsPage() {
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
@@ -100,7 +100,7 @@ export default function BoardsPage() {
             <DialogHeader>
               <DialogTitle>Nova Mesa Diretora</DialogTitle>
             </DialogHeader>
-            <BoardForm onSuccess={() => setIsCreateModalOpen(false)} />
+            <BoardFormV2 onSuccess={() => setIsCreateModalOpen(false)} />
           </DialogContent>
         </Dialog>
       </div>

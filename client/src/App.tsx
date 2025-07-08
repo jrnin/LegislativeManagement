@@ -25,7 +25,7 @@ import CouncilorList from "@/pages/councilors/CouncilorList";
 import CouncilorDetails from "@/pages/councilors/CouncilorDetails";
 import BoardsPage from "@/pages/boards/BoardsPage";
 import CreateBoardPage from "@/pages/boards/CreateBoardPage";
-import EditBoardPage from "@/pages/boards/EditBoardPage";
+import BoardEdit from "@/pages/boards/BoardEdit";
 import BoardDetails from "@/pages/boards/BoardDetails";
 import PublicRoutes from "@/public/PublicRoutes";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,7 +65,7 @@ function AuthenticatedApp() {
         <Route path="/councilors/:id" component={CouncilorDetails} />
         <Route path="/boards" component={BoardsPage} />
         <Route path="/boards/new" component={CreateBoardPage} />
-        <Route path="/boards/:id/edit" component={EditBoardPage} />
+        <Route path="/boards/:id/edit" component={BoardEdit} />
         <Route path="/boards/:id" component={BoardDetails} />
         <Route component={NotFound} />
       </Switch>
