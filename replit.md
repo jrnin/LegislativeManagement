@@ -121,6 +121,8 @@ Preferred communication style: Simple, everyday language.
   - Successfully integrated with legislature system for contextual board management
   - Implemented role-based member assignment (Presidente, Vice-Presidente, 1º Secretário, 2º Secretário)
   - Added responsive design with member avatars and proper user experience flows
+  - **Final fix**: Corrected apiRequest function calls in BoardFormV2.tsx to use proper syntax (method, URL, data as separate parameters)
+  - **Confirmed working**: Mesa Diretora creation and editing now fully functional after API syntax correction
 
 - **June 23, 2025**: Implemented committee integration for event management
   - Added "Reunião Comissão" as new event category option in database and forms
