@@ -110,6 +110,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 8, 2025**: Mesa Diretora module fully implemented and tested
+  - Created complete CRUD functionality for Mesa Diretora (Board of Directors) management
+  - Implemented backend API endpoints for board creation, reading, updating, and deletion
+  - Added comprehensive database schema with board and board_members tables
+  - Created intuitive frontend interface with member selection and role assignment
+  - Resolved foreign key constraint issues by properly validating user IDs
+  - Tested board creation, viewing, and deletion through both API and UI
+  - Added proper error handling and user feedback for all operations
+  - Successfully integrated with legislature system for contextual board management
+  - Implemented role-based member assignment (Presidente, Vice-Presidente, 1º Secretário, 2º Secretário)
+  - Added responsive design with member avatars and proper user experience flows
+
 - **June 23, 2025**: Implemented committee integration for event management
   - Added "Reunião Comissão" as new event category option in database and forms
   - Created event_committees junction table for many-to-many relationships between events and committees
