@@ -1932,7 +1932,12 @@ export class DatabaseStorage implements IStorage {
       );
     }
     
-    return this.getBoardById(createdBoard.id)!;
+    const board = await this.getBoardById(createdBoard.id);
+    if (!board) {
+      throw new Error(`Failed to retrieve created board with ID ${createdBoard.id}`);
+    }
+    
+    return board;
   }
 
   async updateBoard(id: number, boardData: Partial<InsertBoard>, members?: InsertBoardMember[]): Promise<Board | undefined> {
