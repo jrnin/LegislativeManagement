@@ -45,7 +45,7 @@ export default function BoardForm({ boardId, isEditing = false }: BoardFormProps
       if (!response.ok) throw new Error('Failed to fetch board');
       return response.json() as Promise<Board>;
     },
-    enabled: !!boardId,
+    enabled: !!boardId && isEditing,
   });
 
   const { data: legislatures } = useQuery({
