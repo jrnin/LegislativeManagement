@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
@@ -79,7 +79,7 @@ export default function BoardForm({ boardId, isEditing = false, onSuccess }: Boa
   });
 
   // Set form values when board data is loaded
-  useState(() => {
+  useEffect(() => {
     if (board) {
       form.reset({
         name: board.name,
@@ -95,7 +95,7 @@ export default function BoardForm({ boardId, isEditing = false, onSuccess }: Boa
         })));
       }
     }
-  });
+  }, [board, form]);
 
   const createMutation = useMutation({
     mutationFn: async (data: BoardFormData & { members: Array<{ userId: string; role: string }> }) => {
