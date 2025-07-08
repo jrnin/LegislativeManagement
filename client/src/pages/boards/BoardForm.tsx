@@ -40,6 +40,7 @@ export default function BoardForm({ boardId, isEditing = false }: BoardFormProps
   const { data: board } = useQuery({
     queryKey: ['/api/boards', boardId],
     queryFn: async () => {
+      if (!boardId) throw new Error('Board ID is required');
       const response = await fetch(`/api/boards/${boardId}`);
       if (!response.ok) throw new Error('Failed to fetch board');
       return response.json() as Promise<Board>;

@@ -4123,20 +4123,6 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
-  app.get('/api/boards/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const board = await storage.getBoardById(Number(id));
-      if (!board) {
-        return res.status(404).json({ error: 'Board not found' });
-      }
-      res.json(board);
-    } catch (error) {
-      console.error('Error fetching board:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
-
   app.post('/api/boards', async (req, res) => {
     try {
       const validationResult = insertBoardSchema.safeParse(req.body);
@@ -4149,6 +4135,25 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
       res.status(201).json(board);
     } catch (error) {
       console.error('Error creating board:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/boards/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      // Check if the id is a valid number
+      if (isNaN(Number(id))) {
+        return res.status(400).json({ error: 'Invalid board ID' });
+      }
+      
+      const board = await storage.getBoardById(Number(id));
+      if (!board) {
+        return res.status(404).json({ error: 'Board not found' });
+      }
+      res.json(board);
+    } catch (error) {
+      console.error('Error fetching board:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
