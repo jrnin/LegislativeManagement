@@ -28,6 +28,7 @@ const formSchema = z.object({
   eventId: z.coerce.number().int().positive({ message: "Evento é obrigatório" }),
   activityType: z.string().min(1, { message: "Tipo de atividade é obrigatório" }),
   situacao: z.string().min(1, { message: "Situação é obrigatória" }),
+  regimeTramitacao: z.string().min(1, { message: "Regime de Tramitação é obrigatório" }),
   approvalType: z.enum(["", "councilors", "committees"]).optional(),
   authorIds: z.array(z.string()).min(1, { message: "Pelo menos um autor deve ser selecionado" }),
   file: z.any().optional(),
@@ -72,7 +73,8 @@ export default function ActivityForm() {
       description: "",
       eventId: 0,
       activityType: "",
-      situacao: "Em Tramitação",
+      situacao: "Aguardando Análise",
+      regimeTramitacao: "Ordinária",
       approvalType: "none",
       authorIds: [],
       file: undefined,
@@ -89,7 +91,8 @@ export default function ActivityForm() {
         description: activity.description || "",
         eventId: activity.eventId,
         activityType: activity.activityType || "",
-        situacao: activity.situacao || "Em Tramitação",
+        situacao: activity.situacao || "Aguardando Análise",
+        regimeTramitacao: activity.regimeTramitacao || "Ordinária",
         approvalType: activity.approvalType || "none",
         authorIds: activity.authors ? activity.authors.map(author => author.id) : [],
         file: undefined,
@@ -108,6 +111,7 @@ export default function ActivityForm() {
       formData.append("eventId", data.eventId.toString());
       formData.append("activityType", data.activityType);
       formData.append("situacao", data.situacao);
+      formData.append("regimeTramitacao", data.regimeTramitacao);
       formData.append("approvalType", data.approvalType);
       
       // Append authors
@@ -161,6 +165,7 @@ export default function ActivityForm() {
       if (data.eventId) formData.append("eventId", data.eventId.toString());
       if (data.activityType) formData.append("activityType", data.activityType);
       if (data.situacao) formData.append("situacao", data.situacao);
+      if (data.regimeTramitacao) formData.append("regimeTramitacao", data.regimeTramitacao);
       formData.append("approvalType", data.approvalType);
       
       // Append authors
@@ -243,6 +248,11 @@ export default function ActivityForm() {
     "Tramitando em Conjunto",
     "Tramitação Finalizada",
     "Vetado"
+  ];
+
+  const regimeTramitacaoOptions = [
+    "Ordinária",
+    "Urgente"
   ];
 
   if (activityLoading) {
@@ -353,6 +363,36 @@ export default function ActivityForm() {
                           {situacaoOptions.map((situacao) => (
                             <SelectItem key={situacao} value={situacao}>
                               {situacao}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="regimeTramitacao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Regime de Tramitação</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o regime" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {regimeTramitacaoOptions.map((regime) => (
+                            <SelectItem key={regime} value={regime}>
+                              {regime}
                             </SelectItem>
                           ))}
                         </SelectContent>

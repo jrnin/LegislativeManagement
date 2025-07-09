@@ -1044,6 +1044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         eventId: z.number().int().positive(),
         activityType: z.string(),
         situacao: z.string(),
+        regimeTramitacao: z.string(),
         approvalType: z.enum(["none", "councilors", "committees"]).optional(),
         authorIds: z.array(z.string()).min(1, "Pelo menos um autor deve ser selecionado"),
       });
@@ -1146,6 +1147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         eventId: z.number().int().positive().optional(),
         activityType: z.string().optional(),
         situacao: z.string().optional(),
+        regimeTramitacao: z.string().optional(),
         needsApproval: z.boolean().optional(),
         approved: z.boolean().optional(),
         authorIds: z.array(z.string()).min(1, "Pelo menos um autor deve ser selecionado").optional(),
