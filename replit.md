@@ -110,6 +110,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 9, 2025**: Implemented "Regime de Tramitação" field for legislative activities
+  - Added new regimeTramitacao field to legislative activities database schema with default value "Ordinária"
+  - Updated ActivityForm.tsx to include regime selection dropdown with "Ordinária" and "Urgente" options
+  - Integrated validation and form handling for the new field in both creation and update workflows
+  - Updated backend API routes to process and validate the new regime field
+  - Enhanced legislative activity management with processing regime classification
+
 - **July 8, 2025**: Mesa Diretora module fully implemented and tested
   - Created complete CRUD functionality for Mesa Diretora (Board of Directors) management
   - Implemented backend API endpoints for board creation, reading, updating, and deletion

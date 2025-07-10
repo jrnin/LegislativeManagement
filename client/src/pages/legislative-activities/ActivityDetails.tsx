@@ -611,6 +611,15 @@ export default function ActivityDetails() {
                   <div>{getStatusBadge()}</div>
                 </div>
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <h3 className="text-sm text-muted-foreground">Regime de Tramitação</h3>
+                  <Badge className={activity.regimeTramitacao === 'Urgente' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}>
+                    {activity.regimeTramitacao || 'Ordinária'}
+                  </Badge>
+                </div>
+              </div>
 
               <Separator />
 

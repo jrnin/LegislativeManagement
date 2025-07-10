@@ -199,6 +199,15 @@ export default function ActivityList() {
     return situationColors[situacao] || "bg-gray-100 text-gray-800";
   };
 
+  const getRegimeTramitacaoBadge = (regime: string) => {
+    const regimeColors: Record<string, string> = {
+      "Ordinária": "bg-blue-100 text-blue-800",
+      "Urgente": "bg-red-100 text-red-800"
+    };
+    
+    return regimeColors[regime] || "bg-gray-100 text-gray-800";
+  };
+
   const columns: ColumnDef<LegislativeActivity>[] = [
     {
       accessorKey: "activityNumber",
@@ -300,6 +309,19 @@ export default function ActivityList() {
         return (
           <Badge className={getSituationBadge(situacao)}>
             {situacao}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "regimeTramitacao",
+      header: "Regime",
+      cell: ({ row }) => {
+        const activity = row.original;
+        const regime = activity.regimeTramitacao || "Ordinária";
+        return (
+          <Badge className={getRegimeTramitacaoBadge(regime)}>
+            {regime}
           </Badge>
         );
       },
