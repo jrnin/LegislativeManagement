@@ -66,6 +66,7 @@ import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import ActivityDocumentLinker from "@/components/events/ActivityDocumentLinker";
+import EventActivityDocumentManager from "@/components/events/EventActivityDocumentManager";
 
 const VoteOption = ({ value, label, selected, onClick }: 
   { value: string, label: string, selected: boolean, onClick: () => void }) => {
@@ -642,132 +643,155 @@ export default function EventDetails() {
         </TabsList>
         
         <TabsContent value="activities" className="pt-4">
-          {activities.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FileText className="w-12 h-12 mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-medium">Nenhuma atividade registrada</h3>
-              <p className="text-muted-foreground">Este evento ainda não possui atividades legislativas.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold">Atividades Legislativas</h2>
-              <Accordion type="single" collapsible className="w-full">
-                {activities.map((activity: any) => (
-                  <AccordionItem key={activity.id} value={`item-${activity.id}`}>
-                    <AccordionTrigger className="hover:no-underline">
-                      <div className="flex items-center justify-between w-full text-left">
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="font-normal">
-                              #{activity.activityNumber}
-                            </Badge>
-                            <Badge 
-                              variant="secondary" 
-                              className="bg-blue-100 text-blue-800 hover:bg-blue-200"
-                            >
-                              {activity.activityType || activity.type}
-                            </Badge>
+          <div className="space-y-6">
+            {/* Activities Section */}
+            {activities.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <FileText className="w-12 h-12 mb-4 text-muted-foreground" />
+                <h3 className="text-xl font-medium">Nenhuma atividade registrada</h3>
+                <p className="text-muted-foreground">Este evento ainda não possui atividades legislativas.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold">Atividades Legislativas</h2>
+                <Accordion type="single" collapsible className="w-full">
+                  {activities.map((activity: any) => (
+                    <AccordionItem key={activity.id} value={`item-${activity.id}`}>
+                      <AccordionTrigger className="hover:no-underline">
+                        <div className="flex items-center justify-between w-full text-left">
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="font-normal">
+                                #{activity.activityNumber}
+                              </Badge>
+                              <Badge 
+                                variant="secondary" 
+                                className="bg-blue-100 text-blue-800 hover:bg-blue-200"
+                              >
+                                {activity.activityType || activity.type}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(activity.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                            </p>
+                            {activity.authors && activity.authors.length > 0 && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground">Autores:</span>
+                                <div className="flex gap-1">
+                                  {activity.authors.slice(0, 3).map((author: any) => (
+                                    <Badge key={author.id} variant="outline" className="text-xs">
+                                      {author.name}
+                                    </Badge>
+                                  ))}
+                                  {activity.authors.length > 3 && (
+                                    <Badge variant="outline" className="text-xs">
+                                      +{activity.authors.length - 3} mais
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(activity.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                          </p>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-4">
+                        <div className="space-y-4">
+                          <div className="space-y-3">
+                            <div>
+                              <h4 className="text-sm font-semibold text-muted-foreground mb-1">Tipo da Atividade</h4>
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                                {activity.activityType || activity.type}
+                              </Badge>
+                            </div>
+                            
+                            <div>
+                              <h4 className="text-sm font-semibold text-muted-foreground mb-2">Descrição</h4>
+                              <p className="text-sm leading-relaxed">{activity.description}</p>
+                            </div>
+                          </div>
+                          
                           {activity.authors && activity.authors.length > 0 && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-muted-foreground">Autores:</span>
-                              <div className="flex gap-1">
-                                {activity.authors.slice(0, 3).map((author: any) => (
-                                  <Badge key={author.id} variant="outline" className="text-xs">
-                                    {author.name}
-                                  </Badge>
+                            <div>
+                              <h4 className="text-sm font-semibold text-muted-foreground mb-3">Autores da Atividade</h4>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {activity.authors.map((author: any) => (
+                                  <div key={author.id} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                                    <Avatar className="h-8 w-8">
+                                      <AvatarImage src={author.profileImageUrl || ""} />
+                                      <AvatarFallback className="text-xs">
+                                        {author.name?.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex flex-col min-w-0">
+                                      <span className="text-sm font-medium truncate">{author.name}</span>
+                                      <span className="text-xs text-muted-foreground">{author.role}</span>
+                                    </div>
+                                  </div>
                                 ))}
-                                {activity.authors.length > 3 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{activity.authors.length - 3} mais
-                                  </Badge>
-                                )}
                               </div>
                             </div>
                           )}
-                        </div>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-4">
-                      <div className="space-y-4">
-                        <div className="space-y-3">
-                          <div>
-                            <h4 className="text-sm font-semibold text-muted-foreground mb-1">Tipo da Atividade</h4>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                              {activity.activityType || activity.type}
-                            </Badge>
-                          </div>
                           
-                          <div>
-                            <h4 className="text-sm font-semibold text-muted-foreground mb-2">Descrição</h4>
-                            <p className="text-sm leading-relaxed">{activity.description}</p>
-                          </div>
-                        </div>
-                        
-                        {activity.authors && activity.authors.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold text-muted-foreground mb-3">Autores da Atividade</h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              {activity.authors.map((author: any) => (
-                                <div key={author.id} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                                  <Avatar className="h-8 w-8">
-                                    <AvatarImage src={author.profileImageUrl || ""} />
-                                    <AvatarFallback className="text-xs">
-                                      {author.name?.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div className="flex flex-col min-w-0">
-                                    <span className="text-sm font-medium truncate">{author.name}</span>
-                                    <span className="text-xs text-muted-foreground">{author.role}</span>
-                                  </div>
-                                </div>
-                              ))}
+                          {(!activity.authors || activity.authors.length === 0) && (
+                            <div className="flex items-center gap-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                              <span className="text-sm text-yellow-800">
+                                Nenhum autor cadastrado para esta atividade
+                              </span>
                             </div>
-                          </div>
-                        )}
-                        
-                        {(!activity.authors || activity.authors.length === 0) && (
-                          <div className="flex items-center gap-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <span className="text-sm text-yellow-800">
-                              Nenhum autor cadastrado para esta atividade
-                            </span>
-                          </div>
-                        )}
-                        
-                        {/* Activity Document Linker - Only show for authenticated users */}
-                        {isAuthenticated && user?.role === "admin" && (
-                          <div className="pt-4 border-t">
-                            <ActivityDocumentLinker
-                              eventId={eventId}
-                              activityId={activity.id}
-                              activityTitle={activity.description}
-                              activityNumber={activity.activityNumber}
-                            />
-                          </div>
-                        )}
-                        
-                        {activity.filePath && (
-                          <div className="pt-2 border-t">
-                            <Button 
-                              variant="outline" 
-                              className="gap-2"
-                              onClick={() => window.open(`/api/files/activities/${activity.id}`, '_blank')}
-                            >
-                              <Download className="h-4 w-4" />
-                              Baixar Anexo
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
-          )}
+                          )}
+                          
+                          {/* Activity Document Linker - Only show for authenticated users */}
+                          {isAuthenticated && user?.role === "admin" && (
+                            <div className="pt-4 border-t">
+                              <ActivityDocumentLinker
+                                eventId={eventId}
+                                activityId={activity.id}
+                                activityTitle={activity.description}
+                                activityNumber={activity.activityNumber}
+                              />
+                            </div>
+                          )}
+                          
+                          {activity.filePath && (
+                            <div className="pt-2 border-t">
+                              <Button 
+                                variant="outline" 
+                                className="gap-2"
+                                onClick={() => window.open(`/api/files/activities/${activity.id}`, '_blank')}
+                              >
+                                <Download className="h-4 w-4" />
+                                Baixar Anexo
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            )}
+            
+            {/* Document Linking Section - Always show for admin users */}
+            {isAuthenticated && user?.role === "admin" && (
+              <div className="border-t pt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      Gerenciar Documentos das Atividades
+                    </CardTitle>
+                    <CardDescription>
+                      Vincule documentos de atividades legislativas a este evento para facilitar o acesso durante a reunião.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <EventActivityDocumentManager eventId={eventId} />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
         </TabsContent>
         
         <TabsContent value="attendance" className="pt-4">
