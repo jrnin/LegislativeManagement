@@ -117,7 +117,11 @@ Preferred communication style: Simple, everyday language.
   - Updated backend API validation schemas to accept optional eventId values
   - Modified form data processing to handle undefined eventId and approvalType values
   - Added "Nenhum evento" option in event selection dropdown for clarity
-  - Successfully tested with new activity creation without required event association
+  - **FINAL FIX**: Removed strict enum validation for approvalType field to allow empty values
+  - Changed validation from z.enum() to z.string().optional() for maximum flexibility
+  - Updated backend approval type handling to accept any string value including empty strings
+  - Fixed email notification logic to properly handle empty approval type values
+  - Successfully tested with new activity creation without required event or approval type selection
 
 - **July 9, 2025**: Implemented "Regime de Tramitação" field for legislative activities
   - Added new regimeTramitacao field to legislative activities database schema with default value "Ordinária"
