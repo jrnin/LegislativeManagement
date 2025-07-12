@@ -114,7 +114,7 @@ export default function EventList() {
       "Concluido": "status-badge-completed",
       "Cancelado": "status-badge-canceled"
     };
-    return statusMap[status] || "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100";
+    return statusMap[status] || "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200";
   };
 
   // Não há mais restrições para usuários do tipo "Vereador" acessarem a página de eventos

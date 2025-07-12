@@ -124,6 +124,9 @@ Preferred communication style: Simple, everyday language.
   - **Clean Interface Update**: Removed voting statistics section from individual activity voting dialog per user request
   - Fixed voting statistics calculation to properly handle database boolean values stored as 't'/'f' characters
   - Confirmed voting system working correctly with 80% approval rate (4 approve, 1 reject votes)
+  - **Status Color Enhancement**: Updated event status colors to use standard Tailwind CSS backgrounds
+  - Applied consistent color scheme across all components: Aberto (blue), Andamento (yellow), Concluido (green), Cancelado (red)
+  - Enhanced visual consistency with bg-[color]-100 and text-[color]-800 standard Tailwind patterns
 
 - **July 12, 2025**: Implemented comprehensive Event-Activity Management System
   - Created EventActivityManager component with multi-select functionality for adding/removing activities from events

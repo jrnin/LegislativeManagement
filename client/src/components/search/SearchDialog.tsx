@@ -95,13 +95,13 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
       'andamento': 'status-badge-in-progress',
       'concluido': 'status-badge-completed',
       'cancelado': 'status-badge-canceled',
-      'pendente': 'bg-amber-50 text-amber-700 border-amber-200',
-      'aprovado': 'bg-green-50 text-green-700 border-green-200',
-      'ativo': 'bg-green-50 text-green-700 border-green-200',
-      'inativo': 'bg-gray-50 text-gray-700 border-gray-200',
+      'pendente': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'aprovado': 'bg-green-100 text-green-800 border-green-200',
+      'ativo': 'bg-green-100 text-green-800 border-green-200',
+      'inativo': 'bg-gray-100 text-gray-800 border-gray-200',
     };
     
-    const className = statusMap[status.toLowerCase()] || 'bg-gray-50 text-gray-700 border-gray-200';
+    const className = statusMap[status.toLowerCase()] || 'bg-gray-100 text-gray-800 border-gray-200';
     
     return (
       <Badge variant="outline" className={`text-xs ${className}`}>

@@ -47,7 +47,7 @@ export default function Dashboard() {
       "concluido": "status-badge-completed",
       "cancelado": "status-badge-canceled"
     };
-    return statusMap[status.toLowerCase()] || "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100";
+    return statusMap[status.toLowerCase()] || "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200";
   };
 
   return (
