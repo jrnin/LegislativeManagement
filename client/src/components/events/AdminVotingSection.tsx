@@ -97,7 +97,7 @@ export function AdminVotingSection({
 
   return (
     <div className="space-y-4">
-      <div className="max-h-64 overflow-y-auto border rounded-lg p-4 space-y-3">
+      <div className="max-h-48 overflow-y-auto border rounded-lg p-3 space-y-2">
         {councilors.map((councilor) => {
           const existingVote = getExistingVote(councilor.id);
           const isSelected = isCouncilorSelected(councilor.id);
@@ -139,23 +139,23 @@ export function AdminVotingSection({
                 
                 {isSelected && (
                   <div className="space-y-2 pl-11">
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
                       <Button
                         variant={selectedVotes[councilor.id]?.vote === true ? "default" : "outline"}
                         size="sm"
-                        className={`${selectedVotes[councilor.id]?.vote === true ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                        className={`text-xs ${selectedVotes[councilor.id]?.vote === true ? 'bg-green-600 hover:bg-green-700' : ''}`}
                         onClick={() => handleVoteChange(councilor.id, true)}
                       >
-                        <ThumbsUp className="w-4 h-4 mr-1" />
+                        <ThumbsUp className="w-3 h-3 mr-1" />
                         Aprovar
                       </Button>
                       <Button
                         variant={selectedVotes[councilor.id]?.vote === false ? "default" : "outline"}
                         size="sm"
-                        className={`${selectedVotes[councilor.id]?.vote === false ? 'bg-red-600 hover:bg-red-700' : ''}`}
+                        className={`text-xs ${selectedVotes[councilor.id]?.vote === false ? 'bg-red-600 hover:bg-red-700' : ''}`}
                         onClick={() => handleVoteChange(councilor.id, false)}
                       >
-                        <ThumbsDown className="w-4 h-4 mr-1" />
+                        <ThumbsDown className="w-3 h-3 mr-1" />
                         Rejeitar
                       </Button>
                     </div>
@@ -168,8 +168,8 @@ export function AdminVotingSection({
                         id={`comment-${councilor.id}`}
                         value={selectedVotes[councilor.id]?.comment || ""}
                         onChange={(e) => handleCommentChange(councilor.id, e.target.value)}
-                        placeholder="Comentário sobre o voto..."
-                        className="resize-none min-h-[60px] text-sm"
+                        placeholder="Comentário..."
+                        className="resize-none min-h-[50px] text-xs"
                       />
                     </div>
                   </div>

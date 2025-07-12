@@ -1350,7 +1350,7 @@ export default function EventDetails() {
 
       {/* Diálogo de Aprovação de Atividade */}
       <Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
-        <DialogContent className="sm:max-w-[1000px]">
+        <DialogContent className="sm:max-w-[1200px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Analisar Atividade Legislativa</DialogTitle>
             <DialogDescription>
@@ -1360,8 +1360,8 @@ export default function EventDetails() {
           
           <div className="py-4">
             {selectedActivity && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Coluna esquerda - Informações da atividade e estatísticas de votação */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Coluna 1 - Informações da atividade */}
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <h3 className="text-lg font-medium">{selectedActivity.description}</h3>
@@ -1385,24 +1385,22 @@ export default function EventDetails() {
                       </div>
                     ) : activityVotesData ? (
                       <div className="space-y-3">
-                        <div className="grid grid-cols-3 gap-3 text-center">
+                        <div className="grid grid-cols-3 gap-2 text-center">
                           <div className="bg-green-50 p-2 rounded-md">
                             <p className="text-green-700 text-lg font-bold">
                               {activityVotesData.approveCount}
-                              <span className="ml-1 text-sm font-normal">({typeof activityVotesData.approvePercentage === 'number' ? activityVotesData.approvePercentage.toFixed(1) : '0.0'}%)</span>
                             </p>
-                            <p className="text-sm text-green-600">Aprovações</p>
+                            <p className="text-xs text-green-600">Aprovações</p>
                           </div>
                           <div className="bg-red-50 p-2 rounded-md">
                             <p className="text-red-700 text-lg font-bold">
                               {activityVotesData.rejectCount}
-                              <span className="ml-1 text-sm font-normal">({typeof activityVotesData.rejectPercentage === 'number' ? activityVotesData.rejectPercentage.toFixed(1) : '0.0'}%)</span>
                             </p>
-                            <p className="text-sm text-red-600">Rejeições</p>
+                            <p className="text-xs text-red-600">Rejeições</p>
                           </div>
                           <div className="bg-gray-50 p-2 rounded-md">
                             <p className="text-gray-700 text-lg font-bold">{activityVotesData.totalVotes}</p>
-                            <p className="text-sm text-gray-600">Total</p>
+                            <p className="text-xs text-gray-600">Total</p>
                           </div>
                         </div>
                         
@@ -1425,29 +1423,6 @@ export default function EventDetails() {
                       </div>
                     ) : (
                       <p className="text-sm text-muted-foreground">Nenhum voto registrado ainda.</p>
-                    )}
-                    
-                    {/* Lista dos últimos votos */}
-                    {activityVotesData?.votes?.length > 0 && (
-                      <div className="mt-4">
-                        <h5 className="text-sm font-medium mb-2">Últimos votos:</h5>
-                        <div className="space-y-2 max-h-[120px] overflow-y-auto pr-2">
-                          {activityVotesData.votes.map((vote: any) => (
-                            <div key={vote.id} className="flex items-center gap-2 text-sm">
-                              <Avatar className="w-6 h-6">
-                                <AvatarImage src={vote.user?.profileImageUrl || ''} />
-                                <AvatarFallback>{vote.user?.name?.charAt(0)}</AvatarFallback>
-                              </Avatar>
-                              <span className="font-medium">{vote.user?.name}</span>
-                              {vote.vote ? (
-                                <ThumbsUp className="w-4 h-4 text-green-500" />
-                              ) : (
-                                <ThumbsDown className="w-4 h-4 text-red-500" />
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
                     )}
                     
                     {/* Seção de votação do usuário */}
@@ -1489,10 +1464,43 @@ export default function EventDetails() {
                       </div>
                     )}
                   </div>
+                </div>
+                
+                {/* Coluna 2 - Últimos votos e votação administrativa */}
+                <div className="space-y-6">
+                  {/* Lista dos últimos votos */}
+                  {activityVotesData?.votes?.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Últimos votos</h4>
+                      <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                        {activityVotesData.votes.map((vote: any) => (
+                          <div key={vote.id} className="flex items-center gap-2 text-sm p-2 rounded-md bg-gray-50">
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage src={vote.user?.profileImageUrl || ''} />
+                              <AvatarFallback>{vote.user?.name?.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <span className="font-medium">{vote.user?.name}</span>
+                              <div className="flex items-center gap-1 mt-1">
+                                {vote.vote ? (
+                                  <ThumbsUp className="w-4 h-4 text-green-500" />
+                                ) : (
+                                  <ThumbsDown className="w-4 h-4 text-red-500" />
+                                )}
+                                <span className="text-xs text-muted-foreground">
+                                  {vote.vote ? 'Aprovou' : 'Rejeitou'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Seção de votação administrativa */}
                   {user?.role === 'admin' && (
-                    <div className="space-y-4 mt-6 pt-4 border-t">
+                    <div className="space-y-4 pt-4 border-t">
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium">Registrar Votos dos Vereadores</h4>
                         <Button
@@ -1547,7 +1555,7 @@ export default function EventDetails() {
                   )}
                 </div>
                 
-                {/* Coluna direita - Visualização do arquivo */}
+                {/* Coluna 3 - Visualização do arquivo */}
                 <div>
                   {selectedActivity.fileName ? (
                     <div className="border rounded-md p-3 h-full">
