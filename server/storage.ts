@@ -197,6 +197,10 @@ export interface IStorage {
     document: Document; 
     linkedByUser: User 
   })[]>;
+
+  // Event-Activity Management operations
+  addActivitiesToEvent(eventId: number, activityIds: number[]): Promise<boolean>;
+  removeActivityFromEvent(eventId: number, activityId: number): Promise<boolean>;
   
   // Search operations
   searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
@@ -2493,6 +2497,44 @@ export class DatabaseStorage implements IStorage {
         document: row.documents!,
         linkedByUser: row.users!
       })));
+  }
+
+  /**
+   * Event-Activity Management operations
+   */
+  async addActivitiesToEvent(eventId: number, activityIds: number[]): Promise<boolean> {
+    try {
+      // Update the eventId for all selected activities
+      await db
+        .update(legislativeActivities)
+        .set({ eventId })
+        .where(inArray(legislativeActivities.id, activityIds));
+      
+      return true;
+    } catch (error) {
+      console.error("Error adding activities to event:", error);
+      return false;
+    }
+  }
+
+  async removeActivityFromEvent(eventId: number, activityId: number): Promise<boolean> {
+    try {
+      // Set eventId to null for the specified activity
+      const result = await db
+        .update(legislativeActivities)
+        .set({ eventId: null })
+        .where(
+          and(
+            eq(legislativeActivities.id, activityId),
+            eq(legislativeActivities.eventId, eventId)
+          )
+        );
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error removing activity from event:", error);
+      return false;
+    }
   }
 }
 

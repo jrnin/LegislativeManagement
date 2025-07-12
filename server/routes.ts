@@ -2475,6 +2475,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // EVENT ACTIVITIES MANAGEMENT ROUTES
+
+  // Add activities to event
+  app.post('/api/events/:eventId/activities', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const { activityIds } = req.body;
+
+      if (!Array.isArray(activityIds) || activityIds.length === 0) {
+        return res.status(400).json({ message: "Lista de IDs de atividades é obrigatória" });
+      }
+
+      const result = await storage.addActivitiesToEvent(eventId, activityIds);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error adding activities to event:", error);
+      res.status(500).json({ message: "Erro ao adicionar atividades ao evento" });
+    }
+  });
+
+  // Remove activity from event
+  app.delete('/api/events/:eventId/activities/:activityId', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const activityId = Number(req.params.activityId);
+
+      const result = await storage.removeActivityFromEvent(eventId, activityId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Atividade não encontrada no evento" });
+      }
+
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error removing activity from event:", error);
+      res.status(500).json({ message: "Erro ao remover atividade do evento" });
+    }
+  });
+
   // Get councilors list
   app.get('/api/councilors', requireAuth, async (req, res) => {
     try {

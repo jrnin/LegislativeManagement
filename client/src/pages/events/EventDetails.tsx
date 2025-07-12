@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { Loader2, Calendar, MapPin, User, FileText, Clock, Check, X, MessageSquare, Download, UserCheck, RefreshCw, Vote, ThumbsUp, ThumbsDown, AlertCircle } from "lucide-react";
+import { Loader2, Calendar, MapPin, User, FileText, Clock, Check, X, MessageSquare, Download, UserCheck, RefreshCw, Vote, ThumbsUp, ThumbsDown, AlertCircle, Activity } from "lucide-react";
 
 import {
   Tabs,
@@ -67,6 +67,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import ActivityDocumentLinker from "@/components/events/ActivityDocumentLinker";
 import EventActivityDocumentManager from "@/components/events/EventActivityDocumentManager";
+import EventActivityManager from "@/components/events/EventActivityManager";
 
 const VoteOption = ({ value, label, selected, onClick }: 
   { value: string, label: string, selected: boolean, onClick: () => void }) => {
@@ -644,7 +645,31 @@ export default function EventDetails() {
         
         <TabsContent value="activities" className="pt-4">
           <div className="space-y-6">
-            {/* Activities Section */}
+            {/* Activity Management Section - Always show for admin users */}
+            {isAuthenticated && user?.role === "admin" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="w-5 h-5" />
+                    Atividades do Evento
+                  </CardTitle>
+                  <CardDescription>
+                    Adicione ou remova atividades legislativas deste evento.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <EventActivityManager 
+                    eventId={eventId} 
+                    currentActivities={activities} 
+                    onRefresh={() => {
+                      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/details`] });
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Activities Display Section */}
             {activities.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <FileText className="w-12 h-12 mb-4 text-muted-foreground" />
@@ -653,7 +678,7 @@ export default function EventDetails() {
               </div>
             ) : (
               <div className="space-y-4">
-                <h2 className="text-xl font-bold">Atividades Legislativas</h2>
+                <h2 className="text-xl font-bold">Detalhes das Atividades</h2>
                 <Accordion type="single" collapsible className="w-full">
                   {activities.map((activity: any) => (
                     <AccordionItem key={activity.id} value={`item-${activity.id}`}>
