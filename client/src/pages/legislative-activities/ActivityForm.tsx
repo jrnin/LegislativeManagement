@@ -29,7 +29,7 @@ const formSchema = z.object({
   activityType: z.string().min(1, { message: "Tipo de atividade é obrigatório" }),
   situacao: z.string().min(1, { message: "Situação é obrigatória" }),
   regimeTramitacao: z.string().min(1, { message: "Regime de Tramitação é obrigatório" }),
-  approvalType: z.enum(["", "councilors", "committees"]).optional(),
+  approvalType: z.string().optional(),
   authorIds: z.array(z.string()).min(1, { message: "Pelo menos um autor deve ser selecionado" }),
   file: z.any().optional(),
 });
@@ -75,7 +75,7 @@ export default function ActivityForm() {
       activityType: "",
       situacao: "Aguardando Análise",
       regimeTramitacao: "Ordinária",
-      approvalType: "none",
+      approvalType: "",
       authorIds: [],
       file: undefined,
     }
@@ -93,7 +93,7 @@ export default function ActivityForm() {
         activityType: activity.activityType || "",
         situacao: activity.situacao || "Aguardando Análise",
         regimeTramitacao: activity.regimeTramitacao || "Ordinária",
-        approvalType: activity.approvalType || "none",
+        approvalType: activity.approvalType || "",
         authorIds: activity.authors ? activity.authors.map(author => author.id) : [],
         file: undefined,
       });
@@ -114,7 +114,7 @@ export default function ActivityForm() {
       formData.append("activityType", data.activityType);
       formData.append("situacao", data.situacao);
       formData.append("regimeTramitacao", data.regimeTramitacao);
-      if (data.approvalType && data.approvalType !== "none") {
+      if (data.approvalType && data.approvalType !== "none" && data.approvalType !== "") {
         formData.append("approvalType", data.approvalType);
       } else {
         formData.append("approvalType", "");

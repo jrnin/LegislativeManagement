@@ -1045,7 +1045,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activityType: z.string(),
         situacao: z.string(),
         regimeTramitacao: z.string(),
-        approvalType: z.enum(["", "none", "councilors", "committees"]).optional(),
+        approvalType: z.string().optional(),
         authorIds: z.array(z.string()).min(1, "Pelo menos um autor deve ser selecionado"),
       });
       
@@ -1054,7 +1054,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         activityNumber: Number(req.body.activityNumber),
         eventId: req.body.eventId ? Number(req.body.eventId) : undefined,
-        approvalType: req.body.approvalType || "none",
+        approvalType: req.body.approvalType || "",
         authorIds: Array.isArray(req.body.authorIds) ? req.body.authorIds : [req.body.authorIds],
       };
       
@@ -1082,7 +1082,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       // If activity needs approval, send emails to authorized persons
-      if (validated.approvalType && validated.approvalType !== "none") {
+      if (validated.approvalType && validated.approvalType !== "none" && validated.approvalType !== "") {
         // Get users to notify based on approval type
         const host = req.headers.host || "";
         const protocol = req.headers["x-forwarded-proto"] || req.protocol;
