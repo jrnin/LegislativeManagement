@@ -168,6 +168,23 @@ export default function EventDetails() {
     },
     enabled: !!selectedActivityId
   });
+
+  // Auto-load councilors when dialog opens and user is admin
+  useEffect(() => {
+    if (isApprovalDialogOpen && user?.role === 'admin' && councilors.length === 0) {
+      const loadCouncilors = async () => {
+        try {
+          console.log('Loading councilors for admin voting...');
+          const response = await apiRequest<any[]>('/api/councilors');
+          console.log('Councilors loaded:', response);
+          setCouncilors(response || []);
+        } catch (error) {
+          console.error('Error fetching councilors:', error);
+        }
+      };
+      loadCouncilors();
+    }
+  }, [isApprovalDialogOpen, user?.role, councilors.length]);
   
   // Mutation para votar em uma atividade
   const activityVoteMutation = useMutation({
@@ -1494,6 +1511,13 @@ export default function EventDetails() {
                           Atualizar Lista
                         </Button>
                       </div>
+                      
+                      {councilors.length === 0 && (
+                        <div className="text-center p-4 text-muted-foreground">
+                          <p>Carregando vereadores...</p>
+                          <p className="text-xs mt-1">Se não carregar automaticamente, clique em "Atualizar Lista"</p>
+                        </div>
+                      )}
                       
                       {councilors.length > 0 && (
                         <AdminVotingSection 

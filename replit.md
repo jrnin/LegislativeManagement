@@ -110,6 +110,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 12, 2025**: Implemented Administrative Voting System for Event Details
+  - Added AdminVotingSection component to "Ver Votações" dialog in event details
+  - Integrated multi-select councilor voting interface with approve/reject options
+  - Added optional comment fields for each vote registration
+  - Implemented auto-loading of councilors when admin opens voting dialog
+  - Connected to existing backend `/api/activities/:activityId/votes/admin` endpoint
+  - Enhanced voting statistics display with real-time updates after vote registration
+  - Added proper authentication and role-based access control for admin-only voting
+  - Created comprehensive councilor selection interface showing existing vote status
+  - Implemented bulk vote registration with proper validation and error handling
+  - Added toast notifications for successful vote registration and error feedback
+
 - **July 12, 2025**: Implemented comprehensive Event-Activity Management System
   - Created EventActivityManager component with multi-select functionality for adding/removing activities from events
   - Added backend API endpoints (/api/events/:eventId/activities) for managing activity-event associations
