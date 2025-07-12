@@ -1041,7 +1041,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activityNumber: z.number().int().positive(),
         activityDate: z.string().refine(val => !isNaN(Date.parse(val))),
         description: z.string(),
-        eventId: z.number().int().positive(),
+        eventId: z.number().int().positive().optional(),
         activityType: z.string(),
         situacao: z.string(),
         regimeTramitacao: z.string(),
@@ -1053,7 +1053,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = {
         ...req.body,
         activityNumber: Number(req.body.activityNumber),
-        eventId: Number(req.body.eventId),
+        eventId: req.body.eventId ? Number(req.body.eventId) : undefined,
         approvalType: req.body.approvalType || "none",
         authorIds: Array.isArray(req.body.authorIds) ? req.body.authorIds : [req.body.authorIds],
       };

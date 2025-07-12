@@ -110,6 +110,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 12, 2025**: Made Event and Approval Type fields optional in legislative activities
+  - Modified database schema to remove NOT NULL constraint from event_id column
+  - Updated frontend form validation to make eventId and approvalType optional fields
+  - Enhanced ActivityForm.tsx with "(opcional)" labels and proper default value handling
+  - Updated backend API validation schemas to accept optional eventId values
+  - Modified form data processing to handle undefined eventId and approvalType values
+  - Added "Nenhum evento" option in event selection dropdown for clarity
+  - Successfully tested with new activity creation without required event association
+
 - **July 9, 2025**: Implemented "Regime de Tramitação" field for legislative activities
   - Added new regimeTramitacao field to legislative activities database schema with default value "Ordinária"
   - Updated ActivityForm.tsx to include regime selection dropdown with "Ordinária" and "Urgente" options

@@ -124,7 +124,7 @@ export const legislativeActivities = pgTable("legislative_activities", {
   activityNumber: integer("activity_number").notNull(),
   activityDate: timestamp("activity_date").notNull(),
   description: text("description").notNull(),
-  eventId: integer("event_id").notNull(),
+  eventId: integer("event_id"),
   activityType: varchar("activity_type").notNull(), // "Pauta", "Indicação", "Requerimento", "Resolução", "Mensagem", "Moção", "Projeto de Lei"
   situacao: varchar("situacao").notNull().default("Aguardando Análise"), // "Arquivado", "Aguardando Análise", "Análise de Parecer", "Aguardando Deliberação", "Aguardando Despacho do Presidente", "Aguardando Envio ao Executivo", "Devolvida ao Autor", "Pronta para Pauta", "Tramitando em Conjunto", "Tramitação Finalizada", "Vetado"
   regimeTramitacao: varchar("regime_tramitacao").notNull().default("Ordinária"), // "Ordinária", "Urgente"

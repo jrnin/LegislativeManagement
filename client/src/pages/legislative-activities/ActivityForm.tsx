@@ -25,7 +25,7 @@ const formSchema = z.object({
   activityNumber: z.coerce.number().int().positive({ message: "Número da atividade deve ser positivo" }),
   activityDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Data inválida" }),
   description: z.string().min(3, { message: "Descrição é obrigatória" }),
-  eventId: z.coerce.number().int().positive({ message: "Evento é obrigatório" }),
+  eventId: z.coerce.number().int().positive().optional(),
   activityType: z.string().min(1, { message: "Tipo de atividade é obrigatório" }),
   situacao: z.string().min(1, { message: "Situação é obrigatória" }),
   regimeTramitacao: z.string().min(1, { message: "Regime de Tramitação é obrigatório" }),
@@ -71,7 +71,7 @@ export default function ActivityForm() {
       activityNumber: 0,
       activityDate: new Date().toISOString().split('T')[0],
       description: "",
-      eventId: 0,
+      eventId: undefined,
       activityType: "",
       situacao: "Aguardando Análise",
       regimeTramitacao: "Ordinária",
@@ -108,11 +108,15 @@ export default function ActivityForm() {
       formData.append("activityNumber", data.activityNumber.toString());
       formData.append("activityDate", data.activityDate);
       formData.append("description", data.description);
-      formData.append("eventId", data.eventId.toString());
+      if (data.eventId) {
+        formData.append("eventId", data.eventId.toString());
+      }
       formData.append("activityType", data.activityType);
       formData.append("situacao", data.situacao);
       formData.append("regimeTramitacao", data.regimeTramitacao);
-      formData.append("approvalType", data.approvalType);
+      if (data.approvalType && data.approvalType !== "none") {
+        formData.append("approvalType", data.approvalType);
+      }
       
       // Append authors
       data.authorIds.forEach(authorId => {
@@ -166,7 +170,9 @@ export default function ActivityForm() {
       if (data.activityType) formData.append("activityType", data.activityType);
       if (data.situacao) formData.append("situacao", data.situacao);
       if (data.regimeTramitacao) formData.append("regimeTramitacao", data.regimeTramitacao);
-      formData.append("approvalType", data.approvalType);
+      if (data.approvalType && data.approvalType !== "none") {
+        formData.append("approvalType", data.approvalType);
+      }
       
       // Append authors
       data.authorIds.forEach(authorId => {
@@ -432,17 +438,18 @@ export default function ActivityForm() {
                   name="eventId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Evento</FormLabel>
+                      <FormLabel>Evento <span className="text-muted-foreground">(opcional)</span></FormLabel>
                       <Select 
                         onValueChange={(value) => field.onChange(parseInt(value))} 
-                        defaultValue={field.value.toString()}
+                        defaultValue={field.value?.toString() || ""}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione um evento" />
+                            <SelectValue placeholder="Selecione um evento (opcional)" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="">Nenhum evento</SelectItem>
                           {events.map((event) => (
                             <SelectItem key={event.id} value={event.id.toString()}>
                               {event.category} #{event.eventNumber} - {formatDate(event.eventDate.toString())}
@@ -460,10 +467,10 @@ export default function ActivityForm() {
                   name="approvalType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tipo de Aprovação</FormLabel>
+                      <FormLabel>Tipo de Aprovação <span className="text-muted-foreground">(opcional)</span></FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
-                        defaultValue={field.value}
+                        defaultValue={field.value || "none"}
                       >
                         <FormControl>
                           <SelectTrigger>
