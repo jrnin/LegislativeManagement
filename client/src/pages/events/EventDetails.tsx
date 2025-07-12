@@ -69,6 +69,7 @@ import ActivityDocumentLinker from "@/components/events/ActivityDocumentLinker";
 import EventActivityDocumentManager from "@/components/events/EventActivityDocumentManager";
 import EventActivityManager from "@/components/events/EventActivityManager";
 import { EventDocumentManager } from "@/components/events/EventDocumentManager";
+import { AdminVotingSection } from "@/components/events/AdminVotingSection";
 
 const VoteOption = ({ value, label, selected, onClick }: 
   { value: string, label: string, selected: boolean, onClick: () => void }) => {
@@ -1471,6 +1472,41 @@ export default function EventDetails() {
                       </div>
                     )}
                   </div>
+                  
+                  {/* Seção de votação administrativa */}
+                  {user?.role === 'admin' && (
+                    <div className="space-y-4 mt-6 pt-4 border-t">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Registrar Votos dos Vereadores</h4>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              const response = await apiRequest<any[]>('/api/councilors');
+                              setCouncilors(response || []);
+                            } catch (error) {
+                              console.error('Error fetching councilors:', error);
+                            }
+                          }}
+                        >
+                          <RefreshCw className="w-4 h-4 mr-1" />
+                          Atualizar Lista
+                        </Button>
+                      </div>
+                      
+                      {councilors.length > 0 && (
+                        <AdminVotingSection 
+                          activityId={selectedActivityId!}
+                          councilors={councilors}
+                          existingVotes={activityVotesData?.votes || []}
+                          onVotesRegistered={() => {
+                            refetchActivityVotes();
+                          }}
+                        />
+                      )}
+                    </div>
+                  )}
                   
                   {/* Seção de comentário (apenas para administradores) */}
                   {user?.role === 'admin' && (
