@@ -91,17 +91,17 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
     if (!status) return null;
     
     const statusMap: Record<string, string> = {
-      'aberto': 'bg-green-100 text-green-800',
-      'andamento': 'bg-blue-100 text-blue-800',
-      'concluido': 'bg-slate-100 text-slate-800',
-      'cancelado': 'bg-red-100 text-red-800',
-      'pendente': 'bg-amber-100 text-amber-800',
-      'aprovado': 'bg-green-100 text-green-800',
-      'ativo': 'bg-green-100 text-green-800',
-      'inativo': 'bg-slate-100 text-slate-800',
+      'aberto': 'status-badge-open',
+      'andamento': 'status-badge-in-progress',
+      'concluido': 'status-badge-completed',
+      'cancelado': 'status-badge-canceled',
+      'pendente': 'bg-amber-50 text-amber-700 border-amber-200',
+      'aprovado': 'bg-green-50 text-green-700 border-green-200',
+      'ativo': 'bg-green-50 text-green-700 border-green-200',
+      'inativo': 'bg-gray-50 text-gray-700 border-gray-200',
     };
     
-    const className = statusMap[status.toLowerCase()] || 'bg-slate-100 text-slate-800';
+    const className = statusMap[status.toLowerCase()] || 'bg-gray-50 text-gray-700 border-gray-200';
     
     return (
       <Badge variant="outline" className={`text-xs ${className}`}>

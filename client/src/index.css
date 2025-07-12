@@ -74,6 +74,23 @@
   transform: scale(1.05) !important;
 }
 
+/* Event Status Badges - Improved Color Scheme */
+.status-badge-open {
+  @apply bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100;
+}
+
+.status-badge-in-progress {
+  @apply bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100;
+}
+
+.status-badge-completed {
+  @apply bg-green-50 text-green-700 border-green-200 hover:bg-green-100;
+}
+
+.status-badge-canceled {
+  @apply bg-red-50 text-red-700 border-red-200 hover:bg-red-100;
+}
+
 [vw-plugin] .vw-plugin-div button:focus {
   outline: 2px solid #3b82f6 !important;
   outline-offset: 2px !important;

@@ -110,11 +110,11 @@ export default function EventList() {
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, string> = {
       "Aberto": "status-badge-open",
-      "Andamento": "status-badge-in-progress",
+      "Andamento": "status-badge-in-progress", 
       "Concluido": "status-badge-completed",
       "Cancelado": "status-badge-canceled"
     };
-    return statusMap[status] || "";
+    return statusMap[status] || "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100";
   };
 
   // Não há mais restrições para usuários do tipo "Vereador" acessarem a página de eventos
