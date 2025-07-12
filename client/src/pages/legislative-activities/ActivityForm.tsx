@@ -108,7 +108,7 @@ export default function ActivityForm() {
       formData.append("activityNumber", data.activityNumber.toString());
       formData.append("activityDate", data.activityDate);
       formData.append("description", data.description);
-      if (data.eventId) {
+      if (data.eventId && data.eventId !== "none") {
         formData.append("eventId", data.eventId.toString());
       }
       formData.append("activityType", data.activityType);
@@ -166,7 +166,7 @@ export default function ActivityForm() {
       if (data.activityNumber) formData.append("activityNumber", data.activityNumber.toString());
       if (data.activityDate) formData.append("activityDate", data.activityDate);
       if (data.description) formData.append("description", data.description);
-      if (data.eventId) formData.append("eventId", data.eventId.toString());
+      if (data.eventId && data.eventId !== "none") formData.append("eventId", data.eventId.toString());
       if (data.activityType) formData.append("activityType", data.activityType);
       if (data.situacao) formData.append("situacao", data.situacao);
       if (data.regimeTramitacao) formData.append("regimeTramitacao", data.regimeTramitacao);
@@ -440,8 +440,8 @@ export default function ActivityForm() {
                     <FormItem>
                       <FormLabel>Evento <span className="text-muted-foreground">(opcional)</span></FormLabel>
                       <Select 
-                        onValueChange={(value) => field.onChange(parseInt(value))} 
-                        defaultValue={field.value?.toString() || ""}
+                        onValueChange={(value) => field.onChange(value === "none" ? undefined : parseInt(value))} 
+                        defaultValue={field.value?.toString() || "none"}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -449,7 +449,7 @@ export default function ActivityForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Nenhum evento</SelectItem>
+                          <SelectItem value="none">Nenhum evento</SelectItem>
                           {events.map((event) => (
                             <SelectItem key={event.id} value={event.id.toString()}>
                               {event.category} #{event.eventNumber} - {formatDate(event.eventDate.toString())}
