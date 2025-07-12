@@ -116,6 +116,8 @@ export default function ActivityForm() {
       formData.append("regimeTramitacao", data.regimeTramitacao);
       if (data.approvalType && data.approvalType !== "none") {
         formData.append("approvalType", data.approvalType);
+      } else {
+        formData.append("approvalType", "");
       }
       
       // Append authors
@@ -172,6 +174,8 @@ export default function ActivityForm() {
       if (data.regimeTramitacao) formData.append("regimeTramitacao", data.regimeTramitacao);
       if (data.approvalType && data.approvalType !== "none") {
         formData.append("approvalType", data.approvalType);
+      } else if (data.approvalType === "none") {
+        formData.append("approvalType", "");
       }
       
       // Append authors
