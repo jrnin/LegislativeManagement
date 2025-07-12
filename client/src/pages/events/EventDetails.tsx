@@ -1375,95 +1375,44 @@ export default function EventDetails() {
                     </p>
                   </div>
                   
-                  {/* Estatísticas de votação */}
-                  <div className="space-y-4 pt-4 border-t">
-                    <h4 className="font-medium">Estatísticas de Votação</h4>
-                    
-                    {loadingActivityVotes ? (
-                      <div className="flex justify-center py-2">
-                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                  {/* Seção de votação do usuário */}
+                  {user?.role === 'councilor' && (
+                    <div className="space-y-3 pt-4 border-t">
+                      <h4 className="font-medium">Seu voto</h4>
+                      <div className="flex justify-between gap-3">
+                        <Button
+                          variant={activityVote === true ? "default" : "outline"} 
+                          className={`flex-1 ${activityVote === true ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                          onClick={() => {
+                            setActivityVote(true);
+                            activityVoteMutation.mutate({
+                              activityId: selectedActivityId!,
+                              vote: true
+                            });
+                          }}
+                          disabled={activityVoteMutation.isPending}
+                        >
+                          <ThumbsUp className="mr-2 h-4 w-4" />
+                          Aprovar
+                        </Button>
+                        <Button
+                          variant={activityVote === false ? "default" : "outline"}
+                          className={`flex-1 ${activityVote === false ? 'bg-red-600 hover:bg-red-700' : ''}`}
+                          onClick={() => {
+                            setActivityVote(false);
+                            activityVoteMutation.mutate({
+                              activityId: selectedActivityId!,
+                              vote: false
+                            });
+                          }}
+                          disabled={activityVoteMutation.isPending}
+                        >
+                          <ThumbsDown className="mr-2 h-4 w-4" />
+                          Rejeitar
+                        </Button>
                       </div>
-                    ) : activityVotesData ? (
-                      <div className="space-y-3">
-                        <div className="grid grid-cols-3 gap-2 text-center">
-                          <div className="bg-green-50 p-2 rounded-md">
-                            <p className="text-green-700 text-lg font-bold">
-                              {activityVotesData.approveCount}
-                            </p>
-                            <p className="text-xs text-green-600">Aprovações</p>
-                          </div>
-                          <div className="bg-red-50 p-2 rounded-md">
-                            <p className="text-red-700 text-lg font-bold">
-                              {activityVotesData.rejectCount}
-                            </p>
-                            <p className="text-xs text-red-600">Rejeições</p>
-                          </div>
-                          <div className="bg-gray-50 p-2 rounded-md">
-                            <p className="text-gray-700 text-lg font-bold">{activityVotesData.totalVotes}</p>
-                            <p className="text-xs text-gray-600">Total</p>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-xs font-medium">
-                            <span className="text-green-600">Aprovações: {typeof activityVotesData.approvePercentage === 'number' ? activityVotesData.approvePercentage.toFixed(1) : '0.0'}%</span>
-                            <span className="text-red-600">Rejeições: {typeof activityVotesData.rejectPercentage === 'number' ? activityVotesData.rejectPercentage.toFixed(1) : '0.0'}%</span>
-                          </div>
-                          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden flex">
-                            <div 
-                              className="h-full bg-green-500 rounded-l-full" 
-                              style={{ width: `${typeof activityVotesData.approvePercentage === 'number' ? activityVotesData.approvePercentage.toFixed(1) : '0.0'}%` }}
-                            />
-                            <div 
-                              className="h-full bg-red-500 rounded-r-full" 
-                              style={{ width: `${typeof activityVotesData.rejectPercentage === 'number' ? activityVotesData.rejectPercentage.toFixed(1) : '0.0'}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">Nenhum voto registrado ainda.</p>
-                    )}
-                    
-                    {/* Seção de votação do usuário */}
-                    {user?.role === 'councilor' && (
-                      <div className="space-y-3 pt-4 border-t">
-                        <h4 className="font-medium">Seu voto</h4>
-                        <div className="flex justify-between gap-3">
-                          <Button
-                            variant={activityVote === true ? "default" : "outline"} 
-                            className={`flex-1 ${activityVote === true ? 'bg-green-600 hover:bg-green-700' : ''}`}
-                            onClick={() => {
-                              setActivityVote(true);
-                              activityVoteMutation.mutate({
-                                activityId: selectedActivityId!,
-                                vote: true
-                              });
-                            }}
-                            disabled={activityVoteMutation.isPending}
-                          >
-                            <ThumbsUp className="mr-2 h-4 w-4" />
-                            Aprovar
-                          </Button>
-                          <Button
-                            variant={activityVote === false ? "default" : "outline"}
-                            className={`flex-1 ${activityVote === false ? 'bg-red-600 hover:bg-red-700' : ''}`}
-                            onClick={() => {
-                              setActivityVote(false);
-                              activityVoteMutation.mutate({
-                                activityId: selectedActivityId!,
-                                vote: false
-                              });
-                            }}
-                            disabled={activityVoteMutation.isPending}
-                          >
-                            <ThumbsDown className="mr-2 h-4 w-4" />
-                            Rejeitar
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Coluna 2 - Últimos votos e votação administrativa */}

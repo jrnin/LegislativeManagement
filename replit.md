@@ -121,6 +121,9 @@ Preferred communication style: Simple, everyday language.
   - Created comprehensive councilor selection interface showing existing vote status
   - Implemented bulk vote registration with proper validation and error handling
   - Added toast notifications for successful vote registration and error feedback
+  - **Clean Interface Update**: Removed voting statistics section from individual activity voting dialog per user request
+  - Fixed voting statistics calculation to properly handle database boolean values stored as 't'/'f' characters
+  - Confirmed voting system working correctly with 80% approval rate (4 approve, 1 reject votes)
 
 - **July 12, 2025**: Implemented comprehensive Event-Activity Management System
   - Created EventActivityManager component with multi-select functionality for adding/removing activities from events
