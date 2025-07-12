@@ -284,7 +284,7 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
             {currentActivities.map((activity) => (
               <Card key={activity.id} className="p-4">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-2">
+                  <div className="flex-1 space-y-3">
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">
                         #{activity.activityNumber}
@@ -311,17 +311,41 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
                         {activity.regimeTramitacao}
                       </div>
                     </div>
+                    
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2 pt-2">
+                      {activity.filePath && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="gap-1"
+                          onClick={() => window.open(`/api/files/activities/${activity.id}`, '_blank')}
+                        >
+                          <FileText className="h-3 w-3" />
+                          Arquivo
+                        </Button>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="gap-1"
+                        onClick={() => window.open(`/legislative-activities/${activity.id}`, '_blank')}
+                      >
+                        <Activity className="h-3 w-3" />
+                        Detalhes
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleRemoveActivity(activity.id)}
+                        disabled={removeActivityMutation.isPending}
+                        className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <X className="h-3 w-3" />
+                        Remover
+                      </Button>
+                    </div>
                   </div>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRemoveActivity(activity.id)}
-                    disabled={removeActivityMutation.isPending}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
                 </div>
               </Card>
             ))}

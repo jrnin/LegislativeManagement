@@ -123,7 +123,8 @@ Preferred communication style: Simple, everyday language.
   - Implemented activity file access and details viewing functionality within Activities tab
   - Added quick action buttons for each activity: Arquivo (file download), Detalhes (full view), Remover (admin only)
   - Enhanced Activities tab to balance management functionality with activity information display
-  - **User Preference**: Activities tab should show associated activities with file access and details viewing capabilities
+  - Added action buttons inside EventActivityManager component cards for consistent user experience
+  - **User Preference**: Activities tab should show associated activities with file access and details viewing capabilities integrated within each card
 
 - **July 12, 2025**: Made Event and Approval Type fields optional in legislative activities
   - Modified database schema to remove NOT NULL constraint from event_id column
