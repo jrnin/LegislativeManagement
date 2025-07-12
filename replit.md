@@ -128,6 +128,17 @@ Preferred communication style: Simple, everyday language.
   - Added event category display to event details page showing category information alongside date, time, and location
   - **User Preference**: Activities tab should focus solely on activity management through EventActivityManager component
 
+- **July 12, 2025**: Implemented comprehensive Event-Document Management System similar to Activity Management
+  - Created EventDocumentManager component with multi-select functionality for adding/removing documents from events
+  - Added backend API endpoints (/api/events/:eventId/documents) for managing document-event associations
+  - Implemented database operations to handle document-event relationships using eventId field in documents table
+  - Added search functionality to filter documents by number, title, type, or description in document selection dialog
+  - Created bulk selection features (Select All/Deselect All) for efficient document management
+  - Integrated document management into EventDetails Documents tab with admin-only access
+  - Added action buttons for each document: Arquivo (file download), Detalhes (full view), Remover (admin only)
+  - Maintained read-only document view for non-admin users with clean table interface
+  - Applied same design patterns as EventActivityManager for consistency across event management features
+
 - **July 12, 2025**: Made Event and Approval Type fields optional in legislative activities
   - Modified database schema to remove NOT NULL constraint from event_id column
   - Updated frontend form validation to make eventId and approvalType optional fields
