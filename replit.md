@@ -118,8 +118,9 @@ Preferred communication style: Simple, everyday language.
   - Created bulk selection features (Select All/Deselect All) for efficient activity management
   - Integrated activity management into EventDetails Activities tab with admin-only access
   - Removed "Gerenciar Documentos das Atividades" card from Activities tab as requested by user
-  - Enhanced Activities tab to focus on direct activity management rather than document linking
-  - **User Preference**: Activities tab should prioritize activity management over document management
+  - Removed "Detalhes das Atividades" section from Activities tab to streamline interface
+  - Enhanced Activities tab to focus exclusively on activity management functionality
+  - **User Preference**: Activities tab should be clean and focus only on adding/removing activities from events
 
 - **July 12, 2025**: Made Event and Approval Type fields optional in legislative activities
   - Modified database schema to remove NOT NULL constraint from event_id column
