@@ -1420,9 +1420,19 @@ export class DatabaseStorage implements IStorage {
       .from(activityVotes)
       .where(eq(activityVotes.activityId, activityId));
     
+    console.log(`[DEBUG] Activity ${activityId} votes:`, votes);
+    
     const totalVotes = votes.length;
-    const approveCount = votes.filter(v => v.vote === true || v.vote === 't').length;
-    const rejectCount = votes.filter(v => v.vote === false || v.vote === 'f').length;
+    const approveCount = votes.filter(v => {
+      const voteValue = v.vote === true || v.vote === 't' || v.vote === 'true';
+      console.log(`[DEBUG] Vote ${v.vote} is approve: ${voteValue}`);
+      return voteValue;
+    }).length;
+    const rejectCount = votes.filter(v => {
+      const voteValue = v.vote === false || v.vote === 'f' || v.vote === 'false';
+      console.log(`[DEBUG] Vote ${v.vote} is reject: ${voteValue}`);
+      return voteValue;
+    }).length;
     
     // Garantir que os percentuais são calculados corretamente e somam 100%
     let approvePercentage = 0;
@@ -1439,6 +1449,8 @@ export class DatabaseStorage implements IStorage {
         rejectPercentage = Number(((rejectCount / totalVotes) * 100).toFixed(1));
       }
     }
+    
+    console.log(`[DEBUG] Final stats: totalVotes=${totalVotes}, approveCount=${approveCount}, rejectCount=${rejectCount}, approvePercentage=${approvePercentage}, rejectPercentage=${rejectPercentage}`);
     
     return {
       totalVotes,
