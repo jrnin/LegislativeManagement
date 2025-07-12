@@ -797,25 +797,7 @@ export default function EventDetails() {
               </div>
             )}
             
-            {/* Document Linking Section - Always show for admin users */}
-            {isAuthenticated && user?.role === "admin" && (
-              <div className="border-t pt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="w-5 h-5" />
-                      Gerenciar Documentos das Atividades
-                    </CardTitle>
-                    <CardDescription>
-                      Vincule documentos de atividades legislativas a este evento para facilitar o acesso durante a reunião.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <EventActivityDocumentManager eventId={eventId} />
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+
           </div>
         </TabsContent>
         

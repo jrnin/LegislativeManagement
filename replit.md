@@ -110,6 +110,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 12, 2025**: Implemented comprehensive Event-Activity Management System
+  - Created EventActivityManager component with multi-select functionality for adding/removing activities from events
+  - Added backend API endpoints (/api/events/:eventId/activities) for managing activity-event associations
+  - Implemented database operations to handle activity-event relationships with proper foreign key constraints
+  - Added search functionality to filter activities by number, type, or description in activity selection dialog
+  - Created bulk selection features (Select All/Deselect All) for efficient activity management
+  - Integrated activity management into EventDetails Activities tab with admin-only access
+  - Removed "Gerenciar Documentos das Atividades" card from Activities tab as requested by user
+  - Enhanced Activities tab to focus on direct activity management rather than document linking
+  - **User Preference**: Activities tab should prioritize activity management over document management
+
 - **July 12, 2025**: Made Event and Approval Type fields optional in legislative activities
   - Modified database schema to remove NOT NULL constraint from event_id column
   - Updated frontend form validation to make eventId and approvalType optional fields
