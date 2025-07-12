@@ -494,6 +494,14 @@ export default function EventDetails() {
                 </div>
               </div>
               
+              <div className="flex items-center gap-3">
+                <FileText className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Categoria</p>
+                  <p className="font-medium">{event.category || 'Não informado'}</p>
+                </div>
+              </div>
+              
               <div className="flex items-center gap-3 sm:col-span-2">
                 <MapPin className="w-5 h-5 text-muted-foreground" />
                 <div className="flex-1">

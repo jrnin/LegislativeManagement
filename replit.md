@@ -125,6 +125,7 @@ Preferred communication style: Simple, everyday language.
   - Enhanced Activities tab to balance management functionality with activity information display
   - Added action buttons inside EventActivityManager component cards for consistent user experience
   - Removed "Atividades Associadas" section from main Activities tab to eliminate redundancy
+  - Added event category display to event details page showing category information alongside date, time, and location
   - **User Preference**: Activities tab should focus solely on activity management through EventActivityManager component
 
 - **July 12, 2025**: Made Event and Approval Type fields optional in legislative activities
