@@ -684,43 +684,38 @@ export default function EventDetails() {
                 <div className="space-y-3">
                   {activities.map((activity: any) => (
                     <div key={activity.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="font-normal">
-                              #{activity.activityNumber}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline" className="font-normal">
+                            #{activity.activityNumber}
+                          </Badge>
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                            {activity.activityType || activity.type}
+                          </Badge>
+                          <Badge 
+                            variant="outline" 
+                            className={`${
+                              activity.situacao === 'Aguardando Análise' ? 'bg-yellow-100 text-yellow-800' :
+                              activity.situacao === 'Aprovado' ? 'bg-green-100 text-green-800' :
+                              activity.situacao === 'Rejeitado' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {activity.situacao}
+                          </Badge>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium">{activity.description}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Calendar className="w-3 h-3" />
+                            <span>{format(new Date(activity.activityDate), "dd/MM/yyyy", { locale: ptBR })}</span>
+                            <span className="mx-1">•</span>
+                            <Badge variant="outline" className="text-xs">
+                              {activity.regimeTramitacao || 'Ordinária'}
                             </Badge>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                              {activity.activityType || activity.type}
-                            </Badge>
-                            <Badge 
-                              variant="outline" 
-                              className={`${
-                                activity.situacao === 'Aguardando Análise' ? 'bg-yellow-100 text-yellow-800' :
-                                activity.situacao === 'Aprovado' ? 'bg-green-100 text-green-800' :
-                                activity.situacao === 'Rejeitado' ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {activity.situacao}
-                            </Badge>
-                          </div>
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">{activity.description}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {format(new Date(activity.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <Calendar className="w-3 h-3" />
-                              <span>{format(new Date(activity.activityDate), "dd/MM/yyyy", { locale: ptBR })}</span>
-                              <span className="mx-1">•</span>
-                              <Badge variant="outline" className="text-xs">
-                                {activity.regimeTramitacao || 'Ordinária'}
-                              </Badge>
-                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2 pt-2">
                           {activity.filePath && (
                             <Button 
                               variant="outline" 
