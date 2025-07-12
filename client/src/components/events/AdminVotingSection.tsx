@@ -48,9 +48,9 @@ export function AdminVotingSection({
 
   const handleSubmitVotes = async () => {
     const votesToSubmit = Object.entries(selectedVotes).map(([councilorId, voteData]) => ({
-      councilorId,
+      userId: councilorId,
       vote: voteData.vote,
-      comment: voteData.comment
+      comment: voteData.comment || ""
     }));
 
     if (votesToSubmit.length === 0) {
