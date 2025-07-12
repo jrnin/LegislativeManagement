@@ -202,6 +202,10 @@ export interface IStorage {
   addActivitiesToEvent(eventId: number, activityIds: number[]): Promise<boolean>;
   removeActivityFromEvent(eventId: number, activityId: number): Promise<boolean>;
   
+  // Event-Document Management operations
+  addDocumentsToEvent(eventId: number, documentIds: number[]): Promise<boolean>;
+  removeDocumentFromEvent(eventId: number, documentId: number): Promise<boolean>;
+  
   // Search operations
   searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
   
@@ -2533,6 +2537,44 @@ export class DatabaseStorage implements IStorage {
       return result.rowCount > 0;
     } catch (error) {
       console.error("Error removing activity from event:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Event-Document Management operations
+   */
+  async addDocumentsToEvent(eventId: number, documentIds: number[]): Promise<boolean> {
+    try {
+      // Update the eventId for all selected documents
+      await db
+        .update(documents)
+        .set({ eventId })
+        .where(inArray(documents.id, documentIds));
+      
+      return true;
+    } catch (error) {
+      console.error("Error adding documents to event:", error);
+      return false;
+    }
+  }
+
+  async removeDocumentFromEvent(eventId: number, documentId: number): Promise<boolean> {
+    try {
+      // Set eventId to null for the specified document
+      const result = await db
+        .update(documents)
+        .set({ eventId: null })
+        .where(
+          and(
+            eq(documents.id, documentId),
+            eq(documents.eventId, eventId)
+          )
+        );
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error removing document from event:", error);
       return false;
     }
   }

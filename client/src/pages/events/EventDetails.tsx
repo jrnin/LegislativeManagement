@@ -68,6 +68,7 @@ import { ptBR } from "date-fns/locale";
 import ActivityDocumentLinker from "@/components/events/ActivityDocumentLinker";
 import EventActivityDocumentManager from "@/components/events/EventActivityDocumentManager";
 import EventActivityManager from "@/components/events/EventActivityManager";
+import { EventDocumentManager } from "@/components/events/EventDocumentManager";
 
 const VoteOption = ({ value, label, selected, onClick }: 
   { value: string, label: string, selected: boolean, onClick: () => void }) => {
@@ -853,102 +854,99 @@ export default function EventDetails() {
         </TabsContent>
         
         <TabsContent value="documents" className="pt-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Documentos</h2>
-              {isAuthenticated && user?.role === "admin" && (
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate(`/documents/new?eventId=${eventId}`)}
-                  className="gap-2"
-                >
-                  <FileText className="w-4 h-4" />
-                  Novo Documento para este Evento
-                </Button>
+          {isAuthenticated && user?.role === "admin" ? (
+            <EventDocumentManager 
+              eventId={eventId} 
+              associatedDocuments={eventDetails.documents || []}
+            />
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold">Documentos</h2>
+              </div>
+              
+              {!eventDetails.documents || eventDetails.documents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <FileText className="w-12 h-12 mb-4 text-muted-foreground" />
+                  <h3 className="text-xl font-medium">Nenhum documento registrado</h3>
+                  <p className="text-muted-foreground">Este evento ainda não possui documentos associados.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Documentos do Evento</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Número</TableHead>
+                            <TableHead>Tipo</TableHead>
+                            <TableHead>Data</TableHead>
+                            <TableHead>Autor</TableHead>
+                            <TableHead>Situação</TableHead>
+                            <TableHead>Arquivo</TableHead>
+                            <TableHead className="text-right">Ações</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {eventDetails.documents.map((document: any) => (
+                            <TableRow key={document.id}>
+                              <TableCell className="font-medium">{document.documentNumber}</TableCell>
+                              <TableCell>{document.documentType}</TableCell>
+                              <TableCell>
+                                {document.documentDate ? format(new Date(document.documentDate), "dd/MM/yyyy") : "-"}
+                              </TableCell>
+                              <TableCell>{document.authorType}</TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant="outline"
+                                  className={
+                                    document.status === "Vigente" 
+                                      ? "bg-green-100 text-green-800 hover:bg-green-100" 
+                                      : document.status === "Revogada" 
+                                        ? "bg-red-100 text-red-800 hover:bg-red-100"
+                                        : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                                  }
+                                >
+                                  {document.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {document.fileName ? (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => window.open(`/api/files/documents/${document.id}`, '_blank')}
+                                    className="gap-1"
+                                  >
+                                    <FileText className="h-4 w-4" />
+                                    <span className="max-w-[100px] truncate">{document.fileName}</span>
+                                  </Button>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => navigate(`/documents/${document.id}`)}
+                                >
+                                  Detalhes
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </div>
               )}
             </div>
-            
-            {!eventDetails.documents || eventDetails.documents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <FileText className="w-12 h-12 mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-medium">Nenhum documento registrado</h3>
-                <p className="text-muted-foreground">Este evento ainda não possui documentos associados.</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Documentos do Evento</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Número</TableHead>
-                          <TableHead>Tipo</TableHead>
-                          <TableHead>Data</TableHead>
-                          <TableHead>Autor</TableHead>
-                          <TableHead>Situação</TableHead>
-                          <TableHead>Arquivo</TableHead>
-                          <TableHead className="text-right">Ações</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {eventDetails.documents.map((document: any) => (
-                          <TableRow key={document.id}>
-                            <TableCell className="font-medium">{document.documentNumber}</TableCell>
-                            <TableCell>{document.documentType}</TableCell>
-                            <TableCell>
-                              {document.documentDate ? format(new Date(document.documentDate), "dd/MM/yyyy") : "-"}
-                            </TableCell>
-                            <TableCell>{document.authorType}</TableCell>
-                            <TableCell>
-                              <Badge 
-                                variant="outline"
-                                className={
-                                  document.status === "Vigente" 
-                                    ? "bg-green-100 text-green-800 hover:bg-green-100" 
-                                    : document.status === "Revogada" 
-                                      ? "bg-red-100 text-red-800 hover:bg-red-100"
-                                      : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                                }
-                              >
-                                {document.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {document.fileName ? (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => window.open(`/api/files/documents/${document.id}`, '_blank')}
-                                  className="gap-1"
-                                >
-                                  <FileText className="h-4 w-4" />
-                                  <span className="max-w-[100px] truncate">{document.fileName}</span>
-                                </Button>
-                              ) : (
-                                "-"
-                              )}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => navigate(`/documents/${document.id}`)}
-                              >
-                                Detalhes
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
+          )}
         </TabsContent>
         
         <TabsContent value="approvals" className="pt-4">

@@ -2514,6 +2514,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // EVENT DOCUMENTS MANAGEMENT ROUTES
+
+  // Add documents to event
+  app.post('/api/events/:eventId/documents', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const { documentIds } = req.body;
+
+      if (!Array.isArray(documentIds) || documentIds.length === 0) {
+        return res.status(400).json({ message: "Lista de IDs de documentos é obrigatória" });
+      }
+
+      const result = await storage.addDocumentsToEvent(eventId, documentIds);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error adding documents to event:", error);
+      res.status(500).json({ message: "Erro ao adicionar documentos ao evento" });
+    }
+  });
+
+  // Remove document from event
+  app.delete('/api/events/:eventId/documents/:documentId', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const documentId = Number(req.params.documentId);
+
+      const result = await storage.removeDocumentFromEvent(eventId, documentId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Documento não encontrado no evento" });
+      }
+
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error removing document from event:", error);
+      res.status(500).json({ message: "Erro ao remover documento do evento" });
+    }
+  });
+
   // Get councilors list
   app.get('/api/councilors', requireAuth, async (req, res) => {
     try {
