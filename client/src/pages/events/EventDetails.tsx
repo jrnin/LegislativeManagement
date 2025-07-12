@@ -669,12 +669,111 @@ export default function EventDetails() {
               </Card>
             )}
 
-            {/* Simple Activities Display - Only show if no activities */}
-            {activities.length === 0 && (
+            {/* Activities Display Section */}
+            {activities.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <FileText className="w-12 h-12 mb-4 text-muted-foreground" />
                 <h3 className="text-xl font-medium">Nenhuma atividade registrada</h3>
                 <p className="text-muted-foreground">Este evento ainda não possui atividades legislativas.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium">Atividades Associadas ({activities.length})</h3>
+                </div>
+                <div className="space-y-3">
+                  {activities.map((activity: any) => (
+                    <div key={activity.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline" className="font-normal">
+                              #{activity.activityNumber}
+                            </Badge>
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                              {activity.activityType || activity.type}
+                            </Badge>
+                            <Badge 
+                              variant="outline" 
+                              className={`${
+                                activity.situacao === 'Aguardando Análise' ? 'bg-yellow-100 text-yellow-800' :
+                                activity.situacao === 'Aprovado' ? 'bg-green-100 text-green-800' :
+                                activity.situacao === 'Rejeitado' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {activity.situacao}
+                            </Badge>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium">{activity.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(activity.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Calendar className="w-3 h-3" />
+                              <span>{format(new Date(activity.activityDate), "dd/MM/yyyy", { locale: ptBR })}</span>
+                              <span className="mx-1">•</span>
+                              <Badge variant="outline" className="text-xs">
+                                {activity.regimeTramitacao || 'Ordinária'}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 ml-4">
+                          {activity.filePath && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="gap-1"
+                              onClick={() => window.open(`/api/files/activities/${activity.id}`, '_blank')}
+                            >
+                              <FileText className="h-3 w-3" />
+                              Arquivo
+                            </Button>
+                          )}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="gap-1"
+                            onClick={() => window.open(`/legislative-activities/${activity.id}`, '_blank')}
+                          >
+                            <Activity className="h-3 w-3" />
+                            Detalhes
+                          </Button>
+                          {isAuthenticated && user?.role === "admin" && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={async () => {
+                                if (confirm('Tem certeza que deseja remover esta atividade do evento?')) {
+                                  try {
+                                    await apiRequest('DELETE', `/api/events/${eventId}/activities/${activity.id}`);
+                                    queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/details`] });
+                                    toast({
+                                      title: "Atividade removida",
+                                      description: "A atividade foi removida do evento com sucesso."
+                                    });
+                                  } catch (error) {
+                                    toast({
+                                      title: "Erro",
+                                      description: "Não foi possível remover a atividade do evento.",
+                                      variant: "destructive"
+                                    });
+                                  }
+                                }
+                              }}
+                            >
+                              <X className="h-3 w-3" />
+                              Remover
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
             
