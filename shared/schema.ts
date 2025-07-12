@@ -116,6 +116,7 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
   activities: many(legislativeActivities),
   documents: many(documents, { relationName: "event_documents" }),
   committees: many(eventCommittees),
+  activityDocuments: many(eventActivityDocuments),
 }));
 
 // Legislative Activities table
@@ -151,6 +152,7 @@ export const legislativeActivitiesRelations = relations(legislativeActivities, (
   }),
   votes: many(activityVotes),
   committeeApprovals: many(committeeActivityApprovals),
+  eventDocuments: many(eventActivityDocuments),
 }));
 
 // Legislative Activities Authors (many-to-many)
@@ -264,6 +266,7 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
     relationName: "document_versions",
   }),
   votes: many(documentVotes),
+  eventActivityLinks: many(eventActivityDocuments),
 }));
 
 // Document Votes table - For councilors to vote on documents
@@ -376,6 +379,19 @@ export const committeeActivityApprovals = pgTable("committee_activity_approvals"
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Event Activity Documents table - Junction table for many-to-many relationship between events and activity documents
+export const eventActivityDocuments = pgTable("event_activity_documents", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").notNull(),
+  activityId: integer("activity_id").notNull(),
+  documentId: integer("document_id").notNull(),
+  linkedAt: timestamp("linked_at").defaultNow(),
+  linkedBy: varchar("linked_by").notNull(), // User who created the link
+  notes: text("notes"), // Optional notes about the link
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const committeeActivityApprovalsRelations = relations(committeeActivityApprovals, ({ one }) => ({
   activity: one(legislativeActivities, {
     fields: [committeeActivityApprovals.activityId],
@@ -387,6 +403,25 @@ export const committeeActivityApprovalsRelations = relations(committeeActivityAp
   }),
   user: one(users, {
     fields: [committeeActivityApprovals.userId],
+    references: [users.id],
+  }),
+}));
+
+export const eventActivityDocumentsRelations = relations(eventActivityDocuments, ({ one }) => ({
+  event: one(events, {
+    fields: [eventActivityDocuments.eventId],
+    references: [events.id],
+  }),
+  activity: one(legislativeActivities, {
+    fields: [eventActivityDocuments.activityId],
+    references: [legislativeActivities.id],
+  }),
+  document: one(documents, {
+    fields: [eventActivityDocuments.documentId],
+    references: [documents.id],
+  }),
+  linkedByUser: one(users, {
+    fields: [eventActivityDocuments.linkedBy],
     references: [users.id],
   }),
 }));
@@ -484,6 +519,17 @@ export const insertDocumentVoteSchema = createInsertSchema(documentVotes).pick({
   vote: true,
   comment: true,
 });
+
+export const insertEventActivityDocumentSchema = createInsertSchema(eventActivityDocuments).pick({
+  eventId: true,
+  activityId: true,
+  documentId: true,
+  linkedBy: true,
+  notes: true,
+});
+
+export type InsertEventActivityDocument = z.infer<typeof insertEventActivityDocumentSchema>;
+export type EventActivityDocument = typeof eventActivityDocuments.$inferSelect;
 
 // News Articles Relations
 export const newsArticlesRelations = relations(newsArticles, ({ one, many }) => ({

@@ -2397,6 +2397,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // EVENT ACTIVITY DOCUMENTS ROUTES
+  
+  // Get activity documents linked to an event
+  app.get('/api/events/:eventId/activity-documents', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const linkedDocuments = await storage.getEventActivityDocuments(eventId);
+      res.json(linkedDocuments);
+    } catch (error) {
+      console.error("Error fetching event activity documents:", error);
+      res.status(500).json({ message: "Erro ao buscar documentos das atividades do evento" });
+    }
+  });
+
+  // Get documents for a specific activity in an event
+  app.get('/api/events/:eventId/activities/:activityId/documents', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const activityId = Number(req.params.activityId);
+      const linkedDocuments = await storage.getActivityDocumentsForEvent(eventId, activityId);
+      res.json(linkedDocuments);
+    } catch (error) {
+      console.error("Error fetching activity documents for event:", error);
+      res.status(500).json({ message: "Erro ao buscar documentos da atividade para o evento" });
+    }
+  });
+
+  // Link an activity document to an event
+  app.post('/api/events/:eventId/activities/:activityId/documents/:documentId/link', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const activityId = Number(req.params.activityId);
+      const documentId = Number(req.params.documentId);
+      
+      // Get user ID from session
+      const userId = (req as any).userId || (req.session as any)?.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "Usuário não autenticado" });
+      }
+
+      const linkData = {
+        eventId,
+        activityId,
+        documentId,
+        linkedBy: userId,
+        notes: req.body.notes || null
+      };
+
+      const link = await storage.linkActivityDocumentToEvent(eventId, activityId, documentId, userId, req.body.notes);
+      
+      res.status(201).json(link);
+    } catch (error) {
+      console.error("Error linking activity document to event:", error);
+      res.status(500).json({ message: "Erro ao vincular documento da atividade ao evento" });
+    }
+  });
+
+  // Unlink an activity document from an event
+  app.delete('/api/events/:eventId/activities/:activityId/documents/:documentId/unlink', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const activityId = Number(req.params.activityId);
+      const documentId = Number(req.params.documentId);
+
+      const result = await storage.unlinkActivityDocumentFromEvent(eventId, activityId, documentId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Vínculo não encontrado" });
+      }
+
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error unlinking activity document from event:", error);
+      res.status(500).json({ message: "Erro ao desvincular documento da atividade do evento" });
+    }
+  });
+
   // Get councilors list
   app.get('/api/councilors', requireAuth, async (req, res) => {
     try {

@@ -65,6 +65,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import ActivityDocumentLinker from "@/components/events/ActivityDocumentLinker";
 
 const VoteOption = ({ value, label, selected, onClick }: 
   { value: string, label: string, selected: boolean, onClick: () => void }) => {
@@ -733,6 +734,18 @@ export default function EventDetails() {
                             <span className="text-sm text-yellow-800">
                               Nenhum autor cadastrado para esta atividade
                             </span>
+                          </div>
+                        )}
+                        
+                        {/* Activity Document Linker - Only show for authenticated users */}
+                        {isAuthenticated && user?.role === "admin" && (
+                          <div className="pt-4 border-t">
+                            <ActivityDocumentLinker
+                              eventId={eventId}
+                              activityId={activity.id}
+                              activityTitle={activity.description}
+                              activityNumber={activity.activityNumber}
+                            />
                           </div>
                         )}
                         

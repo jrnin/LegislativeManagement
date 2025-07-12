@@ -17,6 +17,7 @@ import {
   newsComments,
   boards,
   boardMembers,
+  eventActivityDocuments,
   type User,
   type Legislature,
   type Event,
@@ -38,7 +39,9 @@ import {
   type Board,
   type BoardMember,
   type InsertBoard,
-  type InsertBoardMember
+  type InsertBoardMember,
+  type EventActivityDocument,
+  type InsertEventActivityDocument
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or, not } from "drizzle-orm";
@@ -181,6 +184,19 @@ export interface IStorage {
   addEventCommittees(eventId: number, committeeIds: number[]): Promise<void>;
   removeEventCommittees(eventId: number): Promise<void>;
   getEventCommittees(eventId: number): Promise<Committee[]>;
+  
+  // Event-Activity-Document operations
+  linkActivityDocumentToEvent(eventId: number, activityId: number, documentId: number, linkedBy: string, notes?: string): Promise<EventActivityDocument>;
+  unlinkActivityDocumentFromEvent(eventId: number, activityId: number, documentId: number): Promise<boolean>;
+  getEventActivityDocuments(eventId: number): Promise<(EventActivityDocument & { 
+    activity: LegislativeActivity; 
+    document: Document; 
+    linkedByUser: User 
+  })[]>;
+  getActivityDocumentsForEvent(eventId: number, activityId: number): Promise<(EventActivityDocument & { 
+    document: Document; 
+    linkedByUser: User 
+  })[]>;
   
   // Search operations
   searchGlobal(query: string, type?: string): Promise<SearchResult[]>;
@@ -2403,6 +2419,80 @@ export class DatabaseStorage implements IStorage {
       .where(eq(newsComments.id, id));
     
     return result.rowCount > 0;
+  }
+
+  /**
+   * Event Activity Documents operations
+   */
+  async linkActivityDocumentToEvent(eventId: number, activityId: number, documentId: number, linkedBy: string, notes?: string): Promise<EventActivityDocument> {
+    const [link] = await db
+      .insert(eventActivityDocuments)
+      .values({
+        eventId,
+        activityId,
+        documentId,
+        linkedBy,
+        notes
+      })
+      .returning();
+    
+    return link;
+  }
+
+  async unlinkActivityDocumentFromEvent(eventId: number, activityId: number, documentId: number): Promise<boolean> {
+    const result = await db
+      .delete(eventActivityDocuments)
+      .where(
+        and(
+          eq(eventActivityDocuments.eventId, eventId),
+          eq(eventActivityDocuments.activityId, activityId),
+          eq(eventActivityDocuments.documentId, documentId)
+        )
+      );
+    
+    return result.rowCount > 0;
+  }
+
+  async getEventActivityDocuments(eventId: number): Promise<(EventActivityDocument & { 
+    activity: LegislativeActivity; 
+    document: Document; 
+    linkedByUser: User 
+  })[]> {
+    return await db
+      .select()
+      .from(eventActivityDocuments)
+      .leftJoin(legislativeActivities, eq(eventActivityDocuments.activityId, legislativeActivities.id))
+      .leftJoin(documents, eq(eventActivityDocuments.documentId, documents.id))
+      .leftJoin(users, eq(eventActivityDocuments.linkedBy, users.id))
+      .where(eq(eventActivityDocuments.eventId, eventId))
+      .then(rows => rows.map(row => ({
+        ...row.event_activity_documents,
+        activity: row.legislative_activities!,
+        document: row.documents!,
+        linkedByUser: row.users!
+      })));
+  }
+
+  async getActivityDocumentsForEvent(eventId: number, activityId: number): Promise<(EventActivityDocument & { 
+    document: Document; 
+    linkedByUser: User 
+  })[]> {
+    return await db
+      .select()
+      .from(eventActivityDocuments)
+      .leftJoin(documents, eq(eventActivityDocuments.documentId, documents.id))
+      .leftJoin(users, eq(eventActivityDocuments.linkedBy, users.id))
+      .where(
+        and(
+          eq(eventActivityDocuments.eventId, eventId),
+          eq(eventActivityDocuments.activityId, activityId)
+        )
+      )
+      .then(rows => rows.map(row => ({
+        ...row.event_activity_documents,
+        document: row.documents!,
+        linkedByUser: row.users!
+      })));
   }
 }
 
