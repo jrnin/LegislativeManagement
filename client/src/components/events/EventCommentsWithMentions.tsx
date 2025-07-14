@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { addTimelineEntry, timelineActions } from '@/lib/timeline';
 
 interface EventComment {
   id: number;
@@ -95,9 +96,13 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
       const response = await apiRequest('POST', `/api/events/${eventId}/comments`, data);
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (newComment) => {
       queryClient.invalidateQueries({ queryKey: ['event-comments', eventId] });
       refetch();
+      
+      // Registrar na timeline
+      addTimelineEntry(eventId, timelineActions.createComment(newComment.id, newComment.content));
+      
       setNewComment('');
       setCurrentMentions([]);
       setShowMentions(false);

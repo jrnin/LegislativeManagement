@@ -888,3 +888,44 @@ export type InsertEventComment = z.infer<typeof insertEventCommentSchema>;
 export type EventComment = typeof eventComments.$inferSelect & {
   user?: User;
 };
+
+// Event Timeline table - To track all user actions in event tabs
+export const eventTimeline = pgTable("event_timeline", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").references(() => events.id, { onDelete: "cascade" }).notNull(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  actionType: varchar("action_type").notNull(), // "activity_add", "activity_remove", "document_add", "document_remove", "attendance_update", "vote_cast", "comment_add", "comment_delete", "comment_edit"
+  targetType: varchar("target_type").notNull(), // "activity", "document", "attendance", "vote", "comment"
+  targetId: integer("target_id"), // ID of the target object
+  description: text("description").notNull(),
+  metadata: jsonb("metadata").default('{}'),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Relations for event timeline
+export const eventTimelineRelations = relations(eventTimeline, ({ one }) => ({
+  event: one(events, {
+    fields: [eventTimeline.eventId],
+    references: [events.id],
+  }),
+  user: one(users, {
+    fields: [eventTimeline.userId],
+    references: [users.id],
+  }),
+}));
+
+// Insert schema for event timeline
+export const insertEventTimelineSchema = createInsertSchema(eventTimeline).pick({
+  eventId: true,
+  userId: true,
+  actionType: true,
+  targetType: true,
+  targetId: true,
+  description: true,
+  metadata: true,
+});
+
+export type InsertEventTimeline = z.infer<typeof insertEventTimelineSchema>;
+export type EventTimeline = typeof eventTimeline.$inferSelect & {
+  user?: User;
+};

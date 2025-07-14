@@ -4373,6 +4373,44 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // EVENT TIMELINE ROUTES
+  
+  // Get timeline for an event
+  app.get('/api/events/:eventId/timeline', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const timeline = await storage.getEventTimelineByEventId(eventId);
+      res.json(timeline);
+    } catch (error) {
+      console.error("Error fetching event timeline:", error);
+      res.status(500).json({ message: "Erro ao buscar linha do tempo do evento" });
+    }
+  });
+
+  // Add entry to event timeline
+  app.post('/api/events/:eventId/timeline', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const userId = (req.user as any).id;
+      const { actionType, targetType, targetId, description, metadata } = req.body;
+      
+      const timelineEntry = await storage.addEventTimelineEntry(
+        eventId,
+        userId,
+        actionType,
+        targetType,
+        targetId,
+        description,
+        metadata
+      );
+      
+      res.status(201).json(timelineEntry);
+    } catch (error) {
+      console.error("Error adding timeline entry:", error);
+      res.status(500).json({ message: "Erro ao adicionar entrada na linha do tempo" });
+    }
+  });
+
   // Criar o servidor HTTP
   const httpServer = createServer(app);
   

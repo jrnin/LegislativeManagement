@@ -19,6 +19,7 @@ import {
   boardMembers,
   eventActivityDocuments,
   eventComments,
+  eventTimeline,
   type User,
   type Legislature,
   type Event,
@@ -44,7 +45,9 @@ import {
   type EventActivityDocument,
   type InsertEventActivityDocument,
   type EventComment,
-  type InsertEventComment
+  type InsertEventComment,
+  type EventTimeline,
+  type InsertEventTimeline
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or, not } from "drizzle-orm";
@@ -263,6 +266,11 @@ export interface IStorage {
   createEventComment(commentData: InsertEventComment): Promise<EventComment>;
   updateEventComment(id: number, commentData: Partial<EventComment>): Promise<EventComment | undefined>;
   deleteEventComment(id: number): Promise<boolean>;
+
+  // Event Timeline operations
+  getEventTimelineByEventId(eventId: number): Promise<(EventTimeline & { user: User })[]>;
+  createEventTimelineEntry(data: InsertEventTimeline): Promise<EventTimeline>;
+  addEventTimelineEntry(eventId: number, userId: string, actionType: string, targetType: string, targetId: number | null, description: string, metadata?: any): Promise<EventTimeline>;
   
   // Mention search operations (for @ mentions in comments)
   searchMentions(query: string, type?: 'event' | 'activity' | 'document'): Promise<{
@@ -2776,6 +2784,73 @@ export class DatabaseStorage implements IStorage {
       console.error("Error deleting event comment:", error);
       return false;
     }
+  }
+
+  /**
+   * Event Timeline operations
+   */
+  async getEventTimelineByEventId(eventId: number): Promise<(EventTimeline & { user: User })[]> {
+    const timeline = await db
+      .select({
+        id: eventTimeline.id,
+        eventId: eventTimeline.eventId,
+        userId: eventTimeline.userId,
+        actionType: eventTimeline.actionType,
+        targetType: eventTimeline.targetType,
+        targetId: eventTimeline.targetId,
+        description: eventTimeline.description,
+        metadata: eventTimeline.metadata,
+        createdAt: eventTimeline.createdAt,
+        user: {
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          role: users.role,
+          profileImageUrl: users.profileImageUrl,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+          isVerified: users.isVerified,
+          verificationToken: users.verificationToken,
+          resetToken: users.resetToken,
+          resetTokenExpiry: users.resetTokenExpiry,
+        }
+      })
+      .from(eventTimeline)
+      .leftJoin(users, eq(eventTimeline.userId, users.id))
+      .where(eq(eventTimeline.eventId, eventId))
+      .orderBy(desc(eventTimeline.createdAt));
+
+    return timeline;
+  }
+
+  async createEventTimelineEntry(data: InsertEventTimeline): Promise<EventTimeline> {
+    const [timeline] = await db
+      .insert(eventTimeline)
+      .values(data)
+      .returning();
+    return timeline;
+  }
+
+  async addEventTimelineEntry(
+    eventId: number,
+    userId: string,
+    actionType: string,
+    targetType: string,
+    targetId: number | null,
+    description: string,
+    metadata: any = {}
+  ): Promise<EventTimeline> {
+    const data: InsertEventTimeline = {
+      eventId,
+      userId,
+      actionType,
+      targetType,
+      targetId,
+      description,
+      metadata,
+    };
+
+    return await this.createEventTimelineEntry(data);
   }
 
   /**
