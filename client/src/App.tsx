@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard/Dashboard";
-import Layout from "@/components/layout/Layout";
+import SafeLayout from "@/components/layout/SafeLayout";
 import LoginPage from "@/pages/login/LoginPage";
 import EmailVerificationPage from "@/pages/login/EmailVerificationPage";
 import UserList from "@/pages/users/UserList";
@@ -36,7 +36,7 @@ import VLibras from "@/components/VLibras";
 
 function AuthenticatedApp() {
   return (
-    <Layout>
+    <SafeLayout>
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/dashboard" component={Dashboard} />
@@ -70,7 +70,7 @@ function AuthenticatedApp() {
         <Route path="/boards/:id" component={BoardDetails} />
         <Route component={NotFound} />
       </Switch>
-    </Layout>
+    </SafeLayout>
   );
 }
 

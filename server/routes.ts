@@ -4414,124 +4414,21 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
   // Criar o servidor HTTP
   const httpServer = createServer(app);
   
-  // Configurar o servidor WebSocket
-  const wss = new WebSocketServer({ 
-    server: httpServer, 
-    path: '/ws',
-    verifyClient: (info) => {
-      // Permitir todas as conexões por enquanto
-      return true;
-    }
-  });
+  // WebSocket desabilitado temporariamente para evitar erros de conexão
+  console.log('WebSocket desabilitado temporariamente para evitar erros de conexão');
   
-  // Armazenar as conexões dos clientes
+  // Armazenar as conexões dos clientes (vazio por enquanto)
   const clients = new Map<string, WebSocket>();
   
-  // Evento de conexão WebSocket
-  wss.on('connection', (ws: WebSocket) => {
-    console.log('Nova conexão WebSocket estabelecida');
-    
-    // Gerar ID único para este cliente
-    const clientId = crypto.randomUUID();
-    clients.set(clientId, ws);
-    
-    // Enviar mensagem de confirmação de conexão
-    ws.send(JSON.stringify({
-      type: 'connection',
-      message: 'Conexão estabelecida com sucesso',
-      clientId
-    }));
-    
-    // Lidar com mensagens recebidas do cliente
-    ws.on('message', (message: string) => {
-      try {
-        const data = JSON.parse(message.toString());
-        console.log('Mensagem recebida:', data);
-        
-        // Identificar o tipo de mensagem (autenticação, inscrição em tópicos, etc.)
-        if (data.type === 'auth') {
-          // Autenticar o usuário
-          if (data.userId) {
-            // Associar usuário a esta conexão
-            clients.set(data.userId, ws);
-            console.log(`Usuário ${data.userId} autenticado via WebSocket`);
-          }
-        }
-        
-        // Outras ações conforme necessário
-      } catch (error) {
-        console.error('Erro ao processar mensagem WebSocket:', error);
-      }
-    });
-    
-    // Lidar com fechamento de conexão
-    ws.on('close', () => {
-      console.log('Conexão WebSocket fechada');
-      clients.delete(clientId);
-    });
-  });
-  
-  // Inicializar a função para enviar notificações em tempo real
+  // Inicializar a função para enviar notificações em tempo real (desabilitada temporariamente)
   sendNotification = (target: 'all' | string | string[], notification: any) => {
-    try {
-      // Se o cliente Map não estiver inicializado, não enviar notificações
-      if (!clients) {
-        console.log('Mapa de clientes WebSocket não inicializado. Notificações desativadas.');
-        return;
-      }
-      
-      const message = JSON.stringify(notification);
-      
-      if (target === 'all') {
-        // Enviar para todos os clientes conectados
-        let sentCount = 0;
-        clients.forEach((client) => {
-          if (client && client.readyState === WebSocket.OPEN) {
-            try {
-              client.send(message);
-              sentCount++;
-            } catch (err) {
-              console.error('Erro ao enviar mensagem para cliente:', err);
-            }
-          }
-        });
-        console.log(`Notificação enviada para ${sentCount} clientes conectados`);
-      } else if (Array.isArray(target)) {
-        // Enviar para uma lista de usuários específicos
-        let sentCount = 0;
-        target.forEach(userId => {
-          const client = clients.get(userId);
-          if (client && client.readyState === WebSocket.OPEN) {
-            try {
-              client.send(message);
-              sentCount++;
-            } catch (err) {
-              console.error(`Erro ao enviar mensagem para usuário ${userId}:`, err);
-            }
-          }
-        });
-        console.log(`Notificação enviada para ${sentCount}/${target.length} usuários específicos`);
-      } else {
-        // Enviar para um único usuário
-        const client = clients.get(target);
-        if (client && client.readyState === WebSocket.OPEN) {
-          try {
-            client.send(message);
-            console.log(`Notificação enviada para usuário ${target}`);
-          } catch (err) {
-            console.error(`Erro ao enviar mensagem para usuário ${target}:`, err);
-          }
-        } else {
-          console.log(`Cliente não encontrado ou não está pronto para o usuário: ${target}`);
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao enviar notificação:', error);
-    }
+    // WebSocket desabilitado temporariamente - notificações não enviadas
+    console.log('WebSocket desabilitado - notificação não enviada:', { target, type: notification?.type });
+    return;
   };
   
-  // Expor apenas o servidor WebSocket globalmente para uso em outros módulos
-  (global as any).wss = wss;
+  // Expor apenas o servidor WebSocket globalmente para uso em outros módulos (desabilitado)
+  (global as any).wss = null;
   
   // Mesa Diretora routes
   app.get('/api/boards', async (req, res) => {

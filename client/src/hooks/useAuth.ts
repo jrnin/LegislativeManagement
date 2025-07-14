@@ -15,7 +15,7 @@ export function useAuth(shouldFetch: boolean = true) {
   } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     retry: false,
-    enabled: false, // Desabilitar a consulta automática
+    enabled: shouldFetch, // Habilitar a consulta automática
     staleTime: 1000 * 60 * 5, // 5 minutos
   });
 
