@@ -39,19 +39,30 @@ const SimpleEventComments: React.FC<SimpleEventCommentsProps> = ({ eventId }) =>
   const { data: comments = [], isLoading, refetch } = useQuery<EventComment[]>({
     queryKey: ['event-comments', eventId],
     queryFn: async () => {
-      const response = await apiRequest('GET', `/api/events/${eventId}/comments`);
+      const response = await apiRequest<EventComment[]>(`/api/events/${eventId}/comments`);
+      console.log('SimpleEventComments API Response:', response);
+      console.log('Response is array:', Array.isArray(response));
+      console.log('Response length:', response?.length);
       return Array.isArray(response) ? response : [];
     },
     enabled: !!eventId,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
+
+  console.log('SimpleEventComments render - Comments data:', comments);
+  console.log('SimpleEventComments render - Loading:', isLoading);
+  console.log('SimpleEventComments render - Comments length:', comments?.length);
 
   // Create comment mutation
   const createCommentMutation = useMutation({
     mutationFn: async (content: string) => {
-      return await apiRequest('POST', `/api/events/${eventId}/comments`, {
+      const response = await apiRequest('POST', `/api/events/${eventId}/comments`, {
         content,
         mentions: []
       });
+      return await response.json();
     },
     onSuccess: () => {
       refetch();
