@@ -4196,6 +4196,41 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // MENTION SUGGESTIONS ROUTES
+  
+  // API endpoint for mention suggestions
+  app.get('/api/mentions/search', requireAuth, async (req, res) => {
+    try {
+      const { type, query } = req.query;
+      
+      if (!type || !query) {
+        return res.status(400).json({ error: "Type and query are required" });
+      }
+      
+      const searchQuery = query.toString().toLowerCase();
+      let suggestions = [];
+      
+      switch (type) {
+        case 'event':
+          suggestions = await storage.searchEvents(searchQuery);
+          break;
+        case 'activity':
+          suggestions = await storage.searchLegislativeActivities(searchQuery);
+          break;
+        case 'document':
+          suggestions = await storage.searchDocuments(searchQuery);
+          break;
+        default:
+          return res.status(400).json({ error: "Invalid type" });
+      }
+      
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Error searching mentions:", error);
+      res.status(500).json({ error: "Failed to search mentions" });
+    }
+  });
+
   // EVENT COMMENTS ROUTES
   
   // Get comments for an event

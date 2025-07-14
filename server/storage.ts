@@ -271,6 +271,11 @@ export interface IStorage {
     type: 'event' | 'activity' | 'document';
     subtitle?: string;
   }[]>;
+  
+  // Search operations for mentions
+  searchEvents(query: string): Promise<any[]>;
+  searchLegislativeActivities(query: string): Promise<any[]>;
+  searchDocuments(query: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2856,6 +2861,89 @@ export class DatabaseStorage implements IStorage {
       return results.slice(0, 10);
     } catch (error) {
       console.error("Error searching mentions:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Search operations for mentions
+   */
+  async searchEvents(query: string): Promise<any[]> {
+    try {
+      const searchTerm = `%${query}%`;
+      const results = await db
+        .select({
+          id: events.id,
+          title: sql<string>`'Evento #' || ${events.eventNumber}`,
+          eventNumber: events.eventNumber,
+          category: events.category,
+          eventDate: events.eventDate,
+          description: events.description,
+        })
+        .from(events)
+        .where(
+          or(
+            like(sql<string>`'Evento #' || ${events.eventNumber}`, searchTerm),
+            like(events.category, searchTerm),
+            like(events.description, searchTerm)
+          )
+        )
+        .limit(10);
+      return results;
+    } catch (error) {
+      console.error("Error searching events:", error);
+      return [];
+    }
+  }
+
+  async searchLegislativeActivities(query: string): Promise<any[]> {
+    try {
+      const searchTerm = `%${query}%`;
+      const results = await db
+        .select({
+          id: legislativeActivities.id,
+          title: sql<string>`${legislativeActivities.activityType} || ' #' || ${legislativeActivities.activityNumber}`,
+          activityNumber: legislativeActivities.activityNumber,
+          activityType: legislativeActivities.activityType,
+          description: legislativeActivities.description,
+        })
+        .from(legislativeActivities)
+        .where(
+          or(
+            like(sql<string>`${legislativeActivities.activityType} || ' #' || ${legislativeActivities.activityNumber}`, searchTerm),
+            like(legislativeActivities.description, searchTerm)
+          )
+        )
+        .limit(10);
+      return results;
+    } catch (error) {
+      console.error("Error searching legislative activities:", error);
+      return [];
+    }
+  }
+
+  async searchDocuments(query: string): Promise<any[]> {
+    try {
+      const searchTerm = `%${query}%`;
+      const results = await db
+        .select({
+          id: documents.id,
+          title: sql<string>`${documents.documentType} || ' #' || ${documents.documentNumber}`,
+          documentNumber: documents.documentNumber,
+          documentType: documents.documentType,
+          description: documents.description,
+        })
+        .from(documents)
+        .where(
+          or(
+            like(sql<string>`${documents.documentType} || ' #' || ${documents.documentNumber}`, searchTerm),
+            like(documents.description, searchTerm)
+          )
+        )
+        .limit(10);
+      return results;
+    } catch (error) {
+      console.error("Error searching documents:", error);
       return [];
     }
   }

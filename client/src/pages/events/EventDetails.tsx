@@ -70,7 +70,7 @@ import EventActivityDocumentManager from "@/components/events/EventActivityDocum
 import EventActivityManager from "@/components/events/EventActivityManager";
 import { EventDocumentManager } from "@/components/events/EventDocumentManager";
 import { AdminVotingSection } from "@/components/events/AdminVotingSection";
-import SimpleEventComments from "@/components/events/SimpleEventComments";
+import EventCommentsWithMentions from "@/components/events/EventCommentsWithMentions";
 
 const VoteOption = ({ value, label, selected, onClick }: 
   { value: string, label: string, selected: boolean, onClick: () => void }) => {
@@ -1071,7 +1071,7 @@ export default function EventDetails() {
         <TabsContent value="comments" className="pt-4">
           <div className="space-y-6">
             <h2 className="text-xl font-bold">Comentários do Evento</h2>
-            <SimpleEventComments eventId={eventId} />
+            <EventCommentsWithMentions eventId={eventId} />
           </div>
         </TabsContent>
         
