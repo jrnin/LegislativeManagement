@@ -57,14 +57,17 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
   const { toast } = useToast();
 
   // Fetch comments for the event
-  const { data: comments = [], isLoading, error } = useQuery<EventComment[]>({
+  const { data: comments = [], isLoading, error, refetch } = useQuery<EventComment[]>({
     queryKey: ['event-comments', eventId],
     queryFn: async () => {
       const response = await apiRequest('GET', `/api/events/${eventId}/comments`);
+      console.log('Comments API response:', response); // Debug log
       return Array.isArray(response) ? response : [];
     },
     staleTime: 0, // Always fetch fresh data
     enabled: !!eventId,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   // Fetch mentions search results
@@ -93,7 +96,7 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event-comments', eventId] });
-      queryClient.refetchQueries({ queryKey: ['event-comments', eventId] });
+      refetch(); // Force refetch
       setNewComment('');
       toast({
         title: "Comentário criado",
@@ -384,6 +387,12 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
 
       {/* Comments List */}
       <div className="space-y-4">
+        {(() => {
+          console.log('Current comments in render:', comments);
+          console.log('Comments length:', comments?.length);
+          console.log('Is loading:', isLoading);
+          return null;
+        })()}
         {!comments || comments.length === 0 ? (
           <Card>
             <CardContent className="text-center py-8">
