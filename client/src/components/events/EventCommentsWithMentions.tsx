@@ -125,7 +125,10 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
     mutationFn: async (commentId: number) => {
       await apiRequest('DELETE', `/api/events/${eventId}/comments/${commentId}`);
     },
-    onSuccess: () => {
+    onSuccess: (_, commentId) => {
+      // Registrar na timeline
+      addTimelineEntry(eventId, timelineActions.deleteComment(commentId));
+      
       queryClient.invalidateQueries({ queryKey: ['event-comments', eventId] });
       refetch();
       toast({

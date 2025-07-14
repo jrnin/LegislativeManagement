@@ -85,4 +85,11 @@ export const timelineActions = {
     targetId: activityId,
     description: `Votou ${voteType} na atividade: ${activityName}`,
   }),
+
+  adminVoting: (activityId: number, voteDescription: string) => ({
+    actionType: 'admin_vote',
+    targetType: 'vote',
+    targetId: activityId,
+    description: `Registrou votos administrativos: ${voteDescription}`,
+  }),
 };

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ThumbsUp, ThumbsDown, Loader2 } from "lucide-react";
+import { addTimelineEntry, timelineActions } from "@/lib/timeline";
 
 interface AdminVotingSectionProps {
   activityId: number;
@@ -71,6 +72,13 @@ export function AdminVotingSection({
         votes: votesToSubmit,
         eventId
       });
+
+      // Registrar ação na timeline
+      const approvedVotes = votesToSubmit.filter(v => v.vote).length;
+      const rejectedVotes = votesToSubmit.filter(v => !v.vote).length;
+      const voteDescription = `${approvedVotes} voto(s) aprovado(s), ${rejectedVotes} voto(s) rejeitado(s)`;
+      
+      addTimelineEntry(eventId, timelineActions.adminVoting(activityId, voteDescription));
 
       toast({
         title: "Votos registrados",

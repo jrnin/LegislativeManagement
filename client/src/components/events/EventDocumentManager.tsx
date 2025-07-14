@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, Plus, FileText, Calendar, Download, Eye, X } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { addTimelineEntry, timelineActions } from "@/lib/timeline";
 
 interface EventDocumentManagerProps {
   eventId: string;
@@ -75,6 +76,14 @@ export function EventDocumentManager({ eventId, associatedDocuments }: EventDocu
         documentIds: selectedDocuments
       });
 
+      // Registrar ações na timeline para cada documento adicionado
+      selectedDocuments.forEach(docId => {
+        const document = allDocuments.find(d => d.id === docId);
+        if (document) {
+          addTimelineEntry(Number(eventId), timelineActions.addDocument(docId, `${document.documentType} ${document.documentNumber}: ${document.title}`));
+        }
+      });
+
       queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/details`] });
       setSelectedDocuments([]);
       setIsDialogOpen(false);
@@ -94,7 +103,16 @@ export function EventDocumentManager({ eventId, associatedDocuments }: EventDocu
   const handleRemoveDocument = async (documentId: number) => {
     if (confirm('Tem certeza que deseja remover este documento do evento?')) {
       try {
+        // Encontrar o documento para registrar na timeline
+        const document = associatedDocuments.find(d => d.id === documentId);
+        
         await apiRequest('DELETE', `/api/events/${eventId}/documents/${documentId}`);
+        
+        // Registrar ação na timeline
+        if (document) {
+          addTimelineEntry(Number(eventId), timelineActions.removeDocument(documentId, `${document.documentType} ${document.documentNumber}: ${document.title}`));
+        }
+        
         queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/details`] });
         toast({
           title: "Documento removido",

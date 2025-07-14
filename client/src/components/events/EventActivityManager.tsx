@@ -14,6 +14,7 @@ import { Plus, X, Activity, Calendar, Search, FileText, User } from 'lucide-reac
 import { LegislativeActivity } from '@shared/schema';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { addTimelineEntry, timelineActions } from '@/lib/timeline';
 
 interface EventActivityManagerProps {
   eventId: number;
@@ -53,6 +54,14 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
       });
     },
     onSuccess: () => {
+      // Registrar ações na timeline para cada atividade adicionada
+      selectedActivityIds.forEach(activityId => {
+        const activity = allActivities.find(a => a.id === activityId);
+        if (activity) {
+          addTimelineEntry(eventId, timelineActions.addActivity(activityId, `${activity.activityType} ${activity.activityNumber}: ${activity.description}`));
+        }
+      });
+      
       toast({
         title: "Atividades adicionadas",
         description: `${selectedActivityIds.length} atividade(s) foi(ram) adicionada(s) ao evento.`,
@@ -75,7 +84,13 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
     mutationFn: async (activityId: number) => {
       return apiRequest('DELETE', `/api/events/${eventId}/activities/${activityId}`);
     },
-    onSuccess: () => {
+    onSuccess: (_, activityId) => {
+      // Registrar ação na timeline
+      const activity = currentActivities.find(a => a.id === activityId);
+      if (activity) {
+        addTimelineEntry(eventId, timelineActions.removeActivity(activityId, `${activity.activityType} ${activity.activityNumber}: ${activity.description}`));
+      }
+      
       toast({
         title: "Atividade removida",
         description: "A atividade foi removida do evento.",

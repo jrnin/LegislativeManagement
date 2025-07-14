@@ -209,7 +209,14 @@ export default function EventDetails() {
         { vote, eventId }
       );
     },
-    onSuccess: () => {
+    onSuccess: (_, { activityId, vote }) => {
+      // Registrar ação na timeline
+      const activity = eventDetails?.activities?.find((a: any) => a.id === activityId);
+      if (activity) {
+        const voteType = vote ? 'favorável' : 'contrário';
+        addTimelineEntry(eventId, timelineActions.castVote(activityId, `${activity.activityType} ${activity.activityNumber}`, voteType));
+      }
+      
       toast({
         title: "Voto registrado",
         description: "Seu voto foi registrado com sucesso."
@@ -359,6 +366,11 @@ export default function EventDetails() {
         }
       );
       
+      // Registrar ação na timeline
+      const councilor = councilors.find(c => c.id === userId);
+      const userName = councilor?.name || userId;
+      addTimelineEntry(eventId, timelineActions.updateAttendance(userId, userName, status));
+      
       queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "attendance"] });
       
       toast({
@@ -390,6 +402,9 @@ export default function EventDetails() {
           notes: attendanceNotes,
         }
       );
+      
+      // Registrar ação na timeline
+      addTimelineEntry(eventId, timelineActions.updateAttendance(user.id, user.name || 'Usuário', attendanceStatus));
       
       toast({
         title: "Presença registrada",
