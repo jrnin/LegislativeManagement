@@ -44,9 +44,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Conectar ao WebSocket quando o usuário estiver autenticado
   useEffect(() => {
     if (isAuthenticated && user) {
+      // Desabilitar WebSocket temporariamente para corrigir problemas de login
+      console.log('WebSocket desabilitado temporariamente');
+      return;
+      
       // Criar a conexão WebSocket
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.host || 'localhost:5000';
+      const host = window.location.host;
       const wsUrl = `${protocol}//${host}/ws`;
       
       console.log('Tentando conectar ao WebSocket:', wsUrl);

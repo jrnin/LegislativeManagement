@@ -4417,7 +4417,11 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
   // Configurar o servidor WebSocket
   const wss = new WebSocketServer({ 
     server: httpServer, 
-    path: '/ws'
+    path: '/ws',
+    verifyClient: (info) => {
+      // Permitir todas as conexões por enquanto
+      return true;
+    }
   });
   
   // Armazenar as conexões dos clientes
