@@ -110,7 +110,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **July 14, 2025**: Completed Advanced Comments System with Full Mention Navigation - MAJOR FEATURE ENHANCEMENT
+- **July 14, 2025**: Completed Advanced Comments System with Full Mention Navigation + Comment Deletion - MAJOR FEATURE ENHANCEMENT
   - **Complete Mention System**: Successfully implemented comprehensive mention functionality with @ for events, # for activities, and ! for documents
   - **Navigation Integration**: All mentions now render as clickable blue buttons that navigate to corresponding detail pages
   - **API Optimization**: Fixed comment creation to use proper current mentions tracking instead of re-parsing comment text
@@ -122,9 +122,15 @@ Preferred communication style: Simple, everyday language.
     - @ mentions → /events/{id} (EventDetails page)
     - # mentions → /activities/{id} (ActivityDetails page)
     - ! mentions → /documents/{id} (DocumentDetails page)
-  - **User Testing**: Confirmed working with real-time suggestion display and successful navigation to all target pages
-  - **Database Integration**: Comments with mentions properly stored and retrieved with clickable rendering
-  - **Status**: System fully functional and tested successfully
+  - **Comment Deletion System**: Implemented complete comment deletion functionality
+    - Red trash button visible only to comment authors and administrators
+    - Confirmation dialog before deletion to prevent accidental removal
+    - Real-time interface updates after successful deletion
+    - Proper authorization checks in backend (user must be comment author or admin)
+    - Success/error toast notifications with appropriate messaging
+  - **User Testing**: Confirmed working with real-time suggestion display, successful navigation to all target pages, and comment deletion
+  - **Database Integration**: Comments with mentions properly stored and retrieved with clickable rendering, deletion removes from database
+  - **Status**: System fully functional and tested successfully with all CRUD operations for comments
 
 - **July 14, 2025**: Implemented Event-Category Based Voting System - MAJOR ARCHITECTURAL CHANGE
   - **Database Schema Update**: Added `event_id` column to `activity_votes` table with NOT NULL constraint
