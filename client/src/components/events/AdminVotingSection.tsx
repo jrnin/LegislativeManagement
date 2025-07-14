@@ -11,6 +11,7 @@ import { ThumbsUp, ThumbsDown, Loader2 } from "lucide-react";
 
 interface AdminVotingSectionProps {
   activityId: number;
+  eventId: number;
   councilors: any[];
   existingVotes: any[];
   onVotesRegistered: () => void;
@@ -18,6 +19,7 @@ interface AdminVotingSectionProps {
 
 export function AdminVotingSection({ 
   activityId, 
+  eventId,
   councilors, 
   existingVotes, 
   onVotesRegistered 
@@ -66,7 +68,8 @@ export function AdminVotingSection({
 
     try {
       await apiRequest('POST', `/api/activities/${activityId}/votes/admin`, {
-        votes: votesToSubmit
+        votes: votesToSubmit,
+        eventId
       });
 
       toast({

@@ -343,10 +343,11 @@ export const activityTimelineRelations = relations(activityTimeline, ({ one }) =
   }),
 }));
 
-// Activity Votes table - Para rastrear votos de vereadores em atividades legislativas
+// Activity Votes table - Para rastrear votos de vereadores em atividades legislativas por evento
 export const activityVotes = pgTable("activity_votes", {
   id: serial("id").primaryKey(),
   activityId: integer("activity_id").notNull(),
+  eventId: integer("event_id").notNull(), // Novo campo para associar voto ao evento
   userId: varchar("user_id").notNull(),
   vote: boolean("vote").notNull(), // true para aprovação, false para reprovação
   votedAt: timestamp("voted_at").defaultNow(),
@@ -359,6 +360,10 @@ export const activityVotesRelations = relations(activityVotes, ({ one }) => ({
   activity: one(legislativeActivities, {
     fields: [activityVotes.activityId],
     references: [legislativeActivities.id],
+  }),
+  event: one(events, {
+    fields: [activityVotes.eventId],
+    references: [events.id],
   }),
   user: one(users, {
     fields: [activityVotes.userId],
@@ -638,6 +643,7 @@ export type ActivityTimeline = typeof activityTimeline.$inferSelect;
 
 export const insertActivityVoteSchema = createInsertSchema(activityVotes).pick({
   activityId: true,
+  eventId: true,
   userId: true,
   vote: true,
   comment: true,

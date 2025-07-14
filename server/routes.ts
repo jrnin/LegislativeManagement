@@ -2762,6 +2762,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/activities/:activityId/votes', requireAuth, async (req, res) => {
     try {
       const activityId = Number(req.params.activityId);
+      const eventId = req.query.eventId ? Number(req.query.eventId) : null;
       
       // Verificar se a atividade existe
       const activity = await storage.getLegislativeActivity(activityId);
@@ -2770,10 +2771,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Buscar os votos
-      const votes = await storage.getActivityVotesByActivityId(activityId);
+      let votes;
+      let stats;
       
-      // Buscar estatísticas de votação
-      const stats = await storage.getActivityVotesStats(activityId);
+      if (eventId) {
+        votes = await storage.getActivityVotesByActivityAndEvent(activityId, eventId);
+        stats = await storage.getActivityVotesStatsByEvent(activityId, eventId);
+      } else {
+        votes = await storage.getActivityVotesByActivityId(activityId);
+        stats = await storage.getActivityVotesStats(activityId);
+      }
       
       // Retornar votos e estatísticas
       res.json({
@@ -2790,7 +2797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/activities/:activityId/votes', requireAuth, async (req, res) => {
     try {
       const activityId = Number(req.params.activityId);
-      const { vote, comment } = req.body;
+      const { vote, comment, eventId } = req.body;
       
       // Verificar se o usuário está autenticado
       if (!req.user && !(req as any).userId) {
@@ -2810,6 +2817,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Atividade não encontrada" });
       }
       
+      // Verificar se o evento foi fornecido
+      if (!eventId) {
+        return res.status(400).json({ message: "O campo 'eventId' é obrigatório para registrar o voto" });
+      }
+      
+      // Verificar se o evento existe
+      const event = await storage.getEvent(eventId);
+      if (!event) {
+        return res.status(404).json({ message: "Evento não encontrado" });
+      }
+      
       // Verificar se a atividade requer aprovação
       if (!activity.needsApproval) {
         return res.status(400).json({ message: "Esta atividade não requer votação" });
@@ -2826,6 +2844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId,
         vote,
         comment: comment || null,
+        eventId,
         votedAt: new Date()
       });
       
@@ -2905,6 +2924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/activities/:activityId/votes/stats', requireAuth, async (req, res) => {
     try {
       const activityId = Number(req.params.activityId);
+      const eventId = req.query.eventId ? Number(req.query.eventId) : null;
       
       // Verificar se a atividade existe
       const activity = await storage.getLegislativeActivity(activityId);
@@ -2913,7 +2933,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Buscar estatísticas de votação
-      const stats = await storage.getActivityVotesStats(activityId);
+      let stats;
+      if (eventId) {
+        stats = await storage.getActivityVotesStatsByEvent(activityId, eventId);
+      } else {
+        stats = await storage.getActivityVotesStats(activityId);
+      }
       
       res.json(stats);
     } catch (error) {
@@ -2926,6 +2951,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/activities/:activityId/votes/my', requireAuth, async (req, res) => {
     try {
       const activityId = Number(req.params.activityId);
+      const eventId = req.query.eventId ? Number(req.query.eventId) : null;
       
       // Verificar se o usuário está autenticado
       if (!req.user && !(req as any).userId) {
@@ -2941,7 +2967,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Buscar o voto do usuário
-      const vote = await storage.getActivityVoteByUserAndActivity(userId, activityId);
+      let vote;
+      if (eventId) {
+        vote = await storage.getActivityVoteByUserActivityAndEvent(userId, activityId, eventId);
+      } else {
+        vote = await storage.getActivityVoteByUserAndActivity(userId, activityId);
+      }
       
       if (!vote) {
         return res.status(200).json(null);
@@ -2958,17 +2989,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/activities/:activityId/votes/admin', requireAdmin, async (req, res) => {
     try {
       const activityId = Number(req.params.activityId);
-      const { votes } = req.body; // Expected format: [{ userId: string, vote: boolean, comment?: string }]
+      const { votes, eventId } = req.body; // Expected format: [{ userId: string, vote: boolean, comment?: string }]
       
       // Validar entrada
       if (!Array.isArray(votes) || votes.length === 0) {
         return res.status(400).json({ message: "Lista de votos é obrigatória e deve conter pelo menos um voto" });
       }
       
+      // Verificar se o evento foi fornecido
+      if (!eventId) {
+        return res.status(400).json({ message: "O campo 'eventId' é obrigatório para registrar os votos" });
+      }
+      
       // Verificar se a atividade existe
       const activity = await storage.getLegislativeActivity(activityId);
       if (!activity) {
         return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Verificar se o evento existe
+      const event = await storage.getEvent(eventId);
+      if (!event) {
+        return res.status(404).json({ message: "Evento não encontrado" });
       }
       
       // Validar esquema de cada voto
@@ -3007,6 +3049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId: voteData.userId,
           vote: voteData.vote,
           comment: voteData.comment || null,
+          eventId,
           votedAt: new Date()
         });
         

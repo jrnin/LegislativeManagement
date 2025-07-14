@@ -161,10 +161,10 @@ export default function EventDetails() {
   
   // Query para buscar os votos de uma atividade
   const { data: activityVotesData, isLoading: loadingActivityVotes, refetch: refetchActivityVotes } = useQuery({
-    queryKey: ["/api/activities", selectedActivityId, "votes"],
+    queryKey: ["/api/activities", selectedActivityId, "votes", eventId],
     queryFn: async () => {
       if (!selectedActivityId) return null;
-      return await apiRequest<any>(`/api/activities/${selectedActivityId}/votes`);
+      return await apiRequest<any>(`/api/activities/${selectedActivityId}/votes?eventId=${eventId}`);
     },
     enabled: !!selectedActivityId
   });
@@ -192,7 +192,7 @@ export default function EventDetails() {
       return await apiRequest(
         "POST",
         `/api/activities/${activityId}/votes`,
-        { vote }
+        { vote, eventId }
       );
     },
     onSuccess: () => {
@@ -202,7 +202,7 @@ export default function EventDetails() {
       });
       
       // Invalidar todas as consultas relacionadas para garantir dados atualizados
-      queryClient.invalidateQueries({ queryKey: ["/api/activities", selectedActivityId, "votes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/activities", selectedActivityId, "votes", eventId] });
       
       // Aguardar um momento e então forçar um refetch explícito
       setTimeout(() => {
@@ -1028,7 +1028,7 @@ export default function EventDetails() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <VotingStats activityId={activity.id} />
+                          <VotingStats activityId={activity.id} eventId={eventId} />
                         </TableCell>
                         <TableCell className="text-right">
                           <Button 
@@ -1043,7 +1043,7 @@ export default function EventDetails() {
                               
                               // Buscar o voto do usuário para esta atividade se estiver autenticado
                               if (isAuthenticated && user?.id) {
-                                apiRequest<any>(`/api/activities/${activity.id}/votes/my`)
+                                apiRequest<any>(`/api/activities/${activity.id}/votes/my?eventId=${eventId}`)
                                   .then(response => {
                                     if (response) {
                                       setActivityVote(response.vote);
@@ -1479,6 +1479,7 @@ export default function EventDetails() {
                       {councilors.length > 0 && (
                         <AdminVotingSection 
                           activityId={selectedActivityId!}
+                          eventId={eventId}
                           councilors={councilors}
                           existingVotes={activityVotesData?.votes || []}
                           onVotesRegistered={() => {
@@ -1582,9 +1583,9 @@ export default function EventDetails() {
 }
 
 // Componente para exibir estatísticas de votação
-function VotingStats({ activityId }: { activityId: number }) {
+function VotingStats({ activityId, eventId }: { activityId: number; eventId: number }) {
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["/api/activities", activityId, "votes/stats"],
+    queryKey: ["/api/activities", activityId, "votes/stats", eventId],
     queryFn: async () => {
       const response = await apiRequest<{
         totalVotes: number;
@@ -1592,7 +1593,7 @@ function VotingStats({ activityId }: { activityId: number }) {
         rejectCount: number;
         approvePercentage: number;
         rejectPercentage: number;
-      }>(`/api/activities/${activityId}/votes/stats`);
+      }>(`/api/activities/${activityId}/votes/stats?eventId=${eventId}`);
       return response;
     }
   });

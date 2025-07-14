@@ -1341,6 +1341,28 @@ export class DatabaseStorage implements IStorage {
       user: record.user,
     }));
   }
+
+  async getActivityVotesByActivityAndEvent(activityId: number, eventId: number): Promise<(ActivityVote & { user: User })[]> {
+    const votes = await db
+      .select({
+        vote: activityVotes,
+        user: users,
+      })
+      .from(activityVotes)
+      .innerJoin(users, eq(activityVotes.userId, users.id))
+      .where(
+        and(
+          eq(activityVotes.activityId, activityId),
+          eq(activityVotes.eventId, eventId)
+        )
+      )
+      .orderBy(desc(activityVotes.votedAt));
+      
+    return votes.map(record => ({
+      ...record.vote,
+      user: record.user,
+    }));
+  }
   
   async getActivityVoteByUserAndActivity(userId: string, activityId: number): Promise<ActivityVote | undefined> {
     const [vote] = await db
@@ -1355,12 +1377,28 @@ export class DatabaseStorage implements IStorage {
       
     return vote;
   }
+
+  async getActivityVoteByUserActivityAndEvent(userId: string, activityId: number, eventId: number): Promise<ActivityVote | undefined> {
+    const [vote] = await db
+      .select()
+      .from(activityVotes)
+      .where(
+        and(
+          eq(activityVotes.userId, userId),
+          eq(activityVotes.activityId, activityId),
+          eq(activityVotes.eventId, eventId)
+        )
+      );
+      
+    return vote;
+  }
   
   async createActivityVote(voteData: Partial<ActivityVote>): Promise<ActivityVote> {
-    // Verificar se já existe um voto deste usuário para esta atividade
-    const existingVote = await this.getActivityVoteByUserAndActivity(
+    // Verificar se já existe um voto deste usuário para esta atividade no evento específico
+    const existingVote = await this.getActivityVoteByUserActivityAndEvent(
       voteData.userId as string,
-      voteData.activityId as number
+      voteData.activityId as number,
+      voteData.eventId as number
     );
     
     if (existingVote) {
@@ -1419,6 +1457,54 @@ export class DatabaseStorage implements IStorage {
       })
       .from(activityVotes)
       .where(eq(activityVotes.activityId, activityId));
+    
+    const totalVotes = votes.length;
+    const approveCount = votes.filter(v => v.vote === true || v.vote === 't' || v.vote === 'true').length;
+    const rejectCount = votes.filter(v => v.vote === false || v.vote === 'f' || v.vote === 'false').length;
+    
+    // Garantir que os percentuais são calculados corretamente e somam 100%
+    let approvePercentage = 0;
+    let rejectPercentage = 0;
+    
+    if (totalVotes > 0) {
+      // Calcular percentuais exatos
+      approvePercentage = Number(((approveCount / totalVotes) * 100).toFixed(1));
+      
+      // Certificar que a soma é exatamente 100% para evitar inconsistências de arredondamento
+      if (approveCount + rejectCount === totalVotes) {
+        rejectPercentage = Number((100 - approvePercentage).toFixed(1));
+      } else {
+        rejectPercentage = Number(((rejectCount / totalVotes) * 100).toFixed(1));
+      }
+    }
+    
+    return {
+      totalVotes,
+      approveCount,
+      rejectCount,
+      approvePercentage,
+      rejectPercentage
+    };
+  }
+
+  async getActivityVotesStatsByEvent(activityId: number, eventId: number): Promise<{
+    totalVotes: number;
+    approveCount: number;
+    rejectCount: number;
+    approvePercentage: number;
+    rejectPercentage: number;
+  }> {
+    const votes = await db
+      .select({
+        vote: activityVotes.vote,
+      })
+      .from(activityVotes)
+      .where(
+        and(
+          eq(activityVotes.activityId, activityId),
+          eq(activityVotes.eventId, eventId)
+        )
+      );
     
     const totalVotes = votes.length;
     const approveCount = votes.filter(v => v.vote === true || v.vote === 't' || v.vote === 'true').length;

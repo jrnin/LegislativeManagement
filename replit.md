@@ -110,6 +110,32 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 14, 2025**: Implemented Event-Category Based Voting System - MAJOR ARCHITECTURAL CHANGE
+  - **Database Schema Update**: Added `event_id` column to `activity_votes` table with NOT NULL constraint
+  - **Migration Completed**: Successfully migrated all existing votes to include event associations
+  - **Unique Constraint**: Added `unique_activity_event_user_vote` constraint to prevent duplicate votes per event
+  - **Backend API Updates**: Modified all voting endpoints to support event-based voting:
+    - `/api/activities/:activityId/votes` - Now accepts `eventId` query parameter
+    - `/api/activities/:activityId/votes/admin` - Now requires `eventId` in request body
+    - `/api/activities/:activityId/votes/my` - Now accepts `eventId` query parameter
+    - `/api/activities/:activityId/votes/stats` - Now accepts `eventId` query parameter
+  - **Storage Layer Enhancement**: Updated all voting methods to handle event context:
+    - `getActivityVotesByActivityAndEvent()` - New method for event-specific votes
+    - `getActivityVoteByUserActivityAndEvent()` - New method for user's vote in specific event
+    - `getActivityVotesStatsByEvent()` - New method for event-specific voting statistics
+    - `createActivityVote()` - Updated to enforce event-based voting validation
+  - **Frontend Component Updates**: Modified all voting components to pass and handle `eventId`:
+    - `AdminVotingSection` - Updated to accept and send `eventId`
+    - `VotingStats` - Updated to display event-specific statistics
+    - `EventDetails` - Updated all voting queries to include event context
+  - **Key Benefits**:
+    - Same legislative activity can now be voted on multiple times across different event categories
+    - Voting results are properly separated by event type (Sessão Ordinária, Extraordinária, Reunião Comissão)
+    - Historical voting data is preserved and properly contextualized
+    - Admin voting system now supports event-specific vote registration
+    - Real-time statistics are accurate for each event context
+  - **Validation**: Confirmed system working with existing data showing proper event associations
+
 - **July 12, 2025**: Implemented Administrative Voting System for Event Details
   - Added AdminVotingSection component to "Ver Votações" dialog in event details
   - Integrated multi-select councilor voting interface with approve/reject options
