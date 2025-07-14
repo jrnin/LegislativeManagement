@@ -110,6 +110,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 14, 2025**: Refined Event Timeline System - MAJOR IMPROVEMENT
+  - **User Request**: Removed visualizations of tabs from timeline to show only meaningful actions
+  - **Database Cleanup**: Removed all timeline entries for tab views (activity_view, document_view, comment_view, attendance_view, voting_view)
+  - **Timeline Actions Updated**: System now tracks only insertion, alteration, and deletion actions:
+    - Activity management: activity_add, activity_remove
+    - Document management: document_add, document_remove
+    - Comments: comment_create, comment_edit, comment_delete
+    - Attendance: attendance_update
+    - Voting: vote_cast
+  - **Frontend Updates**: Updated EventTimeline component to display new action types with appropriate icons and colors
+  - **Code Cleanup**: Removed all tab navigation tracking from EventDetails.tsx
+  - **Improved User Experience**: Timeline now shows only meaningful user actions without noise from tab switching
+  - **Status**: Fully functional timeline system showing only relevant user actions
+
 - **July 14, 2025**: Implemented Comprehensive Event Timeline System - MAJOR FEATURE ENHANCEMENT
   - **Complete Timeline Infrastructure**: Successfully created comprehensive timeline system for tracking all user activities within events
   - **Database Schema**: Created `event_timeline` table with fields: id, event_id, user_id, action_type, target_type, target_id, description, metadata, created_at

@@ -19,19 +19,33 @@ export async function addTimelineEntry(eventId: number, entry: TimelineEntry): P
 
 export const timelineActions = {
   // Ações para atividades
-  viewActivity: (activityId: number, activityName: string) => ({
-    actionType: 'activity_view',
+  addActivity: (activityId: number, activityName: string) => ({
+    actionType: 'activity_add',
     targetType: 'activity',
     targetId: activityId,
-    description: `Visualizou a atividade: ${activityName}`,
+    description: `Adicionou a atividade: ${activityName}`,
+  }),
+
+  removeActivity: (activityId: number, activityName: string) => ({
+    actionType: 'activity_remove',
+    targetType: 'activity',
+    targetId: activityId,
+    description: `Removeu a atividade: ${activityName}`,
   }),
 
   // Ações para documentos
-  viewDocument: (documentId: number, documentName: string) => ({
-    actionType: 'document_view',
+  addDocument: (documentId: number, documentName: string) => ({
+    actionType: 'document_add',
     targetType: 'document',
     targetId: documentId,
-    description: `Visualizou o documento: ${documentName}`,
+    description: `Adicionou o documento: ${documentName}`,
+  }),
+
+  removeDocument: (documentId: number, documentName: string) => ({
+    actionType: 'document_remove',
+    targetType: 'document',
+    targetId: documentId,
+    description: `Removeu o documento: ${documentName}`,
   }),
 
   // Ações para comentários
@@ -42,23 +56,33 @@ export const timelineActions = {
     description: `Adicionou um comentário: "${commentText.substring(0, 100)}${commentText.length > 100 ? '...' : ''}"`,
   }),
 
-  viewComments: () => ({
-    actionType: 'comment_view',
-    targetType: 'tab',
-    description: 'Visualizou a aba de comentários',
+  editComment: (commentId: number, commentText: string) => ({
+    actionType: 'comment_edit',
+    targetType: 'comment',
+    targetId: commentId,
+    description: `Editou um comentário: "${commentText.substring(0, 100)}${commentText.length > 100 ? '...' : ''}"`,
+  }),
+
+  deleteComment: (commentId: number) => ({
+    actionType: 'comment_delete',
+    targetType: 'comment',
+    targetId: commentId,
+    description: `Excluiu um comentário`,
   }),
 
   // Ações para lista de presença
-  viewAttendance: () => ({
-    actionType: 'attendance_view',
-    targetType: 'tab',
-    description: 'Visualizou a lista de presença',
+  updateAttendance: (userId: string, userName: string, status: string) => ({
+    actionType: 'attendance_update',
+    targetType: 'attendance',
+    targetId: null,
+    description: `Atualizou a presença de ${userName} para ${status}`,
   }),
 
   // Ações para votações
-  viewVoting: () => ({
-    actionType: 'voting_view',
-    targetType: 'tab',
-    description: 'Visualizou a aba de votações',
+  castVote: (activityId: number, activityName: string, voteType: string) => ({
+    actionType: 'vote_cast',
+    targetType: 'vote',
+    targetId: activityId,
+    description: `Votou ${voteType} na atividade: ${activityName}`,
   }),
 };

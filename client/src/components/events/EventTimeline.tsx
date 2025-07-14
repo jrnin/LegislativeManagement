@@ -49,17 +49,19 @@ export function EventTimeline({ eventId }: EventTimelineProps) {
 
   const getActionIcon = (actionType: string) => {
     switch (actionType) {
-      case 'activity_view':
+      case 'activity_add':
+      case 'activity_remove':
         return <FileText className="w-4 h-4" />;
-      case 'document_view':
+      case 'document_add':
+      case 'document_remove':
         return <FileText className="w-4 h-4" />;
       case 'comment_create':
+      case 'comment_edit':
+      case 'comment_delete':
         return <MessageSquare className="w-4 h-4" />;
-      case 'comment_view':
-        return <MessageSquare className="w-4 h-4" />;
-      case 'attendance_view':
+      case 'attendance_update':
         return <Users className="w-4 h-4" />;
-      case 'voting_view':
+      case 'vote_cast':
         return <Calendar className="w-4 h-4" />;
       default:
         return <User className="w-4 h-4" />;
@@ -68,18 +70,24 @@ export function EventTimeline({ eventId }: EventTimelineProps) {
 
   const getActionColor = (actionType: string) => {
     switch (actionType) {
-      case 'activity_view':
+      case 'activity_add':
         return 'bg-blue-100 text-blue-800';
-      case 'document_view':
+      case 'activity_remove':
+        return 'bg-red-100 text-red-800';
+      case 'document_add':
         return 'bg-green-100 text-green-800';
+      case 'document_remove':
+        return 'bg-red-100 text-red-800';
       case 'comment_create':
         return 'bg-purple-100 text-purple-800';
-      case 'comment_view':
+      case 'comment_edit':
         return 'bg-purple-100 text-purple-800';
-      case 'attendance_view':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'voting_view':
+      case 'comment_delete':
         return 'bg-red-100 text-red-800';
+      case 'attendance_update':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'vote_cast':
+        return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -117,12 +125,15 @@ export function EventTimeline({ eventId }: EventTimelineProps) {
                   <Badge variant="secondary" className={`text-xs ${getActionColor(entry.actionType)}`}>
                     {getActionIcon(entry.actionType)}
                     <span className="ml-1">
-                      {entry.actionType === 'activity_view' && 'Visualizou Atividade'}
-                      {entry.actionType === 'document_view' && 'Visualizou Documento'}
+                      {entry.actionType === 'activity_add' && 'Adicionou Atividade'}
+                      {entry.actionType === 'activity_remove' && 'Removeu Atividade'}
+                      {entry.actionType === 'document_add' && 'Adicionou Documento'}
+                      {entry.actionType === 'document_remove' && 'Removeu Documento'}
                       {entry.actionType === 'comment_create' && 'Comentou'}
-                      {entry.actionType === 'comment_view' && 'Viu Comentários'}
-                      {entry.actionType === 'attendance_view' && 'Viu Lista de Presença'}
-                      {entry.actionType === 'voting_view' && 'Viu Votações'}
+                      {entry.actionType === 'comment_edit' && 'Editou Comentário'}
+                      {entry.actionType === 'comment_delete' && 'Excluiu Comentário'}
+                      {entry.actionType === 'attendance_update' && 'Atualizou Presença'}
+                      {entry.actionType === 'vote_cast' && 'Registrou Voto'}
                     </span>
                   </Badge>
                   <span className="text-sm text-gray-500">

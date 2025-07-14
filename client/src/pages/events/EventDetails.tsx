@@ -675,20 +675,7 @@ export default function EventDetails() {
         </Card>
       </div>
       
-      <Tabs defaultValue="activities" className="w-full" onValueChange={(value) => {
-        // Rastrear navegação entre abas
-        if (value === 'activities') {
-          trackUserAction(timelineActions.viewActivity(0, 'visualizou a aba de atividades'));
-        } else if (value === 'attendance') {
-          trackUserAction(timelineActions.viewAttendance());
-        } else if (value === 'documents') {
-          trackUserAction(timelineActions.viewDocument(0, 'visualizou a aba de documentos'));
-        } else if (value === 'approvals') {
-          trackUserAction(timelineActions.viewVoting());
-        } else if (value === 'comments') {
-          trackUserAction(timelineActions.viewComments());
-        }
-      }}>
+      <Tabs defaultValue="activities" className="w-full">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="activities">Atividades</TabsTrigger>
           <TabsTrigger value="attendance">Lista de Presença</TabsTrigger>
