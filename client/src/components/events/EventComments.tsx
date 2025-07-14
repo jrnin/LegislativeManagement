@@ -61,7 +61,7 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
     queryKey: ['event-comments', eventId],
     queryFn: async () => {
       const response = await apiRequest('GET', `/api/events/${eventId}/comments`);
-      return response;
+      return Array.isArray(response) ? response : [];
     },
     staleTime: 30000,
     enabled: !!eventId,
@@ -381,7 +381,7 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
 
       {/* Comments List */}
       <div className="space-y-4">
-        {comments.length === 0 ? (
+        {!comments || comments.length === 0 ? (
           <Card>
             <CardContent className="text-center py-8">
               <MessageCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
