@@ -16,13 +16,14 @@ import { ptBR } from 'date-fns/locale';
 interface EventComment {
   id: number;
   eventId: number;
-  userId: number;
+  userId: string;
   content: string;
   mentions: any[];
+  isEdited: boolean;
   createdAt: string;
   updatedAt: string;
   user?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
     profileImageUrl?: string;
@@ -61,7 +62,15 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
     queryKey: ['event-comments', eventId],
     queryFn: async () => {
       const response = await apiRequest('GET', `/api/events/${eventId}/comments`);
-      console.log('Comments API response:', response); // Debug log
+      console.log('Comments API response:', response);
+      console.log('Response type:', typeof response);
+      console.log('Is array:', Array.isArray(response));
+      if (Array.isArray(response)) {
+        console.log('Comments length:', response.length);
+        response.forEach((comment, index) => {
+          console.log(`Comment ${index}:`, comment);
+        });
+      }
       return Array.isArray(response) ? response : [];
     },
     staleTime: 0, // Always fetch fresh data
@@ -400,10 +409,15 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
               <MessageCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
               <p className="text-gray-500">Nenhum comentário ainda.</p>
               <p className="text-sm text-gray-400">Seja o primeiro a comentar!</p>
+              <p className="text-xs text-gray-300 mt-2">Debug: comments={JSON.stringify(comments)}</p>
             </CardContent>
           </Card>
         ) : (
-          comments.map((comment) => (
+          <>
+            <div className="text-xs text-gray-500 mb-2">
+              Debug: Showing {comments.length} comments
+            </div>
+            {comments.map((comment) => (
             <Card key={comment.id}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
@@ -484,7 +498,8 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
                 </div>
               </CardContent>
             </Card>
-          ))
+          ))}
+          </>
         )}
       </div>
     </div>
