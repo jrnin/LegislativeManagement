@@ -62,21 +62,11 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
     queryKey: ['event-comments', eventId],
     queryFn: async () => {
       const response = await apiRequest('GET', `/api/events/${eventId}/comments`);
-      console.log('Comments API response:', response);
-      console.log('Response type:', typeof response);
-      console.log('Is array:', Array.isArray(response));
-      if (Array.isArray(response)) {
-        console.log('Comments length:', response.length);
-        response.forEach((comment, index) => {
-          console.log(`Comment ${index}:`, comment);
-        });
-      }
+      console.log('Comments loaded:', response?.length || 0);
       return Array.isArray(response) ? response : [];
     },
-    staleTime: 0, // Always fetch fresh data
+    staleTime: 0,
     enabled: !!eventId,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
   });
 
   // Fetch mentions search results
