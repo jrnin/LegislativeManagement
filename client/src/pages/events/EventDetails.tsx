@@ -70,6 +70,7 @@ import EventActivityDocumentManager from "@/components/events/EventActivityDocum
 import EventActivityManager from "@/components/events/EventActivityManager";
 import { EventDocumentManager } from "@/components/events/EventDocumentManager";
 import { AdminVotingSection } from "@/components/events/AdminVotingSection";
+import EventComments from "@/components/events/EventComments";
 
 const VoteOption = ({ value, label, selected, onClick }: 
   { value: string, label: string, selected: boolean, onClick: () => void }) => {
@@ -662,11 +663,12 @@ export default function EventDetails() {
       </div>
       
       <Tabs defaultValue="activities" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="activities">Atividades</TabsTrigger>
           <TabsTrigger value="attendance">Lista de Presença</TabsTrigger>
           <TabsTrigger value="documents">Documentos</TabsTrigger>
           <TabsTrigger value="approvals">Votações</TabsTrigger>
+          <TabsTrigger value="comments">Comentários</TabsTrigger>
           <TabsTrigger value="timeline">Linha do Tempo</TabsTrigger>
         </TabsList>
         
@@ -1063,6 +1065,13 @@ export default function EventDetails() {
                 </Table>
               </div>
             )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="comments" className="pt-4">
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold">Comentários do Evento</h2>
+            <EventComments eventId={eventId} />
           </div>
         </TabsContent>
         

@@ -117,6 +117,7 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
   documents: many(documents, { relationName: "event_documents" }),
   committees: many(eventCommittees),
   activityDocuments: many(eventActivityDocuments),
+  comments: many(eventComments),
 }));
 
 // Legislative Activities table
@@ -848,5 +849,42 @@ export type Board = typeof boards.$inferSelect & {
 export type InsertBoardMember = z.infer<typeof insertBoardMemberSchema>;
 export type BoardMember = typeof boardMembers.$inferSelect & {
   board?: Board;
+  user?: User;
+};
+
+// Event Comments (Comentários dos Eventos) - Sistema de Chat
+export const eventComments = pgTable("event_comments", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").references(() => events.id, { onDelete: "cascade" }).notNull(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  content: text("content").notNull(),
+  mentions: jsonb("mentions").default('[]'), // Array of mentioned items: {type: 'event'|'activity'|'document', id: number|string, title: string}
+  isEdited: boolean("is_edited").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Relations for event comments
+export const eventCommentsRelations = relations(eventComments, ({ one }) => ({
+  event: one(events, {
+    fields: [eventComments.eventId],
+    references: [events.id],
+  }),
+  user: one(users, {
+    fields: [eventComments.userId],
+    references: [users.id],
+  }),
+}));
+
+// Insert schema for event comments
+export const insertEventCommentSchema = createInsertSchema(eventComments).pick({
+  eventId: true,
+  userId: true,
+  content: true,
+  mentions: true,
+});
+
+export type InsertEventComment = z.infer<typeof insertEventCommentSchema>;
+export type EventComment = typeof eventComments.$inferSelect & {
   user?: User;
 };

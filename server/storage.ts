@@ -18,6 +18,7 @@ import {
   boards,
   boardMembers,
   eventActivityDocuments,
+  eventComments,
   type User,
   type Legislature,
   type Event,
@@ -41,7 +42,9 @@ import {
   type InsertBoard,
   type InsertBoardMember,
   type EventActivityDocument,
-  type InsertEventActivityDocument
+  type InsertEventActivityDocument,
+  type EventComment,
+  type InsertEventComment
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or, not } from "drizzle-orm";
@@ -253,6 +256,21 @@ export interface IStorage {
   createBoard(boardData: InsertBoard, members: InsertBoardMember[]): Promise<Board>;
   updateBoard(id: number, boardData: Partial<InsertBoard>, members?: InsertBoardMember[]): Promise<Board | undefined>;
   deleteBoard(id: number): Promise<boolean>;
+  
+  // Event Comments operations
+  getEventComment(id: number): Promise<EventComment | undefined>;
+  getEventCommentsByEventId(eventId: number): Promise<(EventComment & { user: User })[]>;
+  createEventComment(commentData: InsertEventComment): Promise<EventComment>;
+  updateEventComment(id: number, commentData: Partial<EventComment>): Promise<EventComment | undefined>;
+  deleteEventComment(id: number): Promise<boolean>;
+  
+  // Mention search operations (for @ mentions in comments)
+  searchMentions(query: string, type?: 'event' | 'activity' | 'document'): Promise<{
+    id: number;
+    title: string;
+    type: 'event' | 'activity' | 'document';
+    subtitle?: string;
+  }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2662,6 +2680,167 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error removing document from event:", error);
       return false;
+    }
+  }
+
+  /**
+   * Event Comments operations
+   */
+  async getEventComment(id: number): Promise<EventComment | undefined> {
+    try {
+      const [comment] = await db
+        .select()
+        .from(eventComments)
+        .where(eq(eventComments.id, id));
+      return comment;
+    } catch (error) {
+      console.error("Error getting event comment:", error);
+      return undefined;
+    }
+  }
+
+  async getEventCommentsByEventId(eventId: number): Promise<(EventComment & { user: User })[]> {
+    try {
+      const comments = await db
+        .select()
+        .from(eventComments)
+        .leftJoin(users, eq(eventComments.userId, users.id))
+        .where(eq(eventComments.eventId, eventId))
+        .orderBy(eventComments.createdAt);
+      
+      return comments.map(row => ({
+        ...row.event_comments,
+        user: row.users!
+      }));
+    } catch (error) {
+      console.error("Error getting event comments:", error);
+      return [];
+    }
+  }
+
+  async createEventComment(commentData: InsertEventComment): Promise<EventComment> {
+    try {
+      const [comment] = await db
+        .insert(eventComments)
+        .values(commentData)
+        .returning();
+      return comment;
+    } catch (error) {
+      console.error("Error creating event comment:", error);
+      throw error;
+    }
+  }
+
+  async updateEventComment(id: number, commentData: Partial<EventComment>): Promise<EventComment | undefined> {
+    try {
+      const [comment] = await db
+        .update(eventComments)
+        .set({ ...commentData, updatedAt: new Date(), isEdited: true })
+        .where(eq(eventComments.id, id))
+        .returning();
+      return comment;
+    } catch (error) {
+      console.error("Error updating event comment:", error);
+      return undefined;
+    }
+  }
+
+  async deleteEventComment(id: number): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(eventComments)
+        .where(eq(eventComments.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting event comment:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Mention search operations (for @ mentions in comments)
+   */
+  async searchMentions(query: string, type?: 'event' | 'activity' | 'document'): Promise<{
+    id: number;
+    title: string;
+    type: 'event' | 'activity' | 'document';
+    subtitle?: string;
+  }[]> {
+    try {
+      const results: {
+        id: number;
+        title: string;
+        type: 'event' | 'activity' | 'document';
+        subtitle?: string;
+      }[] = [];
+
+      const searchTerm = `%${query}%`;
+
+      // Search events
+      if (!type || type === 'event') {
+        const eventResults = await db
+          .select({
+            id: events.id,
+            title: sql<string>`'Evento #' || ${events.eventNumber}`,
+            subtitle: sql<string>`${events.category} || ' - ' || ${events.eventDate}`,
+          })
+          .from(events)
+          .where(
+            or(
+              like(sql<string>`'Evento #' || ${events.eventNumber}`, searchTerm),
+              like(events.category, searchTerm),
+              like(events.description, searchTerm)
+            )
+          )
+          .limit(5);
+
+        results.push(...eventResults.map(r => ({ ...r, type: 'event' as const })));
+      }
+
+      // Search activities
+      if (!type || type === 'activity') {
+        const activityResults = await db
+          .select({
+            id: legislativeActivities.id,
+            title: sql<string>`${legislativeActivities.activityType} || ' #' || ${legislativeActivities.activityNumber}`,
+            subtitle: legislativeActivities.description,
+          })
+          .from(legislativeActivities)
+          .where(
+            or(
+              like(sql<string>`${legislativeActivities.activityType} || ' #' || ${legislativeActivities.activityNumber}`, searchTerm),
+              like(legislativeActivities.description, searchTerm)
+            )
+          )
+          .limit(5);
+
+        results.push(...activityResults.map(r => ({ ...r, type: 'activity' as const })));
+      }
+
+      // Search documents
+      if (!type || type === 'document') {
+        const documentResults = await db
+          .select({
+            id: documents.id,
+            title: sql<string>`${documents.documentType} || ' #' || ${documents.documentNumber}`,
+            subtitle: documents.description,
+          })
+          .from(documents)
+          .where(
+            or(
+              like(sql<string>`${documents.documentType} || ' #' || ${documents.documentNumber}`, searchTerm),
+              like(documents.description, searchTerm)
+            )
+          )
+          .limit(5);
+
+        results.push(...documentResults.map(r => ({ ...r, type: 'document' as const })));
+      }
+
+      return results.slice(0, 10);
+    } catch (error) {
+      console.error("Error searching mentions:", error);
+      return [];
     }
   }
 }

@@ -4196,6 +4196,148 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // EVENT COMMENTS ROUTES
+  
+  // Get comments for an event
+  app.get('/api/events/:eventId/comments', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const comments = await storage.getEventCommentsByEventId(eventId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching event comments:", error);
+      res.status(500).json({ message: "Erro ao buscar comentários do evento" });
+    }
+  });
+  
+  // Create a new comment
+  app.post('/api/events/:eventId/comments', requireAuth, async (req, res) => {
+    try {
+      const eventId = Number(req.params.eventId);
+      const userId = (req.user as any).id;
+      const { content, mentions } = req.body;
+      
+      if (!content || content.trim() === '') {
+        return res.status(400).json({ message: "Conteúdo do comentário é obrigatório" });
+      }
+      
+      const commentData = {
+        eventId,
+        userId,
+        content: content.trim(),
+        mentions: mentions || []
+      };
+      
+      const comment = await storage.createEventComment(commentData);
+      
+      // Fetch the comment with user data
+      const commentWithUser = await storage.getEventComment(comment.id);
+      if (commentWithUser) {
+        const user = await storage.getUser(userId);
+        res.status(201).json({
+          ...commentWithUser,
+          user
+        });
+      } else {
+        res.status(201).json(comment);
+      }
+    } catch (error) {
+      console.error("Error creating event comment:", error);
+      res.status(500).json({ message: "Erro ao criar comentário" });
+    }
+  });
+  
+  // Update a comment
+  app.put('/api/events/:eventId/comments/:commentId', requireAuth, async (req, res) => {
+    try {
+      const commentId = Number(req.params.commentId);
+      const userId = (req.user as any).id;
+      const isAdmin = (req.user as any).role === 'admin';
+      
+      // Check if comment exists
+      const existingComment = await storage.getEventComment(commentId);
+      if (!existingComment) {
+        return res.status(404).json({ message: "Comentário não encontrado" });
+      }
+      
+      // Check if user can edit this comment
+      if (existingComment.userId !== userId && !isAdmin) {
+        return res.status(403).json({ message: "Não autorizado a editar este comentário" });
+      }
+      
+      const { content, mentions } = req.body;
+      
+      if (!content || content.trim() === '') {
+        return res.status(400).json({ message: "Conteúdo do comentário é obrigatório" });
+      }
+      
+      const updatedComment = await storage.updateEventComment(commentId, {
+        content: content.trim(),
+        mentions: mentions || []
+      });
+      
+      if (!updatedComment) {
+        return res.status(404).json({ message: "Comentário não encontrado" });
+      }
+      
+      res.json(updatedComment);
+    } catch (error) {
+      console.error("Error updating event comment:", error);
+      res.status(500).json({ message: "Erro ao atualizar comentário" });
+    }
+  });
+  
+  // Delete a comment
+  app.delete('/api/events/:eventId/comments/:commentId', requireAuth, async (req, res) => {
+    try {
+      const commentId = Number(req.params.commentId);
+      const userId = (req.user as any).id;
+      const isAdmin = (req.user as any).role === 'admin';
+      
+      // Check if comment exists
+      const existingComment = await storage.getEventComment(commentId);
+      if (!existingComment) {
+        return res.status(404).json({ message: "Comentário não encontrado" });
+      }
+      
+      // Check if user can delete this comment
+      if (existingComment.userId !== userId && !isAdmin) {
+        return res.status(403).json({ message: "Não autorizado a excluir este comentário" });
+      }
+      
+      const result = await storage.deleteEventComment(commentId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Comentário não encontrado" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting event comment:", error);
+      res.status(500).json({ message: "Erro ao excluir comentário" });
+    }
+  });
+  
+  // Search mentions for comments
+  app.get('/api/search/mentions', requireAuth, async (req, res) => {
+    try {
+      const { query, type } = req.query;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: "Termo de busca é obrigatório" });
+      }
+      
+      const validTypes = ['event', 'activity', 'document'];
+      const searchType = type && validTypes.includes(type as string) ? type as any : undefined;
+      
+      const results = await storage.searchMentions(query, searchType);
+      res.json(results);
+    } catch (error) {
+      console.error("Error searching mentions:", error);
+      res.status(500).json({ message: "Erro ao buscar menções" });
+    }
+  });
+
   // Criar o servidor HTTP
   const httpServer = createServer(app);
   
