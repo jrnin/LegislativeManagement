@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import LoginPage from "@/pages/login/LoginPage";
-import Dashboard from "@/pages/dashboard/Dashboard";
-import Layout from "@/components/layout/Layout";
+import SafeLayout from "@/components/layout/SafeLayout";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -80,7 +79,7 @@ export default function SimpleApp() {
   return (
     <TooltipProvider>
       {user ? (
-        <Layout>
+        <SafeLayout>
           <div className="p-6">
             <div className="mb-6 flex justify-between items-center">
               <h1 className="text-2xl font-bold">Dashboard - Sistema Legislativo</h1>
@@ -140,7 +139,7 @@ export default function SimpleApp() {
               </ul>
             </div>
           </div>
-        </Layout>
+        </SafeLayout>
       ) : (
         <LoginPage onLogin={handleLogin} />
       )}
