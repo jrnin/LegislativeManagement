@@ -63,7 +63,7 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
       const response = await apiRequest('GET', `/api/events/${eventId}/comments`);
       return Array.isArray(response) ? response : [];
     },
-    staleTime: 30000,
+    staleTime: 0, // Always fetch fresh data
     enabled: !!eventId,
   });
 
@@ -93,6 +93,7 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event-comments', eventId] });
+      queryClient.refetchQueries({ queryKey: ['event-comments', eventId] });
       setNewComment('');
       toast({
         title: "Comentário criado",
@@ -118,6 +119,7 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event-comments', eventId] });
+      queryClient.refetchQueries({ queryKey: ['event-comments', eventId] });
       setEditingComment(null);
       setEditContent('');
       toast({
@@ -141,6 +143,7 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event-comments', eventId] });
+      queryClient.refetchQueries({ queryKey: ['event-comments', eventId] });
       toast({
         title: "Comentário excluído",
         description: "O comentário foi excluído com sucesso.",
