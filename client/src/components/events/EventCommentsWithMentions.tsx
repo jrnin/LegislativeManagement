@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +17,8 @@ import {
   FileText,
   Activity,
   User,
-  Hash
+  Hash,
+  ExternalLink
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -56,8 +58,10 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
   const [mentionQuery, setMentionQuery] = useState('');
   const [mentionPosition, setMentionPosition] = useState(0);
   const [mentionType, setMentionType] = useState<'event' | 'activity' | 'document'>('event');
+  const [currentMentions, setCurrentMentions] = useState<Mention[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   // Fetch comments for the event
   const { data: comments = [], isLoading, refetch } = useQuery<EventComment[]>({
@@ -92,6 +96,7 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
       queryClient.invalidateQueries({ queryKey: ['event-comments', eventId] });
       refetch();
       setNewComment('');
+      setCurrentMentions([]);
       setShowMentions(false);
       toast({
         title: "Comentário criado",
@@ -142,6 +147,18 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
     setNewComment(newContent);
     setShowMentions(false);
     
+    // Store the mention data
+    const mentionData: Mention = {
+      id: suggestion.id,
+      type: mentionType,
+      title: suggestion.title || suggestion.activityNumber || suggestion.documentNumber,
+      position: mentionPosition - 1,
+      length: mentionText.length
+    };
+    
+    // Add to current mentions array
+    setCurrentMentions(prev => [...prev, mentionData]);
+    
     // Focus back to textarea
     if (textareaRef.current) {
       textareaRef.current.focus();
@@ -153,32 +170,23 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
   const handleSubmit = () => {
     if (!newComment.trim()) return;
 
-    // Parse mentions from comment content
-    const mentions: Mention[] = [];
-    const mentionRegex = /(@|#|!)([^@#!\s]+)/g;
-    let match;
-    
-    while ((match = mentionRegex.exec(newComment)) !== null) {
-      const [fullMatch, trigger, content] = match;
-      let type: 'event' | 'activity' | 'document';
-      
-      if (trigger === '@') type = 'event';
-      else if (trigger === '#') type = 'activity';
-      else type = 'document';
-      
-      mentions.push({
-        id: 0, // Will be set by backend
-        type,
-        title: content,
-        position: match.index,
-        length: fullMatch.length
-      });
-    }
-
     createCommentMutation.mutate({
       content: newComment.trim(),
-      mentions
+      mentions: currentMentions
     });
+  };
+
+  const getNavigationUrl = (mention: Mention) => {
+    switch (mention.type) {
+      case 'event':
+        return `/events/${mention.id}`;
+      case 'activity':
+        return `/activities/${mention.id}`;
+      case 'document':
+        return `/documents/${mention.id}`;
+      default:
+        return '#';
+    }
   };
 
   const renderCommentContent = (comment: EventComment) => {
@@ -197,21 +205,23 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
           parts.push(comment.content.substring(lastIndex, mention.position));
         }
         
-        // Add mention as badge
+        // Add mention as clickable link
         const mentionText = comment.content.substring(mention.position, mention.position + mention.length);
         const icon = mention.type === 'event' ? Calendar : 
                     mention.type === 'activity' ? Activity : FileText;
         const IconComponent = icon;
+        const navigationUrl = getNavigationUrl(mention);
         
         parts.push(
-          <Badge 
+          <button
             key={`mention-${index}`}
-            variant="secondary"
-            className="inline-flex items-center gap-1 mx-1"
+            onClick={() => navigate(navigationUrl)}
+            className="inline-flex items-center gap-1 mx-1 px-2 py-1 text-sm bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors cursor-pointer border border-blue-200"
           >
             <IconComponent className="w-3 h-3" />
             {mentionText}
-          </Badge>
+            <ExternalLink className="w-3 h-3" />
+          </button>
         );
         
         lastIndex = mention.position + mention.length;
