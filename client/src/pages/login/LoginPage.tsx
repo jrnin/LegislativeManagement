@@ -35,7 +35,11 @@ const registerSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function LoginPage() {
+interface LoginPageProps {
+  onLogin?: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+}
+
+export default function LoginPage({ onLogin }: LoginPageProps = {}) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("login");
@@ -82,7 +86,11 @@ export default function LoginPage() {
   const handleLogin = async (values: LoginFormValues) => {
     try {
       setIsLoggingIn(true);
-      const result = await login(values.email, values.password);
+      
+      // Usar onLogin customizado se fornecido, caso contrário usar o hook padrão
+      const result = onLogin 
+        ? await onLogin(values.email, values.password)
+        : await login(values.email, values.password);
       
       if (result.success) {
         toast({
@@ -90,8 +98,10 @@ export default function LoginPage() {
           description: "Você será redirecionado para o painel administrativo",
         });
         
-        // Usar navegação programática do wouter
-        setLocation("/dashboard");
+        // Usar navegação programática do wouter apenas se não tiver onLogin customizado
+        if (!onLogin) {
+          setLocation("/dashboard");
+        }
       } else {
         toast({
           title: "Erro ao fazer login",
