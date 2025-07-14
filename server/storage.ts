@@ -2790,37 +2790,94 @@ export class DatabaseStorage implements IStorage {
    * Event Timeline operations
    */
   async getEventTimelineByEventId(eventId: number): Promise<(EventTimeline & { user: User })[]> {
-    const timeline = await db
-      .select({
-        id: eventTimeline.id,
-        eventId: eventTimeline.eventId,
-        userId: eventTimeline.userId,
-        actionType: eventTimeline.actionType,
-        targetType: eventTimeline.targetType,
-        targetId: eventTimeline.targetId,
-        description: eventTimeline.description,
-        metadata: eventTimeline.metadata,
-        createdAt: eventTimeline.createdAt,
-        user: {
-          id: users.id,
-          email: users.email,
-          name: users.name,
-          role: users.role,
-          profileImageUrl: users.profileImageUrl,
-          createdAt: users.createdAt,
-          updatedAt: users.updatedAt,
-          isVerified: users.isVerified,
-          verificationToken: users.verificationToken,
-          resetToken: users.resetToken,
-          resetTokenExpiry: users.resetTokenExpiry,
-        }
-      })
-      .from(eventTimeline)
-      .leftJoin(users, eq(eventTimeline.userId, users.id))
-      .where(eq(eventTimeline.eventId, eventId))
-      .orderBy(desc(eventTimeline.createdAt));
-
-    return timeline;
+    try {
+      // Usar o pool diretamente para executar SQL puro
+      const query = `
+        SELECT 
+          et.id,
+          et.event_id as "eventId",
+          et.user_id as "userId",
+          et.action_type as "actionType",
+          et.target_type as "targetType",
+          et.target_id as "targetId",
+          et.description,
+          et.metadata,
+          et.created_at as "createdAt",
+          u.id as "user_id",
+          u.email as "user_email",
+          u.name as "user_name",
+          u.role as "user_role",
+          u.profile_image_url as "user_profileImageUrl",
+          u.created_at as "user_createdAt",
+          u.updated_at as "user_updatedAt",
+          u.email_verified as "user_emailVerified",
+          u.verification_token as "user_verificationToken",
+          u.password as "user_password",
+          u.cpf as "user_cpf",
+          u.birth_date as "user_birthDate",
+          u.zip_code as "user_zipCode",
+          u.address as "user_address",
+          u.neighborhood as "user_neighborhood",
+          u.number as "user_number",
+          u.city as "user_city",
+          u.state as "user_state",
+          u.legislature_id as "user_legislatureId",
+          u.marital_status as "user_maritalStatus",
+          u.occupation as "user_occupation",
+          u.education as "user_education",
+          u.partido as "user_partido",
+          u.email_verification_sent_at as "user_emailVerificationSentAt"
+        FROM event_timeline et
+        LEFT JOIN users u ON et.user_id = u.id
+        WHERE et.event_id = $1
+        ORDER BY et.created_at DESC
+      `;
+      
+      const { pool } = await import('./db');
+      const result = await pool.query(query, [eventId]);
+      
+      // Transformar o resultado para o formato esperado
+      return result.rows.map((row: any) => ({
+        id: row.id,
+        eventId: row.eventId,
+        userId: row.userId,
+        actionType: row.actionType,
+        targetType: row.targetType,
+        targetId: row.targetId,
+        description: row.description,
+        metadata: row.metadata,
+        createdAt: row.createdAt,
+        user: row.user_id ? {
+          id: row.user_id,
+          email: row.user_email,
+          name: row.user_name,
+          role: row.user_role,
+          profileImageUrl: row.user_profileImageUrl,
+          createdAt: row.user_createdAt,
+          updatedAt: row.user_updatedAt,
+          emailVerified: row.user_emailVerified,
+          verificationToken: row.user_verificationToken,
+          password: row.user_password,
+          cpf: row.user_cpf,
+          birthDate: row.user_birthDate,
+          zipCode: row.user_zipCode,
+          address: row.user_address,
+          neighborhood: row.user_neighborhood,
+          number: row.user_number,
+          city: row.user_city,
+          state: row.user_state,
+          legislatureId: row.user_legislatureId,
+          maritalStatus: row.user_maritalStatus,
+          occupation: row.user_occupation,
+          education: row.user_education,
+          partido: row.user_partido,
+          emailVerificationSentAt: row.user_emailVerificationSentAt
+        } : null
+      })) as (EventTimeline & { user: User })[];
+    } catch (error) {
+      console.error("Error fetching event timeline:", error);
+      return [];
+    }
   }
 
   async createEventTimelineEntry(data: InsertEventTimeline): Promise<EventTimeline> {
