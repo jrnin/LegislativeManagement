@@ -110,6 +110,27 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 14, 2025**: Completed Comprehensive Timeline Integration System - MAJOR SYSTEM ENHANCEMENT
+  - **Comprehensive Action Tracking**: Successfully integrated timeline tracking across all major system components
+  - **Activity Management Integration**: Added automatic timeline entries for activity addition/removal in EventActivityManager
+    - Tracks when activities are added to events with full activity details
+    - Records when activities are removed from events with complete context
+  - **Document Management Integration**: Implemented timeline tracking for document associations in EventDocumentManager
+    - Captures document additions to events with document type and title information
+    - Logs document removals from events with complete document details
+  - **Voting System Integration**: Added comprehensive voting action tracking
+    - Individual user votes tracked with vote type (favorável/contrário) and activity details
+    - Administrative bulk voting tracked with vote counts and approval statistics
+  - **Attendance System Integration**: Implemented presence tracking for all attendance updates
+    - Self-attendance registration tracked with user name and status
+    - Administrative attendance updates tracked with councilor information
+  - **Comments System Integration**: Enhanced comment tracking with creation and deletion actions
+    - Comment creation tracked with content preview (first 100 characters)
+    - Comment deletion tracked with appropriate timeline entries
+  - **Real-time Timeline Updates**: All actions are automatically recorded in real-time without user intervention
+  - **Complete User Experience**: Timeline now provides comprehensive audit trail of all legislative activities
+  - **Status**: Fully functional system with complete integration across all major components - confirmed working by user testing
+
 - **July 14, 2025**: Refined Event Timeline System - MAJOR IMPROVEMENT
   - **User Request**: Removed visualizations of tabs from timeline to show only meaningful actions
   - **Database Cleanup**: Removed all timeline entries for tab views (activity_view, document_view, comment_view, attendance_view, voting_view)
@@ -118,7 +139,7 @@ Preferred communication style: Simple, everyday language.
     - Document management: document_add, document_remove
     - Comments: comment_create, comment_edit, comment_delete
     - Attendance: attendance_update
-    - Voting: vote_cast
+    - Voting: vote_cast, admin_vote
   - **Frontend Updates**: Updated EventTimeline component to display new action types with appropriate icons and colors
   - **Code Cleanup**: Removed all tab navigation tracking from EventDetails.tsx
   - **Improved User Experience**: Timeline now shows only meaningful user actions without noise from tab switching
