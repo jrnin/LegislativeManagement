@@ -3,6 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,7 +19,8 @@ import {
   Activity,
   User,
   Hash,
-  ExternalLink
+  ExternalLink,
+  Trash2
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -61,6 +63,7 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
   const [currentMentions, setCurrentMentions] = useState<Mention[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
   const [, navigate] = useLocation();
 
   // Fetch comments for the event
@@ -106,6 +109,28 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
     onError: (error: any) => {
       toast({
         title: "Erro ao criar comentário",
+        description: error.message || "Erro desconhecido",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete comment mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: async (commentId: number) => {
+      await apiRequest('DELETE', `/api/events/${eventId}/comments/${commentId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event-comments', eventId] });
+      refetch();
+      toast({
+        title: "Comentário excluído",
+        description: "O comentário foi removido com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir comentário",
         description: error.message || "Erro desconhecido",
         variant: "destructive",
       });
@@ -174,6 +199,16 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
       content: newComment.trim(),
       mentions: currentMentions
     });
+  };
+
+  const handleDeleteComment = (commentId: number) => {
+    if (window.confirm('Tem certeza que deseja excluir este comentário?')) {
+      deleteCommentMutation.mutate(commentId);
+    }
+  };
+
+  const canDeleteComment = (comment: EventComment) => {
+    return user && (user.id === comment.userId || user.role === 'admin');
   };
 
   const getNavigationUrl = (mention: Mention) => {
@@ -365,18 +400,32 @@ const EventCommentsWithMentions: React.FC<EventCommentsWithMentionsProps> = ({ e
                   </Avatar>
                   
                   <div className="flex-1 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{comment.user?.name}</span>
-                      <span className="text-sm text-gray-500">
-                        {formatDistanceToNow(new Date(comment.createdAt), { 
-                          addSuffix: true, 
-                          locale: ptBR 
-                        })}
-                      </span>
-                      {comment.isEdited && (
-                        <Badge variant="outline" className="text-xs">
-                          Editado
-                        </Badge>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{comment.user?.name}</span>
+                        <span className="text-sm text-gray-500">
+                          {formatDistanceToNow(new Date(comment.createdAt), { 
+                            addSuffix: true, 
+                            locale: ptBR 
+                          })}
+                        </span>
+                        {comment.isEdited && (
+                          <Badge variant="outline" className="text-xs">
+                            Editado
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {canDeleteComment(comment) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteComment(comment.id)}
+                          disabled={deleteCommentMutation.isPending}
+                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       )}
                     </div>
                     
