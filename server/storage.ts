@@ -2702,15 +2702,31 @@ export class DatabaseStorage implements IStorage {
   async getEventCommentsByEventId(eventId: number): Promise<(EventComment & { user: User })[]> {
     try {
       const comments = await db
-        .select()
+        .select({
+          id: eventComments.id,
+          eventId: eventComments.eventId,
+          userId: eventComments.userId,
+          content: eventComments.content,
+          mentions: eventComments.mentions,
+          isEdited: eventComments.isEdited,
+          createdAt: eventComments.createdAt,
+          updatedAt: eventComments.updatedAt,
+          user: {
+            id: users.id,
+            email: users.email,
+            name: users.name,
+            profileImageUrl: users.profileImageUrl,
+            role: users.role
+          }
+        })
         .from(eventComments)
         .leftJoin(users, eq(eventComments.userId, users.id))
         .where(eq(eventComments.eventId, eventId))
         .orderBy(eventComments.createdAt);
       
       return comments.map(row => ({
-        ...row.event_comments,
-        user: row.users!
+        ...row,
+        user: row.user!
       }));
     } catch (error) {
       console.error("Error getting event comments:", error);

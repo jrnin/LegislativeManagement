@@ -387,13 +387,14 @@ const EventComments: React.FC<EventCommentsProps> = ({ eventId }) => {
 
       {/* Comments List */}
       <div className="space-y-4">
-        {(() => {
-          console.log('Current comments in render:', comments);
-          console.log('Comments length:', comments?.length);
-          console.log('Is loading:', isLoading);
-          return null;
-        })()}
-        {!comments || comments.length === 0 ? (
+        {isLoading ? (
+          <Card>
+            <CardContent className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="text-gray-500 mt-2">Carregando comentários...</p>
+            </CardContent>
+          </Card>
+        ) : !comments || comments.length === 0 ? (
           <Card>
             <CardContent className="text-center py-8">
               <MessageCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
