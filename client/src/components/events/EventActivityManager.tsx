@@ -34,13 +34,8 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
     select: (data: any) => data || []
   });
 
-  // Filter activities that are not already associated with this event
-  const availableActivities = allActivities.filter(activity => 
-    !currentActivities.some(current => current.id === activity.id)
-  );
-
-  // Filter activities based on search term
-  const filteredActivities = availableActivities.filter(activity =>
+  // Filter activities based on search term (allowing all activities, even if already associated)
+  const filteredActivities = allActivities.filter(activity =>
     activity.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     activity.activityNumber.toString().includes(searchTerm) ||
     activity.activityType.toLowerCase().includes(searchTerm.toLowerCase())
@@ -140,6 +135,11 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
     setSelectedActivityIds([]);
   };
 
+  // Check if activity is already associated with current event
+  const isActivityAssociated = (activityId: number) => {
+    return currentActivities.some(current => current.id === activityId);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header with Add Button */}
@@ -162,7 +162,7 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
             <DialogHeader>
               <DialogTitle>Adicionar Atividades Legislativas ao Evento</DialogTitle>
               <DialogDescription>
-                Selecione uma ou mais atividades legislativas para associar a este evento.
+                Selecione uma ou mais atividades legislativas para associar a este evento. A mesma atividade pode ser adicionada em vários eventos independente da categoria.
               </DialogDescription>
             </DialogHeader>
             
@@ -212,7 +212,7 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
                   <div className="text-center py-8 text-muted-foreground">
                     <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">
-                      {searchTerm ? 'Nenhuma atividade encontrada' : 'Todas as atividades já estão associadas ao evento'}
+                      {searchTerm ? 'Nenhuma atividade encontrada' : 'Nenhuma atividade disponível'}
                     </p>
                   </div>
                 ) : (
@@ -234,6 +234,11 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
                             <Badge variant="secondary" className="text-xs">
                               {activity.activityType}
                             </Badge>
+                            {isActivityAssociated(activity.id) && (
+                              <Badge variant="default" className="text-xs bg-green-600 hover:bg-green-700">
+                                Já no evento
+                              </Badge>
+                            )}
                           </div>
                           <p className="text-sm font-medium line-clamp-2">
                             {activity.description}
