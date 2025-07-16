@@ -643,10 +643,22 @@ export class DatabaseStorage implements IStorage {
   async getAllLegislativeActivities(): Promise<LegislativeActivity[]> {
     const activities = await db.select().from(legislativeActivities).orderBy(desc(legislativeActivities.activityDate));
     
-    // For each activity, get the authors
-    const result: LegislativeActivity[] = [];
+    // Group activities by activityNumber and activityType to avoid duplicates
+    const uniqueActivities = new Map<string, LegislativeActivity>();
     
     for (const activity of activities) {
+      const key = `${activity.activityNumber}-${activity.activityType}`;
+      
+      // Se ainda não temos essa atividade, ou se esta é a versão original (sem eventId)
+      if (!uniqueActivities.has(key) || (!activity.eventId && uniqueActivities.get(key)?.eventId)) {
+        uniqueActivities.set(key, activity);
+      }
+    }
+    
+    // For each unique activity, get the authors
+    const result: LegislativeActivity[] = [];
+    
+    for (const activity of uniqueActivities.values()) {
       const authors = await db
         .select({
           user: users
@@ -661,7 +673,7 @@ export class DatabaseStorage implements IStorage {
       });
     }
     
-    return result;
+    return result.sort((a, b) => new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime());
   }
   
   async getRecentLegislativeActivities(limit: number = 3): Promise<LegislativeActivity[]> {
@@ -2625,11 +2637,89 @@ export class DatabaseStorage implements IStorage {
    */
   async addActivitiesToEvent(eventId: number, activityIds: number[]): Promise<boolean> {
     try {
-      // Update the eventId for all selected activities
-      await db
-        .update(legislativeActivities)
-        .set({ eventId })
-        .where(inArray(legislativeActivities.id, activityIds));
+      // Para cada atividade, verificar se já existe no evento
+      for (const activityId of activityIds) {
+        // Verificar se a atividade já existe no evento
+        const existingActivity = await db
+          .select()
+          .from(legislativeActivities)
+          .where(
+            and(
+              eq(legislativeActivities.id, activityId),
+              eq(legislativeActivities.eventId, eventId)
+            )
+          );
+        
+        if (existingActivity.length > 0) {
+          // Atividade já existe no evento, pular
+          continue;
+        }
+        
+        // Verificar se a atividade existe sem eventId ou com eventId diferente
+        const sourceActivity = await db
+          .select()
+          .from(legislativeActivities)
+          .where(eq(legislativeActivities.id, activityId))
+          .limit(1);
+        
+        if (sourceActivity.length === 0) {
+          continue; // Atividade não encontrada
+        }
+        
+        const activity = sourceActivity[0];
+        
+        // Se a atividade não tem eventId, simplesmente associar
+        if (!activity.eventId) {
+          await db
+            .update(legislativeActivities)
+            .set({ eventId })
+            .where(eq(legislativeActivities.id, activityId));
+        } else {
+          // Se a atividade já tem eventId, criar uma cópia para o novo evento
+          const newActivity = {
+            activityNumber: activity.activityNumber,
+            activityDate: activity.activityDate,
+            description: activity.description,
+            eventId: eventId,
+            activityType: activity.activityType,
+            situacao: activity.situacao,
+            regimeTramitacao: activity.regimeTramitacao,
+            filePath: activity.filePath,
+            fileName: activity.fileName,
+            fileType: activity.fileType,
+            approvalType: activity.approvalType,
+            approved: activity.approved,
+            approvedBy: activity.approvedBy,
+            approvedAt: activity.approvedAt,
+            approvalComment: activity.approvalComment,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          
+          // Inserir a nova atividade
+          const [insertedActivity] = await db
+            .insert(legislativeActivities)
+            .values(newActivity)
+            .returning();
+          
+          // Copiar os autores da atividade original
+          const originalAuthors = await db
+            .select()
+            .from(legislativeActivitiesAuthors)
+            .where(eq(legislativeActivitiesAuthors.activityId, activityId));
+          
+          if (originalAuthors.length > 0) {
+            const newAuthors = originalAuthors.map(author => ({
+              activityId: insertedActivity.id,
+              userId: author.userId,
+            }));
+            
+            await db
+              .insert(legislativeActivitiesAuthors)
+              .values(newAuthors);
+          }
+        }
+      }
       
       return true;
     } catch (error) {
@@ -2640,18 +2730,54 @@ export class DatabaseStorage implements IStorage {
 
   async removeActivityFromEvent(eventId: number, activityId: number): Promise<boolean> {
     try {
-      // Set eventId to null for the specified activity
-      const result = await db
-        .update(legislativeActivities)
-        .set({ eventId: null })
+      // Verificar se é uma atividade original (sem eventId inicial) ou uma cópia
+      const activity = await db
+        .select()
+        .from(legislativeActivities)
         .where(
           and(
             eq(legislativeActivities.id, activityId),
             eq(legislativeActivities.eventId, eventId)
           )
+        )
+        .limit(1);
+      
+      if (activity.length === 0) {
+        return false; // Atividade não encontrada no evento
+      }
+      
+      // Verificar se existem outras atividades com o mesmo número e tipo
+      const sameActivities = await db
+        .select()
+        .from(legislativeActivities)
+        .where(
+          and(
+            eq(legislativeActivities.activityNumber, activity[0].activityNumber),
+            eq(legislativeActivities.activityType, activity[0].activityType),
+            not(eq(legislativeActivities.id, activityId))
+          )
         );
       
-      return result.rowCount > 0;
+      if (sameActivities.length > 0) {
+        // Se existem outras instâncias da mesma atividade, remover esta completamente
+        await db
+          .delete(legislativeActivitiesAuthors)
+          .where(eq(legislativeActivitiesAuthors.activityId, activityId));
+        
+        await db
+          .delete(legislativeActivities)
+          .where(eq(legislativeActivities.id, activityId));
+        
+        return true;
+      } else {
+        // Se é a única instância, apenas remover o eventId
+        const result = await db
+          .update(legislativeActivities)
+          .set({ eventId: null })
+          .where(eq(legislativeActivities.id, activityId));
+        
+        return result.rowCount > 0;
+      }
     } catch (error) {
       console.error("Error removing activity from event:", error);
       return false;

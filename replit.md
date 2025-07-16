@@ -110,6 +110,29 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 16, 2025**: Implemented True 1:N Relationship for Legislative Activities - MAJOR ARCHITECTURAL ENHANCEMENT
+  - **Database Architecture**: Successfully implemented proper one-to-many relationship allowing same legislative activity to exist in multiple events
+  - **Activity Duplication System**: Created intelligent activity duplication mechanism that:
+    - Preserves original activity when not associated with any event
+    - Creates activity copies when adding to new events if activity already has eventId
+    - Maintains all original data including authors, description, and metadata
+  - **Enhanced Storage Layer**: Updated `addActivitiesToEvent()` method to handle true 1:N relationships:
+    - Checks if activity already exists in target event to prevent duplicates
+    - Automatically associates activities without eventId to new events
+    - Duplicates activities with existing eventId to maintain data integrity
+    - Copies all related data including authors and metadata
+  - **Improved Removal Logic**: Enhanced `removeActivityFromEvent()` to handle activity lifecycle:
+    - Deletes duplicate activities when other instances exist
+    - Preserves original activity by setting eventId to null when it's the only instance
+    - Maintains referential integrity across all related tables
+  - **Unique Activity Display**: Modified `getAllLegislativeActivities()` to show only unique activities:
+    - Groups activities by activityNumber and activityType
+    - Prioritizes original activities (without eventId) over duplicates
+    - Maintains consistent user experience in activity selection
+  - **Visual Indicators**: Added "Já no evento" badges in EventActivityManager to show current associations
+  - **User Experience**: Updated interface descriptions to clearly communicate new functionality
+  - **Status**: Fully functional 1:N relationship system allowing same legislative activity across multiple events
+
 - **July 14, 2025**: Completed Comprehensive Timeline Integration System - MAJOR SYSTEM ENHANCEMENT
   - **Comprehensive Action Tracking**: Successfully integrated timeline tracking across all major system components
   - **Activity Management Integration**: Added automatic timeline entries for activity addition/removal in EventActivityManager
