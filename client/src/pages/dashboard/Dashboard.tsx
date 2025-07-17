@@ -59,9 +59,7 @@ export default function Dashboard() {
             <p className="mt-1 text-slate-500">Bem-vindo ao Sistema Legislativo</p>
           </div>
           <div className="mt-4 md:mt-0 flex space-x-3">
-            <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-sm">
-              Exportar Relatório
-            </button>
+            
             <button className="button-primary px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
               Nova Atividade
             </button>

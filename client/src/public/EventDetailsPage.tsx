@@ -48,6 +48,34 @@ export default function EventDetailsPage() {
     enabled: !!id
   });
 
+  // Fetch voting statistics for activities
+  const { data: votingStats, isLoading: loadingVotingStats } = useQuery({
+    queryKey: ['/api/public/events', id, 'voting-stats'],
+    queryFn: async () => {
+      if (!eventDetails?.activities) return [];
+      
+      const promises = eventDetails.activities.map(async (activity: any) => {
+        try {
+          const response = await fetch(`/api/activities/${activity.id}/votes/stats?eventId=${id}`);
+          if (!response.ok) return null;
+          const stats = await response.json();
+          return {
+            activityId: activity.id,
+            activity: activity,
+            ...stats
+          };
+        } catch (error) {
+          console.error(`Error fetching voting stats for activity ${activity.id}:`, error);
+          return null;
+        }
+      });
+      
+      const results = await Promise.all(promises);
+      return results.filter(Boolean);
+    },
+    enabled: !!eventDetails?.activities && activeTab === 'voting'
+  });
+
   // Extract data from comprehensive response
   const event = eventDetails;
   const activities = eventDetails?.activities || [];
@@ -369,7 +397,7 @@ export default function EventDetailsPage() {
             <Card>
               <CardContent className="p-0">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-5 bg-gray-50 border-b rounded-none">
+                  <TabsList className="grid w-full grid-cols-6 bg-gray-50 border-b rounded-none">
                     <TabsTrigger value="overview" className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       Visão Geral
@@ -377,6 +405,10 @@ export default function EventDetailsPage() {
                     <TabsTrigger value="activities" className="flex items-center gap-2">
                       <Activity className="h-4 w-4" />
                       Atividades
+                    </TabsTrigger>
+                    <TabsTrigger value="voting" className="flex items-center gap-2">
+                      <Vote className="h-4 w-4" />
+                      Votações
                     </TabsTrigger>
                     <TabsTrigger value="documents" className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
@@ -422,7 +454,7 @@ export default function EventDetailsPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-6 border-t">
                         <Card className="text-center">
                           <CardContent className="pt-6">
                             <Activity className="h-8 w-8 mx-auto mb-2" style={{color: '#48654e'}} />
@@ -430,6 +462,16 @@ export default function EventDetailsPage() {
                               {activities.length}
                             </div>
                             <p className="text-sm text-gray-600">Atividades</p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="text-center">
+                          <CardContent className="pt-6">
+                            <Vote className="h-8 w-8 mx-auto mb-2" style={{color: '#48654e'}} />
+                            <div className="text-2xl font-bold" style={{color: '#48654e'}}>
+                              {votingStats?.reduce((total, stat) => total + (stat.totalVotes || 0), 0) || 0}
+                            </div>
+                            <p className="text-sm text-gray-600">Votações</p>
                           </CardContent>
                         </Card>
                         
@@ -580,6 +622,112 @@ export default function EventDetailsPage() {
                             ))}
                           </div>
                         </ScrollArea>
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="voting" className="p-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold" style={{color: '#48654e'}}>
+                        Votações das Atividades Legislativas
+                      </h3>
+                      
+                      {activities.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                          <Vote className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>Nenhuma atividade disponível para votação neste evento.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {loadingVotingStats ? (
+                            <div className="text-center py-8">
+                              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" style={{color: '#48654e'}} />
+                              <p className="text-gray-600">Carregando estatísticas de votação...</p>
+                            </div>
+                          ) : (
+                            activities.map((activity: any) => {
+                              const stats = votingStats?.find((s: any) => s.activityId === activity.id);
+                              
+                              return (
+                                <Card key={activity.id} className="border-l-4" style={{borderLeftColor: '#48654e'}}>
+                                  <CardContent className="pt-6">
+                                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <Badge variant="outline" className="text-xs">
+                                            {activity.activityType}
+                                          </Badge>
+                                          <span className="text-sm font-medium">#{activity.activityNumber}</span>
+                                        </div>
+                                        <h4 className="font-semibold text-lg mb-2">{activity.description}</h4>
+                                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                                          <div className="flex items-center gap-1">
+                                            <Calendar className="h-4 w-4" />
+                                            {format(new Date(activity.activityDate), "dd/MM/yyyy")}
+                                          </div>
+                                          <div className="flex items-center gap-1">
+                                            <Activity className="h-4 w-4" />
+                                            {activity.situacao || 'Aguardando Análise'}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="lg:w-80">
+                                        {stats && stats.totalVotes > 0 ? (
+                                          <div className="space-y-3">
+                                            <div className="flex h-3 bg-gray-200 rounded-full overflow-hidden">
+                                              {stats.approvePercentage > 0 && (
+                                                <div 
+                                                  className="bg-green-500 h-full transition-all duration-300"
+                                                  style={{ width: `${stats.approvePercentage}%` }}
+                                                />
+                                              )}
+                                              {stats.rejectPercentage > 0 && (
+                                                <div 
+                                                  className="bg-red-500 h-full transition-all duration-300"
+                                                  style={{ width: `${stats.rejectPercentage}%` }}
+                                                />
+                                              )}
+                                            </div>
+                                            
+                                            <div className="flex items-center justify-between text-sm">
+                                              <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                                <span className="text-green-700 font-medium">
+                                                  {stats.approveCount} Aprovações ({stats.approvePercentage}%)
+                                                </span>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                <span className="text-red-700 font-medium">
+                                                  {stats.rejectCount} Rejeições ({stats.rejectPercentage}%)
+                                                </span>
+                                              </div>
+                                            </div>
+                                            
+                                            <div className="text-center">
+                                              <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full text-sm">
+                                                <Vote className="h-4 w-4 text-gray-600" />
+                                                <span className="font-medium">Total: {stats.totalVotes} votos</span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <div className="text-center py-4">
+                                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg text-sm text-gray-600">
+                                              <Vote className="h-4 w-4" />
+                                              <span>Nenhum voto registrado</span>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })
+                          )}
+                        </div>
                       )}
                     </div>
                   </TabsContent>
