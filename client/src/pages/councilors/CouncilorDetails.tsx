@@ -371,7 +371,7 @@ export default function CouncilorDetails() {
               {/* Aba de Atividades Legislativas */}
               <TabsContent value="activities" className="mt-6">
                 <div className="bg-white rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-6 text-gray-900">Activity Logs</h3>
+                  <h3 className="text-lg font-semibold mb-6 text-gray-900">Atividades Legislativas</h3>
                   
                   {!activities || activities.length === 0 ? (
                     <p className="text-gray-500 text-center py-6">
@@ -380,28 +380,103 @@ export default function CouncilorDetails() {
                   ) : (
                     <div className="space-y-4">
                       {activities.map((activity: any) => (
-                        <div key={activity.id} className="border rounded-lg p-4 hover:shadow-sm transition-shadow">
-                          <div className="flex items-start justify-between">
+                        <div key={activity.id} className="border rounded-lg p-6 hover:shadow-sm transition-shadow">
+                          <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
-                              <h4 className="font-medium text-gray-900">
+                              <h4 className="text-lg font-medium text-gray-900 mb-2">
                                 {activity.activityType} Nº {activity.activityNumber}
                               </h4>
-                              <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-                              <div className="flex items-center mt-2 text-xs text-gray-500">
-                                <Calendar className="mr-1 h-3 w-3" />
-                                {activity.activityDate ? formatDate(activity.activityDate) : 'Data não informada'}
+                              <p className="text-sm text-gray-600 mb-3">{activity.description}</p>
+                              
+                              {/* Informações básicas em grid */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div className="flex items-center text-sm">
+                                  <Calendar className="mr-2 h-4 w-4 text-gray-500" />
+                                  <span className="text-gray-600">Data:</span>
+                                  <span className="ml-2 font-medium">
+                                    {activity.activityDate ? format(new Date(activity.activityDate), "dd/MM/yyyy", { locale: ptBR }) : 'Não informada'}
+                                  </span>
+                                </div>
+                                
+                                <div className="flex items-center text-sm">
+                                  <Activity className="mr-2 h-4 w-4 text-gray-500" />
+                                  <span className="text-gray-600">Regime:</span>
+                                  <span className="ml-2 font-medium">{activity.regimeTramitacao || 'Ordinária'}</span>
+                                </div>
+                                
+                                <div className="flex items-center text-sm">
+                                  <FileText className="mr-2 h-4 w-4 text-gray-500" />
+                                  <span className="text-gray-600">Tipo de Aprovação:</span>
+                                  <span className="ml-2 font-medium">
+                                    {activity.approvalType === 'councilors' ? 'Vereadores' : 
+                                     activity.approvalType === 'committees' ? 'Comissões' : 'Não necessária'}
+                                  </span>
+                                </div>
+                                
+                                <div className="flex items-center text-sm">
+                                  <Users className="mr-2 h-4 w-4 text-gray-500" />
+                                  <span className="text-gray-600">Aprovado por:</span>
+                                  <span className="ml-2 font-medium">{activity.approvedBy || 'Não informado'}</span>
+                                </div>
+                              </div>
+                              
+                              {/* Comentário de aprovação */}
+                              {activity.approvalComment && (
+                                <div className="mb-4 p-3 bg-gray-50 rounded-md">
+                                  <span className="text-sm font-medium text-gray-700">Comentário de Aprovação:</span>
+                                  <p className="text-sm text-gray-600 mt-1">{activity.approvalComment}</p>
+                                </div>
+                              )}
+                              
+                              {/* Datas importantes */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-500">
+                                <div>
+                                  <span>Criado em:</span>
+                                  <span className="ml-2">
+                                    {activity.createdAt ? format(new Date(activity.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}
+                                  </span>
+                                </div>
+                                {activity.approvedAt && (
+                                  <div>
+                                    <span>Aprovado em:</span>
+                                    <span className="ml-2">
+                                      {format(new Date(activity.approvedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                            {activity.status && (
+                            
+                            {/* Badges de status */}
+                            <div className="flex flex-col items-end space-y-2">
                               <Badge className={cn(
-                                "ml-4",
-                                activity.status === "Aprovado" ? "bg-green-100 text-green-800" : 
-                                activity.status === "Em análise" ? "bg-yellow-100 text-yellow-800" : 
-                                "bg-gray-100 text-gray-800"
+                                activity.situacao === "Tramitação Finalizada" ? "bg-green-100 text-green-800" : 
+                                activity.situacao === "Aguardando Análise" ? "bg-yellow-100 text-yellow-800" : 
+                                activity.situacao === "Arquivado" ? "bg-red-100 text-red-800" :
+                                activity.situacao === "Vetado" ? "bg-red-100 text-red-800" :
+                                "bg-blue-100 text-blue-800"
                               )}>
-                                {activity.status}
+                                {activity.situacao}
                               </Badge>
-                            )}
+                              
+                              {activity.approved !== null && (
+                                <Badge variant={activity.approved ? "default" : "destructive"}>
+                                  {activity.approved ? "Aprovado" : "Reprovado"}
+                                </Badge>
+                              )}
+                              
+                              {activity.filePath && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => window.open(`/api/files/activities/${activity.id}`, '_blank')}
+                                  className="mt-2"
+                                >
+                                  <Download className="mr-1 h-3 w-3" />
+                                  Arquivo
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -466,36 +541,111 @@ export default function CouncilorDetails() {
                   ) : (
                     <div className="space-y-4">
                       {documents.map((doc: any) => (
-                        <div key={doc.id} className="border rounded-lg p-4 hover:shadow-sm transition-shadow">
-                          <div className="flex items-start justify-between">
+                        <div key={doc.id} className="border rounded-lg p-6 hover:shadow-sm transition-shadow">
+                          <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
-                              <h4 className="font-medium text-gray-900">
+                              <h4 className="text-lg font-medium text-gray-900 mb-2">
                                 {doc.documentType} Nº {doc.documentNumber}
                               </h4>
-                              <p className="text-sm text-gray-600 mt-1">{doc.description}</p>
-                              <div className="flex items-center mt-2 text-xs text-gray-500">
-                                <Calendar className="mr-1 h-3 w-3" />
-                                {doc.documentDate ? formatDate(doc.documentDate) : 'Data não informada'}
+                              <p className="text-sm text-gray-600 mb-3">{doc.description}</p>
+                              
+                              {/* Informações básicas em grid */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div className="flex items-center text-sm">
+                                  <Calendar className="mr-2 h-4 w-4 text-gray-500" />
+                                  <span className="text-gray-600">Data do Documento:</span>
+                                  <span className="ml-2 font-medium">
+                                    {doc.documentDate ? format(new Date(doc.documentDate), "dd/MM/yyyy", { locale: ptBR }) : 'Não informada'}
+                                  </span>
+                                </div>
+                                
+                                <div className="flex items-center text-sm">
+                                  <Users className="mr-2 h-4 w-4 text-gray-500" />
+                                  <span className="text-gray-600">Autor:</span>
+                                  <span className="ml-2 font-medium">{doc.authorType || 'Não informado'}</span>
+                                </div>
+                                
+                                {doc.fileName && (
+                                  <div className="flex items-center text-sm">
+                                    <FileText className="mr-2 h-4 w-4 text-gray-500" />
+                                    <span className="text-gray-600">Arquivo:</span>
+                                    <span className="ml-2 font-medium">{doc.fileName}</span>
+                                  </div>
+                                )}
+                                
+                                {doc.fileType && (
+                                  <div className="flex items-center text-sm">
+                                    <Activity className="mr-2 h-4 w-4 text-gray-500" />
+                                    <span className="text-gray-600">Tipo:</span>
+                                    <span className="ml-2 font-medium">{doc.fileType}</span>
+                                  </div>
+                                )}
+                                
+                                {doc.activityId && (
+                                  <div className="flex items-center text-sm">
+                                    <ClipboardList className="mr-2 h-4 w-4 text-gray-500" />
+                                    <span className="text-gray-600">Atividade ID:</span>
+                                    <span className="ml-2 font-medium">{doc.activityId}</span>
+                                  </div>
+                                )}
+                                
+                                {doc.eventId && (
+                                  <div className="flex items-center text-sm">
+                                    <MapPin className="mr-2 h-4 w-4 text-gray-500" />
+                                    <span className="text-gray-600">Evento ID:</span>
+                                    <span className="ml-2 font-medium">{doc.eventId}</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Informações de versionamento */}
+                              {doc.parentDocumentId && (
+                                <div className="mb-4 p-3 bg-blue-50 rounded-md">
+                                  <span className="text-sm font-medium text-blue-700">Documento Versionado:</span>
+                                  <p className="text-sm text-blue-600 mt-1">
+                                    Este documento é uma versão do documento ID: {doc.parentDocumentId}
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {/* Datas importantes */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-500">
+                                <div>
+                                  <span>Criado em:</span>
+                                  <span className="ml-2">
+                                    {doc.createdAt ? format(new Date(doc.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span>Atualizado em:</span>
+                                  <span className="ml-2">
+                                    {doc.updatedAt ? format(new Date(doc.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-2 ml-4">
-                              {doc.status && (
-                                <Badge className={cn(
-                                  doc.status === "Vigente" ? "bg-green-100 text-green-800" : 
-                                  doc.status === "Revogada" ? "bg-red-100 text-red-800" : 
-                                  "bg-gray-100 text-gray-800"
-                                )}>
-                                  {doc.status}
-                                </Badge>
-                              )}
+                            
+                            {/* Badges de status e ações */}
+                            <div className="flex flex-col items-end space-y-2">
+                              <Badge className={cn(
+                                doc.status === "Vigente" ? "bg-green-100 text-green-800" : 
+                                doc.status === "Revogada" ? "bg-red-100 text-red-800" : 
+                                doc.status === "Alterada" ? "bg-yellow-100 text-yellow-800" :
+                                doc.status === "Suspenso" ? "bg-orange-100 text-orange-800" :
+                                "bg-gray-100 text-gray-800"
+                              )}>
+                                {doc.status}
+                              </Badge>
+                              
                               {doc.filePath && (
                                 <Button 
                                   variant="outline" 
                                   size="sm"
                                   onClick={() => window.open(`/api/files/documents/${doc.id}`, '_blank')}
+                                  className="mt-2"
                                 >
                                   <Download className="mr-1 h-3 w-3" />
-                                  Baixar
+                                  Baixar Arquivo
                                 </Button>
                               )}
                             </div>
