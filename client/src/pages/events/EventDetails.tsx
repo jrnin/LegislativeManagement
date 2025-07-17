@@ -352,7 +352,7 @@ export default function EventDetails() {
           console.error('Error fetching councilors:', error);
           toast({
             title: "Erro",
-            description: "Não foi possível carregar a lista de vereadores",
+            description: "Não foi possível carregar a lista de vereadores(as)",
             variant: "destructive"
           });
         } finally {
@@ -452,7 +452,7 @@ export default function EventDetails() {
       
       toast({
         title: "Presença registrada",
-        description: `Presença do vereador foi registrada como ${status}.`
+        description: `Presença do vereador(a) foi registrada como ${status}.`
       });
     } catch (error) {
       console.error('Error registering attendance:', error);
@@ -468,7 +468,7 @@ export default function EventDetails() {
       
       toast({
         title: "Erro",
-        description: "Não foi possível registrar a presença do vereador.",
+        description: "Não foi possível registrar a presença do vereador(a).",
         variant: "destructive"
       });
     }

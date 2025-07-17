@@ -128,7 +128,7 @@ export default function CouncilorList() {
               </p>
             )}
             <Button onClick={() => setLocation("/users/new")}>
-              <Plus className="mr-2 h-4 w-4" /> Adicionar Vereador
+              <Plus className="mr-2 h-4 w-4" /> Adicionar Vereador(a)
             </Button>
           </div>
         ) : (
@@ -169,7 +169,7 @@ export default function CouncilorList() {
                         </Avatar>
                         <div>
                           <div className="font-medium">{councilor.name}</div>
-                          <div className="text-xs text-muted-foreground">{councilor.role === 'councilor' ? 'Vereador' : councilor.role === 'admin' ? 'Administrador' : councilor.role}</div>
+                          <div className="text-xs text-muted-foreground">{councilor.role === 'councilor' ? 'Vereador(a)' : councilor.role === 'admin' ? 'Administrador' : councilor.role}</div>
                         </div>
                       </div>
                     </TableCell>

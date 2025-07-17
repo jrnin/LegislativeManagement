@@ -526,7 +526,7 @@ export default function ActivityDetails() {
                                   </Label>
                                   <Textarea
                                     id={`comment-${councilor.id}`}
-                                    placeholder="Comentário do vereador..."
+                                    placeholder="Comentário do vereador(a)..."
                                     value={current.comment}
                                     onChange={(e) => updateCouncilorSelection(councilor.id, 'comment', e.target.value)}
                                     rows={2}

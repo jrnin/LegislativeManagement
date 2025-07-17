@@ -272,7 +272,7 @@ export default function CommitteeEditModal({
                     {isLoadingCouncilors ? (
                       <div className="flex items-center justify-center p-4">
                         <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
-                        <span className="ml-2 text-sm text-muted-foreground">Carregando vereadores...</span>
+                        <span className="ml-2 text-sm text-muted-foreground">Carregando vereadores(as)...</span>
                       </div>
                     ) : (
                       <div className="border rounded-md p-4">
@@ -342,7 +342,7 @@ export default function CommitteeEditModal({
                               })
                             ) : (
                               <div className="text-sm text-muted-foreground">
-                                {councilors ? "Nenhum vereador encontrado" : "Erro ao carregar vereadores"}
+                                {councilors ? "Nenhum vereador(a) encontrado" : "Erro ao carregar vereadores(as)"}
                               </div>
                             )}
                           </div>

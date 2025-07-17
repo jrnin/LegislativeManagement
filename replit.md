@@ -110,6 +110,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 17, 2025**: Translated "councilor" to "Vereador(a)" System-wide - LOCALIZATION IMPROVEMENT
+  - **Complete Translation**: Successfully translated all occurrences of "councilor" term to "Vereador(a)" throughout the system
+  - **CouncilorList.tsx Updates**: Updated role display and button text to use "Vereador(a)" instead of "Vereador"
+  - **AdminVotingSection.tsx Enhancement**: Updated voting selection message to use inclusive "Vereador(a)" terminology
+  - **ActivityDetails.tsx Improvement**: Updated comment placeholder text to use "Vereador(a)" for inclusive language
+  - **EventDetails.tsx Enhancements**: Updated all toast messages and error descriptions to use "Vereador(a)" and "Vereadores(as)"
+  - **CommitteeEditModal.tsx Updates**: Updated loading messages and error states to use inclusive "Vereadores(as)" terminology
+  - **Inclusive Language**: Implemented gender-inclusive language throughout the municipal legislative system
+  - **User Experience**: Improved accessibility and inclusivity for all users regardless of gender identity
+  - **Consistency**: Maintained consistent terminology across administrative and public interfaces
+  - **Status**: Complete system-wide translation confirmed across all components and user-facing messages
+
 - **July 17, 2025**: Implemented Public Voting Tab for Event Details - PUBLIC INTERFACE ENHANCEMENT
   - **New "Votações" Tab**: Successfully added voting statistics tab to public event details page (EventDetailsPage.tsx)
   - **Comprehensive Voting Display**: Shows voting statistics for all legislative activities within each event

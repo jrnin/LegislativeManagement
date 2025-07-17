@@ -61,7 +61,7 @@ export function AdminVotingSection({
     if (votesToSubmit.length === 0) {
       toast({
         title: "Nenhum voto selecionado",
-        description: "Selecione pelo menos um vereador para registrar votos.",
+        description: "Selecione pelo menos um vereador(a) para registrar votos.",
         variant: "destructive"
       });
       return;
