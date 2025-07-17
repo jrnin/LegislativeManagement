@@ -1,6 +1,6 @@
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Loader2, Calendar, MapPin, User, FileText, Clock, Check, X, MessageSquare, Download, UserCheck, RefreshCw, Vote, ThumbsUp, ThumbsDown, AlertCircle, Activity } from "lucide-react";
@@ -115,6 +115,7 @@ export default function EventDetails() {
   const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState<boolean>(false);
   const [currentDocumentId, setCurrentDocumentId] = useState<number | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [localAttendance, setLocalAttendance] = useState<any[]>([]);
   
   // Função para rastrear ações do usuário na timeline
   const trackUserAction = async (action: any) => {
@@ -354,6 +355,31 @@ export default function EventDetails() {
   const handleCouncilorAttendance = async (userId: string, status: string) => {
     if (!isAuthenticated || !eventId) return;
     
+    // Optimistic update - add attendance immediately
+    const councilor = councilors.find(c => c.id === userId);
+    const newAttendanceRecord = {
+      id: Date.now(), // Temporary ID
+      eventId: eventId,
+      userId: userId,
+      status: status,
+      notes: `Presença registrada por ${user?.name}`,
+      registeredBy: user?.id,
+      registeredAt: new Date().toISOString(),
+      user: councilor
+    };
+    
+    // Update local state immediately
+    const existingIndex = localAttendance.findIndex(a => a.userId === userId);
+    if (existingIndex >= 0) {
+      // Update existing record
+      const updatedAttendance = [...localAttendance];
+      updatedAttendance[existingIndex] = { ...updatedAttendance[existingIndex], ...newAttendanceRecord };
+      setLocalAttendance(updatedAttendance);
+    } else {
+      // Add new record
+      setLocalAttendance(prev => [...prev, newAttendanceRecord]);
+    }
+    
     try {
       await apiRequest(
         "POST",
@@ -367,11 +393,11 @@ export default function EventDetails() {
       );
       
       // Registrar ação na timeline
-      const councilor = councilors.find(c => c.id === userId);
       const userName = councilor?.name || userId;
       addTimelineEntry(eventId, timelineActions.updateAttendance(userId, userName, status));
       
-      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "attendance"] });
+      // Refresh from server to get real IDs
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/details`] });
       
       toast({
         title: "Presença registrada",
@@ -379,6 +405,16 @@ export default function EventDetails() {
       });
     } catch (error) {
       console.error('Error registering attendance:', error);
+      
+      // Revert optimistic update on error
+      if (existingIndex >= 0) {
+        const revertedAttendance = [...localAttendance];
+        revertedAttendance.splice(existingIndex, 1);
+        setLocalAttendance(revertedAttendance);
+      } else {
+        setLocalAttendance(prev => prev.filter(a => a.id !== newAttendanceRecord.id));
+      }
+      
       toast({
         title: "Erro",
         description: "Não foi possível registrar a presença do vereador.",
@@ -464,6 +500,13 @@ export default function EventDetails() {
     attendance: eventDetails.attendance || [],
     eventDocuments: eventDetails.documents || []
   };
+
+  // Sync local attendance with server data
+  useEffect(() => {
+    if (attendance) {
+      setLocalAttendance(attendance);
+    }
+  }, [attendance]);
   
   const eventDate = new Date(event.eventDate);
   const formattedDate = format(eventDate, "PPP", { locale: ptBR });
@@ -782,7 +825,7 @@ export default function EventDetails() {
                       ) : (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                           {councilors.map((councilor) => {
-                            const councilAttendance = attendance.find((a: any) => a.userId === councilor.id);
+                            const councilAttendance = localAttendance.find((a: any) => a.userId === councilor.id);
                             
                             return (
                               <Card key={councilor.id} className={councilAttendance ? "border-green-200" : ""}>
@@ -847,7 +890,7 @@ export default function EventDetails() {
               </Card>
             )}
             
-            {attendance.length === 0 ? (
+            {localAttendance.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <UserCheck className="w-12 h-12 mb-4 text-muted-foreground" />
                 <h3 className="text-xl font-medium">Nenhuma presença registrada</h3>
@@ -864,7 +907,7 @@ export default function EventDetails() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {attendance.map((record: any) => (
+                  {localAttendance.map((record: any) => (
                     <TableRow key={record.id}>
                       <TableCell className="flex items-center gap-2">
                         <Avatar className="w-6 h-6">
