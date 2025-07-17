@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +26,13 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedActivityIds, setSelectedActivityIds] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [localActivities, setLocalActivities] = useState<LegislativeActivity[]>(currentActivities);
   const { toast } = useToast();
+
+  // Sync local activities with props when they change
+  useEffect(() => {
+    setLocalActivities(currentActivities);
+  }, [currentActivities]);
 
   // Fetch all legislative activities - only when dialog is opened
   const { data: allActivities = [] } = useQuery<LegislativeActivity[]>({
@@ -49,6 +55,20 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
         activityIds
       });
     },
+    onMutate: async (activityIds) => {
+      // Optimistic update: add activities to local state immediately
+      const activitiesToAdd = allActivities.filter(activity => activityIds.includes(activity.id));
+      const newActivities = [...localActivities];
+      
+      activitiesToAdd.forEach(activity => {
+        if (!newActivities.some(existing => existing.id === activity.id)) {
+          newActivities.push(activity);
+        }
+      });
+      
+      setLocalActivities(newActivities);
+      return { previousActivities: localActivities };
+    },
     onSuccess: () => {
       // Registrar ações na timeline para cada atividade adicionada
       selectedActivityIds.forEach(activityId => {
@@ -64,9 +84,16 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
       });
       setSelectedActivityIds([]);
       setIsDialogOpen(false);
+      
+      // Refresh to sync with server
       onRefresh();
     },
-    onError: (error: any) => {
+    onError: (error: any, _, context) => {
+      // Revert optimistic update on error
+      if (context?.previousActivities) {
+        setLocalActivities(context.previousActivities);
+      }
+      
       toast({
         title: "Erro ao adicionar atividades",
         description: error.message || "Não foi possível adicionar as atividades ao evento.",
@@ -80,6 +107,13 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
     mutationFn: async (activityId: number) => {
       return apiRequest('DELETE', `/api/events/${eventId}/activities/${activityId}`);
     },
+    onMutate: async (activityId) => {
+      // Optimistic update: remove activity from local state immediately
+      const previousActivities = localActivities;
+      const newActivities = localActivities.filter(activity => activity.id !== activityId);
+      setLocalActivities(newActivities);
+      return { previousActivities };
+    },
     onSuccess: (_, activityId) => {
       // Registrar ação na timeline
       const activity = currentActivities.find(a => a.id === activityId);
@@ -91,9 +125,16 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
         title: "Atividade removida",
         description: "A atividade foi removida do evento.",
       });
+      
+      // Refresh to sync with server
       onRefresh();
     },
-    onError: (error: any) => {
+    onError: (error: any, _, context) => {
+      // Revert optimistic update on error
+      if (context?.previousActivities) {
+        setLocalActivities(context.previousActivities);
+      }
+      
       toast({
         title: "Erro ao remover atividade",
         description: error.message || "Não foi possível remover a atividade do evento.",
@@ -138,7 +179,7 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
 
   // Check if activity is already associated with current event
   const isActivityAssociated = (activityId: number) => {
-    return currentActivities.some(current => current.id === activityId);
+    return localActivities.some(current => current.id === activityId);
   };
 
   return (
@@ -285,7 +326,7 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
       <Separator />
 
       {/* Current Activities */}
-      {currentActivities.length === 0 ? (
+      {localActivities.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
           <h3 className="text-lg font-medium mb-2">Nenhuma atividade associada</h3>
@@ -297,12 +338,12 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium text-muted-foreground">
-              Atividades Associadas ({currentActivities.length})
+              Atividades Associadas ({localActivities.length})
             </h4>
           </div>
           
           <div className="grid gap-4">
-            {currentActivities.map((activity) => (
+            {localActivities.map((activity) => (
               <Card key={activity.id} className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 space-y-3">
