@@ -16,6 +16,7 @@ interface AdminVotingSectionProps {
   councilors: any[];
   existingVotes: any[];
   onVotesRegistered: () => void;
+  onOptimisticUpdate?: (votes: any[]) => void;
 }
 
 export function AdminVotingSection({ 
@@ -23,7 +24,8 @@ export function AdminVotingSection({
   eventId,
   councilors, 
   existingVotes, 
-  onVotesRegistered 
+  onVotesRegistered,
+  onOptimisticUpdate 
 }: AdminVotingSectionProps) {
   const [selectedVotes, setSelectedVotes] = useState<Record<string, { vote: boolean; comment: string }>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,6 +68,11 @@ export function AdminVotingSection({
     }
 
     setIsSubmitting(true);
+
+    // Optimistic update
+    if (onOptimisticUpdate) {
+      onOptimisticUpdate(votesToSubmit);
+    }
 
     try {
       await apiRequest('POST', `/api/activities/${activityId}/votes/admin`, {

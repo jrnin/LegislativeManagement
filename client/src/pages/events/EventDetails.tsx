@@ -174,6 +174,9 @@ export default function EventDetails() {
   const filePreviewRef = useRef<HTMLIFrameElement>(null);
   const [activityVote, setActivityVote] = useState<boolean | null>(null);
   
+  // Estado local para estatísticas de votação (otimização)
+  const [localVotingStats, setLocalVotingStats] = useState<{[key: string]: any}>({});
+  
   // Query para buscar os votos de uma atividade
   const { data: activityVotesData, isLoading: loadingActivityVotes, refetch: refetchActivityVotes } = useQuery({
     queryKey: ["/api/activities", selectedActivityId, "votes", eventId],
@@ -210,6 +213,39 @@ export default function EventDetails() {
         { vote, eventId }
       );
     },
+    onMutate: async ({ activityId, vote }) => {
+      // Optimistic update - update local voting stats immediately
+      const statsKey = `${activityId}-${eventId}`;
+      
+      // Get current stats from cache or create new ones
+      const currentStats = queryClient.getQueryData(["/api/activities", activityId, "votes/stats", eventId]) || {
+        totalVotes: 0,
+        approveCount: 0,
+        rejectCount: 0,
+        approvePercentage: 0,
+        rejectPercentage: 0
+      };
+      
+      // Calculate new stats
+      const newStats = {
+        ...currentStats,
+        totalVotes: currentStats.totalVotes + 1,
+        approveCount: vote ? currentStats.approveCount + 1 : currentStats.approveCount,
+        rejectCount: !vote ? currentStats.rejectCount + 1 : currentStats.rejectCount
+      };
+      
+      // Recalculate percentages
+      newStats.approvePercentage = Math.round((newStats.approveCount / newStats.totalVotes) * 100);
+      newStats.rejectPercentage = Math.round((newStats.rejectCount / newStats.totalVotes) * 100);
+      
+      // Update local state
+      setLocalVotingStats(prev => ({
+        ...prev,
+        [statsKey]: newStats
+      }));
+      
+      return { statsKey, previousStats: currentStats };
+    },
     onSuccess: (_, { activityId, vote }) => {
       // Registrar ação na timeline
       const activity = eventDetails?.activities?.find((a: any) => a.id === activityId);
@@ -224,15 +260,30 @@ export default function EventDetails() {
       });
       
       // Invalidar todas as consultas relacionadas para garantir dados atualizados
+      queryClient.invalidateQueries({ queryKey: ["/api/activities", activityId, "votes/stats", eventId] });
       queryClient.invalidateQueries({ queryKey: ["/api/activities", selectedActivityId, "votes", eventId] });
       
-      // Aguardar um momento e então forçar um refetch explícito
+      // Clear local stats after server sync
       setTimeout(() => {
-        refetchActivityVotes();
-      }, 300);
+        setLocalVotingStats(prev => {
+          const newStats = { ...prev };
+          delete newStats[`${activityId}-${eventId}`];
+          return newStats;
+        });
+      }, 500);
     },
-    onError: (error) => {
+    onError: (error, { activityId }, context) => {
       console.error("Erro ao registrar voto:", error);
+      
+      // Revert optimistic update
+      if (context?.statsKey) {
+        setLocalVotingStats(prev => {
+          const newStats = { ...prev };
+          delete newStats[context.statsKey];
+          return newStats;
+        });
+      }
+      
       toast({
         title: "Erro",
         description: "Não foi possível registrar seu voto.",
@@ -1101,7 +1152,11 @@ export default function EventDetails() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <VotingStats activityId={activity.id} eventId={eventId} />
+                          <VotingStats 
+                            activityId={activity.id} 
+                            eventId={eventId} 
+                            localStats={localVotingStats[`${activity.id}-${eventId}`]} 
+                          />
                         </TableCell>
                         <TableCell className="text-right">
                           <Button 
@@ -1386,6 +1441,32 @@ export default function EventDetails() {
                           onVotesRegistered={() => {
                             refetchActivityVotes();
                           }}
+                          onOptimisticUpdate={(votes) => {
+                            // Update local voting stats optimistically
+                            const statsKey = `${selectedActivityId}-${eventId}`;
+                            const currentStats = queryClient.getQueryData(["/api/activities", selectedActivityId, "votes/stats", eventId]) || {
+                              totalVotes: 0,
+                              approveCount: 0,
+                              rejectCount: 0,
+                              approvePercentage: 0,
+                              rejectPercentage: 0
+                            };
+                            
+                            const newStats = {
+                              ...currentStats,
+                              totalVotes: currentStats.totalVotes + votes.length,
+                              approveCount: currentStats.approveCount + votes.filter(v => v.vote).length,
+                              rejectCount: currentStats.rejectCount + votes.filter(v => !v.vote).length
+                            };
+                            
+                            newStats.approvePercentage = Math.round((newStats.approveCount / newStats.totalVotes) * 100);
+                            newStats.rejectPercentage = Math.round((newStats.rejectCount / newStats.totalVotes) * 100);
+                            
+                            setLocalVotingStats(prev => ({
+                              ...prev,
+                              [statsKey]: newStats
+                            }));
+                          }}
                         />
                       )}
                     </div>
@@ -1484,7 +1565,7 @@ export default function EventDetails() {
 }
 
 // Componente para exibir estatísticas de votação
-function VotingStats({ activityId, eventId }: { activityId: number; eventId: number }) {
+function VotingStats({ activityId, eventId, localStats }: { activityId: number; eventId: number; localStats?: any }) {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["/api/activities", activityId, "votes/stats", eventId],
     queryFn: async () => {
@@ -1499,7 +1580,10 @@ function VotingStats({ activityId, eventId }: { activityId: number; eventId: num
     }
   });
 
-  if (isLoading) {
+  // Use local stats if available, otherwise use server data
+  const displayStats = localStats || stats;
+
+  if (isLoading && !localStats) {
     return (
       <div className="flex items-center justify-center w-32 h-8">
         <Loader2 className="w-4 h-4 animate-spin" />
@@ -1507,7 +1591,7 @@ function VotingStats({ activityId, eventId }: { activityId: number; eventId: num
     );
   }
 
-  if (!stats || stats.totalVotes === 0) {
+  if (!displayStats || displayStats.totalVotes === 0) {
     return (
       <div className="text-sm text-muted-foreground">
         Sem votos
@@ -1519,16 +1603,16 @@ function VotingStats({ activityId, eventId }: { activityId: number; eventId: num
     <div className="space-y-2 min-w-[200px]">
       {/* Barra de progresso visual */}
       <div className="flex h-2 bg-gray-200 rounded-full overflow-hidden">
-        {stats.approvePercentage > 0 && (
+        {displayStats.approvePercentage > 0 && (
           <div 
             className="bg-green-500 h-full"
-            style={{ width: `${stats.approvePercentage}%` }}
+            style={{ width: `${displayStats.approvePercentage}%` }}
           />
         )}
-        {stats.rejectPercentage > 0 && (
+        {displayStats.rejectPercentage > 0 && (
           <div 
             className="bg-red-500 h-full"
-            style={{ width: `${stats.rejectPercentage}%` }}
+            style={{ width: `${displayStats.rejectPercentage}%` }}
           />
         )}
       </div>
@@ -1537,17 +1621,17 @@ function VotingStats({ activityId, eventId }: { activityId: number; eventId: num
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span>{stats.approveCount} ({stats.approvePercentage}%)</span>
+          <span>{displayStats.approveCount} ({displayStats.approvePercentage}%)</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-          <span>{stats.rejectCount} ({stats.rejectPercentage}%)</span>
+          <span>{displayStats.rejectCount} ({displayStats.rejectPercentage}%)</span>
         </div>
       </div>
       
       {/* Total de votos */}
       <div className="text-xs text-center text-muted-foreground">
-        Total: {stats.totalVotes} votos
+        Total: {displayStats.totalVotes} votos
       </div>
     </div>
   );
