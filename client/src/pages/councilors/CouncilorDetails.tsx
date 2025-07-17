@@ -206,101 +206,160 @@ export default function CouncilorDetails() {
               {/* Aba de Informações Básicas */}
               <TabsContent value="info" className="mt-6">
                 <div className="bg-white rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-6 text-gray-900">INFO</h3>
+                  <h3 className="text-lg font-semibold mb-6 text-gray-900">Informações Básicas</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-600 w-32">First name</span>
-                      <span className="text-sm font-medium">:</span>
-                      <span className="text-sm text-gray-900 ml-4">{councilor?.name?.split(' ')[0] || 'Não informado'}</span>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-600 w-32">Last name</span>
-                      <span className="text-sm font-medium">:</span>
-                      <span className="text-sm text-gray-900 ml-4">{councilor?.name?.split(' ').slice(1).join(' ') || 'Não informado'}</span>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-600 w-32">Email</span>
-                      <span className="text-sm font-medium">:</span>
-                      <span className="text-sm text-gray-900 ml-4">{councilor?.email || 'Não informado'}</span>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-600 w-32">Phone number</span>
-                      <span className="text-sm font-medium">:</span>
-                      <span className="text-sm text-gray-900 ml-4">{councilor?.phone ? formatPhone(councilor.phone) : 'Não informado'}</span>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-600 w-32">Default address</span>
-                      <span className="text-sm font-medium">:</span>
-                      <span className="text-sm text-gray-900 ml-4">{councilor?.address || 'Não informado'}</span>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-600 w-32">User name</span>
-                      <span className="text-sm font-medium">:</span>
-                      <span className="text-sm text-gray-900 ml-4">{councilor?.name || 'Não informado'}</span>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-600 w-32">Password</span>
-                      <span className="text-sm font-medium">:</span>
-                      <span className="text-sm text-gray-900 ml-4">••••••••••</span>
-                      <Button variant="ghost" size="sm" className="ml-2 h-6 w-6 p-0">
-                        ✏️
-                      </Button>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-600 w-32">Role</span>
-                      <span className="text-sm font-medium">:</span>
-                      <span className="text-sm text-gray-900 ml-4">{councilor?.position || 'Vereador'}</span>
+                  {/* Informações Pessoais */}
+                  <div className="mb-8">
+                    <h4 className="text-base font-semibold mb-4 text-gray-900 border-b pb-2">Dados Pessoais</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Nome Completo</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.name || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">CPF</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.cpf || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Data de Nascimento</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">
+                          {councilor?.birthDate ? format(new Date(councilor.birthDate), "dd/MM/yyyy", { locale: ptBR }) : 'Não informado'}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Estado Civil</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.maritalStatus || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Profissão</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.occupation || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Escolaridade</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.education || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Partido Político</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.partido || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Cargo</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">
+                          {councilor?.role === 'admin' ? 'Administrador' : 'Vereador'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Seção de endereços */}
-                  <div className="mt-8">
-                    <h4 className="text-base font-semibold mb-4 text-gray-900">Shipping address</h4>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="border rounded-lg p-4 bg-gray-50">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-900">Endereço Principal</span>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                            ✏️
-                          </Button>
-                        </div>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <div>Street address: {councilor?.address || 'Não informado'}</div>
-                          <div>City: Cidade não informada</div>
-                          <div>State: Estado não informado</div>
-                          <div>Zip: CEP não informado</div>
-                        </div>
+                  {/* Informações de Contato */}
+                  <div className="mb-8">
+                    <h4 className="text-base font-semibold mb-4 text-gray-900 border-b pb-2">Contato</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Email</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.email || 'Não informado'}</span>
                       </div>
                       
-                      <div className="border rounded-lg p-4 bg-gray-50">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-900">Endereço Alternativo</span>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                            ✏️
-                          </Button>
-                        </div>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <div>Street address: Não informado</div>
-                          <div>City: Não informado</div>
-                          <div>State: Não informado</div>
-                          <div>Zip: Não informado</div>
-                        </div>
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Verificação de Email</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">
+                          <Badge variant={councilor?.emailVerified ? "default" : "secondary"}>
+                            {councilor?.emailVerified ? 'Verificado' : 'Não verificado'}
+                          </Badge>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Informações de Endereço */}
+                  <div className="mb-8">
+                    <h4 className="text-base font-semibold mb-4 text-gray-900 border-b pb-2">Endereço</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Endereço</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.address || 'Não informado'}</span>
                       </div>
                       
-                      <div className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8">
-                        <Button variant="ghost" className="text-blue-600 hover:text-blue-700">
-                          <span className="text-2xl mr-2">+</span>
-                          Adicionar Endereço
-                        </Button>
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Número</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.number || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Bairro</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.neighborhood || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Cidade</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.city || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Estado</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.state || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">CEP</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.zipCode || 'Não informado'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Informações do Sistema */}
+                  <div className="mb-8">
+                    <h4 className="text-base font-semibold mb-4 text-gray-900 border-b pb-2">Informações do Sistema</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Data de Cadastro</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">
+                          {councilor?.createdAt ? format(new Date(councilor.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Última Atualização</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">
+                          {councilor?.updatedAt ? format(new Date(councilor.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">ID do Usuário</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4 font-mono text-xs">{councilor?.id || 'Não informado'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-600 w-40">Legislatura</span>
+                        <span className="text-sm font-medium">:</span>
+                        <span className="text-sm text-gray-900 ml-4">{councilor?.legislatureId || 'Não informado'}</span>
                       </div>
                     </div>
                   </div>
