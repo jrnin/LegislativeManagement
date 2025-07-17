@@ -110,6 +110,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 17, 2025**: Implemented Optimistic Updates for Activities and Attendance - PERFORMANCE ENHANCEMENT
+  - **Optimistic Updates Implementation**: Added immediate UI feedback for both Activities and Attendance tabs
+  - **Activities Tab Enhancement**: EventActivityManager now displays current activities immediately without server delay
+  - **Attendance System Optimization**: Lista de Presença updates instantly when registering councilor attendance
+  - **Local State Management**: Implemented proper local state synchronization with server data
+  - **React Hooks Fix**: Resolved "rendered more hooks than previous render" error by repositioning useEffect calls
+  - **User Experience**: Eliminated loading delays - activities appear instantly when added/removed, attendance registers immediately
+  - **Performance Optimization**: Reduced server round-trips by using optimistic updates with fallback error handling
+  - **Real-time Interface**: Both tabs now provide immediate visual feedback during all CRUD operations
+  - **Status**: System fully functional with instant response times for both activity management and attendance tracking
+
 - **July 17, 2025**: Implemented Direct Event Navigation from Committee Meeting Cards - USER EXPERIENCE IMPROVEMENT
   - **Navigation Enhancement**: Updated committee meeting cards in /committees page to redirect directly to event details
   - **Modal Removal**: Removed event detail modal in favor of direct navigation to /events/{id} pages
