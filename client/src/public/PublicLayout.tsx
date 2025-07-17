@@ -103,6 +103,11 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       href: '/atividades',
     submenu: [
       {
+        name: 'Indicações', 
+        href: '/atividades?tipo=Indicação',
+        external: false
+      },
+      {
         name: 'Sessões Legislativas', 
         href: '/sessoes',
           external: true

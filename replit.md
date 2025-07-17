@@ -110,6 +110,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 17, 2025**: Created "Indicações" Submenu in Legislative Activities Navigation - NAVIGATION ENHANCEMENT
+  - **Submenu Implementation**: Added "Indicações" submenu item within "Atividades Legislativas" dropdown menu
+  - **URL Parameter Support**: Configured redirect to `/atividades?tipo=Indicação` for automatic filtering
+  - **Automatic Filter Detection**: Enhanced AtividadesPage.tsx to detect URL parameters and pre-select filters
+  - **User Experience**: Users can now access "Indicações" directly from navigation menu with automatic type filter
+  - **Navigation Structure**: Maintained existing menu structure while adding new focused access point
+  - **Query Parameter Integration**: Implemented useEffect to parse URL parameters and apply filters seamlessly
+  - **Status**: Fully functional submenu with automatic filter application confirmed working
+
 - **July 17, 2025**: Translated "councilor" to "Vereador(a)" System-wide - LOCALIZATION IMPROVEMENT
   - **Complete Translation**: Successfully translated all occurrences of "councilor" term to "Vereador(a)" throughout the system
   - **CouncilorList.tsx Updates**: Updated role display and button text to use "Vereador(a)" instead of "Vereador"

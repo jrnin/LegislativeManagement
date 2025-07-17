@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Activity, Search, Filter, X, Calendar, User, Download, FileText, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 
 // Interface para atividade legislativa
 interface LegislativeActivity {
@@ -40,10 +41,22 @@ interface ActivitiesResponse {
 }
 
 export default function AtividadesPage() {
+  const [location] = useLocation();
+  
   // Estados para filtros
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
+  
+  // Effect para detectar parâmetros de URL e aplicar filtros automaticamente
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipoParam = urlParams.get('tipo');
+    
+    if (tipoParam) {
+      setType(tipoParam);
+    }
+  }, [location]);
   
   // Construir query string para filtros
   const getQueryString = () => {
@@ -169,9 +182,10 @@ export default function AtividadesPage() {
     }
   };
 
-  // Aplicar filtros e buscar atividades
+  // Aplicar filtros e buscar atividades (os filtros são aplicados automaticamente via useQuery)
   const applyFilters = () => {
-    fetchActivities();
+    // Os filtros são aplicados automaticamente através do useQuery
+    // que monitora as mudanças em search, type e status
   };
 
   return (
