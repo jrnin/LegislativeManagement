@@ -110,6 +110,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 17, 2025**: Implemented Direct Event Navigation from Committee Meeting Cards - USER EXPERIENCE IMPROVEMENT
+  - **Navigation Enhancement**: Updated committee meeting cards in /committees page to redirect directly to event details
+  - **Modal Removal**: Removed event detail modal in favor of direct navigation to /events/{id} pages
+  - **Code Cleanup**: Removed unused state variables and dialog components for event details
+  - **User Experience**: Streamlined workflow by allowing users to click meeting cards and go directly to full event pages
+  - **Implementation**: Changed onClick handler from modal display to `setLocation('/events/${event.id}')`
+  - **Status**: Fully functional direct navigation from committee meeting cards to event detail pages
+
 - **July 17, 2025**: Removed "Projetos de Lei" Tab from Committee Details - USER INTERFACE IMPROVEMENT
   - **Tab Removal**: Successfully removed the "Projetos de Lei" tab from committee detail pages per user request
   - **UI Optimization**: Updated tab layout from 3 columns to 2 columns for better visual balance

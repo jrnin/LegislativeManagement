@@ -72,8 +72,7 @@ export default function CommitteeList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
-  const [eventDetailOpen, setEventDetailOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<CommitteeEvent | null>(null);
+
 
   const { data: committees = [], isLoading } = useQuery({
     queryKey: ["/api/committees"],
@@ -368,8 +367,7 @@ export default function CommitteeList() {
                       key={event.id} 
                       className="p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                       onClick={() => {
-                        setSelectedEvent(event);
-                        setEventDetailOpen(true);
+                        setLocation(`/events/${event.id}`);
                       }}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -468,107 +466,7 @@ export default function CommitteeList() {
         committee={selectedCommittee}
       />
 
-      {/* Modal de detalhes do evento */}
-      <Dialog open={eventDetailOpen} onOpenChange={setEventDetailOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Detalhes do Evento
-            </DialogTitle>
-          </DialogHeader>
-          
-          {selectedEvent && (
-            <div className="space-y-6">
-              {/* Informações básicas */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h3 className="font-semibold mb-2">Informações Gerais</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">#{selectedEvent.eventNumber}</Badge>
-                      <span className="text-sm text-gray-600">Número do Evento</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">
-                        {format(new Date(selectedEvent.eventDate), "dd/MM/yyyy", { locale: ptBR })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">{selectedEvent.eventTime}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">{selectedEvent.location}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2">Status e Categoria</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Badge 
-                        variant={selectedEvent.status === "Programado" ? "default" : "secondary"}
-                      >
-                        {selectedEvent.status}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">
-                        {selectedEvent.category}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Descrição */}
-              <div>
-                <h3 className="font-semibold mb-2">Descrição</h3>
-                <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                  {selectedEvent.description || "Sem descrição disponível"}
-                </p>
-              </div>
-
-              {/* Comissões envolvidas */}
-              {selectedEvent.committees && selectedEvent.committees.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Comissões Envolvidas
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedEvent.committees.map((committee) => (
-                      <Badge key={committee.id} variant="secondary">
-                        {committee.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Título do evento se existir */}
-              {selectedEvent.title && (
-                <div>
-                  <h3 className="font-semibold mb-2">Título</h3>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                    {selectedEvent.title}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEventDetailOpen(false)}>
-              Fechar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
