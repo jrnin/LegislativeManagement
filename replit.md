@@ -117,6 +117,7 @@ Preferred communication style: Simple, everyday language.
   - **ActivityDetails.tsx Improvement**: Updated comment placeholder text to use "Vereador(a)" for inclusive language
   - **EventDetails.tsx Enhancements**: Updated all toast messages and error descriptions to use "Vereador(a)" and "Vereadores(as)"
   - **CommitteeEditModal.tsx Updates**: Updated loading messages and error states to use inclusive "Vereadores(as)" terminology
+  - **EventDetailsPage.tsx Final Fix**: Fixed attendance list display to show "Vereador(a)" instead of "councilor" in public event details
   - **Inclusive Language**: Implemented gender-inclusive language throughout the municipal legislative system
   - **User Experience**: Improved accessibility and inclusivity for all users regardless of gender identity
   - **Consistency**: Maintained consistent terminology across administrative and public interfaces

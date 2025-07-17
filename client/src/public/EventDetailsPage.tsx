@@ -760,7 +760,7 @@ export default function EventDetailsPage() {
                                       
                                       <div>
                                         <h4 className="font-semibold">{record.user?.name || 'Usuário não identificado'}</h4>
-                                        <p className="text-sm text-gray-500">{record.user?.role}</p>
+                                        <p className="text-sm text-gray-500">{record.user?.role === 'councilor' ? 'Vereador(a)' : record.user?.role}</p>
                                         {record.notes && (
                                           <p className="text-xs text-gray-400 mt-1">{record.notes}</p>
                                         )}
