@@ -475,6 +475,13 @@ export default function EventDetails() {
     setIsVoteDialogOpen(true);
   };
 
+  // Sync local attendance with server data
+  useEffect(() => {
+    if (eventDetails?.attendance) {
+      setLocalAttendance(eventDetails.attendance);
+    }
+  }, [eventDetails?.attendance]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -500,13 +507,6 @@ export default function EventDetails() {
     attendance: eventDetails.attendance || [],
     eventDocuments: eventDetails.documents || []
   };
-
-  // Sync local attendance with server data
-  useEffect(() => {
-    if (attendance) {
-      setLocalAttendance(attendance);
-    }
-  }, [attendance]);
   
   const eventDate = new Date(event.eventDate);
   const formattedDate = format(eventDate, "PPP", { locale: ptBR });
