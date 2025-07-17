@@ -110,6 +110,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 17, 2025**: Implemented Public Voting Tab for Event Details - PUBLIC INTERFACE ENHANCEMENT
+  - **New "Votações" Tab**: Successfully added voting statistics tab to public event details page (EventDetailsPage.tsx)
+  - **Comprehensive Voting Display**: Shows voting statistics for all legislative activities within each event
+  - **Visual Progress Bars**: Implemented horizontal progress bars showing approval/rejection percentages with color coding
+  - **Detailed Statistics**: Displays total votes, approval count, rejection count, and percentages for each activity
+  - **Smart Data Loading**: Voting statistics load automatically when "Votações" tab is selected for optimal performance
+  - **Overview Integration**: Added voting counter to "Visão Geral" tab showing total votes across all activities
+  - **Real-time Statistics**: Fetches current voting data from /api/activities/:id/votes/stats endpoint with event context
+  - **Public Access**: Fully accessible to public users without authentication requirements
+  - **Responsive Design**: Optimized layout for desktop and mobile viewing with proper spacing and typography
+  - **Empty State Handling**: Graceful display when no votes are registered for activities
+  - **Visual Consistency**: Maintains same design language as administrative voting interface with green/red color scheme
+  - **Status**: Fully functional public voting statistics display confirmed working by user testing
+
 - **July 17, 2025**: Implemented Complete Optimistic Updates System - MAJOR PERFORMANCE ENHANCEMENT
   - **Comprehensive Optimistic Updates**: Added immediate UI feedback for Activities, Attendance, and Voting tabs
   - **Activities Tab Enhancement**: EventActivityManager displays current activities immediately without server delay
