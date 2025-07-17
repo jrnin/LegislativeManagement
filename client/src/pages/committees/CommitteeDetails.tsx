@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { EditIcon, ArrowLeft, Users, AlertTriangle, Calendar, MapPin, Clock, ExternalLink, Eye, FileText, UserCheck, Gavel, Download } from "lucide-react";
+import { EditIcon, ArrowLeft, Users, AlertTriangle, Calendar, MapPin, Clock, ExternalLink, Eye, FileText, UserCheck, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Committee, User } from "@shared/schema";
 import {
@@ -67,10 +67,7 @@ export default function CommitteeDetails() {
     enabled: !!id,
   });
 
-  const { data: committeeBills, isLoading: isLoadingBills } = useQuery({
-    queryKey: [`/api/committees/${id}/activities?type=Projeto de Lei`],
-    enabled: !!id,
-  });
+
 
 
 
@@ -253,10 +250,9 @@ export default function CommitteeDetails() {
       </div>
 
       <Tabs defaultValue="members" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="members">Membros da Comissão</TabsTrigger>
           <TabsTrigger value="events">Reuniões</TabsTrigger>
-          <TabsTrigger value="bills">Projetos de Lei</TabsTrigger>
         </TabsList>
         
         <TabsContent value="members" className="mt-6">
@@ -442,120 +438,7 @@ export default function CommitteeDetails() {
           </Card>
         </TabsContent>
         
-        <TabsContent value="bills" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Projetos de Lei</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLoadingBills ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Carregando projetos de lei...</p>
-                </div>
-              ) : !committeeBills || committeeBills.length === 0 ? (
-                <div className="text-center py-8">
-                  <Gavel className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <h3 className="mt-2 text-lg font-semibold">
-                    Nenhum projeto de lei encontrado
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Esta comissão ainda não possui projetos de lei associados.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {committeeBills.map((bill: any) => (
-                    <div key={bill.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">
-                            Projeto de Lei #{bill.activityNumber}
-                          </h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
-                              {format(new Date(bill.activityDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <Badge
-                            variant={
-                              bill.approved === true
-                                ? "default"
-                                : bill.approved === false
-                                ? "destructive"
-                                : "secondary"
-                            }
-                          >
-                            {bill.approved === true
-                              ? "Aprovado"
-                              : bill.approved === false
-                              ? "Rejeitado"
-                              : "Em Tramitação"}
-                          </Badge>
-                          {bill.approvalType && (
-                            <Badge variant="outline" className="text-xs">
-                              {bill.approvalType === "committees" ? "Comissões" : "Vereadores"}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                        {bill.description}
-                      </p>
-                      
-                      {bill.authors && bill.authors.length > 0 && (
-                        <div className="mb-3">
-                          <p className="text-xs text-muted-foreground mb-1">Autores:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {bill.authors.map((author: any) => (
-                              <Badge key={author.userId} variant="outline" className="text-xs">
-                                {author.user.name}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="flex gap-2">
-                        {bill.filePath && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                          >
-                            <a href={`/api/activities/${bill.id}/download`} target="_blank">
-                              <Download className="h-4 w-4 mr-1" />
-                              Download
-                            </a>
-                          </Button>
-                        )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(`/activities/${bill.id}`, '_blank')}
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Ver Detalhes
-                        </Button>
-                      </div>
-                      
-                      {bill.approvalComment && (
-                        <div className="mt-3 p-2 bg-gray-50 rounded text-xs">
-                          <p className="font-medium">Comentário da aprovação:</p>
-                          <p className="text-gray-600">{bill.approvalComment}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+
       </Tabs>
 
       <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>

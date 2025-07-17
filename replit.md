@@ -110,6 +110,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 17, 2025**: Removed "Projetos de Lei" Tab from Committee Details - USER INTERFACE IMPROVEMENT
+  - **Tab Removal**: Successfully removed the "Projetos de Lei" tab from committee detail pages per user request
+  - **UI Optimization**: Updated tab layout from 3 columns to 2 columns for better visual balance
+  - **Code Cleanup**: Removed unused queries and imports related to committee bill tracking
+  - **Interface Streamlining**: Committee details now focus on "Membros da Comissão" and "Reuniões" tabs only
+  - **User Experience**: Simplified committee interface by removing redundant bill project display
+  - **Status**: Fully functional committee detail page with streamlined interface
+
 - **July 17, 2025**: Enhanced Councilor Profile Information Display - COMPREHENSIVE DATABASE INTEGRATION
   - **Complete Database Integration**: Successfully updated councilor profile "Informações Básicas" tab to display all available database fields
   - **Organized Information Sections**: Restructured display into four logical sections:
@@ -121,7 +129,22 @@ Preferred communication style: Simple, everyday language.
   - **Visual Improvements**: Implemented section headers with borders, consistent field spacing, and status badges
   - **Database Field Mapping**: Mapped all user schema fields to display components for complete information visibility
   - **User Experience**: Replaced generic field names with Portuguese labels appropriate for municipal context
-  - **Status**: Fully functional comprehensive profile information system displaying all database data
+  - **Legislative Activities Tab Enhancement**: Comprehensive display of all database fields including:
+    - Activity type, number, date, description with proper formatting
+    - Regime de tramitação (processing regime) and approval type information
+    - Situação (status) with color-coded badges for all legislative workflow stages
+    - Approval details including approver, approval date, and comments
+    - Creation and update timestamps with proper date formatting
+    - File download functionality for activities with attachments
+  - **Documents Tab Enhancement**: Complete database information display including:
+    - Document type, number, date, description with detailed formatting
+    - Author type (Legislative/Executive) and file information
+    - Activity and event associations with ID references
+    - Document versioning information for parent-child relationships
+    - Status tracking with color-coded badges (Vigente, Revogada, Alterada, Suspenso)
+    - Creation and update timestamps with comprehensive date formatting
+    - Download functionality for documents with file attachments
+  - **Status**: Fully functional comprehensive profile information system displaying all database data across all tabs
 
 - **July 16, 2025**: Implemented True 1:N Relationship for Legislative Activities - MAJOR ARCHITECTURAL ENHANCEMENT
   - **Database Architecture**: Successfully implemented proper one-to-many relationship allowing same legislative activity to exist in multiple events
