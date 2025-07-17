@@ -28,10 +28,11 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
-  // Fetch all legislative activities
+  // Fetch all legislative activities - only when dialog is opened
   const { data: allActivities = [] } = useQuery<LegislativeActivity[]>({
     queryKey: ['/api/activities'],
-    select: (data: any) => data || []
+    select: (data: any) => data || [],
+    enabled: isDialogOpen // Only fetch when dialog is open
   });
 
   // Filter activities based on search term (allowing all activities, even if already associated)

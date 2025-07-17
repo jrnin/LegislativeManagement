@@ -266,7 +266,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Legislative Chamber Image Banner */}
+          {/* Legislative Chamber Image Banner 
           <div className="mt-12 overflow-hidden rounded-2xl shadow-xl bg-white">
             <div className="relative">
               <img 
@@ -336,6 +336,9 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+          */}
+
+          
         </div>
       </div>
     </div>
