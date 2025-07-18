@@ -69,10 +69,12 @@ export default function ImagesPage() {
   });
 
   // Carregar eventos para seleção
-  const { data: events = [] } = useQuery({
+  const { data: eventsData = [] } = useQuery({
     queryKey: ['/api/events'],
     queryFn: () => apiRequest('GET', '/api/events'),
   });
+  
+  const events = Array.isArray(eventsData) ? eventsData : [];
 
   // Mutation para upload de imagem
   const uploadImageMutation = useMutation({
