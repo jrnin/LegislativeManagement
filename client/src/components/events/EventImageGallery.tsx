@@ -28,11 +28,14 @@ export function EventImageGallery({ eventId, isAdmin = false }: EventImageGaller
   const queryClient = useQueryClient();
 
   // Carregar imagens do evento
-  const { data: images = [], isLoading } = useQuery({
+  const { data: imagesData = [], isLoading } = useQuery({
     queryKey: ['/api/events', eventId, 'images'],
     queryFn: () => apiRequest('GET', `/api/events/${eventId}/images`),
     refetchOnWindowFocus: false,
   });
+
+  // Garantir que images seja sempre um array
+  const images = Array.isArray(imagesData) ? imagesData : [];
 
   // Mutation para upload de imagem
   const uploadImageMutation = useMutation({
