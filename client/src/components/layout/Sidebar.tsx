@@ -28,7 +28,7 @@ export default function Sidebar() {
     { name: "Eventos", href: "/events", icon: Calendar, badge: "3" },
     { name: "Atividades Legislativas", href: "/activities", icon: FileText, badge: "Novo" },
     { name: "Documentos", href: "/documents", icon: Files },
-    { name: "Notícias", href: "/news", icon: Newspaper },
+    { name: "Notícias", href: "/news", icon: Newspaper, badge: "Novo" },
     { name: "Imagens", href: "/images", icon: Image },
     { name: "Usuários", href: "/users", icon: Users },
     { name: "Vereadores", href: "/councilors", icon: UsersRound },
@@ -63,7 +63,7 @@ export default function Sidebar() {
           </div>
         </div>
         
-        <nav className="mt-2 flex-1 space-y-1 px-3">
+        <nav className="mt-2 flex-1 space-y-1 px-3 max-h-screen overflow-y-auto">
           {navigation.map((item) => (
             <Link key={item.name} href={item.href}>
               <a
