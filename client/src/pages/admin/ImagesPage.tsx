@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet';
-import { Plus, Edit, Trash2, Eye, Upload, X, Search, Filter, Calendar, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Upload, X, Search, Calendar, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
