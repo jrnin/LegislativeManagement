@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useParams } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Calendar, 
   Clock, 
@@ -21,7 +23,9 @@ import {
   ArrowLeft,
   MessageSquare,
   ThumbsUp,
-  Bookmark
+  Bookmark,
+  FileText,
+  Loader2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -32,96 +36,73 @@ interface NewsArticle {
   title: string;
   content: string;
   excerpt: string;
-  author: string;
-  publishedAt: string;
-  updatedAt?: string;
-  category: string;
+  author: {
+    id: string;
+    name: string;
+  } | string;
+  category: {
+    id: number;
+    name: string;
+  } | string;
   tags: string[];
   imageUrl?: string;
-  gallery?: string[];
-  views: number;
-  likes: number;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  status: 'draft' | 'published' | 'archived';
   featured: boolean;
-  relatedArticles?: number[];
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const NoticiaDetalhePage = () => {
   const params = useParams();
   const articleId = parseInt(params.id || '1');
-  const [currentGalleryImage, setCurrentGalleryImage] = useState(0);
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const { toast } = useToast();
 
-  // Mock data - replace with real API call
-  const article: NewsArticle = {
-    id: articleId,
-    title: "Câmara aprova projeto que incentiva a reciclagem no município",
-    content: `
-      <p>O projeto de lei que incentiva a reciclagem de resíduos sólidos foi aprovado por unanimidade na sessão de ontem. A nova legislação prevê benefícios fiscais para empresas que adotarem práticas sustentáveis e implementarem programas de coleta seletiva.</p>
-      
-      <p>A medida faz parte do plano municipal de sustentabilidade que visa reduzir em 40% a quantidade de resíduos enviados ao aterro sanitário até 2026. O projeto foi proposto pelo vereador João Silva e contou com o apoio de toda a bancada.</p>
-      
-      <h3>Principais benefícios do projeto:</h3>
-      <ul>
-        <li>Redução de 15% no IPTU para empresas que implementarem coleta seletiva</li>
-        <li>Isenção de taxas municipais para cooperativas de reciclagem</li>
-        <li>Criação de pontos de coleta em todos os bairros da cidade</li>
-        <li>Programa de educação ambiental nas escolas municipais</li>
-      </ul>
-      
-      <p>O vereador João Silva destacou a importância da medida: "Este projeto representa um marco na política ambiental do nosso município. Estamos criando incentivos concretos para que empresas e cidadãos adotem práticas mais sustentáveis."</p>
-      
-      <p>A implementação do projeto começará no próximo mês, com a instalação dos primeiros pontos de coleta seletiva nos bairros centrais. A prefeitura tem prazo de 90 dias para regulamentar a lei e iniciar a concessão dos benefícios fiscais.</p>
-      
-      <h3>Impacto esperado</h3>
-      <p>Segundo estudos da Secretaria de Meio Ambiente, a medida poderá resultar em:</p>
-      <ul>
-        <li>Redução de 40% nos resíduos enviados ao aterro sanitário</li>
-        <li>Geração de 200 novos empregos diretos na cadeia de reciclagem</li>
-        <li>Economia de R$ 2 milhões anuais em custos de destinação de resíduos</li>
-        <li>Melhoria significativa na qualidade ambiental da cidade</li>
-      </ul>
-      
-      <p>A população pode acompanhar a implementação do projeto através do portal da transparência da prefeitura, onde serão publicados relatórios mensais sobre o andamento das ações.</p>
-    `,
-    excerpt: "O projeto de lei que incentiva a reciclagem de resíduos sólidos foi aprovado por unanimidade na sessão de ontem. A nova legislação prevê benefícios fiscais para empresas que adotarem práticas sustentáveis.",
-    author: "Assessoria de Comunicação",
-    publishedAt: "2025-06-10T10:00:00Z",
-    updatedAt: "2025-06-10T15:30:00Z",
-    category: "Meio Ambiente",
-    tags: ["reciclagem", "sustentabilidade", "meio ambiente", "projeto de lei", "benefícios fiscais"],
-    imageUrl: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
-    ],
-    views: 1247,
-    likes: 89,
-    featured: true,
-    relatedArticles: [2, 3]
-  };
+  // Fetch single news article
+  const { data: article, isLoading: articleLoading, error: articleError } = useQuery<NewsArticle>({
+    queryKey: [`/api/public/news/${articleId}`],
+    enabled: !!articleId,
+  });
 
-  const relatedNews = [
-    {
-      id: 2,
-      title: "Audiência pública discutirá mobilidade urbana na próxima semana",
-      excerpt: "Uma audiência pública para discutir o plano de mobilidade urbana será realizada na próxima semana.",
-      category: "Infraestrutura",
-      publishedAt: "2025-06-08T14:30:00Z",
-      imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-    },
-    {
-      id: 3,
-      title: "Nova comissão para fiscalizar obras públicas é formada na Câmara",
-      excerpt: "Os vereadores formaram uma nova comissão especial para fiscalizar as obras públicas em andamento no município.",
-      category: "Política",
-      publishedAt: "2025-06-05T09:15:00Z",
-      imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-    }
-  ];
+  // Fetch related articles
+  const { data: relatedArticles } = useQuery<{ articles: NewsArticle[] }>({
+    queryKey: [`/api/public/news?limit=3&exclude=${articleId}`],
+    enabled: !!article,
+  });
+
+  if (articleLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 size={40} className="animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Carregando notícia...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (articleError || !article) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <FileText size={48} className="mx-auto mb-4 text-gray-400" />
+          <h2 className="text-2xl font-bold mb-2">Notícia não encontrada</h2>
+          <p className="text-gray-600 mb-4">A notícia que você está procurando não existe ou foi removida.</p>
+          <Link href="/noticias">
+            <Button>
+              <ArrowLeft size={16} className="mr-2" />
+              Voltar para notícias
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const formatDate = (dateString: string) => {
     try {
@@ -171,21 +152,46 @@ const NoticiaDetalhePage = () => {
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    // Show toast notification
-  };
-
-  const nextGalleryImage = () => {
-    if (article.gallery && article.gallery.length > 0) {
-      setCurrentGalleryImage((prev) => (prev + 1) % article.gallery!.length);
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copiado!",
+        description: "O link da notícia foi copiado para sua área de transferência.",
+      });
+    } catch (err) {
+      toast({
+        title: "Erro ao copiar",
+        description: "Não foi possível copiar o link. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
-  const prevGalleryImage = () => {
-    if (article.gallery && article.gallery.length > 0) {
-      setCurrentGalleryImage((prev) => (prev - 1 + article.gallery!.length) % article.gallery!.length);
-    }
+  const getAuthorName = (author: NewsArticle['author']) => {
+    return typeof author === 'object' && author?.name ? author.name : author;
+  };
+
+  const getCategoryName = (category: NewsArticle['category']) => {
+    return typeof category === 'object' && category?.name ? category.name : category;
+  };
+
+  const getStatusColor = (status: NewsArticle['status']) => {
+    const colors = {
+      'published': 'bg-green-100 text-green-800',
+      'draft': 'bg-yellow-100 text-yellow-800',
+      'archived': 'bg-gray-100 text-gray-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getStatusText = (status: NewsArticle['status']) => {
+    const texts = {
+      'published': 'Publicado',
+      'draft': 'Rascunho',
+      'archived': 'Arquivado',
+    };
+    return texts[status] || status;
   };
 
   return (
@@ -206,9 +212,17 @@ const NoticiaDetalhePage = () => {
         <div className="max-w-4xl mx-auto">
           {/* Article Header */}
           <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
-            <div className="mb-6">
-              <Badge className={`${getCategoryColor(article.category)} text-base px-3 py-1`}>
-                {article.category}
+            <div className="mb-6 flex items-center gap-3">
+              <Badge className={`${getCategoryColor(getCategoryName(article.category))} text-base px-3 py-1`}>
+                {getCategoryName(article.category)}
+              </Badge>
+              {article.featured && (
+                <Badge variant="secondary" className="text-base px-3 py-1">
+                  ⭐ Destaque
+                </Badge>
+              )}
+              <Badge className={`${getStatusColor(article.status)} text-xs px-2 py-1`}>
+                {getStatusText(article.status)}
               </Badge>
             </div>
             
@@ -219,22 +233,18 @@ const NoticiaDetalhePage = () => {
             <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-6">
               <div className="flex items-center">
                 <User size={16} className="mr-2" />
-                <span>{article.author}</span>
+                <span>{getAuthorName(article.author)}</span>
               </div>
               <div className="flex items-center">
                 <Calendar size={16} className="mr-2" />
-                <span>Publicado em {formatDateTime(article.publishedAt)}</span>
+                <span>Publicado em {formatDateTime(article.publishedAt || article.createdAt)}</span>
               </div>
-              {article.updatedAt && (
+              {article.updatedAt && new Date(article.updatedAt).getTime() !== new Date(article.createdAt).getTime() && (
                 <div className="flex items-center">
                   <Clock size={16} className="mr-2" />
                   <span>Atualizado em {formatDateTime(article.updatedAt)}</span>
                 </div>
               )}
-              <div className="flex items-center">
-                <Eye size={16} className="mr-2" />
-                <span>{article.views} visualizações</span>
-              </div>
             </div>
 
             {/* Social Actions */}
@@ -247,7 +257,7 @@ const NoticiaDetalhePage = () => {
                   className="flex items-center space-x-2"
                 >
                   <ThumbsUp size={16} />
-                  <span>{article.likes + (liked ? 1 : 0)}</span>
+                  <span>{liked ? 1 : 0}</span>
                 </Button>
                 
                 <Button
@@ -265,6 +275,7 @@ const NoticiaDetalhePage = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => shareOnSocial('facebook')}
+                  title="Compartilhar no Facebook"
                 >
                   <Facebook size={16} />
                 </Button>
@@ -272,6 +283,7 @@ const NoticiaDetalhePage = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => shareOnSocial('twitter')}
+                  title="Compartilhar no Twitter"
                 >
                   <Twitter size={16} />
                 </Button>
@@ -279,6 +291,7 @@ const NoticiaDetalhePage = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => shareOnSocial('linkedin')}
+                  title="Compartilhar no LinkedIn"
                 >
                   <Linkedin size={16} />
                 </Button>
@@ -286,6 +299,7 @@ const NoticiaDetalhePage = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => shareOnSocial('whatsapp')}
+                  title="Compartilhar no WhatsApp"
                 >
                   <Share2 size={16} />
                 </Button>
@@ -293,6 +307,7 @@ const NoticiaDetalhePage = () => {
                   variant="outline"
                   size="sm"
                   onClick={copyToClipboard}
+                  title="Copiar link"
                 >
                   <Link2 size={16} />
                 </Button>
@@ -319,102 +334,62 @@ const NoticiaDetalhePage = () => {
             />
           </div>
 
-          {/* Image Gallery */}
-          {article.gallery && article.gallery.length > 1 && (
+          {/* Tags */}
+          {article.tags && article.tags.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h3 className="text-xl font-bold mb-4" style={{color: '#48654e'}}>
-                Galeria de Imagens ({article.gallery.length})
+              <h3 className="text-lg font-bold mb-4 flex items-center" style={{color: '#48654e'}}>
+                <Tag size={20} className="mr-2" />
+                Tags
               </h3>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {article.gallery.map((image, index) => (
-                  <Dialog key={index}>
-                    <DialogTrigger asChild>
-                      <div 
-                        className="relative aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                        onClick={() => {
-                          setCurrentGalleryImage(index);
-                          setIsGalleryOpen(true);
-                        }}
-                      >
-                        <img 
-                          src={image} 
-                          alt={`Imagem ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                          <div className="text-white opacity-0 hover:opacity-100 transition-opacity">
-                            <Eye size={24} />
-                          </div>
-                        </div>
-                      </div>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl w-full p-0">
-                      <div className="relative">
-                        <img 
-                          src={article.gallery ? article.gallery[currentGalleryImage] : ''} 
-                          alt={`Imagem ${currentGalleryImage + 1}`}
-                          className="w-full h-auto max-h-[80vh] object-contain"
-                        />
-                        
-                        {article.gallery && article.gallery.length > 1 && (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90"
-                              onClick={prevGalleryImage}
-                            >
-                              <ChevronLeft size={16} />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90"
-                              onClick={nextGalleryImage}
-                            >
-                              <ChevronRight size={16} />
-                            </Button>
-                          </>
-                        )}
-                        
-                        {article.gallery && (
-                          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 rounded text-sm">
-                            {currentGalleryImage + 1} de {article.gallery.length}
-                          </div>
-                        )}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+              <div className="flex flex-wrap gap-2">
+                {article.tags.map((tag, index) => (
+                  <Badge key={index} variant="outline" className="cursor-pointer hover:bg-gray-100">
+                    {tag}
+                  </Badge>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Tags */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-bold mb-4 flex items-center" style={{color: '#48654e'}}>
-              <Tag size={20} className="mr-2" />
-              Tags
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {article.tags.map((tag, index) => (
-                <Badge key={index} variant="outline" className="cursor-pointer hover:bg-gray-100">
-                  {tag}
-                </Badge>
-              ))}
+          {/* SEO Information */}
+          {(article.seoTitle || article.seoDescription || article.seoKeywords) && (
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <h3 className="text-lg font-bold mb-4 flex items-center" style={{color: '#48654e'}}>
+                <FileText size={20} className="mr-2" />
+                Informações SEO
+              </h3>
+              <div className="space-y-4">
+                {article.seoTitle && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Título SEO:</label>
+                    <p className="text-sm text-gray-600 mt-1">{article.seoTitle}</p>
+                  </div>
+                )}
+                {article.seoDescription && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Descrição SEO:</label>
+                    <p className="text-sm text-gray-600 mt-1">{article.seoDescription}</p>
+                  </div>
+                )}
+                {article.seoKeywords && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Palavras-chave SEO:</label>
+                    <p className="text-sm text-gray-600 mt-1">{article.seoKeywords}</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Related Articles */}
-          {relatedNews.length > 0 && (
+          {relatedArticles && relatedArticles.articles && relatedArticles.articles.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-xl font-bold mb-6" style={{color: '#48654e'}}>
                 Notícias Relacionadas
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {relatedNews.map((related) => (
+                {relatedArticles.articles.slice(0, 4).map((related) => (
                   <Link key={related.id} href={`/noticias/${related.id}`}>
                     <Card className="hover:shadow-md transition-shadow cursor-pointer">
                       <div className="flex">
@@ -428,8 +403,8 @@ const NoticiaDetalhePage = () => {
                           </div>
                         )}
                         <CardContent className="flex-1 p-4">
-                          <Badge className={`${getCategoryColor(related.category)} text-xs px-2 py-0.5`}>
-                            {related.category}
+                          <Badge className={`${getCategoryColor(getCategoryName(related.category))} text-xs px-2 py-0.5`}>
+                            {getCategoryName(related.category)}
                           </Badge>
                           <h4 className="font-semibold text-sm mt-2 mb-1 line-clamp-2">
                             {related.title}
@@ -438,7 +413,7 @@ const NoticiaDetalhePage = () => {
                             {related.excerpt}
                           </p>
                           <div className="text-xs text-gray-500 mt-2">
-                            {formatDate(related.publishedAt)}
+                            {formatDate(related.publishedAt || related.createdAt)}
                           </div>
                         </CardContent>
                       </div>

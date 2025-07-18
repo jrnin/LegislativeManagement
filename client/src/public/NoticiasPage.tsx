@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, Clock, Search, Filter, FileText, User, Tag, Image as ImageIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, Search, Filter, FileText, User, Tag, Image as ImageIcon, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import { Link } from 'wouter';
 import { NewsArticle, NewsCategory } from '@shared/schema';
 import { formatDate } from '@/lib/utils';
@@ -210,16 +210,27 @@ const NoticiasPage = () => {
                     </div>
                   )}
                   
+                  <Link href={`/noticias/${article.id}`}>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                    >
+                      <FileText size={14} className="mr-2" />
+                      Ler Notícia
+                    </Button>
+                  </Link>
+                  
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button 
-                        variant="outline" 
+                        variant="ghost" 
                         size="sm" 
-                        className="w-full"
+                        className="w-full mt-2 text-xs"
                         onClick={() => setSelectedArticle(article)}
                       >
-                        <FileText size={14} className="mr-2" />
-                        Ler Notícia
+                        <Eye size={12} className="mr-1" />
+                        Pré-visualizar
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">

@@ -2122,8 +2122,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single news article by ID (public)
+  app.get('/api/public/news/:id', async (req, res) => {
+    try {
+      const articleId = parseInt(req.params.id);
+      
+      if (!articleId || isNaN(articleId)) {
+        return res.status(400).json({ message: "ID de notícia inválido" });
+      }
+      
+      const article = await storage.getNewsArticle(articleId);
+      
+      if (!article || article.status !== 'published') {
+        return res.status(404).json({ message: "Notícia não encontrada" });
+      }
+
+      res.json(article);
+    } catch (error) {
+      console.error("Error fetching news article:", error);
+      res.status(500).json({ message: "Erro ao buscar notícia" });
+    }
+  });
+
   // Get single news article by slug (public)
-  app.get('/api/public/news/:slug', async (req, res) => {
+  app.get('/api/public/news/slug/:slug', async (req, res) => {
     try {
       const article = await storage.getNewsArticleBySlug(req.params.slug);
       
@@ -2131,9 +2153,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Notícia não encontrada" });
       }
 
-      // Increment view count
-      await storage.incrementNewsViews(article.id);
-      
       res.json(article);
     } catch (error) {
       console.error("Error fetching news article:", error);
