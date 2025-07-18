@@ -25,14 +25,14 @@ export default function Sidebar() {
   
   const navigation = [
     { name: "Dashboard", href: "/", icon: PieChart },
-    { name: "Eventos", href: "/events", icon: Calendar, badge: "3" },
-    { name: "Atividades Legislativas", href: "/activities", icon: FileText, badge: "Novo" },
+    { name: "Eventos", href: "/events", icon: Calendar },
+    { name: "Atividades", href: "/activities", icon: FileText },
     { name: "Documentos", href: "/documents", icon: Files },
-    { name: "Notícias", href: "/news", icon: Newspaper, badge: "Novo" },
+    { name: "Notícias", href: "/news", icon: Newspaper },
     { name: "Imagens", href: "/images", icon: Image },
     { name: "Usuários", href: "/users", icon: Users },
     { name: "Vereadores", href: "/councilors", icon: UsersRound },
-    { name: "Comissões", href: "/committees", icon: UsersRound, badge: "Novo" },
+    { name: "Comissões", href: "/committees", icon: UsersRound },
     { name: "Mesa Diretora", href: "/boards", icon: Shield },
     { name: "Legislaturas", href: "/legislatures", icon: Building },
   ];

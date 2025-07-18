@@ -2172,6 +2172,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all news categories (admin) - moved before individual news article route
+  app.get('/api/news/categories', requireAuth, async (req, res) => {
+    try {
+      const categories = await storage.getAllNewsCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching news categories:", error);
+      res.status(500).json({ message: "Erro ao buscar categorias" });
+    }
+  });
+
   // Get single news article by ID (admin)
   app.get('/api/news/:id', requireAuth, async (req, res) => {
     try {
@@ -2317,16 +2328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all news categories (admin)
-  app.get('/api/news/categories', requireAuth, async (req, res) => {
-    try {
-      const categories = await storage.getAllNewsCategories();
-      res.json(categories);
-    } catch (error) {
-      console.error("Error fetching news categories:", error);
-      res.status(500).json({ message: "Erro ao buscar categorias" });
-    }
-  });
+
 
   // Create news category (admin)
   app.post('/api/news/categories', requireAuth, async (req, res) => {
