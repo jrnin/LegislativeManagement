@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'wouter';
 import { Helmet } from 'react-helmet';
@@ -23,7 +23,9 @@ import {
   XCircle,
   Clock as ClockIcon,
   Image as ImageIcon,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +41,7 @@ export default function EventDetailsPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Fetch comprehensive event details with activities, documents, attendance
   const { data: eventDetails, isLoading, error } = useQuery({
@@ -96,6 +99,55 @@ export default function EventDetailsPage() {
     },
     enabled: !!id
   });
+
+  // Navigation functions for image gallery
+  const nextImage = () => {
+    if (eventImages.length > 0) {
+      const nextIndex = (currentImageIndex + 1) % eventImages.length;
+      setCurrentImageIndex(nextIndex);
+      setSelectedImage(eventImages[nextIndex]);
+    }
+  };
+
+  const prevImage = () => {
+    if (eventImages.length > 0) {
+      const prevIndex = (currentImageIndex - 1 + eventImages.length) % eventImages.length;
+      setCurrentImageIndex(prevIndex);
+      setSelectedImage(eventImages[prevIndex]);
+    }
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (imageDialogOpen) {
+        switch (event.key) {
+          case 'ArrowRight':
+            event.preventDefault();
+            nextImage();
+            break;
+          case 'ArrowLeft':
+            event.preventDefault();
+            prevImage();
+            break;
+          case 'Escape':
+            event.preventDefault();
+            setImageDialogOpen(false);
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [imageDialogOpen, currentImageIndex, eventImages]);
+
+  // Handle image selection
+  const handleImageClick = (image: any, index: number) => {
+    setSelectedImage(image);
+    setCurrentImageIndex(index);
+    setImageDialogOpen(true);
+  };
 
   // Extract data from comprehensive response
   const event = eventDetails;
@@ -366,10 +418,7 @@ export default function EventDetailsPage() {
                           <div 
                             key={image.id}
                             className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer relative"
-                            onClick={() => {
-                              setSelectedImage(image);
-                              setImageDialogOpen(true);
-                            }}
+                            onClick={() => handleImageClick(image, index)}
                           >
                             <img 
                               src={image.imageData} 
@@ -434,10 +483,7 @@ export default function EventDetailsPage() {
                         <div 
                           key={image.id}
                           className="aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-pointer relative"
-                          onClick={() => {
-                            setSelectedImage(image);
-                            setImageDialogOpen(true);
-                          }}
+                          onClick={() => handleImageClick(image, index)}
                         >
                           <img 
                             src={image.imageData} 
@@ -978,21 +1024,55 @@ export default function EventDetailsPage() {
       <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>
-              {selectedImage?.caption || 'Imagem do Evento'}
+            <DialogTitle className="flex items-center justify-between">
+              <span>{selectedImage?.caption || 'Imagem do Evento'}</span>
+              {eventImages.length > 1 && (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <span>{currentImageIndex + 1} de {eventImages.length}</span>
+                </div>
+              )}
             </DialogTitle>
           </DialogHeader>
           <div className="relative">
             {selectedImage && (
-              <img 
-                src={selectedImage.imageData} 
-                alt={selectedImage.caption || 'Imagem do evento'}
-                className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
-              />
+              <>
+                <img 
+                  src={selectedImage.imageData} 
+                  alt={selectedImage.caption || 'Imagem do evento'}
+                  className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
+                />
+                
+                {/* Navigation buttons */}
+                {eventImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200"
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200"
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                  </>
+                )}
+              </>
             )}
+            
             {selectedImage?.caption && (
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-700">{selectedImage.caption}</p>
+              </div>
+            )}
+            
+            {/* Keyboard navigation hint */}
+            {eventImages.length > 1 && (
+              <div className="mt-2 text-center text-xs text-gray-500">
+                Use as setas do teclado (← →) para navegar entre as imagens
               </div>
             )}
           </div>
