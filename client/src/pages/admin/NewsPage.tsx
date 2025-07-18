@@ -32,8 +32,8 @@ export default function NewsPage() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchTerm) params.append("search", searchTerm);
-      if (selectedCategory) params.append("category", selectedCategory);
-      if (selectedStatus) params.append("status", selectedStatus);
+      if (selectedCategory && selectedCategory !== "all") params.append("category", selectedCategory);
+      if (selectedStatus && selectedStatus !== "all") params.append("status", selectedStatus);
       
       const response = await fetch(`/api/news?${params}`);
       if (!response.ok) throw new Error("Erro ao carregar notícias");
@@ -266,7 +266,7 @@ export default function NewsPage() {
                 <SelectValue placeholder="Filtrar por categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as categorias</SelectItem>
+                <SelectItem value="all">Todas as categorias</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.slug}>
                     {category.name}
@@ -279,7 +279,7 @@ export default function NewsPage() {
                 <SelectValue placeholder="Filtrar por status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os status</SelectItem>
+                <SelectItem value="all">Todos os status</SelectItem>
                 <SelectItem value="published">Publicado</SelectItem>
                 <SelectItem value="draft">Rascunho</SelectItem>
                 <SelectItem value="archived">Arquivado</SelectItem>
