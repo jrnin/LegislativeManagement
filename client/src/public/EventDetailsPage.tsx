@@ -30,6 +30,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EventImageGallery } from "@/components/events/EventImageGallery";
 
 export default function EventDetailsPage() {
   const { id } = useParams();
@@ -397,7 +398,7 @@ export default function EventDetailsPage() {
             <Card>
               <CardContent className="p-0">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-6 bg-gray-50 border-b rounded-none">
+                  <TabsList className="grid w-full grid-cols-7 bg-gray-50 border-b rounded-none">
                     <TabsTrigger value="overview" className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       Visão Geral
@@ -417,6 +418,10 @@ export default function EventDetailsPage() {
                     <TabsTrigger value="attendance" className="flex items-center gap-2">
                       <Users className="h-4 w-4" />
                       Lista de Presença
+                    </TabsTrigger>
+                    <TabsTrigger value="gallery" className="flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      Galeria
                     </TabsTrigger>
                     <TabsTrigger value="timeline" className="flex items-center gap-2">
                       <GitCommit className="h-4 w-4" />
@@ -789,6 +794,16 @@ export default function EventDetailsPage() {
                           </div>
                         </ScrollArea>
                       )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="gallery" className="p-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold" style={{color: '#48654e'}}>
+                        Galeria de Imagens
+                      </h3>
+                      
+                      <EventImageGallery eventId={parseInt(id!)} isAdmin={false} />
                     </div>
                   </TabsContent>
 

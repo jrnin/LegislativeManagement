@@ -118,6 +118,7 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
   committees: many(eventCommittees),
   activityDocuments: many(eventActivityDocuments),
   comments: many(eventComments),
+  images: many(eventImages),
 }));
 
 // Legislative Activities table
@@ -928,4 +929,44 @@ export const insertEventTimelineSchema = createInsertSchema(eventTimeline).pick(
 export type InsertEventTimeline = z.infer<typeof insertEventTimelineSchema>;
 export type EventTimeline = typeof eventTimeline.$inferSelect & {
   user?: User;
+};
+
+// Event Images (Galeria de Imagens dos Eventos)
+export const eventImages = pgTable("event_images", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").references(() => events.id, { onDelete: "cascade" }).notNull(),
+  imageData: text("image_data").notNull(), // Base64 encoded image data
+  fileName: varchar("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  mimeType: varchar("mime_type").notNull(),
+  caption: text("caption"),
+  orderIndex: integer("order_index").default(0),
+  uploadedBy: varchar("uploaded_by").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const eventImagesRelations = relations(eventImages, ({ one }) => ({
+  event: one(events, {
+    fields: [eventImages.eventId],
+    references: [events.id],
+  }),
+  uploadedByUser: one(users, {
+    fields: [eventImages.uploadedBy],
+    references: [users.id],
+  }),
+}));
+
+export const insertEventImageSchema = createInsertSchema(eventImages).pick({
+  eventId: true,
+  imageData: true,
+  fileName: true,
+  fileSize: true,
+  mimeType: true,
+  caption: true,
+  orderIndex: true,
+  uploadedBy: true,
+});
+export type InsertEventImage = z.infer<typeof insertEventImageSchema>;
+export type EventImage = typeof eventImages.$inferSelect & {
+  uploadedByUser?: User;
 };

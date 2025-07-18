@@ -20,6 +20,7 @@ import {
   eventActivityDocuments,
   eventComments,
   eventTimeline,
+  eventImages,
   type User,
   type Legislature,
   type Event,
@@ -47,7 +48,9 @@ import {
   type EventComment,
   type InsertEventComment,
   type EventTimeline,
-  type InsertEventTimeline
+  type InsertEventTimeline,
+  type EventImage,
+  type InsertEventImage
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or, not } from "drizzle-orm";
@@ -284,6 +287,13 @@ export interface IStorage {
   searchEvents(query: string): Promise<any[]>;
   searchLegislativeActivities(query: string): Promise<any[]>;
   searchDocuments(query: string): Promise<any[]>;
+  
+  // Event Images operations
+  getEventImages(eventId: number): Promise<EventImage[]>;
+  createEventImage(imageData: InsertEventImage): Promise<EventImage>;
+  updateEventImage(id: number, imageData: Partial<EventImage>): Promise<EventImage | undefined>;
+  deleteEventImage(id: number): Promise<boolean>;
+  getEventImageCount(eventId: number): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -3204,6 +3214,53 @@ export class DatabaseStorage implements IStorage {
       console.error("Error searching documents:", error);
       return [];
     }
+  }
+
+  /**
+   * Event Images operations
+   */
+  async getEventImages(eventId: number): Promise<EventImage[]> {
+    return await db
+      .select()
+      .from(eventImages)
+      .where(eq(eventImages.eventId, eventId))
+      .orderBy(eventImages.orderIndex, eventImages.createdAt);
+  }
+
+  async createEventImage(imageData: InsertEventImage): Promise<EventImage> {
+    const [image] = await db
+      .insert(eventImages)
+      .values(imageData)
+      .returning();
+    
+    return image;
+  }
+
+  async updateEventImage(id: number, imageData: Partial<EventImage>): Promise<EventImage | undefined> {
+    const [image] = await db
+      .update(eventImages)
+      .set(imageData)
+      .where(eq(eventImages.id, id))
+      .returning();
+    
+    return image;
+  }
+
+  async deleteEventImage(id: number): Promise<boolean> {
+    const result = await db
+      .delete(eventImages)
+      .where(eq(eventImages.id, id));
+    
+    return result.rowCount > 0;
+  }
+
+  async getEventImageCount(eventId: number): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(eventImages)
+      .where(eq(eventImages.eventId, eventId));
+    
+    return result.count;
   }
 }
 

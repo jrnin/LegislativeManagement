@@ -4430,6 +4430,96 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
   // Expor apenas o servidor WebSocket globalmente para uso em outros módulos (desabilitado)
   (global as any).wss = null;
   
+  // Event Images routes
+  app.get('/api/events/:eventId/images', async (req, res) => {
+    try {
+      const { eventId } = req.params;
+      const images = await storage.getEventImages(Number(eventId));
+      res.json(images);
+    } catch (error) {
+      console.error('Error fetching event images:', error);
+      res.status(500).json({ error: 'Erro ao carregar imagens do evento' });
+    }
+  });
+
+  app.post('/api/events/:eventId/images', requireAuth, async (req: any, res) => {
+    try {
+      const { eventId } = req.params;
+      const { imageData, fileName, fileSize, mimeType, caption } = req.body;
+      
+      // Validar se o evento existe
+      const event = await storage.getEvent(Number(eventId));
+      if (!event) {
+        return res.status(404).json({ error: 'Evento não encontrado' });
+      }
+      
+      // Verificar limite de 8 imagens por evento
+      const imageCount = await storage.getEventImageCount(Number(eventId));
+      if (imageCount >= 8) {
+        return res.status(400).json({ error: 'Limite de 8 imagens por evento atingido' });
+      }
+      
+      // Validar tamanho do arquivo (máximo 5MB)
+      if (fileSize > 5 * 1024 * 1024) {
+        return res.status(400).json({ error: 'Arquivo muito grande. Máximo 5MB' });
+      }
+      
+      // Validar tipo de arquivo
+      if (!mimeType.startsWith('image/')) {
+        return res.status(400).json({ error: 'Apenas imagens são permitidas' });
+      }
+      
+      const image = await storage.createEventImage({
+        eventId: Number(eventId),
+        imageData,
+        fileName,
+        fileSize,
+        mimeType,
+        caption,
+        orderIndex: imageCount,
+        uploadedBy: req.user.id
+      });
+      
+      res.status(201).json(image);
+    } catch (error) {
+      console.error('Error uploading event image:', error);
+      res.status(500).json({ error: 'Erro ao fazer upload da imagem' });
+    }
+  });
+
+  app.put('/api/events/:eventId/images/:imageId', requireAuth, async (req: any, res) => {
+    try {
+      const { imageId } = req.params;
+      const { caption } = req.body;
+      
+      const image = await storage.updateEventImage(Number(imageId), { caption });
+      if (!image) {
+        return res.status(404).json({ error: 'Imagem não encontrada' });
+      }
+      
+      res.json(image);
+    } catch (error) {
+      console.error('Error updating event image:', error);
+      res.status(500).json({ error: 'Erro ao atualizar imagem' });
+    }
+  });
+
+  app.delete('/api/events/:eventId/images/:imageId', requireAuth, async (req: any, res) => {
+    try {
+      const { imageId } = req.params;
+      
+      const deleted = await storage.deleteEventImage(Number(imageId));
+      if (!deleted) {
+        return res.status(404).json({ error: 'Imagem não encontrada' });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting event image:', error);
+      res.status(500).json({ error: 'Erro ao deletar imagem' });
+    }
+  });
+
   // Mesa Diretora routes
   app.get('/api/boards', async (req, res) => {
     try {
