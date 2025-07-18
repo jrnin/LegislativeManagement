@@ -232,7 +232,7 @@ export default function ImagesPage() {
       image.caption?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       image.event?.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesEvent = !filterEventId || image.eventId.toString() === filterEventId;
+    const matchesEvent = !filterEventId || filterEventId === 'all' || image.eventId.toString() === filterEventId;
     
     return matchesSearch && matchesEvent;
   });
@@ -379,7 +379,7 @@ export default function ImagesPage() {
                   <SelectValue placeholder="Filtrar por evento" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os eventos</SelectItem>
+                  <SelectItem value="all">Todos os eventos</SelectItem>
                   {events.map((event: Event) => (
                     <SelectItem key={event.id} value={event.id.toString()}>
                       {event.category} #{event.eventNumber}
