@@ -11,7 +11,8 @@ import {
   Settings,
   UsersRound,
   Shield,
-  Image
+  Image,
+  Newspaper
 } from "lucide-react";
 import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -30,6 +31,7 @@ export default function Sidebar() {
     { name: "Eventos", href: "/events", icon: Calendar, badge: "3" },
     { name: "Atividades Legislativas", href: "/activities", icon: FileText, badge: "Novo" },
     { name: "Documentos", href: "/documents", icon: Files },
+    { name: "Notícias", href: "/news", icon: Newspaper },
     { name: "Imagens", href: "/images", icon: Image },
     { name: "Comissões", href: "/committees", icon: UsersRound, badge: "Novo" },
     { name: "Mesa Diretora", href: "/boards", icon: Shield },

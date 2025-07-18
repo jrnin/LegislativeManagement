@@ -2141,6 +2141,256 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ADMIN NEWS ROUTES
+  
+  // Get all news articles (admin)
+  app.get('/api/news', requireAuth, async (req, res) => {
+    try {
+      const { 
+        category, 
+        status, 
+        featured, 
+        search, 
+        limit = 50, 
+        offset = 0 
+      } = req.query;
+      
+      const filters = {
+        category: category ? String(category) : undefined,
+        status: status ? String(status) : undefined,
+        featured: featured ? featured === 'true' : undefined,
+        search: search ? String(search) : undefined,
+        limit: parseInt(String(limit)),
+        offset: parseInt(String(offset))
+      };
+      
+      const articles = await storage.getAllNewsArticles(filters);
+      res.json(articles);
+    } catch (error) {
+      console.error("Error fetching news articles:", error);
+      res.status(500).json({ message: "Erro ao buscar notícias" });
+    }
+  });
+
+  // Get single news article by ID (admin)
+  app.get('/api/news/:id', requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const article = await storage.getNewsArticle(id);
+      
+      if (!article) {
+        return res.status(404).json({ message: "Notícia não encontrada" });
+      }
+      
+      res.json(article);
+    } catch (error) {
+      console.error("Error fetching news article:", error);
+      res.status(500).json({ message: "Erro ao buscar notícia" });
+    }
+  });
+
+  // Create news article (admin)
+  app.post('/api/news', requireAuth, handleFileUpload, async (req, res) => {
+    try {
+      const {
+        title,
+        slug,
+        excerpt,
+        content,
+        categoryId,
+        status,
+        featured,
+        tags,
+        metaTitle,
+        metaDescription,
+        publishedAt
+      } = req.body;
+
+      // Parse tags if it's a string
+      let parsedTags = [];
+      if (tags) {
+        try {
+          parsedTags = typeof tags === 'string' ? JSON.parse(tags) : tags;
+        } catch (e) {
+          parsedTags = [];
+        }
+      }
+
+      const articleData = {
+        title,
+        slug,
+        excerpt,
+        content,
+        categoryId: categoryId ? parseInt(categoryId) : undefined,
+        authorId: req.user.id,
+        status: status || 'draft',
+        featured: featured === 'true',
+        tags: parsedTags,
+        metaTitle,
+        metaDescription,
+        publishedAt: publishedAt ? new Date(publishedAt) : undefined,
+        imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined
+      };
+
+      const article = await storage.createNewsArticle(articleData);
+      res.json(article);
+    } catch (error) {
+      console.error("Error creating news article:", error);
+      res.status(500).json({ message: "Erro ao criar notícia" });
+    }
+  });
+
+  // Update news article (admin)
+  app.put('/api/news/:id', requireAuth, handleFileUpload, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const {
+        title,
+        slug,
+        excerpt,
+        content,
+        categoryId,
+        status,
+        featured,
+        tags,
+        metaTitle,
+        metaDescription,
+        publishedAt
+      } = req.body;
+
+      // Parse tags if it's a string
+      let parsedTags = [];
+      if (tags) {
+        try {
+          parsedTags = typeof tags === 'string' ? JSON.parse(tags) : tags;
+        } catch (e) {
+          parsedTags = [];
+        }
+      }
+
+      const updateData = {
+        title,
+        slug,
+        excerpt,
+        content,
+        categoryId: categoryId ? parseInt(categoryId) : undefined,
+        status: status || 'draft',
+        featured: featured === 'true',
+        tags: parsedTags,
+        metaTitle,
+        metaDescription,
+        publishedAt: publishedAt ? new Date(publishedAt) : undefined,
+        updatedAt: new Date()
+      };
+
+      // Add new image if uploaded
+      if (req.file) {
+        updateData.imageUrl = `/uploads/${req.file.filename}`;
+      }
+
+      const article = await storage.updateNewsArticle(id, updateData);
+      if (!article) {
+        return res.status(404).json({ message: "Notícia não encontrada" });
+      }
+      
+      res.json(article);
+    } catch (error) {
+      console.error("Error updating news article:", error);
+      res.status(500).json({ message: "Erro ao atualizar notícia" });
+    }
+  });
+
+  // Delete news article (admin)
+  app.delete('/api/news/:id', requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteNewsArticle(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Notícia não encontrada" });
+      }
+      
+      res.json({ message: "Notícia excluída com sucesso" });
+    } catch (error) {
+      console.error("Error deleting news article:", error);
+      res.status(500).json({ message: "Erro ao excluir notícia" });
+    }
+  });
+
+  // Get all news categories (admin)
+  app.get('/api/news/categories', requireAuth, async (req, res) => {
+    try {
+      const categories = await storage.getAllNewsCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching news categories:", error);
+      res.status(500).json({ message: "Erro ao buscar categorias" });
+    }
+  });
+
+  // Create news category (admin)
+  app.post('/api/news/categories', requireAuth, async (req, res) => {
+    try {
+      const { name, slug, description, color } = req.body;
+      
+      const categoryData = {
+        name,
+        slug,
+        description,
+        color: color || '#3B82F6'
+      };
+
+      const category = await storage.createNewsCategory(categoryData);
+      res.json(category);
+    } catch (error) {
+      console.error("Error creating news category:", error);
+      res.status(500).json({ message: "Erro ao criar categoria" });
+    }
+  });
+
+  // Update news category (admin)
+  app.put('/api/news/categories/:id', requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { name, slug, description, color } = req.body;
+      
+      const updateData = {
+        name,
+        slug,
+        description,
+        color,
+        updatedAt: new Date()
+      };
+
+      const category = await storage.updateNewsCategory(id, updateData);
+      if (!category) {
+        return res.status(404).json({ message: "Categoria não encontrada" });
+      }
+      
+      res.json(category);
+    } catch (error) {
+      console.error("Error updating news category:", error);
+      res.status(500).json({ message: "Erro ao atualizar categoria" });
+    }
+  });
+
+  // Delete news category (admin)
+  app.delete('/api/news/categories/:id', requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteNewsCategory(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Categoria não encontrada" });
+      }
+      
+      res.json({ message: "Categoria excluída com sucesso" });
+    } catch (error) {
+      console.error("Error deleting news category:", error);
+      res.status(500).json({ message: "Erro ao excluir categoria" });
+    }
+  });
+
   // EVENT ATTENDANCE ROUTES
   
   // Get attendance for an event
