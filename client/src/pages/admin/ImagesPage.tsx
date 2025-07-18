@@ -63,10 +63,12 @@ export default function ImagesPage() {
   const queryClient = useQueryClient();
 
   // Carregar todas as imagens com informações do evento
-  const { data: images = [], isLoading } = useQuery({
+  const { data: imagesData = [], isLoading } = useQuery({
     queryKey: ['/api/admin/images'],
     queryFn: () => apiRequest('GET', '/api/admin/images'),
   });
+  
+  const images = Array.isArray(imagesData) ? imagesData : [];
 
   // Carregar eventos para seleção
   const { data: eventsData = [] } = useQuery({
