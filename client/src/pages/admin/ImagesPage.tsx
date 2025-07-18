@@ -65,7 +65,6 @@ export default function ImagesPage() {
   // Carregar todas as imagens com informações do evento
   const { data: imagesData = [], isLoading } = useQuery({
     queryKey: ['/api/admin/images'],
-    queryFn: () => apiRequest('GET', '/api/admin/images'),
   });
   
   const images = Array.isArray(imagesData) ? imagesData : [];
@@ -76,10 +75,6 @@ export default function ImagesPage() {
   });
   
   const events = Array.isArray(eventsData) ? eventsData : [];
-  
-  // Debug: Log para verificar se os eventos estão sendo carregados
-  console.log('Events data:', eventsData);
-  console.log('Events array:', events);
 
   // Mutation para upload de imagem
   const uploadImageMutation = useMutation({
