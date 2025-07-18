@@ -110,6 +110,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 18, 2025**: Implemented Individual News Pages with Social Sharing - MAJOR PUBLIC INTERFACE ENHANCEMENT
+  - **Individual News Pages**: Created dedicated pages for each news article at `/noticias/{id}` route with complete article information
+  - **Social Media Sharing**: Implemented sharing buttons for Facebook, Twitter, LinkedIn, and WhatsApp with proper URL encoding
+  - **Copy Link Feature**: Added copy-to-clipboard functionality with toast notifications for successful/failed operations
+  - **Real Database Integration**: Connected to new `/api/public/news/:id` endpoint for fetching individual articles
+  - **Enhanced Article Display**: Complete article view with author, publication date, category badges, and status indicators
+  - **SEO Information Display**: Shows SEO title, description, and keywords when available for articles
+  - **Tags System**: Displays article tags as clickable badges for better content categorization
+  - **Related Articles**: Automatic loading of related news articles with clickable navigation
+  - **Navigation Enhancement**: Updated main news page with direct "Ler Notícia" links to individual pages
+  - **Preview Option**: Maintained modal preview functionality alongside full page navigation
+  - **Featured Badge**: Visual indicators for featured articles with star badges
+  - **Responsive Design**: Mobile-optimized individual article pages with proper content formatting
+  - **Status**: Complete individual news page system with social sharing fully operational
+
 - **July 18, 2025**: Implemented Public News Page with Real Database Integration - MAJOR PUBLIC INTERFACE ENHANCEMENT
   - **Public News Access**: Successfully created public news page at `/noticias` route displaying real database content
   - **API Integration**: Connected to existing `/api/public/news` and `/api/public/news/categories` endpoints
