@@ -784,14 +784,7 @@ export default function EventDetails() {
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Galeria de Imagens</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <EventImageGallery eventId={eventId} isAdmin={isAuthenticated && user?.role === "admin"} />
-          </CardContent>
-        </Card>
+
       </div>
       
       <Tabs defaultValue="activities" className="w-full">

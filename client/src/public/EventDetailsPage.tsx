@@ -30,7 +30,6 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EventImageGallery } from "@/components/events/EventImageGallery";
 
 export default function EventDetailsPage() {
   const { id } = useParams();
@@ -394,15 +393,7 @@ export default function EventDetailsPage() {
               </div>
             )}
 
-            {/* Galeria de Imagens */}
-            <Card>
-              <CardHeader>
-                <CardTitle style={{color: '#48654e'}}>Galeria de Imagens</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <EventImageGallery eventId={parseInt(id!)} isAdmin={false} />
-              </CardContent>
-            </Card>
+
 
             {/* Detailed Information Tabs */}
             <Card>
