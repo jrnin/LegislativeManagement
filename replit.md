@@ -110,6 +110,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 18, 2025**: Fixed and Enhanced Accessibility Features - MAJOR ACCESSIBILITY IMPROVEMENT
+  - **Dark Mode Fix**: Corrected dark mode toggle functionality that was not working properly
+  - **High Contrast Mode**: Added new high contrast accessibility option with dedicated toggle button
+  - **Enhanced CSS Styles**: Implemented comprehensive high contrast styles for better accessibility compliance
+  - **Visual Improvements**: Enhanced button contrast, text visibility, and border definitions in high contrast mode
+  - **User Interface**: Added "Alto contraste" button alongside existing dark/light mode toggle
+  - **Accessibility Standards**: Improved compliance with WCAG guidelines through better color contrast ratios
+  - **CSS Implementation**: Added filter: contrast(150%) and specific styling for high contrast elements
+  - **User Experience**: Dual accessibility modes now working correctly - dark/light mode + high contrast option
+  - **Status**: Both dark mode and high contrast functionality confirmed working by user testing
+
 - **July 18, 2025**: Implemented Enhanced Public Image Gallery with Keyboard Navigation - MAJOR USER EXPERIENCE IMPROVEMENT
   - **Dynamic Image Loading**: Successfully replaced placeholder gallery with real database-driven images from event_images table
   - **Keyboard Navigation**: Added arrow key navigation (← → keys) for seamless image browsing in modal view
