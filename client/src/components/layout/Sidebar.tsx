@@ -11,7 +11,7 @@ import {
   Settings,
   UsersRound,
   Shield,
-  ImageIcon
+  Image
 } from "lucide-react";
 import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -32,7 +32,7 @@ export default function Sidebar() {
     { name: "Documentos", href: "/documents", icon: Files },
     { name: "Comissões", href: "/committees", icon: UsersRound, badge: "Novo" },
     { name: "Mesa Diretora", href: "/boards", icon: Shield },
-    { name: "Imagens", href: "/images", icon: ImageIcon },
+    { name: "Imagens", href: "/images", icon: Image },
   ];
 
   const getInitials = (name: string) => {
