@@ -128,25 +128,25 @@ const LegislativeActivitiesWidget = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
+      <div className="flex justify-center py-10">
+        <Loader2 className="h-10 w-10 animate-spin" style={{color: '#48654e'}} />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {activities?.slice(0, 3).map((activity: any) => (
         <Link key={activity.id} href={`/atividades/${activity.id}`}>
-          <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-4 border-l-green-500">
-            <CardContent className="p-6">
-              <div className="space-y-4">
+          <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-8 border-l-green-700">
+            <CardContent className="p-4">
+              <div className="space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-sm leading-tight mb-2" style={{color: '#48654e'}}>
+                    <h4 className="font-semibold text-sm leading-tight" style={{color: '#48654e'}}>
                       {activity.title}
                     </h4>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-gray-600 mt-1">
                       {activity.type || 'Atividade Legislativa'}
                     </p>
                   </div>
@@ -156,12 +156,12 @@ const LegislativeActivitiesWidget = () => {
                 </div>
                 
                 {activity.description && (
-                  <p className="text-xs text-gray-700 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-gray-700 line-clamp-2">
                     {activity.description.substring(0, 100)}...
                   </p>
                 )}
                 
-                <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                <div className="flex items-center justify-between text-xs text-gray-500 ">
                   <div className="flex items-center">
                     <Clock size={12} className="mr-1" />
                     {formatDate(activity.date || activity.createdAt)}
@@ -607,7 +607,7 @@ export default function HomePage() {
                 minWidth: '177.78vh', // 16:9 aspect ratio (16/9 = 1.7778)
                 objectFit: 'cover'
               }}
-              src="https://www.youtube.com/embed/l7VAs92qEXA?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=l7VAs92qEXA"
+              src="https://www.youtube.com/embed/z7FA7JA16vc?si=k87KmctYgy4BBauV&autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=z7FA7JA16vc"
               title="Vídeo de fundo da Câmara Municipal"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
