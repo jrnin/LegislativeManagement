@@ -77,6 +77,10 @@ export default function ImagesPage() {
   });
   
   const events = Array.isArray(eventsData) ? eventsData : [];
+  
+  // Debug: Log para verificar se os eventos estão sendo carregados
+  console.log('Events data:', eventsData);
+  console.log('Events array:', events);
 
   // Mutation para upload de imagem
   const uploadImageMutation = useMutation({
