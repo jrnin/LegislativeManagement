@@ -329,14 +329,14 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
               <div>
                 <Label htmlFor="categoryId">Categoria</Label>
                 <Select
-                  value={form.watch("categoryId")?.toString() || ""}
-                  onValueChange={(value) => form.setValue("categoryId", value ? parseInt(value) : undefined)}
+                  value={form.watch("categoryId")?.toString() || "none"}
+                  onValueChange={(value) => form.setValue("categoryId", value && value !== "none" ? parseInt(value) : undefined)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sem categoria</SelectItem>
+                    <SelectItem value="none">Sem categoria</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id.toString()}>
                         {category.name}
