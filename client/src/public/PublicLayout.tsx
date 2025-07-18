@@ -42,6 +42,7 @@ interface PublicLayoutProps {
 export default function PublicLayout({ children }: PublicLayoutProps) {
   const [location] = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isHighContrast, setIsHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState(16);
   const [weather] = useState({
     temp: 27,
@@ -71,8 +72,23 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
   // Opções para configurações de acessibilidade
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  const toggleHighContrast = () => {
+    const newHighContrast = !isHighContrast;
+    setIsHighContrast(newHighContrast);
+    if (newHighContrast) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
   };
 
   const increaseFontSize = () => {
@@ -164,7 +180,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
   ];
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'dark bg-slate-900 text-white' : 'bg-white'}`}>
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'dark bg-slate-900 text-white' : 'bg-white'} ${isHighContrast ? 'high-contrast' : ''}`}>
       <Helmet>
         <title>Sistema Legislativo - Portal Público</title>
         <meta name="description" content="Portal público do Sistema Legislativo Municipal. Acesse informações sobre vereadores, documentos, atividades legislativas e mais." />
@@ -183,6 +199,14 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 aria-label={isDarkMode ? "Modo claro" : "Modo escuro"}
               >
                 {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+              <button 
+                onClick={toggleHighContrast} 
+                className="p-1 rounded-md hover:opacity-80 text-xs" 
+                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
+                aria-label={isHighContrast ? "Contraste normal" : "Alto contraste"}
+              >
+                {isHighContrast ? "Contraste normal" : "Alto contraste"}
               </button>
               <button 
                 onClick={increaseFontSize} 
