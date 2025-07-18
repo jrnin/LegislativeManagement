@@ -8,7 +8,8 @@ import {
   Building,
   UserCheck,
   Gavel,
-  Archive
+  Archive,
+  Image
 } from "lucide-react";
 
 const navigation = [
@@ -16,6 +17,7 @@ const navigation = [
   { name: "Eventos", href: "/events", icon: Calendar },
   { name: "Atividades", href: "/activities", icon: FileText },
   { name: "Documentos", href: "/documents", icon: Archive },
+  { name: "Imagens", href: "/images", icon: Image },
   { name: "Usuários", href: "/users", icon: Users },
   { name: "Comissões", href: "/committees", icon: Building },
   { name: "Vereadores", href: "/councilors", icon: UserCheck },

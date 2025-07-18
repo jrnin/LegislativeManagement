@@ -30,9 +30,9 @@ export default function Sidebar() {
     { name: "Eventos", href: "/events", icon: Calendar, badge: "3" },
     { name: "Atividades Legislativas", href: "/activities", icon: FileText, badge: "Novo" },
     { name: "Documentos", href: "/documents", icon: Files },
+    { name: "Imagens", href: "/images", icon: Image },
     { name: "Comissões", href: "/committees", icon: UsersRound, badge: "Novo" },
     { name: "Mesa Diretora", href: "/boards", icon: Shield },
-    { name: "Imagens", href: "/images", icon: Image },
   ];
 
   const getInitials = (name: string) => {
