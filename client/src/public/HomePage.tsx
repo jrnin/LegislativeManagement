@@ -135,18 +135,18 @@ const LegislativeActivitiesWidget = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {activities?.slice(0, 3).map((activity: any) => (
         <Link key={activity.id} href={`/atividades/${activity.id}`}>
           <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-4 border-l-green-500">
-            <CardContent className="p-4">
-              <div className="space-y-3">
+            <CardContent className="p-6">
+              <div className="space-y-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-sm leading-tight" style={{color: '#48654e'}}>
+                    <h4 className="font-semibold text-sm leading-tight mb-2" style={{color: '#48654e'}}>
                       {activity.title}
                     </h4>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-gray-600">
                       {activity.type || 'Atividade Legislativa'}
                     </p>
                   </div>
@@ -156,12 +156,12 @@ const LegislativeActivitiesWidget = () => {
                 </div>
                 
                 {activity.description && (
-                  <p className="text-xs text-gray-700 line-clamp-2">
+                  <p className="text-xs text-gray-700 line-clamp-2 leading-relaxed">
                     {activity.description.substring(0, 100)}...
                   </p>
                 )}
                 
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
                   <div className="flex items-center">
                     <Clock size={12} className="mr-1" />
                     {formatDate(activity.date || activity.createdAt)}
@@ -961,8 +961,8 @@ export default function HomePage() {
               ) : (
                 <div className="space-y-6">
                   {/* Primeira linha - 6 vereadores */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-                    {(councilors?.length > 0 ? councilors : []).slice(0, 6).map((councilor, index) => (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-4">
+                    {(councilors?.length > 0 ? councilors : []).slice(0, 13).map((councilor, index) => (
                       <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
                         <div className="group cursor-pointer text-center">
                           <div className="relative mb-3">
@@ -1014,7 +1014,7 @@ export default function HomePage() {
                     ))}
                   </div>
                   
-                  {/* Segunda linha - 6 vereadores */}
+                  {/* Segunda linha - 6 vereadores 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
                     {(councilors?.length > 0 ? councilors : []).slice(6, 12).map((councilor, index) => (
                       <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
@@ -1066,7 +1066,7 @@ export default function HomePage() {
                         </div>
                       </Link>
                     ))}
-                  </div>
+                  </div>*/}
                 </div>
               )}
               
