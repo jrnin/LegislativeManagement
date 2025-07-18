@@ -73,7 +73,6 @@ export default function ImagesPage() {
   // Carregar eventos para seleção
   const { data: eventsData = [] } = useQuery({
     queryKey: ['/api/events'],
-    queryFn: () => apiRequest('GET', '/api/events'),
   });
   
   const events = Array.isArray(eventsData) ? eventsData : [];
