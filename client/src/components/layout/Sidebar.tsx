@@ -48,7 +48,7 @@ export default function Sidebar() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
+      <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto min-h-0">
         <div className="flex items-center justify-center flex-shrink-0 px-4 mb-5">
           <div className="flex items-center space-x-3">
             <img 
@@ -63,7 +63,7 @@ export default function Sidebar() {
           </div>
         </div>
         
-        <nav className="mt-2 flex-1 space-y-1 px-3 max-h-screen overflow-y-auto">
+        <nav className="mt-2 flex-1 space-y-1 px-3 overflow-y-auto">
           {navigation.map((item) => (
             <Link key={item.name} href={item.href}>
               <a
@@ -102,15 +102,7 @@ export default function Sidebar() {
           ))}
         </nav>
         
-        <div className="mt-6 px-3">
-          <div className="rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 p-3">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">Precisa de ajuda?</h3>
-            <p className="text-xs text-slate-600 mb-3">Acesse nosso centro de suporte para encontrar recursos e tutoriais.</p>
-            <button className="w-full py-1.5 px-3 bg-white text-xs font-medium text-blue-700 rounded border border-blue-100 hover:bg-blue-50 transition-colors">
-              Centro de Suporte
-            </button>
-          </div>
-        </div>
+
       </div>
       
       {user && (
