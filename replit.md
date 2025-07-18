@@ -110,6 +110,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 18, 2025**: Enhanced Event Image Gallery Display - USER INTERFACE IMPROVEMENT
+  - **UI Layout Change**: Moved gallery from tab-based interface to dedicated card layout
+  - **Administrative Interface**: Added "Galeria de Imagens" card below "Informações da Legislatura" in EventDetails.tsx
+  - **Public Interface**: Added "Galeria de Imagens" card in EventDetailsPage.tsx for public event viewing
+  - **Tab Optimization**: Removed gallery tabs from both interfaces, reducing tabs from 7 to 6 columns
+  - **Improved Accessibility**: Gallery now prominently displayed as separate card for better user experience
+  - **Error Resolution**: Fixed "images.map is not a function" error with proper array validation
+  - **Database Integration**: Confirmed event_images table working with proper foreign key relationships
+  - **Status**: Fully functional gallery system with enhanced card-based display confirmed working
+
 - **July 17, 2025**: Created "Indicações" Submenu in Legislative Activities Navigation - NAVIGATION ENHANCEMENT
   - **Submenu Implementation**: Added "Indicações" submenu item within "Atividades Legislativas" dropdown menu
   - **URL Parameter Support**: Configured redirect to `/atividades?tipo=Indicação` for automatic filtering

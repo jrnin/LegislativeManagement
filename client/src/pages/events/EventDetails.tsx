@@ -783,16 +783,24 @@ export default function EventDetails() {
             </div>
           </CardContent>
         </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Galeria de Imagens</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EventImageGallery eventId={eventId} isAdmin={isAuthenticated && user?.role === "admin"} />
+          </CardContent>
+        </Card>
       </div>
       
       <Tabs defaultValue="activities" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="activities">Atividades</TabsTrigger>
           <TabsTrigger value="attendance">Lista de Presença</TabsTrigger>
           <TabsTrigger value="documents">Documentos</TabsTrigger>
           <TabsTrigger value="approvals">Votações</TabsTrigger>
           <TabsTrigger value="comments">Comentários</TabsTrigger>
-          <TabsTrigger value="images">Galeria</TabsTrigger>
           <TabsTrigger value="timeline">Linha do Tempo</TabsTrigger>
         </TabsList>
         
@@ -1200,12 +1208,6 @@ export default function EventDetails() {
           <div className="space-y-6">
             <h2 className="text-xl font-bold">Comentários do Evento</h2>
             <EventCommentsWithMentions eventId={eventId} />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="images" className="pt-4">
-          <div className="space-y-6">
-            <EventImageGallery eventId={eventId} isAdmin={isAuthenticated && user?.role === "admin"} />
           </div>
         </TabsContent>
         
