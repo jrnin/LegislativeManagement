@@ -14,6 +14,7 @@ import NoticiaDetalhePage from './NoticiaDetalhePage';
 import ContatoPage from './ContatoPageFunctional';
 import ComissoesPage from './ComissoesPageBasic';
 import ComissaoDetalhePage from './ComissaoDetalhePage';
+import MesaDiretoraPage from './MesaDiretoraPage';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
@@ -61,6 +62,9 @@ export default function PublicRoutes() {
         
         <Route path="/public/contato" component={ContatoPage} />
         <Route path="/contato" component={ContatoPage} />
+        
+        <Route path="/public/mesa-diretora" component={MesaDiretoraPage} />
+        <Route path="/mesa-diretora" component={MesaDiretoraPage} />
         
         {/* Adicionar outras rotas públicas aqui */}
         <Route component={NotFound} />

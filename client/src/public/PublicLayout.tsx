@@ -114,6 +114,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
   const mainMenuLinks = [
     { name: 'Início', href: '/' },
     { name: 'Vereadores', href: '/vereadores' },
+    { name: 'Mesa Diretora', href: '/mesa-diretora' },
     { name: 
       'Atividades Legislativas',
       href: '/atividades',

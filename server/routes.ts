@@ -4909,5 +4909,24 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // Public endpoint to get current board (Mesa Diretora)
+  app.get('/api/public/board', async (req, res) => {
+    try {
+      const boards = await storage.getAllBoards();
+      
+      // Get the most recent board (current Mesa Diretora)
+      const currentBoard = boards.length > 0 ? boards[0] : null;
+      
+      if (!currentBoard) {
+        return res.status(404).json({ message: 'Nenhuma Mesa Diretora encontrada' });
+      }
+      
+      res.json(currentBoard);
+    } catch (error) {
+      console.error('Error fetching current board:', error);
+      res.status(500).json({ error: 'Erro ao buscar Mesa Diretora' });
+    }
+  });
+
   return httpServer;
 }
