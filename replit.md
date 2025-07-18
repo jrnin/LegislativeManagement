@@ -110,6 +110,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 18, 2025**: Implemented Enhanced Public Image Gallery with Keyboard Navigation - MAJOR USER EXPERIENCE IMPROVEMENT
+  - **Dynamic Image Loading**: Successfully replaced placeholder gallery with real database-driven images from event_images table
+  - **Keyboard Navigation**: Added arrow key navigation (← → keys) for seamless image browsing in modal view
+  - **Visual Navigation Controls**: Implemented clickable arrow buttons (ChevronLeft/ChevronRight) on modal for intuitive navigation
+  - **Image Counter**: Added "1 of X" counter display in modal header for better user orientation
+  - **Circular Navigation**: Implemented wraparound navigation (last→first image) for continuous browsing
+  - **Modal Enhancements**: Added escape key support, navigation hints, and improved visual feedback
+  - **Responsive Layout**: Adaptive gallery layout supporting both events with and without videos
+  - **Empty State Handling**: Graceful display when no images are available with informative messaging
+  - **Enhanced Spacing**: Improved visual spacing in "Últimas Atividades Legislativas" card with better padding and organization
+  - **Video Update**: Updated hero section background video to new YouTube URL (z7FA7JA16vc)
+  - **User Experience**: Complete navigation system with visual cues and keyboard shortcuts for enhanced accessibility
+  - **Status**: Fully functional image gallery with comprehensive navigation features confirmed working by user
+
 - **July 18, 2025**: Removed Event Image Gallery - USER INTERFACE SIMPLIFICATION
   - **UI Simplification**: Removed "Galeria de Imagens" card from both administrative and public event details pages
   - **Administrative Interface**: Removed EventImageGallery component from EventDetails.tsx
