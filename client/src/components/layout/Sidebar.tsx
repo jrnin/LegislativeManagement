@@ -10,7 +10,8 @@ import {
   PieChart,
   Settings,
   UsersRound,
-  Shield
+  Shield,
+  ImageIcon
 } from "lucide-react";
 import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -31,6 +32,7 @@ export default function Sidebar() {
     { name: "Documentos", href: "/documents", icon: Files },
     { name: "Comissões", href: "/committees", icon: UsersRound, badge: "Novo" },
     { name: "Mesa Diretora", href: "/boards", icon: Shield },
+    { name: "Imagens", href: "/images", icon: ImageIcon },
   ];
 
   const getInitials = (name: string) => {

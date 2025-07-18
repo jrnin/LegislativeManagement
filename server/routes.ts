@@ -4520,6 +4520,50 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // Admin Images routes
+  app.get('/api/admin/images', requireAuth, async (req, res) => {
+    try {
+      const images = await storage.getAllEventImagesWithEvents();
+      res.json(images);
+    } catch (error) {
+      console.error('Error fetching admin images:', error);
+      res.status(500).json({ error: 'Erro ao carregar imagens' });
+    }
+  });
+
+  app.put('/api/admin/images/:imageId', requireAuth, async (req: any, res) => {
+    try {
+      const { imageId } = req.params;
+      const { caption } = req.body;
+      
+      const image = await storage.updateEventImage(Number(imageId), { caption });
+      if (!image) {
+        return res.status(404).json({ error: 'Imagem não encontrada' });
+      }
+      
+      res.json(image);
+    } catch (error) {
+      console.error('Error updating image:', error);
+      res.status(500).json({ error: 'Erro ao atualizar imagem' });
+    }
+  });
+
+  app.delete('/api/admin/images/:imageId', requireAuth, async (req: any, res) => {
+    try {
+      const { imageId } = req.params;
+      
+      const success = await storage.deleteEventImage(Number(imageId));
+      if (!success) {
+        return res.status(404).json({ error: 'Imagem não encontrada' });
+      }
+      
+      res.json({ message: 'Imagem excluída com sucesso' });
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      res.status(500).json({ error: 'Erro ao excluir imagem' });
+    }
+  });
+
   // Mesa Diretora routes
   app.get('/api/boards', async (req, res) => {
     try {

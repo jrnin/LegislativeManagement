@@ -28,6 +28,7 @@ import BoardsPage from "@/pages/boards/BoardsPage";
 import CreateBoardPage from "@/pages/boards/CreateBoardPage";
 import BoardEdit from "@/pages/boards/BoardEdit";
 import BoardDetails from "@/pages/boards/BoardDetails";
+import ImagesPage from "@/pages/admin/ImagesPage";
 import PublicRoutes from "@/public/PublicRoutes";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationProvider } from "@/context/NotificationContext";
@@ -68,6 +69,7 @@ function AuthenticatedApp() {
         <Route path="/boards/new" component={CreateBoardPage} />
         <Route path="/boards/:id/edit" component={BoardEdit} />
         <Route path="/boards/:id" component={BoardDetails} />
+        <Route path="/images" component={ImagesPage} />
         <Route component={NotFound} />
       </Switch>
     </SafeLayout>

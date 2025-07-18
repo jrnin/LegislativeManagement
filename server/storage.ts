@@ -3262,6 +3262,42 @@ export class DatabaseStorage implements IStorage {
     
     return result.count;
   }
+
+  async getAllEventImagesWithEvents(): Promise<any[]> {
+    try {
+      const images = await db
+        .select({
+          id: eventImages.id,
+          eventId: eventImages.eventId,
+          imageData: eventImages.imageData,
+          fileName: eventImages.fileName,
+          fileSize: eventImages.fileSize,
+          mimeType: eventImages.mimeType,
+          caption: eventImages.caption,
+          orderIndex: eventImages.orderIndex,
+          uploadedBy: eventImages.uploadedBy,
+          createdAt: eventImages.createdAt,
+          event: {
+            id: events.id,
+            eventNumber: events.eventNumber,
+            eventDate: events.eventDate,
+            eventTime: events.eventTime,
+            location: events.location,
+            category: events.category,
+            status: events.status,
+            description: events.description,
+          }
+        })
+        .from(eventImages)
+        .innerJoin(events, eq(eventImages.eventId, events.id))
+        .orderBy(desc(eventImages.createdAt));
+      
+      return images;
+    } catch (error) {
+      console.error("Error fetching all event images with events:", error);
+      return [];
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();
