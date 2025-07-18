@@ -110,7 +110,8 @@ function App() {
                        location.startsWith("/eventos") ||
                        location.startsWith("/comissoes") ||
                        location.startsWith("/noticias") ||
-                       location.startsWith("/contato")) &&
+                       location.startsWith("/contato") ||
+                       location.startsWith("/mesa-diretora")) &&
                        !location.startsWith("/login") &&
                        !location.startsWith("/verify-email");
   
