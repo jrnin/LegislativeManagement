@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth } from "./replitAuth";
-import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload } from "./middlewares";
+import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload, handleNewsUpload } from "./middlewares";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest, sendEventNotificationEmail } from "./sendgrid";
 import { z } from "zod";
 import crypto from "crypto";
@@ -2201,7 +2201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create news article (admin)
-  app.post('/api/news', requireAuth, handleFileUpload, async (req, res) => {
+  app.post('/api/news', requireAuth, handleNewsUpload('coverImage'), async (req, res) => {
     try {
       const {
         title,
@@ -2240,7 +2240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metaTitle,
         metaDescription,
         publishedAt: publishedAt ? new Date(publishedAt) : undefined,
-        imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined
+        imageUrl: req.file ? `/uploads/news/${req.file.filename}` : undefined
       };
 
       const article = await storage.createNewsArticle(articleData);
@@ -2252,7 +2252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update news article (admin)
-  app.put('/api/news/:id', requireAuth, handleFileUpload, async (req, res) => {
+  app.put('/api/news/:id', requireAuth, handleNewsUpload('coverImage'), async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const {

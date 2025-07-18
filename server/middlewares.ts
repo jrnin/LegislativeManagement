@@ -30,6 +30,12 @@ if (!fs.existsSync(avatarDir)) {
   fs.mkdirSync(avatarDir, { recursive: true });
 }
 
+// Ensure news directory exists
+const newsDir = path.join(process.cwd(), "uploads", "news");
+if (!fs.existsSync(newsDir)) {
+  fs.mkdirSync(newsDir, { recursive: true });
+}
+
 // Configure avatar storage
 const avatarStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -40,6 +46,19 @@ const avatarStorage = multer.diskStorage({
     const uniqueSuffix = Date.now() + "-" + crypto.randomBytes(6).toString("hex");
     const ext = path.extname(file.originalname);
     cb(null, "avatar-" + uniqueSuffix + ext);
+  },
+});
+
+// Configure news storage
+const newsStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, newsDir);
+  },
+  filename: function (req, file, cb) {
+    // Generate unique filename with original extension
+    const uniqueSuffix = Date.now() + "-" + crypto.randomBytes(6).toString("hex");
+    const ext = path.extname(file.originalname);
+    cb(null, "news-" + uniqueSuffix + ext);
   },
 });
 
@@ -99,6 +118,15 @@ export const uploadAvatar = multer({
     fileSize: 5 * 1024 * 1024, // 5MB max file size for avatars
   },
   fileFilter: avatarFileFilter,
+});
+
+// Upload instance specifically for news
+export const uploadNews = multer({
+  storage: newsStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max file size for news images
+  },
+  fileFilter: avatarFileFilter, // Use same filter as avatars (images only)
 });
 
 /**
@@ -234,6 +262,21 @@ export const handleAvatarUpload = (fieldName: string) => {
         const basePath = '/uploads/avatars/';
         const avatarPath = basePath + path.basename(req.file.path);
         req.body.profileImageUrl = avatarPath;
+      }
+      
+      next();
+    });
+  };
+};
+
+/**
+ * Middleware to handle news file uploads
+ */
+export const handleNewsUpload = (fieldName: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    uploadNews.single(fieldName)(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
       }
       
       next();
