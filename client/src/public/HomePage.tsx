@@ -238,7 +238,7 @@ interface NewsCardProps {
 }
 
 const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProps) => (
-  <Link href={`/public/noticias/${id}`}>
+  <Link href={`/noticias/${id}`}>
     <Card className="group cursor-pointer h-full hover:shadow-lg transition-all duration-300">
       <div className="relative">
         {imageUrl && (
@@ -247,6 +247,9 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
               src={imageUrl} 
               alt={title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                e.currentTarget.src = '/api/placeholder/400/300';
+              }}
             />
           </div>
         )}
@@ -570,11 +573,23 @@ export default function HomePage() {
     enabled: true
   });
 
-  const { data: news = mockNews } = useQuery({
+  const { data: newsData, isLoading: newsLoading } = useQuery({
     queryKey: ['/api/public/news'],
-    enabled: false,
-    initialData: mockNews
+    select: (data: any) => {
+      if (!data || !Array.isArray(data)) return [];
+      
+      return data.map((article: any) => ({
+        id: article.id,
+        title: article.title,
+        excerpt: article.excerpt || article.content?.substring(0, 200) + '...',
+        date: article.publishedDate || article.createdAt,
+        imageUrl: article.coverImage || '/api/placeholder/400/300',
+        category: article.category?.name || 'Notícias'
+      }));
+    }
   });
+  
+  const news = newsData || [];
 
   // Formatador de datas
   const formatDate = (dateString: string) => {
@@ -660,83 +675,90 @@ export default function HomePage() {
             </Link>
           </div>
           
-          {/* Seção de notícias sem filtros */}
-          <div className="grid grid-cols-4 gap-4">
-            {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
-            <div className="lg:col-span-2">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-                <div className="p-6">                
-                      
-                  {/* Destaque principal com carrossel */}
-                  <Carousel
-                    opts={{ loop: true }}
-                    className="w-full mb-8"
-                  >
-                    <CarouselContent>
-                      {news.slice(0, 3).map((item) => (
-                        <CarouselItem key={item.id}>
-                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
-                            <img
-                              src={item.imageUrl} 
-                              alt={item.title}
-                              className="h-full w-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
-                              <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#48654e'}}>
-                                {item.category}
-                              </Badge>
-                              <h3 className="text-white text-xl font-bold mb-2 line-clamp-2">
-                                {item.title}
-                              </h3>
-                              <p className="text-gray-200 text-sm line-clamp-2 mb-3">
-                                {item.excerpt}
-                              </p>
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-300 text-xs">{formatDate(item.date)}</span>
-                                <Button size="sm" variant="secondary" className="text-xs">
-                                  Ler mais
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </CarouselItem>
+          {/* Seção de notícias */}
+          {newsLoading ? (
+            <div className="text-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" style={{color: '#48654e'}} />
+              <p className="text-gray-600">Carregando notícias...</p>
+            </div>
+          ) : news.length === 0 ? (
+            <div className="text-center py-12">
+              <Newspaper className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-600">Nenhuma notícia encontrada</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-4">
+              {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
+              <div className="lg:col-span-2">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                  <div className="p-6">                
+                        
+                    {/* Destaque principal com carrossel */}
+                    {news.length > 0 && (
+                      <Carousel
+                        opts={{ loop: true }}
+                        className="w-full mb-8"
+                      >
+                        <CarouselContent>
+                          {news.slice(0, 3).map((item) => (
+                            <CarouselItem key={item.id}>
+                              <Link href={`/noticias/${item.id}`}>
+                                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl cursor-pointer group">
+                                  <img
+                                    src={item.imageUrl} 
+                                    alt={item.title}
+                                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    onError={(e) => {
+                                      e.currentTarget.src = '/api/placeholder/400/300';
+                                    }}
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+                                    <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#48654e'}}>
+                                      {item.category}
+                                    </Badge>
+                                    <h3 className="text-white text-xl font-bold mb-2 line-clamp-2">
+                                      {item.title}
+                                    </h3>
+                                    <p className="text-gray-200 text-sm line-clamp-2 mb-3">
+                                      {item.excerpt}
+                                    </p>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-gray-300 text-xs">{formatDate(item.date)}</span>
+                                      <Button size="sm" variant="secondary" className="text-xs">
+                                        Ler mais
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </Link>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        <CarouselPrevious />
+                        <CarouselNext />
+                      </Carousel>
+                    )}
+                    
+                    {/* Grid de notícias menores */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {news.slice(3, 7).map((item) => (
+                        <NewsCard
+                          key={item.id}
+                          id={item.id}
+                          title={item.title}
+                          excerpt={item.excerpt}
+                          date={formatDate(item.date)}
+                          imageUrl={item.imageUrl}
+                          category={item.category}
+                        />
                       ))}
-                    </CarouselContent>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </Carousel>
-                  
-                  {/* Grid de notícias menores */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    {news.slice(3, 7).map((item) => (
-                      <NewsCard
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        excerpt={item.excerpt}
-                        date={formatDate(item.date)}
-                        imageUrl={item.imageUrl}
-                        category={item.category}
-                      />
-                    ))}
-
-                    {news.slice(2, 7).map((item) => (
-                      <NewsCard
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        excerpt={item.excerpt}
-                        date={formatDate(item.date)}
-                        imageUrl={item.imageUrl}
-                        category={item.category}
-                      />
-                    ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             
             {/* Coluna da direita (sidebar) - ocupa 1/3 do espaço */}
+            <div className="lg:col-span-2 space-y-6">
             
               {/* Próximos eventos */}
               <div className="bg-white rounded-lg shadow-md p-4">
@@ -923,13 +945,9 @@ export default function HomePage() {
                     </p>
                   </div>
                 </div>
-                
               </div>
-              
-                
-                      
-             
-            
+            </div>
+            )}
           </div>
         </div>
       </section>

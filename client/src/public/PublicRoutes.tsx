@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch, Route } from 'wouter';
 import PublicLayout from './PublicLayout';
-import HomePage from './HomePage';
+import HomePage from './HomePageTemp';
 import VereadoresPage from './VereadoresPage';
 import VereadorDetalhesModerno from './VereadorDetalhesModerno';
 import DocumentosPage from './DocumentosPageBasic';
