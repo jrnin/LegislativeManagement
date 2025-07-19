@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { Helmet } from 'react-helmet';
@@ -8,21 +8,224 @@ import {
   Calendar, 
   FileText, 
   Users, 
+  Zap,
   Gavel,
+  FileSearch,
+  Building,
+  PieChart,
   ChevronRight,
   ArrowRight,
+  Volume2,
+  VolumeX,
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  CloudSun,
+  CloudRain,
+  Cloud,
+  Sun,
+  Umbrella,
+  Thermometer,
   Loader2,
   Clock,
   Eye,
+  Users2,
   MapPin,
+  Home,
+  GraduationCap,
+  Heart,
+  Briefcase,
+  Scissors,
+  Car,
+  CreditCard,
+  AlertTriangle,
+  FolderOpen,
   Newspaper,
-  Building
+  Theater,
+  Edit,
+  Shield,
+  FileCheck,
+  DollarSign,
+  CreditCard as Payment,
+  UserCheck,
+  Clock as Time,
+  Globe,
+  Building2,
+  FileBarChart,
+  TrendingUp
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+
+// Função auxiliar para obter iniciais
+const getInitials = (name: string) => {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase();
+};
+// Componente para exibir as últimas atividades legislativas
+const LegislativeActivitiesWidget = () => {
+  const { data: activities, isLoading } = useQuery({
+    queryKey: ['/api/public/legislative-activities'],
+    select: (data: any) => {
+      const rawActivities = data?.activities || [];
+      return rawActivities.map((activity: any) => {
+        // Use fallback values and ensure proper date handling
+        const activityType = activity.activityType || 'Atividade';
+        const activityNumber = activity.activityNumber || 1;
+        const year = activity.activityDate ? new Date(activity.activityDate).getFullYear() : new Date().getFullYear();
+        
+        return {
+          ...activity,
+          title: `${activityType} Nº ${activityNumber}/${year}`,
+          type: activityType,
+          status: activity.approved === true ? 'aprovado' : 'em_tramitacao',
+          date: activity.activityDate || activity.createdAt
+        };
+      });
+    }
+  });
+
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'aprovado':
+        return 'bg-green-100 text-green-800';
+      case 'em_tramitacao':
+        return 'bg-blue-100 text-blue-800';
+      case 'rejeitado':
+        return 'bg-red-100 text-red-800';
+      case 'pendente':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'em_tramitacao':
+        return 'Em Tramitação';
+      case 'aprovado':
+        return 'Aprovado';
+      case 'rejeitado':
+        return 'Rejeitado';
+      case 'pendente':
+        return 'Pendente';
+      default:
+        return status;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="h-10 w-10 animate-spin" style={{color: '#48654e'}} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {activities?.slice(0, 3).map((activity: any) => (
+        <Link key={activity.id} href={`/atividades/${activity.id}`}>
+          <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-8 border-l-green-700">
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm leading-tight" style={{color: '#48654e'}}>
+                      {activity.title}
+                    </h4>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {activity.type || 'Atividade Legislativa'}
+                    </p>
+                  </div>
+                  <Badge className={`text-xs ${getStatusColor(activity.status)}`}>
+                    {getStatusText(activity.status)}
+                  </Badge>
+                </div>
+                
+                {activity.description && (
+                  <p className="text-xs text-gray-700 line-clamp-2">
+                    {activity.description.substring(0, 100)}...
+                  </p>
+                )}
+                
+                <div className="flex items-center justify-between text-xs text-gray-500 ">
+                  <div className="flex items-center">
+                    <Clock size={12} className="mr-1" />
+                    {formatDate(activity.date || activity.createdAt)}
+                  </div>
+                  <div className="flex items-center">
+                    <Eye size={12} className="mr-1" />
+                    Ver detalhes
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      ))}
+      
+      {(!activities || activities.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <FileText size={32} className="mx-auto mb-2 opacity-50" />
+          <p className="text-sm">Nenhuma atividade encontrada</p>
+        </div>
+      )}
+      
+      <div className="text-center mt-6">
+        <Link href="/public/atividades">
+          <Button variant="outline" size="sm" className="text-sm">
+            <FileText className="mr-2" size={16} />
+            Ver Todas as Atividades
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+// Interface para QuickServiceCard
+interface QuickServiceCardProps {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  href: string;
+}
+
+const QuickServiceCard = ({ title, description, icon: Icon, href }: QuickServiceCardProps) => (
+  <Link href={href}>
+    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-95 border-0 bg-white/80 backdrop-blur-sm">
+      <CardContent className="p-6">
+        <div className="flex items-start space-x-4">
+          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#007825'}}>
+            <Icon size={24} style={{color: '#e4e6da'}} />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#253529'}}>
+              {title}
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {description}
+            </p>
+          </div>
+          <ChevronRight size={20} className="text-gray-400 group-hover:text-green-600 transition-colors" />
+        </div>
+      </CardContent>
+    </Card>
+  </Link>
+);
 
 // Interface para NewsCard
 interface NewsCardProps {
@@ -35,7 +238,7 @@ interface NewsCardProps {
 }
 
 const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProps) => (
-  <Link href={`/noticias/${id}`}>
+  <Link href={`/public/noticias/${id}`}>
     <Card className="group cursor-pointer h-full hover:shadow-lg transition-all duration-300">
       <div className="relative">
         {imageUrl && (
@@ -44,9 +247,6 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
               src={imageUrl} 
               alt={title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
-                e.currentTarget.src = '/api/placeholder/400/300';
-              }}
             />
           </div>
         )}
@@ -70,31 +270,299 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
   </Link>
 );
 
-// Função auxiliar para obter iniciais
-const getInitials = (name: string) => {
-  return name.split(' ').map(n => n[0]).join('').toUpperCase();
+// Interface para CouncilorCard
+interface CouncilorCardProps {
+  id: string;
+  name: string;
+  role?: string;
+  party?: string;
+  imageUrl?: string;
+  profileImageUrl?: string;
+  occupation?: string;
+  education?: string;
+}
+
+const CouncilorCard = ({ id, name, role, party, imageUrl, profileImageUrl, occupation, education }: CouncilorCardProps) => (
+  <Link href={`/public/vereadores/${id}`}>
+    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg">
+      <CardHeader className="pb-2 pt-6">
+        <div className="flex justify-center mb-4">
+          <Avatar className="h-24 w-24 border-4 border-white shadow-md">
+            <AvatarImage src={profileImageUrl || imageUrl} />
+            <AvatarFallback className="text-white text-lg" style={{backgroundColor: '#7FA653'}}>{getInitials(name)}</AvatarFallback>
+          </Avatar>
+        </div>
+        <CardTitle className="text-lg">{name}</CardTitle>
+        <CardDescription>{party || occupation || "Vereador(a)"}</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {role && (
+          <Badge variant="secondary" className="mb-2">
+            {role}
+          </Badge>
+        )}
+        {education && (
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {education}
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  </Link>
+);
+
+// Interface para EventCard
+interface EventCardProps {
+  id: number;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  type: string;
+}
+
+const EventCard = ({ id, title, date, time, location, type }: EventCardProps) => (
+  <Link href={`/public/eventos/${id}`}>
+    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg border-l-4" style={{borderLeftColor: '#7FA653'}}>
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-2">
+          <Badge variant="outline" className="text-xs" style={{borderColor: '#7FA653', color: '#63783D'}}>
+            {type}
+          </Badge>
+          <span className="text-xs text-gray-500">{time}</span>
+        </div>
+        <h3 className="font-semibold text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+          {title}
+        </h3>
+        <div className="space-y-1 text-xs text-gray-600">
+          <div className="flex items-center">
+            <Calendar size={12} className="mr-1" />
+            {date}
+          </div>
+          <div className="flex items-center">
+            <Building size={12} className="mr-1" />
+            {location}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </Link>
+);
+
+// Dados mockados para serviços rápidos
+const quickServices = [
+  {
+    title: "Transparência",
+    description: "Acesse informações sobre orçamento, despesas e receitas",
+    icon: PieChart,
+    href: "/public/transparencia"
+  },
+  {
+    title: "Atividades Legislativas",
+    description: "Consulte atividades, projetos de lei e deliberações em andamento",
+    icon: Gavel,
+    href: "/public/atividades"
+  },
+  {
+    title: "Sessões",
+    description: "Acompanhe as sessões da Câmara, calendário e pautas de reuniões",
+    icon: Zap,
+    href: "/public/sessoes"
+  },
+  {
+    title: "Atas e Documentos",
+    description: "Acesse documentos oficiais, atas de reuniões e registros públicos",
+    icon: FileText,
+    href: "/public/documentos"
+  },
+  {
+    title: "Legislação",
+    description: "Consulte leis, decretos, portarias e toda a legislação municipal",
+    icon: Gavel,
+    href: "/public/legislacao"
+  },
+  {
+    title: "Licitações",
+    description: "Informações sobre processos licitatórios, contratos e convênios",
+    icon: FileSearch,
+    href: "/public/licitacoes"
+  },
+  {
+    title: "Recursos Humanos",
+    description: "Dados orçamentários, despesas, receitas e relatórios fiscais",
+    icon: PieChart,
+    href: "/public/transparencia"
+  },
+  {
+    title: "Audiências",
+    description: "Calendário de audiências públicas, consultas e participação cidadã",
+    icon: Building,
+    href: "/public/audiencias"
+  }
+];
+
+// Notícias mockadas
+const mockNews = [
+  {
+    id: 1,
+    title: "Câmara aprova projeto que incentiva a reciclagem no município",
+    excerpt: "O projeto de lei que incentiva a reciclagem de resíduos sólidos foi aprovado por unanimidade na sessão de ontem. A nova legislação prevê benefícios fiscais para empresas que adotarem práticas sustentáveis.",
+    date: "10 de Maio de 2023",
+    imageUrl: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    category: "Meio Ambiente"
+  },
+  {
+    id: 2,
+    title: "Audiência pública discutirá mobilidade urbana na próxima semana",
+    excerpt: "Uma audiência pública para discutir o plano de mobilidade urbana será realizada na próxima semana. A população poderá enviar sugestões e participar ativamente das discussões sobre transporte público.",
+    date: "08 de Maio de 2023",
+    imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    category: "Urbanismo"
+  },
+  {
+    id: 3,
+    title: "Nova comissão para fiscalizar obras públicas é formada na Câmara",
+    excerpt: "Os vereadores formaram uma nova comissão especial para fiscalizar as obras públicas em andamento no município. O objetivo é garantir a qualidade dos serviços e a aplicação correta dos recursos.",
+    date: "05 de Maio de 2023",
+    imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    category: "Fiscalização"
+  },
+  {
+    id: 4,
+    title: "Programa de inclusão digital é aprovado e beneficiará escolas públicas",
+    excerpt: "O programa de inclusão digital que beneficiará escolas públicas do município foi aprovado. A iniciativa prevê a instalação de laboratórios de informática e acesso à internet de alta velocidade.",
+    date: "03 de Maio de 2023",
+    imageUrl: "https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    category: "Educação"
+  }
+];
+
+// Vereadores mockados
+const mockCouncilors = [
+  {
+    id: "1",
+    name: "Ana Silva",
+    role: "Presidente",
+    party: "Partido A",
+    imageUrl: "https://randomuser.me/api/portraits/women/32.jpg"
+  },
+  {
+    id: "2",
+    name: "Carlos Santos",
+    role: "Vice-Presidente",
+    party: "Partido B",
+    imageUrl: "https://randomuser.me/api/portraits/men/41.jpg"
+  },
+  {
+    id: "3",
+    name: "Mariana Oliveira",
+    role: "Secretária",
+    party: "Partido C",
+    imageUrl: "https://randomuser.me/api/portraits/women/45.jpg"
+  },
+  {
+    id: "4",
+    name: "Ricardo Almeida",
+    role: "Vereador",
+    party: "Partido D",
+    imageUrl: "https://randomuser.me/api/portraits/men/55.jpg"
+  },
+  {
+    id: "5",
+    name: "Fernanda Costa",
+    role: "Vereadora",
+    party: "Partido E",
+    imageUrl: "https://randomuser.me/api/portraits/women/28.jpg"
+  }
+];
+
+// Eventos mockados
+const mockEvents = [
+  {
+    id: 1,
+    title: "Sessão Ordinária da Câmara Municipal",
+    date: "15/05/2023",
+    time: "09:00",
+    location: "Plenário Principal",
+    type: "Sessão Ordinária"
+  },
+  {
+    id: 2,
+    title: "Audiência Pública - Orçamento 2024",
+    date: "18/05/2023",
+    time: "14:00",
+    location: "Auditório da Câmara",
+    type: "Audiência Pública"
+  },
+  {
+    id: 3,
+    title: "Reunião da Comissão de Finanças",
+    date: "22/05/2023",
+    time: "10:30",
+    location: "Sala de Reuniões",
+    type: "Comissão"
+  },
+  {
+    id: 4,
+    title: "Sessão Extraordinária",
+    date: "26/05/2023",
+    time: "15:00",
+    location: "Plenário Principal",
+    type: "Sessão Plenária"
+  }
+];
+
+// Dados dos serviços por categoria
+const servicesData = {
+  servicos: [
+    { title: "Agendamento eletrônico - ITBI", icon: Calendar, color: "bg-blue-600" },
+    { title: "Agendamento eletrônico - Tesourinha", icon: Scissors, color: "bg-blue-600" },
+    { title: "Cartão Estacionamento Idoso - PCD", icon: Car, color: "bg-blue-600" },
+    { title: "Consulta de Multas", icon: CreditCard, color: "bg-green-600" },
+    { title: "Consulta de Processos Físicos", icon: FolderOpen, color: "bg-blue-600" },
+    { title: "Diário Oficial", icon: Newspaper, color: "bg-blue-600" },
+    { title: "Editais da Cultura", icon: Theater, color: "bg-purple-600" },
+    { title: "Emendas Parlamentares", icon: Edit, color: "bg-blue-600" }
+  ],
+  acessoRapido: [
+    { title: "Portal da Transparência", icon: Eye, color: "bg-green-600" },
+    { title: "Consulta Pública", icon: FileCheck, color: "bg-blue-600" },
+    { title: "Ouvidoria Municipal", icon: Users, color: "bg-orange-600" },
+    { title: "E-SIC - Informações", icon: Shield, color: "bg-purple-600" },
+    { title: "Licitações e Contratos", icon: FileBarChart, color: "bg-red-600" },
+    { title: "Portal do Cidadão", icon: UserCheck, color: "bg-teal-600" },
+    { title: "Agenda de Eventos", icon: Calendar, color: "bg-indigo-600" },
+    { title: "Notícias Municipais", icon: Newspaper, color: "bg-yellow-600" }
+  ],
+  servidor: [
+    { title: "Portal do Servidor", icon: UserCheck, color: "bg-blue-700" },
+    { title: "Contracheque Online", icon: DollarSign, color: "bg-green-700" },
+    { title: "Férias e Licenças", icon: Time, color: "bg-orange-700" },
+    { title: "Benefícios", icon: Heart, color: "bg-red-700" },
+    { title: "Treinamentos", icon: GraduationCap, color: "bg-purple-700" },
+    { title: "Avaliação de Desempenho", icon: TrendingUp, color: "bg-teal-700" },
+    { title: "Protocolo Interno", icon: FileText, color: "bg-indigo-700" },
+    { title: "Suporte Técnico", icon: Building2, color: "bg-gray-700" }
+  ],
+  empresas: [
+    { title: "Alvará de Funcionamento", icon: Building2, color: "bg-blue-800" },
+    { title: "CNPJ - Consulta", icon: FileSearch, color: "bg-green-800" },
+    { title: "Tributos Empresariais", icon: Payment, color: "bg-orange-800" },
+    { title: "Licenciamento Ambiental", icon: Globe, color: "bg-teal-800" },
+    { title: "Nota Fiscal Eletrônica", icon: FileBarChart, color: "bg-purple-800" },
+    { title: "Cadastro de Fornecedores", icon: Building, color: "bg-red-800" },
+    { title: "Parcelamento de Débitos", icon: DollarSign, color: "bg-yellow-800" },
+    { title: "Certidões Negativas", icon: Shield, color: "bg-indigo-800" }
+  ]
 };
 
 export default function HomePage() {
-  const { data: newsData, isLoading: newsLoading } = useQuery({
-    queryKey: ['/api/public/news'],
-    select: (data: any) => {
-      if (!data || !data.articles || !Array.isArray(data.articles)) return [];
-      
-      return data.articles.map((article: any) => ({
-        id: article.id,
-        title: String(article.title || ''),
-        excerpt: String(article.excerpt || article.content?.substring(0, 200) + '...' || ''),
-        date: String(article.publishedDate || article.createdAt || ''),
-        imageUrl: String(article.coverImage || '/api/placeholder/400/300'),
-        category: String(article.category?.name || 'Notícias')
-      }));
-    }
-  });
-
+  const [activeServiceTab, setActiveServiceTab] = useState('servicos');
+  
+  // Consulta real à API para obter dados de eventos
   const { data: events = [], isLoading: eventsLoading } = useQuery({
     queryKey: ['/api/public/events'],
-    refetchInterval: 30000
+    refetchInterval: 30000 // Atualizar a cada 30 segundos
   });
 
   const { data: councilors = [], isLoading: councilorLoading } = useQuery({
@@ -102,23 +570,11 @@ export default function HomePage() {
     enabled: true
   });
 
-  const { data: activities, isLoading: activitiesLoading } = useQuery({
-    queryKey: ['/api/public/legislative-activities'],
-    select: (data: any) => {
-      const rawActivities = data?.activities || [];
-      return rawActivities.map((activity: any) => ({
-        id: activity.id,
-        activityNumber: String(activity.activityNumber || ''),
-        activityType: String(activity.activityType || 'Atividade'),
-        description: String(activity.description || 'Sem descrição'),
-        date: String(activity.activityDate || activity.createdAt || ''),
-        status: String(activity.situacao || 'Em Tramitação'),
-        authors: String(activity.authors || 'Não informado')
-      }));
-    }
+  const { data: news = mockNews } = useQuery({
+    queryKey: ['/api/public/news'],
+    enabled: false,
+    initialData: mockNews
   });
-  
-  const news = newsData || [];
 
   // Formatador de datas
   const formatDate = (dateString: string) => {
@@ -126,7 +582,7 @@ export default function HomePage() {
       const date = new Date(dateString);
       return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
     } catch (error) {
-      return dateString;
+      return dateString; // Se já for uma string formatada, retorna como está
     }
   };
 
@@ -138,7 +594,7 @@ export default function HomePage() {
       </Helmet>
 
       {/* Seção Hero Principal com vista aérea */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
         {/* Vídeo de fundo */}
         <div className="absolute inset-0 w-full h-full z-0">
           <div className="w-full h-full flex items-center justify-center">
@@ -146,9 +602,9 @@ export default function HomePage() {
               className="pointer-events-none"
               style={{
                 width: '100vw',
-                height: '56.25vw',
+                height: '56.25vw', // 16:9 aspect ratio (9/16 = 0.5625)
                 minHeight: '100vh',
-                minWidth: '177.78vh',
+                minWidth: '177.78vh', // 16:9 aspect ratio (16/9 = 1.7778)
                 objectFit: 'cover'
               }}
               src="https://www.youtube.com/embed/z7FA7JA16vc?si=k87KmctYgy4BBauV&autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playlist=z7FA7JA16vc"
@@ -158,382 +614,747 @@ export default function HomePage() {
               allowFullScreen
             />
           </div>
-        </div>
-
-        {/* Overlay escuro */}
-        <div className="absolute inset-0 bg-black bg-opacity-50 z-10" />
-        
-        {/* Conteúdo */}
+        </div>        
+                
+              
         <div className="container mx-auto px-4 relative z-20">
           <div className="text-center text-white max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Câmara Municipal
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
-              Portal de Transparência e Participação Cidadã
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/sessoes">
-                <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
-                  <Calendar className="mr-2" size={20} />
-                  Ver Sessões
-                </Button>
-              </Link>
-              <Link href="/documentos">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900">
-                  <FileText className="mr-2" size={20} />
-                  Documentos
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Seção de Próximas Sessões */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-            <h2 className="text-3xl font-bold flex items-center">
-              <Calendar className="mr-3" style={{color: '#48654e'}} />
-              Próximas Sessões
-            </h2>
-            <Link href="/sessoes">
-              <a className="hover:underline mt-2 sm:mt-0 flex items-center" style={{color: '#48654e'}}>
-                Ver todas <ChevronRight size={16} />
-              </a>
-            </Link>
-          </div>
           
-          {eventsLoading ? (
-            <div className="text-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" style={{color: '#48654e'}} />
-              <p className="text-gray-600">Carregando sessões...</p>
-            </div>
-          ) : events.length === 0 ? (
-            <div className="text-center py-12">
-              <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">Nenhuma sessão agendada</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.slice(0, 6).map((event: any) => (
-                <Link key={event.id} href={`/eventos/${event.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg">{event.title}</CardTitle>
-                          <Badge variant="outline" className="mt-2">
-                            {event.category}
-                          </Badge>
-                        </div>
-                        <Badge variant={event.status === 'Aberto' ? 'default' : 'secondary'}>
-                          {event.status}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Clock size={16} className="mr-2" />
-                          {formatDate(event.date)} às {event.time}
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <MapPin size={16} className="mr-2" />
-                          {event.location}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
+            
+        
+          </div>
         </div>
       </section>
 
-      {/* Seção de Notícias */}
-      <section className="py-16 px-4 bg-gray-50">
+      {/* Seção de Serviços Rápidos */}
+      <section className="py-4 px-2 bg-white">
+        <div className="container mx-auto">     
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {quickServices.slice(0, 8).map((service, index) => (
+              <QuickServiceCard
+                key={index}
+                title={service.title}
+                description={service.description}
+                icon={service.icon}
+                href={service.href}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+  
+
+      {/* Seção de notícias com layout de duas colunas */}
+      <section className="py-10 px-4 bg-gray-50">
         <div className="container mx-auto">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-            <h2 className="text-3xl font-bold flex items-center">
-              <FileText className="mr-3" style={{color: '#48654e'}} />
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <h2 className="text-2xl font-bold flex items-center">
+              <FileText className="mr-2" style={{color: '#48654e'}} />
               Notícias e Publicações
             </h2>
-            <Link href="/noticias">
+            <Link href="/public/noticias">
               <a className="hover:underline mt-2 sm:mt-0 flex items-center" style={{color: '#48654e'}}>
                 Ver todas <ChevronRight size={16} />
               </a>
             </Link>
           </div>
           
-          {newsLoading ? (
-            <div className="text-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" style={{color: '#48654e'}} />
-              <p className="text-gray-600">Carregando notícias...</p>
-            </div>
-          ) : news.length === 0 ? (
-            <div className="text-center py-12">
-              <Newspaper className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">Nenhuma notícia encontrada</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Coluna da esquerda (maior, com carrossel) */}
-              <div className="lg:col-span-2">
-                <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                  <div className="p-6">
-                    {/* Destaque principal com carrossel */}
-                    {news.length > 0 && (
-                      <Carousel opts={{ loop: true }} className="w-full mb-8">
-                        <CarouselContent>
-                          {news.slice(0, 3).map((item) => (
-                            <CarouselItem key={item.id}>
-                              <Link href={`/noticias/${item.id}`}>
-                                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl cursor-pointer group">
-                                  <img
-                                    src={item.imageUrl} 
-                                    alt={item.title}
-                                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    onError={(e) => {
-                                      e.currentTarget.src = '/api/placeholder/400/300';
-                                    }}
-                                  />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
-                                    <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#48654e'}}>
-                                      {item.category}
-                                    </Badge>
-                                    <h3 className="text-white text-xl font-bold mb-2 line-clamp-2">
-                                      {item.title}
-                                    </h3>
-                                    <p className="text-gray-200 text-sm line-clamp-2 mb-3">
-                                      {item.excerpt}
-                                    </p>
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-gray-300 text-xs">{formatDate(item.date)}</span>
-                                      <Button size="sm" variant="secondary" className="text-xs">
-                                        Ler mais
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </Link>
-                            </CarouselItem>
-                          ))}
-                        </CarouselContent>
-                        <CarouselPrevious />
-                        <CarouselNext />
-                      </Carousel>
-                    )}
-                    
-                    {/* Grid de notícias menores */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {news.slice(3, 7).map((item) => (
-                        <NewsCard
-                          key={item.id}
-                          id={item.id}
-                          title={item.title}
-                          excerpt={item.excerpt}
-                          date={formatDate(item.date)}
-                          imageUrl={item.imageUrl}
-                          category={item.category}
-                        />
+          {/* Seção de notícias sem filtros */}
+          <div className="grid grid-cols-4 gap-4">
+            {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
+            <div className="lg:col-span-2">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                <div className="p-6">                
+                      
+                  {/* Destaque principal com carrossel */}
+                  <Carousel
+                    opts={{ loop: true }}
+                    className="w-full mb-8"
+                  >
+                    <CarouselContent>
+                      {news.slice(0, 3).map((item) => (
+                        <CarouselItem key={item.id}>
+                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
+                            <img
+                              src={item.imageUrl} 
+                              alt={item.title}
+                              className="h-full w-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+                              <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#48654e'}}>
+                                {item.category}
+                              </Badge>
+                              <h3 className="text-white text-xl font-bold mb-2 line-clamp-2">
+                                {item.title}
+                              </h3>
+                              <p className="text-gray-200 text-sm line-clamp-2 mb-3">
+                                {item.excerpt}
+                              </p>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-300 text-xs">{formatDate(item.date)}</span>
+                                <Button size="sm" variant="secondary" className="text-xs">
+                                  Ler mais
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CarouselItem>
                       ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                  </Carousel>
+                  
+                  {/* Grid de notícias menores */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    {news.slice(3, 7).map((item) => (
+                      <NewsCard
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        excerpt={item.excerpt}
+                        date={formatDate(item.date)}
+                        imageUrl={item.imageUrl}
+                        category={item.category}
+                      />
+                    ))}
 
-              {/* Coluna da direita (sidebar) */}
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-lg shadow-md p-4">
-                  <h3 className="text-lg font-semibold mb-4" style={{color: '#48654e'}}>
-                    Últimas Publicações
-                  </h3>
-                  <div className="space-y-4">
-                    {news.slice(0, 5).map((item) => (
-                      <Link key={item.id} href={`/noticias/${item.id}`}>
-                        <div className="border-b border-gray-200 pb-4 last:border-b-0 cursor-pointer hover:bg-gray-50 p-2 rounded">
-                          <h4 className="font-medium text-sm line-clamp-2 mb-1">
-                            {item.title}
-                          </h4>
-                          <p className="text-xs text-gray-500">{formatDate(item.date)}</p>
-                        </div>
-                      </Link>
+                    {news.slice(2, 7).map((item) => (
+                      <NewsCard
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        excerpt={item.excerpt}
+                        date={formatDate(item.date)}
+                        imageUrl={item.imageUrl}
+                        category={item.category}
+                      />
                     ))}
                   </div>
                 </div>
               </div>
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* Seção de Vereadores */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-            <h2 className="text-3xl font-bold flex items-center">
-              <Users className="mr-3" style={{color: '#48654e'}} />
-              Nossos Vereadores(as)
-            </h2>
-            <Link href="/vereadores">
-              <a className="hover:underline mt-2 sm:mt-0 flex items-center" style={{color: '#48654e'}}>
-                Ver todos <ChevronRight size={16} />
-              </a>
-            </Link>
-          </div>
-          
-          {councilorLoading ? (
-            <div className="text-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" style={{color: '#48654e'}} />
-              <p className="text-gray-600">Carregando vereadores...</p>
-            </div>
-          ) : councilors.length === 0 ? (
-            <div className="text-center py-12">
-              <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">Nenhum vereador encontrado</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {councilors.slice(0, 12).map((councilor: any) => (
-                <Link key={councilor.id} href={`/vereadores/${councilor.id}`}>
-                  <div className="text-center group cursor-pointer">
-                    <div className="relative mb-4">
-                      <Avatar className="w-20 h-20 mx-auto border-4 border-transparent group-hover:border-blue-200 transition-colors">
-                        <AvatarImage 
-                          src={councilor.avatarUrl} 
-                          alt={councilor.name}
-                          className="object-cover"
-                        />
-                        <AvatarFallback className="text-lg font-semibold" style={{backgroundColor: '#48654e', color: 'white'}}>
-                          {getInitials(councilor.name)}
-                        </AvatarFallback>
-                      </Avatar>
+            
+            {/* Coluna da direita (sidebar) - ocupa 1/3 do espaço */}
+            
+              {/* Próximos eventos */}
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
+                  <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
+                  Eventos do Mês
+                </h3>
+                
+                {eventsLoading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
+                  </div>
+                ) : events.length > 0 ? (
+                  <div className="space-y-4">
+                    {events.slice(0, 4).map((event) => (
+                      <EventCard
+                        key={event.id}
+                        id={event.id}
+                        title={event.title}
+                        date={event.date}
+                        time={event.time}
+                        location={event.location}
+                        type={event.type}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Calendar className="mx-auto mb-2 h-12 w-12 text-gray-300" />
+                    <p className="text-sm">Nenhum evento próximo</p>
+                  </div>
+                )}
+                
+                {events.length > 0 && (
+                  <Link href="/public/eventos">
+                    <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
+                      Ver agenda completa
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
+           
+            
+              {/* Widget do clima */}
+              <div className="bg-[#e4e6da] rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                  <Sun className="mr-2" style={{color: '#7FA653'}} size={20} />
+                  Clima Hoje
+                </h3>
+                
+                <div className="text-center mb-4">
+                  <div className="flex items-center justify-center mb-2">
+                    <Sun size={32} style={{color: '#7FA653'}} />
+                    <span className="text-3xl font-bold ml-2">28°C</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Ensolarado</p>
+                  <p className="text-xs text-gray-500">Máx: 32°C • Mín: 22°C</p>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-2 mb-4">
+                  {[
+                    { day: 'Seg', temp: '27°', icon: Sun, desc: 'Ensolarado' },
+                    { day: 'Ter', temp: '25°', icon: CloudSun, desc: 'Parcialmente nublado' },
+                    { day: 'Qua', temp: '26°', icon: Cloud, desc: 'Nublado' },
+                    { day: 'Qui', temp: '24°', icon: CloudRain, desc: 'Chuva' },
+                  ].map((item, index) => (
+                    <div key={index} className="text-center p-2 bg-gray-50 rounded">
+                      <div className="text-xs font-medium mb-1">{item.day}</div>
+                      <div style={{color: '#7FA653'}}>
+                        {React.createElement(item.icon, { size: 24 })}
+                      </div>
+                      <div className="text-sm font-semibold mt-1">{item.temp}</div>
                     </div>
-                    <h3 className="font-semibold text-sm text-center leading-tight mb-1 group-hover:text-blue-600 transition-colors">
-                      {councilor.name}
-                    </h3>
+                  ))}
+                </div>  
+                {/* Widget de Assuntos em Alta - Nuvem de Tags 
+                <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
+                    <Zap className="mr-2" style={{color: '#7FA653'}} size={20} />
+                    Assuntos em alta
+                  </h3>
+
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { text: "Iptu 2025", size: "text-lg", color: "bg-blue-100 hover:bg-blue-200 text-blue-800" },
+                      { text: "Nota Fiscal", size: "text-sm", color: "bg-green-100 hover:bg-green-200 text-green-800" }, 
+                      { text: "Pregão Eletrônico", size: "text-base", color: "bg-purple-100 hover:bg-purple-200 text-purple-800" },
+                      { text: "Processos", size: "text-sm", color: "bg-orange-100 hover:bg-orange-200 text-orange-800" },
+                      { text: "Ouvidoria", size: "text-xs", color: "bg-red-100 hover:bg-red-200 text-red-800" },
+                      { text: "Serviços Online", size: "text-base", color: "bg-teal-100 hover:bg-teal-200 text-teal-800" },
+                      { text: "Licitações", size: "text-sm", color: "bg-indigo-100 hover:bg-indigo-200 text-indigo-800" },
+                      { text: "Documentos", size: "text-xs", color: "bg-pink-100 hover:bg-pink-200 text-pink-800" },
+                      { text: "Transparência", size: "text-sm", color: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800" }
+                    ].map((tag, index) => (
+                      <button 
+                        key={index} 
+                        className={`px-3 py-1 rounded-full transition-all duration-200 transform hover:scale-105 ${tag.size} ${tag.color} font-medium shadow-sm hover:shadow-md`}
+                      >
+                        {tag.text}
+                      </button>
+                    ))}
+                  </div>                
+                </div>   */}
+
+                {/* Widget de Dados Demográficos - Jaíba/MG */}
+                <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
+                    <Building className="mr-2" style={{color: '#7FA653'}} size={20} />
+                    Jaíba em Números
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* População */}
+                    <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Users2 size={20} className="text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">População</p>
+                        <p className="text-lg font-bold text-blue-700">37.000</p>
+                      </div>
+                    </div>
+
+                    {/* Área */}
+                    <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <MapPin size={20} className="text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Área</p>
+                        <p className="text-lg font-bold text-green-700">1.182 km²</p>
+                      </div>
+                    </div>
+
+                    {/* IDH */}
+                    <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                        <Heart size={20} className="text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">IDH</p>
+                        <p className="text-lg font-bold text-purple-700">0.681</p>
+                      </div>
+                    </div>
+
+                    {/* PIB per capita */}
+                    <div className="flex items-center space-x-3 p-3 bg-yellow-50 rounded-lg">
+                      <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <Briefcase size={20} className="text-yellow-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">PIB per capita</p>
+                        <p className="text-lg font-bold text-yellow-700">R$ 28.450</p>
+                      </div>
+                    </div>
+
+                    {/* Escolaridade */}
+                    <div className="flex items-center space-x-3 p-3 bg-red-50 rounded-lg">
+                      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                        <GraduationCap size={20} className="text-red-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Taxa Alfabetização</p>
+                        <p className="text-lg font-bold text-red-700">89.2%</p>
+                      </div>
+                    </div>
+
+                    {/* Densidade */}
+                    <div className="flex items-center space-x-3 p-3 bg-teal-50 rounded-lg">
+                      <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
+                        <Home size={20} className="text-teal-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Densidade</p>
+                        <p className="text-lg font-bold text-teal-700">31.3 hab/km²</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-gray-200">
                     <p className="text-xs text-gray-500 text-center">
-                      {councilor.politicalParty}
+                      Fonte: IBGE - Censo 2022 e estimativas atuais
                     </p>
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                </div>
+                
+              </div>
+              
+                
+                      
+             
+            
+          </div>
         </div>
       </section>
 
-      {/* Seção de Últimas Atividades */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-            <h2 className="text-3xl font-bold flex items-center">
-              <Gavel className="mr-3" style={{color: '#48654e'}} />
-              Últimas Atividades Legislativas
-            </h2>
-            <Link href="/atividades">
-              <a className="hover:underline mt-2 sm:mt-0 flex items-center" style={{color: '#48654e'}}>
-                Ver todas <ChevronRight size={16} />
-              </a>
-            </Link>
-          </div>
+      {/* Seção de Vereadores e Atividades Legislativas - Layout em Duas Colunas */}
+      <section className="py-20 px-4 bg-white">
+        <div className="container mx-auto"> {/*
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#48654e'}}>
+                <Users size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-4xl font-bold" style={{color: '#48654e'}}>Vereadores e Atividades Legislativas</h2>
+                <p className="text-gray-500 text-sm">2025-2028</p>
+              </div>
+            </div>
+          </div>*/}
           
-          {activitiesLoading ? (
-            <div className="text-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" style={{color: '#48654e'}} />
-              <p className="text-gray-600">Carregando atividades...</p>
-            </div>
-          ) : !activities || activities.length === 0 ? (
-            <div className="text-center py-12">
-              <Gavel className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">Nenhuma atividade encontrada</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activities.slice(0, 6).map((activity: any) => (
-                <Link key={activity.id} href={`/atividades/${activity.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-start">
-                        <Badge variant="outline" className="mb-2">
-                          {activity.activityType}
-                        </Badge>
-                        <span className="text-sm font-medium text-gray-600">
-                          Nº {activity.activityNumber}
-                        </span>
-                      </div>
-                      <CardTitle className="text-base line-clamp-2">
-                        {activity.description}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="space-y-2">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Clock size={14} className="mr-2" />
-                          {formatDate(activity.date)}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Coluna da Esquerda - Vereadores (2/3 do espaço) */}
+            <div className="lg:col-span-2">
+              <h3 className="text-2xl font-bold mb-6" style={{color: '#48654e'}}>Nossos Vereadores</h3>
+              
+              {councilorLoading ? (
+                <div className="flex justify-center">
+                  <Loader2 className="h-16 w-16 animate-spin" style={{color: '#48654e'}} />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Primeira linha - 6 vereadores */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-4">
+                    {(councilors?.length > 0 ? councilors : []).slice(0, 13).map((councilor, index) => (
+                      <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
+                        <div className="group cursor-pointer text-center">
+                          <div className="relative mb-3">
+                            {councilor.role && (
+                              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
+                                {councilor.role === 'Presidente' && (
+                                  <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Presidente
+                                  </div>
+                                )}
+                                {councilor.role === 'Vice-Presidente' && (
+                                  <div className="bg-red-400 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Vice-Presidente
+                                  </div>
+                                )}
+                                {councilor.role === 'Secretário' && (
+                                  <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Secretário
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className="w-280 h-370 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
+                              {councilor.profileImageUrl ? (
+                                <img 
+                                  src={councilor.profileImageUrl} 
+                                  alt={councilor.name}
+                                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold" style={{backgroundColor: '#8aa88a'}}>
+                                  {getInitials(councilor.name)}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <h4 className="text-xs font-bold group-hover:opacity-80 transition-opacity duration-300" style={{color: '#48654e'}}>
+                              {councilor.name}
+                            </h4>
+                            <p className="text-xs text-gray-600">
+                              {councilor.partido || councilor.occupation || "Vereador"}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">
-                            {activity.authors}
-                          </span>
-                          <Badge variant="secondary" className="text-xs">
-                            {activity.status}
-                          </Badge>
+                      </Link>
+                    ))}
+                  </div>
+                  
+                  {/* Segunda linha - 6 vereadores 
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                    {(councilors?.length > 0 ? councilors : []).slice(6, 12).map((councilor, index) => (
+                      <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
+                        <div className="group cursor-pointer text-center">
+                          <div className="relative mb-3">
+                            {councilor.role && (
+                              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
+                                {councilor.role === 'Presidente' && (
+                                  <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Presidente
+                                  </div>
+                                )}
+                                {councilor.role === 'Vice-Presidente' && (
+                                  <div className="bg-red-400 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Vice-Presidente
+                                  </div>
+                                )}
+                                {councilor.role === 'Secretário' && (
+                                  <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+                                    Secretário
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            <div className="w-280 h-370 mx-auto rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 border-2 border-gray-200 group-hover:border-gray-300">
+                              {councilor.profileImageUrl ? (
+                                <img 
+                                  src={councilor.profileImageUrl} 
+                                  alt={councilor.name}
+                                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold" style={{backgroundColor: '#8aa88a'}}>
+                                  {getInitials(councilor.name)}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <h4 className="text-xs font-bold group-hover:opacity-80 transition-opacity duration-300" style={{color: '#48654e'}}>
+                              {councilor.name}
+                            </h4>
+                            <p className="text-xs text-gray-600">
+                              {councilor.partido || councilor.occupation || "Vereador"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </Link>
+                    ))}
+                  </div>*/}
+                </div>
+              )}
+              
+              <div className="text-center mt-8">
+                <Link href="/public/vereadores">
+                  <Button size="lg" className="text-white hover:opacity-90 transition-all duration-300"
+                          style={{backgroundColor: '#007825'}}>
+                    <Users className="mr-3" size={20} />
+                    Ver Todos os Vereadores
+                  </Button>
                 </Link>
-              ))}
+              </div>
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* Seção de Acesso Rápido */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Acesso Rápido
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Link href="/documentos">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-6">
-                <FileText size={40} className="mx-auto mb-4" style={{color: '#48654e'}} />
-                <h3 className="font-semibold text-lg mb-2">Documentos</h3>
-                <p className="text-gray-600 text-sm">Acesse leis, decretos e documentos oficiais</p>
-              </Card>
-            </Link>
             
-            <Link href="/comissoes">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-6">
-                <Users size={40} className="mx-auto mb-4" style={{color: '#48654e'}} />
-                <h3 className="font-semibold text-lg mb-2">Comissões</h3>
-                <p className="text-gray-600 text-sm">Conheça as comissões e seus membros</p>
-              </Card>
-            </Link>
-            
-            <Link href="/mesa-diretora">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-6">
-                <Building size={40} className="mx-auto mb-4" style={{color: '#48654e'}} />
-                <h3 className="font-semibold text-lg mb-2">Mesa Diretora</h3>
-                <p className="text-gray-600 text-sm">Veja a composição da Mesa Diretora</p>
-              </Card>
-            </Link>
-            
-            <Link href="/contato">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer text-center p-6">
-                <MapPin size={40} className="mx-auto mb-4" style={{color: '#48654e'}} />
-                <h3 className="font-semibold text-lg mb-2">Contato</h3>
-                <p className="text-gray-600 text-sm">Entre em contato conosco</p>
-              </Card>
-            </Link>
+            {/* Coluna da Direita - Atividades Legislativas (1/3 do espaço) */}
+            <div className="lg:col-span-1">
+              <h3 className="text-2xl font-bold mb-6" style={{color: '#48654e'}}>Últimas Atividades Legislativas</h3>
+              <LegislativeActivitiesWidget />
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Seção de Vídeos da Câmara Municipal */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{color: '#48654e'}}>
+              Vídeos da Câmara Municipal
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Acompanhe as sessões, eventos e atividades da Câmara Municipal de Jaíba
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Vídeo 1 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=aZNrMCohdRw', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/aZNrMCohdRw/maxresdefault.jpg"
+                  alt="10ª Reunião Ordinária"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/aZNrMCohdRw/hqdefault.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
+                  10ª Reunião Ordinária 02/06/2025
+                </h3>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Acompanhe a sessão ordinária com as principais deliberações e votações da Câmara Municipal.
+                </p>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Eye className="h-3 w-3 mr-1" />
+                  <span>Visualizações: 1.2k</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vídeo 2 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=hcESKWXjRdY', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/hcESKWXjRdY/maxresdefault.jpg"
+                  alt="Sessão Ordinária Janeiro"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/hcESKWXjRdY/hqdefault.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
+                  Sessão Ordinária - Janeiro 2025
+                </h3>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Acompanhe a sessão ordinária com as principais deliberações e votações da Câmara Municipal.
+                </p>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  <span>15 de Janeiro, 2025</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vídeo 3 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=RUL_vTIvUPQ', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/RUL_vTIvUPQ/maxresdefault.jpg"
+                  alt="Audiência Pública Orçamento"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/RUL_vTIvUPQ/hqdefault.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
+                  Audiência Pública - Orçamento
+                </h3>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Audiência pública para discussão do orçamento municipal e projetos prioritários da cidade.
+                </p>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Users className="h-3 w-3 mr-1" />
+                  <span>Participação Cidadã</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Vídeo 4 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=pwBTK7Xw00Q', '_blank')}>
+                <img 
+                  src="https://img.youtube.com/vi/pwBTK7Xw00Q/maxresdefault.jpg"
+                  alt="Cerimônia de Posse"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://img.youtube.com/vi/pwBTK7Xw00Q/hqdefault.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
+                  Cerimônia de Posse - 2025
+                </h3>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Cerimônia oficial de posse da nova legislatura da Câmara Municipal de Jaíba para o mandato 2025-2028.
+                </p>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Gavel className="h-3 w-3 mr-1" />
+                  <span>Evento Oficial</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Link para o canal completo */}
+          <div className="text-center">
+            <a 
+              href="https://www.youtube.com/@C%C3%A2maraMunicipaldeJa%C3%ADba" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center"
+            >
+              <Button size="lg" className="text-white hover:opacity-90 transition-all duration-300"
+                      style={{backgroundColor: '#48654e'}}>
+                <Youtube className="mr-3" size={20} />
+                Ver Canal Completo no YouTube
+                <ArrowRight className="ml-2" size={16} />
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção Central de Serviços */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{backgroundColor: '#48654e'}}>
+                  <Building className="h-6 w-6 text-white" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold" style={{color: '#2d3748'}}>
+                  Central de Serviços
+                </h2>
+              </div>
+            </div>
+            
+            <div className="flex justify-center space-x-8 mb-8">
+              <div className="text-center">
+                <span className="text-sm font-medium text-gray-600">Exibir:</span>
+              </div>
+              <div className="flex space-x-6">
+                <button 
+                  onClick={() => setActiveServiceTab('servicos')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'servicos' 
+                      ? 'text-blue-600 border-b-2 border-blue-600' 
+                      : 'text-gray-500 hover:text-blue-600'
+                  }`}
+                >
+                  Serviços
+                </button>
+                <button 
+                  onClick={() => setActiveServiceTab('acessoRapido')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'acessoRapido' 
+                      ? 'text-purple-600 border-b-2 border-purple-600' 
+                      : 'text-gray-500 hover:text-purple-600'
+                  }`}
+                >
+                  Acesso Rápido
+                </button>
+                <button 
+                  onClick={() => setActiveServiceTab('servidor')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'servidor' 
+                      ? 'text-yellow-600 border-b-2 border-yellow-600' 
+                      : 'text-gray-500 hover:text-yellow-600'
+                  }`}
+                >
+                  Servidor
+                </button>
+                <button 
+                  onClick={() => setActiveServiceTab('empresas')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'empresas' 
+                      ? 'text-blue-400 border-b-2 border-blue-400' 
+                      : 'text-gray-500 hover:text-blue-400'
+                  }`}
+                >
+                  Empresas
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {servicesData[activeServiceTab as keyof typeof servicesData].map((service, index) => {
+              const IconComponent = service.icon;
+              return (
+                <Card key={index} className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50 cursor-pointer">
+                  <div className="flex items-start space-x-4">
+                    <div className={`w-12 h-12 rounded-full ${service.color} flex items-center justify-center flex-shrink-0`}>
+                      <IconComponent className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 mb-1">
+                        {service.title}
+                      </h3>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+
+          <div className="text-center mt-12">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-2 hover:bg-gray-50 transition-all duration-300"
+              style={{borderColor: '#48654e', color: '#48654e'}}
+            >
+              <Building className="mr-3" size={20} />
+              Ver Todos os Serviços
+              <ArrowRight className="ml-2" size={16} />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+    
     </>
   );
 }
