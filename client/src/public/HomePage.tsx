@@ -699,7 +699,7 @@ export default function HomePage() {
                         className="w-full mb-8"
                       >
                         <CarouselContent>
-                          {news.slice(0, 3).map((item) => (
+                          {news.slice(0, 2).map((item) => (
                             <CarouselItem key={item.id}>
                               <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
                                 <img
@@ -736,7 +736,7 @@ export default function HomePage() {
                       
                       {/* Grid de notícias menores */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {news.slice(3, 5).map((item) => (
+                        {news.slice(2, 4).map((item) => (
                           <NewsCard
                             key={item.id}
                             id={item.id}
