@@ -270,7 +270,7 @@ interface NewsCardProps {
 }
 
 const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProps) => (
-  <Link href={`/public/noticias/${id}`}>
+  <Link href={`/noticias/${id}`}>
     <Card className="group cursor-pointer h-full hover:shadow-lg transition-all duration-300">
       <div className="relative">
         {imageUrl && (
@@ -437,41 +437,7 @@ const quickServices = [
   }
 ];
 
-// Notícias mockadas
-const mockNews = [
-  {
-    id: 1,
-    title: "Câmara aprova projeto que incentiva a reciclagem no município",
-    excerpt: "O projeto de lei que incentiva a reciclagem de resíduos sólidos foi aprovado por unanimidade na sessão de ontem. A nova legislação prevê benefícios fiscais para empresas que adotarem práticas sustentáveis.",
-    date: "10 de Maio de 2023",
-    imageUrl: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
-    category: "Meio Ambiente"
-  },
-  {
-    id: 2,
-    title: "Audiência pública discutirá mobilidade urbana na próxima semana",
-    excerpt: "Uma audiência pública para discutir o plano de mobilidade urbana será realizada na próxima semana. A população poderá enviar sugestões e participar ativamente das discussões sobre transporte público.",
-    date: "08 de Maio de 2023",
-    imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
-    category: "Urbanismo"
-  },
-  {
-    id: 3,
-    title: "Nova comissão para fiscalizar obras públicas é formada na Câmara",
-    excerpt: "Os vereadores formaram uma nova comissão especial para fiscalizar as obras públicas em andamento no município. O objetivo é garantir a qualidade dos serviços e a aplicação correta dos recursos.",
-    date: "05 de Maio de 2023",
-    imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
-    category: "Fiscalização"
-  },
-  {
-    id: 4,
-    title: "Programa de inclusão digital é aprovado e beneficiará escolas públicas",
-    excerpt: "O programa de inclusão digital que beneficiará escolas públicas do município foi aprovado. A iniciativa prevê a instalação de laboratórios de informática e acesso à internet de alta velocidade.",
-    date: "03 de Maio de 2023",
-    imageUrl: "https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
-    category: "Educação"
-  }
-];
+
 
 // Vereadores mockados
 const mockCouncilors = [
@@ -606,11 +572,12 @@ export default function HomePage() {
     enabled: true
   });
 
-  const { data: news = mockNews } = useQuery({
+  const { data: newsResponse, isLoading: newsLoading } = useQuery({
     queryKey: ['/api/public/news'],
-    enabled: false,
-    initialData: mockNews
+    enabled: true
   });
+  
+  const news = newsResponse?.articles || [];
 
   // Formatador de datas
   const formatDate = (dateString: string) => {
@@ -707,85 +674,87 @@ export default function HomePage() {
               <FileText className="mr-2" style={{color: '#48654e'}} />
               Notícias e Publicações
             </h2>
-            <Link href="/public/noticias">
-              <a className="hover:underline mt-2 sm:mt-0 flex items-center" style={{color: '#48654e'}}>
+            <Link href="/noticias">
+              <span className="hover:underline mt-2 sm:mt-0 flex items-center cursor-pointer" style={{color: '#48654e'}}>
                 Ver todas <ChevronRight size={16} />
-              </a>
+              </span>
             </Link>
           </div>
           
-          {/* Seção de notícias sem filtros */}
+          {/* Seção de notícias do banco de dados */}
           <div className="grid grid-cols-4 gap-4">
             {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
             <div className="lg:col-span-2">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                 <div className="p-6">                
-                      
-                  {/* Destaque principal com carrossel */}
-                  <Carousel
-                    opts={{ loop: true }}
-                    className="w-full mb-8"
-                  >
-                    <CarouselContent>
-                      {news.slice(0, 3).map((item) => (
-                        <CarouselItem key={item.id}>
-                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
-                            <img
-                              src={item.imageUrl} 
-                              alt={item.title}
-                              className="h-full w-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
-                              <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#48654e'}}>
-                                {item.category}
-                              </Badge>
-                              <h3 className="text-white text-xl font-bold mb-2 line-clamp-2">
-                                {item.title}
-                              </h3>
-                              <p className="text-gray-200 text-sm line-clamp-2 mb-3">
-                                {item.excerpt}
-                              </p>
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-300 text-xs">{formatDate(item.date)}</span>
-                                <Button size="sm" variant="secondary" className="text-xs">
-                                  Ler mais
-                                </Button>
+                  {newsLoading ? (
+                    <div className="flex justify-center items-center py-16">
+                      <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
+                    </div>
+                  ) : news.length > 0 ? (
+                    <>
+                      {/* Destaque principal com carrossel */}
+                      <Carousel
+                        opts={{ loop: true }}
+                        className="w-full mb-8"
+                      >
+                        <CarouselContent>
+                          {news.slice(0, 3).map((item) => (
+                            <CarouselItem key={item.id}>
+                              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
+                                <img
+                                  src={item.coverImage || item.imageUrl || '/api/placeholder/400/300'} 
+                                  alt={item.title}
+                                  className="h-full w-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+                                  <Badge className="self-start mb-3 text-xs" style={{backgroundColor: '#48654e'}}>
+                                    {item.category?.name || item.category || 'Notícia'}
+                                  </Badge>
+                                  <h3 className="text-white text-xl font-bold mb-2 line-clamp-2">
+                                    {item.title}
+                                  </h3>
+                                  <p className="text-gray-200 text-sm line-clamp-2 mb-3">
+                                    {item.excerpt || item.content?.slice(0, 150) + '...'}
+                                  </p>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-gray-300 text-xs">{formatDate(item.createdAt || item.date)}</span>
+                                    <Link href={`/noticias/${item.id}`}>
+                                      <Button size="sm" variant="secondary" className="text-xs">
+                                        Ler mais
+                                      </Button>
+                                    </Link>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          </div>
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </Carousel>
-                  
-                  {/* Grid de notícias menores */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    {news.slice(3, 7).map((item) => (
-                      <NewsCard
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        excerpt={item.excerpt}
-                        date={formatDate(item.date)}
-                        imageUrl={item.imageUrl}
-                        category={item.category}
-                      />
-                    ))}
-
-                    {news.slice(2, 7).map((item) => (
-                      <NewsCard
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        excerpt={item.excerpt}
-                        date={formatDate(item.date)}
-                        imageUrl={item.imageUrl}
-                        category={item.category}
-                      />
-                    ))}
-                  </div>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        <CarouselPrevious />
+                        <CarouselNext />
+                      </Carousel>
+                      
+                      {/* Grid de notícias menores */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {news.slice(3, 7).map((item) => (
+                          <NewsCard
+                            key={item.id}
+                            id={item.id}
+                            title={item.title}
+                            excerpt={item.excerpt || item.content?.slice(0, 100) + '...'}
+                            date={formatDate(item.createdAt || item.date)}
+                            imageUrl={item.coverImage || item.imageUrl}
+                            category={item.category?.name || item.category || 'Notícia'}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-16 text-gray-500">
+                      <Newspaper className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+                      <p className="text-lg">Nenhuma notícia encontrada</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
