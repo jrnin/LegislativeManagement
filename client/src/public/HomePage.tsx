@@ -202,30 +202,62 @@ interface QuickServiceCardProps {
   description: string;
   icon: React.ElementType;
   href: string;
+  external?: boolean;
 }
 
-const QuickServiceCard = ({ title, description, icon: Icon, href }: QuickServiceCardProps) => (
-  <Link href={href}>
-    <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-95 border-0 bg-white/80 backdrop-blur-sm">
-      <CardContent className="p-6">
-        <div className="flex items-start space-x-4">
-          <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#007825'}}>
-            <Icon size={24} style={{color: '#e4e6da'}} />
+const QuickServiceCard = ({ title, description, icon: Icon, href, external = false }: QuickServiceCardProps) => {
+  const handleClick = () => {
+    if (external) {
+      window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  if (external) {
+    return (
+      <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-95 border-0 bg-white/80 backdrop-blur-sm" onClick={handleClick}>
+        <CardContent className="p-6">
+          <div className="flex items-start space-x-4">
+            <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#007825'}}>
+              <Icon size={24} style={{color: '#e4e6da'}} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#253529'}}>
+                {title}
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {description}
+              </p>
+            </div>
+            <ChevronRight size={20} className="text-gray-400 group-hover:text-green-600 transition-colors" />
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#253529'}}>
-              {title}
-            </h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              {description}
-            </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Link href={href}>
+      <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-95 border-0 bg-white/80 backdrop-blur-sm">
+        <CardContent className="p-6">
+          <div className="flex items-start space-x-4">
+            <div className="p-3 rounded-lg transition-colors" style={{backgroundColor: '#007825'}}>
+              <Icon size={24} style={{color: '#e4e6da'}} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{color: '#253529'}}>
+                {title}
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {description}
+              </p>
+            </div>
+            <ChevronRight size={20} className="text-gray-400 group-hover:text-green-600 transition-colors" />
           </div>
-          <ChevronRight size={20} className="text-gray-400 group-hover:text-green-600 transition-colors" />
-        </div>
-      </CardContent>
-    </Card>
-  </Link>
-);
+        </CardContent>
+      </Card>
+    </Link>
+  );
+};
 
 // Interface para NewsCard
 interface NewsCardProps {
@@ -355,7 +387,8 @@ const quickServices = [
     title: "Transparência",
     description: "Acesse informações sobre orçamento, despesas e receitas",
     icon: PieChart,
-    href: "https://cmjaiba.cidadesmg.com.br/portaltransparencia/index.xhtml"
+    href: "http://cidadesmg.com.br/portaltransparencia/faces/user/licitacao.xhtml?Param=CamJaiba",
+    external: true
   },
   {
     title: "Atividades Legislativas",
@@ -651,6 +684,7 @@ export default function HomePage() {
                 description={service.description}
                 icon={service.icon}
                 href={service.href}
+                external={service.external}
               />
             ))}
           </div>
