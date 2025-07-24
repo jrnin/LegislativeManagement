@@ -1132,18 +1132,19 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Vídeo 1 */}
-            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white border-0 shadow-lg">
+            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg" 
+                  style={{background: 'linear-gradient(135deg, #48654e 0%, #5a7a60 50%, #6b8f72 100%)'}}>
               <div className="relative aspect-video cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=aZNrMCohdRw', '_blank')}>
                 <img 
                   src="https://img.youtube.com/vi/aZNrMCohdRw/maxresdefault.jpg"
                   alt="10ª Reunião Ordinária"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-t-lg"
                   onError={(e) => {
                     e.currentTarget.src = "https://img.youtube.com/vi/aZNrMCohdRw/hqdefault.jpg";
                   }}
                 />
-                {/* Overlay verde da Câmara */}
-                <div className="absolute top-4 left-4 px-3 py-1 rounded-md text-white text-xs font-medium" style={{backgroundColor: '#48654e'}}>
+                {/* Overlay branco da Câmara */}
+                <div className="absolute top-4 left-4 px-3 py-1 rounded-md bg-white/90 text-xs font-bold" style={{color: '#48654e'}}>
                   CÂMARA MUNICIPAL DE JAÍBA
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/40 transition-all duration-300 flex items-center justify-center">
@@ -1154,19 +1155,19 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <CardContent className="p-4" style={{backgroundColor: '#f8faf9'}}>
-                <h3 className="font-bold text-base mb-2" style={{color: '#48654e'}}>
+              <CardContent className="p-4 bg-white/95">
+                <h3 className="font-bold text-base mb-2 text-white">
                   10ª Reunião Ordinária 02/06/2025
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                <p className="text-white/80 text-sm mb-3 line-clamp-2">
                   Acompanhe a sessão ordinária com as principais deliberações e votações da Câmara Municipal.
                 </p>
                 <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center text-gray-500">
+                  <div className="flex items-center text-white/70">
                     <Eye className="h-3 w-3 mr-1" />
                     <span>1.2k visualizações</span>
                   </div>
-                  <div className="flex items-center text-green-600">
+                  <div className="flex items-center text-white">
                     <Calendar className="h-3 w-3 mr-1" />
                     <span>02/06/2025</span>
                   </div>
@@ -1175,17 +1176,18 @@ export default function HomePage() {
             </Card>
 
             {/* Vídeo 2 */}
-            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white border-0 shadow-lg">
+            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg" 
+                  style={{background: 'linear-gradient(135deg, #48654e 0%, #5a7a60 50%, #6b8f72 100%)'}}>
               <div className="relative aspect-video cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=hcESKWXjRdY', '_blank')}>
                 <img 
                   src="https://img.youtube.com/vi/hcESKWXjRdY/maxresdefault.jpg"
                   alt="Sessão Ordinária Janeiro"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-t-lg"
                   onError={(e) => {
                     e.currentTarget.src = "https://img.youtube.com/vi/hcESKWXjRdY/hqdefault.jpg";
                   }}
                 />
-                <div className="absolute top-4 left-4 px-3 py-1 rounded-md text-white text-xs font-medium" style={{backgroundColor: '#48654e'}}>
+                <div className="absolute top-4 left-4 px-3 py-1 rounded-md bg-white/90 text-xs font-bold" style={{color: '#48654e'}}>
                   CÂMARA MUNICIPAL DE JAÍBA
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/40 transition-all duration-300 flex items-center justify-center">
@@ -1196,19 +1198,19 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <CardContent className="p-4" style={{backgroundColor: '#f8faf9'}}>
-                <h3 className="font-bold text-base mb-2" style={{color: '#48654e'}}>
+              <CardContent className="p-4 bg-white/95">
+                <h3 className="font-bold text-base mb-2 text-white">
                   Sessão Ordinária - Janeiro 2025
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                <p className="text-white/80 text-sm mb-3 line-clamp-2">
                   Acompanhe a sessão ordinária com as principais deliberações e votações da Câmara Municipal.
                 </p>
                 <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center text-gray-500">
+                  <div className="flex items-center text-white/70">
                     <Eye className="h-3 w-3 mr-1" />
                     <span>890 visualizações</span>
                   </div>
-                  <div className="flex items-center text-green-600">
+                  <div className="flex items-center text-white">
                     <Calendar className="h-3 w-3 mr-1" />
                     <span>15/01/2025</span>
                   </div>
@@ -1217,17 +1219,18 @@ export default function HomePage() {
             </Card>
 
             {/* Vídeo 3 */}
-            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white border-0 shadow-lg">
+            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg" 
+                  style={{background: 'linear-gradient(135deg, #48654e 0%, #5a7a60 50%, #6b8f72 100%)'}}>
               <div className="relative aspect-video cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=RUL_vTIvUPQ', '_blank')}>
                 <img 
                   src="https://img.youtube.com/vi/RUL_vTIvUPQ/maxresdefault.jpg"
                   alt="Audiência Pública Orçamento"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-t-lg"
                   onError={(e) => {
                     e.currentTarget.src = "https://img.youtube.com/vi/RUL_vTIvUPQ/hqdefault.jpg";
                   }}
                 />
-                <div className="absolute top-4 left-4 px-3 py-1 rounded-md text-white text-xs font-medium" style={{backgroundColor: '#48654e'}}>
+                <div className="absolute top-4 left-4 px-3 py-1 rounded-md bg-white/90 text-xs font-bold" style={{color: '#48654e'}}>
                   CÂMARA MUNICIPAL DE JAÍBA
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/40 transition-all duration-300 flex items-center justify-center">
@@ -1238,19 +1241,19 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <CardContent className="p-4" style={{backgroundColor: '#f8faf9'}}>
-                <h3 className="font-bold text-base mb-2" style={{color: '#48654e'}}>
+              <CardContent className="p-4 bg-white/95">
+                <h3 className="font-bold text-base mb-2 text-white">
                   Audiência Pública - Orçamento
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                <p className="text-white/80 text-sm mb-3 line-clamp-2">
                   Audiência pública para discussão do orçamento municipal e projetos prioritários da cidade.
                 </p>
                 <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center text-gray-500">
+                  <div className="flex items-center text-white/70">
                     <Eye className="h-3 w-3 mr-1" />
                     <span>654 visualizações</span>
                   </div>
-                  <div className="flex items-center text-green-600">
+                  <div className="flex items-center text-white">
                     <Users className="h-3 w-3 mr-1" />
                     <span>Participação Cidadã</span>
                   </div>
@@ -1259,17 +1262,18 @@ export default function HomePage() {
             </Card>
 
             {/* Vídeo 4 */}
-            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white border-0 shadow-lg">
+            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg" 
+                  style={{background: 'linear-gradient(135deg, #48654e 0%, #5a7a60 50%, #6b8f72 100%)'}}>
               <div className="relative aspect-video cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=pwBTK7Xw00Q', '_blank')}>
                 <img 
                   src="https://img.youtube.com/vi/pwBTK7Xw00Q/maxresdefault.jpg"
                   alt="Cerimônia de Posse"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-t-lg"
                   onError={(e) => {
                     e.currentTarget.src = "https://img.youtube.com/vi/pwBTK7Xw00Q/hqdefault.jpg";
                   }}
                 />
-                <div className="absolute top-4 left-4 px-3 py-1 rounded-md text-white text-xs font-medium" style={{backgroundColor: '#48654e'}}>
+                <div className="absolute top-4 left-4 px-3 py-1 rounded-md bg-white/90 text-xs font-bold" style={{color: '#48654e'}}>
                   CÂMARA MUNICIPAL DE JAÍBA
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:from-black/40 transition-all duration-300 flex items-center justify-center">
@@ -1280,19 +1284,19 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <CardContent className="p-4" style={{backgroundColor: '#f8faf9'}}>
-                <h3 className="font-bold text-base mb-2" style={{color: '#48654e'}}>
+              <CardContent className="p-4 bg-white/95">
+                <h3 className="font-bold text-base mb-2 text-white">
                   Cerimônia de Posse - 2025
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                <p className="text-white/80 text-sm mb-3 line-clamp-2">
                   Cerimônia oficial de posse da nova legislatura da Câmara Municipal de Jaíba para o mandato 2025-2028.
                 </p>
                 <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center text-gray-500">
+                  <div className="flex items-center text-white/70">
                     <Eye className="h-3 w-3 mr-1" />
                     <span>2.1k visualizações</span>
                   </div>
-                  <div className="flex items-center text-green-600">
+                  <div className="flex items-center text-white">
                     <Gavel className="h-3 w-3 mr-1" />
                     <span>Evento Oficial</span>
                   </div>
