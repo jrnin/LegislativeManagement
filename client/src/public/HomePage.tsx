@@ -387,7 +387,7 @@ const quickServices = [
     title: "Transparência",
     description: "Acesse informações sobre orçamento, despesas e receitas",
     icon: PieChart,
-    href: "http://cidadesmg.com.br/portaltransparencia/faces/user/licitacao.xhtml?Param=CamJaiba",
+    href: "https://cmjaiba.cidadesmg.com.br/portaltransparencia/index.xhtml",
     external: true
   },
   {
@@ -409,10 +409,11 @@ const quickServices = [
     href: "/public/documentos"
   },
   {
-    title: "Legislação",
+    title: "Estrutura Organizacional",
     description: "Consulte leis, decretos, portarias e toda a legislação municipal",
     icon: Gavel,
-    href: "/public/legislacao"
+    href: "https://cmjaiba.cidadesmg.com.br/portaltransparencia/publica/estruturaOrganizacional/estruturaOrganizacional.xhtml",
+      external: true,
   },
   {
     title: "Licitações",
@@ -425,7 +426,8 @@ const quickServices = [
     title: "Recursos Humanos",
     description: "Dados orçamentários, despesas, receitas e relatórios fiscais",
     icon: PieChart,
-    href: "/public/transparencia"
+    href: "https://cmjaiba.cidadesmg.com.br/portaltransparencia/publica/recursosHumanos/recursosHumanos.xhtml",
+      external: true,
   },
   {
     title: "Audiências",
@@ -660,14 +662,18 @@ export default function HomePage() {
               Transparência, participação e democracia ao alcance de todos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-green-700 hover:bg-gray-100 ">
-                <Users className="mr-2" />
-                Conheça os Vereadores
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-green-700 hover:bg-white hover:text-green-700">
-                <FileText className="mr-2" />
-                Documentos Públicos
-              </Button>
+              <Link href="/vereadores">
+                <Button size="lg" className="bg-white text-green-700 hover:bg-gray-100 ">
+                  <Users className="mr-2" />
+                  Conheça os Vereadores
+                </Button>
+              </Link>
+              <Link href="/documentos">
+                <Button size="lg" variant="outline" className="border-white text-green-700 hover:bg-white hover:text-green-700">
+                  <FileText className="mr-2" />
+                  Documentos Públicos
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
