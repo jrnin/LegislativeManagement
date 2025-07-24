@@ -736,7 +736,7 @@ export default function HomePage() {
                       
                       {/* Grid de notícias menores */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {news.slice(3, 7).map((item) => (
+                        {news.slice(3, 5).map((item) => (
                           <NewsCard
                             key={item.id}
                             id={item.id}
