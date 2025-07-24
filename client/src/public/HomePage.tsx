@@ -355,7 +355,7 @@ const quickServices = [
     title: "Transparência",
     description: "Acesse informações sobre orçamento, despesas e receitas",
     icon: PieChart,
-    href: "/public/transparencia"
+    href: "https://cmjaiba.cidadesmg.com.br/portaltransparencia/index.xhtml"
   },
   {
     title: "Atividades Legislativas",
@@ -385,7 +385,8 @@ const quickServices = [
     title: "Licitações",
     description: "Informações sobre processos licitatórios, contratos e convênios",
     icon: FileSearch,
-    href: "/public/licitacoes"
+    href: "https://cmjaiba.cidadesmg.com.br/portaltransparencia/index.xhtml?pagina=Licita%C3%A7%C3%B5es,%20Contrata%C3%A7%C3%B5es%20e%20Compras",
+    external: true,
   },
   {
     title: "Recursos Humanos",
@@ -614,14 +615,27 @@ export default function HomePage() {
               allowFullScreen
             />
           </div>
-        </div>        
-                
-              
-        <div className="container mx-auto px-4 relative z-20">
-          <div className="text-center text-white max-w-4xl mx-auto">
-          
+        </div>
+
+        {/* Overlay escuro para melhorar legibilidade do texto */}
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center text-white">
             
-        
+            <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
+              Transparência, participação e democracia ao alcance de todos.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-white text-green-700 hover:bg-gray-100 ">
+                <Users className="mr-2" />
+                Conheça os Vereadores
+              </Button>
+              <Button size="lg" variant="outline" className="border-white text-green-700 hover:bg-white hover:text-green-700">
+                <FileText className="mr-2" />
+                Documentos Públicos
+              </Button>
+            </div>
           </div>
         </div>
       </section>

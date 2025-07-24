@@ -113,8 +113,14 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
   // Links do menu principal
   const mainMenuLinks = [
     { name: 'Início', href: '/' },
-    { name: 'Vereadores', href: '/vereadores' },
-    { name: 'Mesa Diretora', href: '/mesa-diretora' },
+    { name: 'Vereadores',
+     href: '/vereadores',
+    submenu: [
+      { name: 'Mesa Diretora', href: '/mesa-diretora' },
+      { name: 'Comissões', href: '/comissoes'},
+      { name: 'Vereadores', href: '/vereadores?tipo=Vereador' }
+    ]},
+    { name: 'Documentos Administrativos', href: '/documentos' },
     { name: 
       'Atividades Legislativas',
       href: '/atividades',
@@ -372,15 +378,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 ))}
                 
                 <div className="ml-2">
-                  <Button 
-                    variant={location === '/public' && !isScrolled ? "secondary" : "outline"} 
-                    size="sm"
-                    className="text-white hover:opacity-100 rounded-[10px]"
-                    style={{backgroundColor: '#48654e', borderColor: '#48654e'}}
-                    onClick={() => window.location.href = "/login"}
-                  >
-                    Área Restrita
-                  </Button>
+                  
                 </div>
               </nav>
 
