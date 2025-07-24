@@ -512,52 +512,128 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className={`w-full py-8 px-4 mt-8 ${isDarkMode ? 'bg-slate-800 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Sobre o Portal</h3>
-              <p className="text-sm">
-                O Portal Público do Sistema Legislativo é um canal de comunicação entre a Câmara Municipal e os cidadãos, oferecendo acesso a informações sobre as atividades legislativas, documentos oficiais e serviços.
-              </p>
+      <footer className="w-full mt-8" style={{backgroundColor: '#1a3e1f'}}>
+        {/* Header do Footer com ícone, redes sociais e botões */}
+        <div className="w-full py-4 px-6 border-b border-green-700/30">
+          <div className="container mx-auto flex flex-wrap justify-between items-center">
+            {/* Logo/Ícone da Câmara */}
+            <div className="flex items-center space-x-3">
+              <img 
+                src={logoPath} 
+                alt="Câmara Municipal de Jaíba" 
+                className="h-12 w-12 object-contain filter brightness-0 invert"
+              />
+              <div className="hidden sm:block">
+                <h3 className="text-white font-bold text-lg">Câmara Municipal de Jaíba</h3>
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Links Úteis</h3>
-              <ul className="space-y-2 text-sm">
-                {mainMenuLinks.map((link) => (
-                  <li key={link.href}>
-                    <Link href={link.href}>
-                      <span className="hover:underline cursor-pointer">{link.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Contato</h3>
-              <address className="not-italic text-sm">
-                <p>Rua da Câmara, 123 - Centro</p>
-                <p>CEP: 12345-678</p>
-                <p>Telefone: (11) 2222-3333</p>
-                <p>Email: contato@sistemalegislativo.gov.br</p>
-              </address>
+
+            {/* Redes Sociais */}
+            <div className="flex items-center space-x-3">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
+                 className="text-white hover:text-green-300 transition-colors" aria-label="Facebook">
+                <Facebook size={20} />
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" 
+                 className="text-white hover:text-green-300 transition-colors" aria-label="YouTube">
+                <Youtube size={20} />
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" 
+                 className="text-white hover:text-green-300 transition-colors" aria-label="Instagram">
+                <Instagram size={20} />
+              </a>
+              <span className="text-white font-medium mx-4">Portal da Transparência</span>
+              
+              {/* Botões de Acesso */}
+              <div className="flex space-x-2">
+                <Button 
+                  size="sm" 
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm"
+                  onClick={() => window.open('https://cmjaiba.cidadesmg.com.br/webmail', '_blank')}
+                >
+                  Acessar Webmail
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm"
+                  onClick={() => window.open('/contato', '_self')}
+                >
+                  Ouvidoria
+                </Button>
+              </div>
             </div>
           </div>
-          <div className="border-t mt-8 pt-6 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} Sistema Legislativo. Todos os direitos reservados.</p>
-            <p className="mt-2">
-              <Link href="/public/privacidade">
-                <span className="hover:underline cursor-pointer">Política de Privacidade</span>
-              </Link>
-              {" | "}
-              <Link href="/public/acessibilidade">
-                <span className="hover:underline cursor-pointer">Acessibilidade</span>
-              </Link>
-              {" | "}
-              <Link href="/public/mapa-do-site">
-                <span className="hover:underline cursor-pointer">Mapa do Site</span>
-              </Link>
-            </p>
+        </div>
+
+        {/* Conteúdo Principal do Footer */}
+        <div className="w-full py-8 px-6">
+          <div className="container mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              
+              {/* Telefone */}
+              <div className="bg-green-800/30 rounded-lg p-4">
+                <h4 className="text-white font-semibold text-sm mb-2">Telefone</h4>
+                <p className="text-white text-xl font-bold">(38) 3548-1000</p>
+              </div>
+
+              {/* Horário de Atendimento */}
+              <div className="bg-green-800/30 rounded-lg p-4">
+                <h4 className="text-white font-semibold text-sm mb-2">Horário de atendimento</h4>
+                <p className="text-white text-xl font-bold">07h às 13h</p>
+              </div>
+
+              {/* A Câmara */}
+              <div>
+                <h4 className="text-white font-semibold text-sm mb-4">A Câmara</h4>
+                <ul className="space-y-2">
+                  <li><Link href="/vereadores"><span className="text-white text-sm hover:text-green-300 cursor-pointer">Vereadores</span></Link></li>
+                  <li><Link href="/mesa-diretora"><span className="text-white text-sm hover:text-green-300 cursor-pointer">Mesa Diretora</span></Link></li>
+                  <li><Link href="/comissoes"><span className="text-white text-sm hover:text-green-300 cursor-pointer">Comissões</span></Link></li>
+                </ul>
+              </div>
+
+              {/* Legislação */}
+              <div>
+                <h4 className="text-white font-semibold text-sm mb-4">Legislação</h4>
+                <ul className="space-y-2">
+                  <li><Link href="/atividades"><span className="text-white text-sm hover:text-green-300 cursor-pointer">Atividades Legislativas</span></Link></li>
+                  <li><Link href="/documentos"><span className="text-white text-sm hover:text-green-300 cursor-pointer">Documentos</span></Link></li>
+                  <li><Link href="/noticias"><span className="text-white text-sm hover:text-green-300 cursor-pointer">Notícias</span></Link></li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Endereço */}
+            <div className="mt-6">
+              <div className="bg-green-800/30 rounded-lg p-4">
+                <h4 className="text-white font-semibold text-sm mb-2">Endereço</h4>
+                <p className="text-white text-lg font-medium">Avenida Pará, Nº 359-E, Bairro Cidade Nova, CEP 78.462-141</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Rodapé Final */}
+        <div className="w-full py-4 px-6 border-t border-green-700/30">
+          <div className="container mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-white text-sm">&copy; 2025 - Câmara Municipal de Jaíba - MG - Todos os direitos reservados</p>
+              <div className="flex items-center space-x-4 mt-2 md:mt-0">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
+                   className="text-white hover:text-green-300 transition-colors" aria-label="Facebook">
+                  <Facebook size={16} />
+                </a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" 
+                   className="text-white hover:text-green-300 transition-colors" aria-label="YouTube">
+                  <Youtube size={16} />
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" 
+                   className="text-white hover:text-green-300 transition-colors" aria-label="Instagram">
+                  <Instagram size={16} />
+                </a>
+                <span className="text-white text-xs">desenvolvido por Replit</span>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
