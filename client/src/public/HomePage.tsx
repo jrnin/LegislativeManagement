@@ -695,7 +695,11 @@ export default function HomePage() {
                     <>
                       {/* Destaque principal com carrossel */}
                       <Carousel
-                        opts={{ loop: true }}
+                        opts={{ 
+                          loop: true,
+                          autoplay: true,
+                          autoplayDelay: 5000
+                        }}
                         className="w-full mb-8"
                       >
                         <CarouselContent>
