@@ -110,6 +110,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 24, 2025**: Updated Homepage News Section Layout - USER INTERFACE OPTIMIZATION
+  - **News Distribution Update**: Modified homepage news layout to display 2 articles in carousel and 2 in grid section
+  - **Carrossel Principal**: Updated to show 2 main news articles (.slice(0, 2)) instead of 3
+  - **Grid de Notícias Menores**: Now displays exactly 2 news articles (.slice(2, 4)) as requested by user
+  - **Database Integration**: Confirmed working with real news data from /api/public/news endpoint
+  - **Field Mapping**: Updated to use correct database fields (coverImage, category.name, createdAt, content)
+  - **Navigation Links**: All news links properly direct to /noticias/{id} route for individual article pages
+  - **Loading States**: Implemented loading spinner and empty state handling for better user experience
+  - **Status**: Homepage news section fully functional with optimized 2+2 article distribution layout
+
 - **July 18, 2025**: Implemented Individual News Pages with Social Sharing - MAJOR PUBLIC INTERFACE ENHANCEMENT
   - **Individual News Pages**: Created dedicated pages for each news article at `/noticias/{id}` route with complete article information
   - **Social Media Sharing**: Implemented sharing buttons for Facebook, Twitter, LinkedIn, and WhatsApp with proper URL encoding
