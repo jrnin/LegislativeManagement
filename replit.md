@@ -110,6 +110,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 27, 2025**: Implemented Real-time Weather Integration for Jaíba/MG - MAJOR UTILITY ENHANCEMENT
+  - **Weather API Integration**: Successfully integrated Open-Meteo API for real-time weather data from Jaíba/MG
+  - **Coordinates Configuration**: Configured accurate coordinates (Latitude -15.3372, Longitude -43.6719) for Jaíba city
+  - **Backend Weather Service**: Created comprehensive weather endpoints `/api/weather/current` and `/api/weather/forecast`
+  - **WeatherWidget Component**: Developed reusable weather widget with compact and detailed variants
+  - **Navigation Bar Integration**: Added weather display in top navigation showing current temperature and conditions
+  - **Homepage Integration**: Replaced video content with detailed weather widget showing comprehensive climate information
+  - **Automatic Updates**: Implemented 10-minute refresh intervals for current weather data across the system
+  - **Visual Enhancements**: Added weather icons, temperature display, humidity, wind speed, and atmospheric conditions
+  - **User Experience**: Real-time weather information provides practical value to citizens and visitors
+  - **Performance Optimization**: Weather data cached efficiently with proper stale time management
+  - **Status**: Complete weather integration fully operational with real temperature readings (26°C confirmed)
+
 - **July 24, 2025**: Updated Homepage News Section Layout - USER INTERFACE OPTIMIZATION
   - **News Distribution Update**: Modified homepage news layout to display 2 articles in carousel and 2 in grid section
   - **Carrossel Principal**: Updated to show 2 main news articles (.slice(0, 2)) instead of 3
