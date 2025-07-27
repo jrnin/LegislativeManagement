@@ -60,6 +60,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import WeatherWidget from "@/components/WeatherWidget";
 
 // Função auxiliar para obter iniciais
 const getInitials = (name: string) => {
@@ -1229,38 +1230,8 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Vídeo 4 */}
-            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=pwBTK7Xw00Q', '_blank')}>
-                <img 
-                  src="https://img.youtube.com/vi/pwBTK7Xw00Q/maxresdefault.jpg"
-                  alt="Cerimônia de Posse"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = "https://img.youtube.com/vi/pwBTK7Xw00Q/hqdefault.jpg";
-                  }}
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
-                  Cerimônia de Posse - 2025
-                </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  Cerimônia oficial de posse da nova legislatura da Câmara Municipal de Jaíba para o mandato 2025-2028.
-                </p>
-                <div className="flex items-center text-xs text-gray-500">
-                  <Gavel className="h-3 w-3 mr-1" />
-                  <span>Evento Oficial</span>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Widget Meteorológico */}
+            <WeatherWidget variant="detailed" className="h-full" />
           </div>
 
           {/* Link para o canal completo */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Helmet } from 'react-helmet';
 import logoPath from '@assets/logo.png';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Search, 
   Menu, 
@@ -17,6 +18,7 @@ import {
   Cloud,
   CloudRain,
   CloudSun,
+  Snowflake,
   Volume2,
   VolumeX
 } from 'lucide-react';
@@ -44,13 +46,29 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState(16);
-  const [weather] = useState({
-    temp: 27,
-    condition: 'Parcialmente nublado',
-    icon: CloudSun
-  });
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+
+  // Buscar dados meteorológicos da API
+  const { data: weather } = useQuery({
+    queryKey: ['/api/weather/current'],
+    refetchInterval: 10 * 60 * 1000, // Atualizar a cada 10 minutos
+    staleTime: 5 * 60 * 1000, // Considerar stale após 5 minutos
+  });
+
+  // Mapear ícones do clima para componentes Lucide
+  const getWeatherIcon = (iconName: string) => {
+    const iconMap: { [key: string]: any } = {
+      'sun': Sun,
+      'cloud-sun': CloudSun,
+      'cloud': Cloud,
+      'cloud-drizzle': CloudRain,
+      'cloud-rain': CloudRain,
+      'snowflake': Snowflake,
+      'zap': Zap
+    };
+    return iconMap[iconName] || Cloud;
+  };
   
   // Detectar quando o usuário rola a página para aplicar o efeito do menu fixo
   useEffect(() => {
@@ -244,9 +262,19 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
           <div className="flex items-center space-x-4 mt-2 sm:mt-0">
             <div className="flex items-center space-x-2">
-              <weather.icon size={16} />
-              <span>{weather.temp}°C</span>
-              <span className="hidden sm:inline">{weather.condition}</span>
+              {weather ? (
+                <>
+                  {React.createElement(getWeatherIcon(weather.icon), { size: 16 })}
+                  <span>{weather.temperature}°C</span>
+                  <span className="hidden sm:inline">{weather.weatherDescription}</span>
+                </>
+              ) : (
+                <>
+                  <Cloud size={16} />
+                  <span>--°C</span>
+                  <span className="hidden sm:inline">Carregando...</span>
+                </>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
@@ -517,14 +545,9 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         <div className="w-full py-4 px-6 border-b border-green-700/30">
           <div className="container mx-auto flex flex-wrap justify-between items-center">
             {/* Logo/Ícone da Câmara */}
-            <div className="flex items-center space-x-3">
-              <img 
-                src={logoPath} 
-                alt="Câmara Municipal de Jaíba" 
-                className="h-12 w-12 object-contain filter brightness-0 invert"
-              />
+            <div className="flex items-center space-x-3">              
               <div className="hidden sm:block">
-                <h3 className="text-white font-bold text-lg">Câmara Municipal de Jaíba</h3>
+                <h3 className="text-white font-bold text-lg">Poder Legislativo</h3>
               </div>
             </div>
 
@@ -573,7 +596,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               {/* Telefone */}
               <div className="bg-green-800/30 rounded-lg p-4">
                 <h4 className="text-white font-semibold text-sm mb-2">Telefone</h4>
-                <p className="text-white text-xl font-bold">(38) 3548-1000</p>
+                <p className="text-white text-xl font-bold">(38) 3833-1492</p>
               </div>
 
               {/* Horário de Atendimento */}
@@ -607,7 +630,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             <div className="mt-6">
               <div className="bg-green-800/30 rounded-lg p-4">
                 <h4 className="text-white font-semibold text-sm mb-2">Endereço</h4>
-                <p className="text-white text-lg font-medium">Avenida Pará, Nº 359-E, Bairro Cidade Nova, CEP 78.462-141</p>
+                <p className="text-white text-lg font-medium">Rua Amândio José de Carvalho, nº 371, Centro</p>
               </div>
             </div>
           </div>
@@ -617,7 +640,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         <div className="w-full py-4 px-6 border-t border-green-700/30">
           <div className="container mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-white text-sm">&copy; 2025 - Câmara Municipal de Jaíba - MG - Todos os direitos reservados</p>
+              <p className="text-white text-sm">&copy; 2025 - Câmara Municipal de Jaíba - Todos os direitos reservados</p>
               <div className="flex items-center space-x-4 mt-2 md:mt-0">
                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
                    className="text-white hover:text-green-300 transition-colors" aria-label="Facebook">
@@ -631,7 +654,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                    className="text-white hover:text-green-300 transition-colors" aria-label="Instagram">
                   <Instagram size={16} />
                 </a>
-                <span className="text-white text-xs">desenvolvido por Replit</span>
+                <span className="text-white text-xs">HubPúblico</span>
               </div>
             </div>
           </div>

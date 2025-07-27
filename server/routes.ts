@@ -12,6 +12,7 @@ import path from "path";
 import bcrypt from "bcryptjs";
 import { format } from "date-fns";
 import { WebSocketServer, WebSocket } from 'ws';
+import { getCurrentWeather, getWeatherForecast, getCachedWeather } from './weather';
 import { 
   committees,
   committeeMembers, 
@@ -4925,6 +4926,54 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     } catch (error) {
       console.error('Error fetching current board:', error);
       res.status(500).json({ error: 'Erro ao buscar Mesa Diretora' });
+    }
+  });
+
+  // WEATHER API ROUTES
+  
+  // Get current weather for Jaíba/MG
+  app.get('/api/weather/current', async (req, res) => {
+    try {
+      const weather = await getCachedWeather();
+      
+      if (!weather) {
+        return res.status(503).json({ 
+          error: 'Dados meteorológicos indisponíveis no momento',
+          fallback: {
+            temperature: 25,
+            weatherDescription: 'Informação indisponível',
+            icon: 'cloud'
+          }
+        });
+      }
+      
+      res.json(weather);
+    } catch (error) {
+      console.error('Error fetching current weather:', error);
+      res.status(500).json({ 
+        error: 'Erro ao buscar dados meteorológicos',
+        fallback: {
+          temperature: 25,
+          weatherDescription: 'Informação indisponível',
+          icon: 'cloud'
+        }
+      });
+    }
+  });
+
+  // Get weather forecast for Jaíba/MG
+  app.get('/api/weather/forecast', async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 7;
+      const forecast = await getWeatherForecast(Math.min(days, 10)); // Máximo 10 dias
+      
+      res.json({ forecast });
+    } catch (error) {
+      console.error('Error fetching weather forecast:', error);
+      res.status(500).json({ 
+        error: 'Erro ao buscar previsão do tempo',
+        forecast: []
+      });
     }
   });
 
