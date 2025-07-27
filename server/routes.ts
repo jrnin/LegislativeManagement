@@ -1387,15 +1387,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update document
-  app.put('/api/documents/:id', requireAuth, handleFileUpload('file'), async (req: any, res) => {
+  app.put('/api/documents/:id', requireAdmin, handleFileUpload('file'), async (req: any, res) => {
     try {
       const documentId = Number(req.params.id);
-      
-      // Only admins can update documents directly
-      const currentUser = await storage.getUser(req.user.claims.sub);
-      if (currentUser?.role !== "admin") {
-        return res.status(403).json({ message: "Permissão negada" });
-      }
       
       // Get current document
       const currentDocument = await storage.getDocument(documentId);
