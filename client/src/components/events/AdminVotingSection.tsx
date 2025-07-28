@@ -113,6 +113,24 @@ export function AdminVotingSection({
     return selectedVotes[councilorId] !== undefined;
   };
 
+  const handleApproveAll = () => {
+    const allApprovedVotes: Record<string, { vote: boolean; comment: string }> = {};
+    
+    councilors.forEach((councilor) => {
+      allApprovedVotes[councilor.id] = {
+        vote: true, // Todos marcados como aprovado
+        comment: ""
+      };
+    });
+    
+    setSelectedVotes(allApprovedVotes);
+    
+    toast({
+      title: "Aprovação oficial aplicada",
+      description: `Todos os ${councilors.length} vereadores(as) foram selecionados com voto "Aprovado".`
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="max-h-48 overflow-y-auto border rounded-lg p-3 space-y-2">
@@ -198,31 +216,43 @@ export function AdminVotingSection({
         })}
       </div>
       
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-between gap-2">
         <Button
-          variant="outline"
-          onClick={() => setSelectedVotes({})}
-          disabled={Object.keys(selectedVotes).length === 0}
+          variant="default"
+          onClick={handleApproveAll}
+          disabled={isSubmitting || councilors.length === 0}
+          className="bg-green-600 hover:bg-green-700 text-white"
         >
-          Limpar Seleção
+          <ThumbsUp className="w-4 h-4 mr-2" />
+          Aprovar Oficialmente
         </Button>
-        <Button
-          onClick={handleSubmitVotes}
-          disabled={Object.keys(selectedVotes).length === 0 || isSubmitting}
-          className="bg-purple-600 hover:bg-purple-700"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Registrando...
-            </>
-          ) : (
-            <>
-              <ThumbsUp className="w-4 h-4 mr-2" />
-              Registrar Votos ({Object.keys(selectedVotes).length})
-            </>
-          )}
-        </Button>
+        
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setSelectedVotes({})}
+            disabled={Object.keys(selectedVotes).length === 0}
+          >
+            Limpar Seleção
+          </Button>
+          <Button
+            onClick={handleSubmitVotes}
+            disabled={Object.keys(selectedVotes).length === 0 || isSubmitting}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Registrando...
+              </>
+            ) : (
+              <>
+                <ThumbsUp className="w-4 h-4 mr-2" />
+                Registrar Votos ({Object.keys(selectedVotes).length})
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

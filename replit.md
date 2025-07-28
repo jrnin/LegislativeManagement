@@ -187,6 +187,16 @@ Preferred communication style: Simple, everyday language.
   - **User Guidance**: Added explanatory text "* indica campos obrigatórios" in form description
   - **Status**: Clear visual hierarchy helps users identify which fields must be completed
 
+- **July 28, 2025**: Implemented "Aprovar Oficialmente" Button in Admin Voting - ADMINISTRATIVE ENHANCEMENT
+  - **New Functionality**: Added "Aprovar Oficialmente" button in AdminVotingSection component for event voting
+  - **Automatic Selection**: Button automatically selects all councilors (vereadores) with "Aprovado" vote status
+  - **User Experience**: Single-click operation to approve all councilors simultaneously for administrative efficiency
+  - **Visual Design**: Green button styling (bg-green-600) with ThumbsUp icon positioned on the left side
+  - **Toast Notification**: Displays confirmation message showing number of councilors selected
+  - **Admin-Only Access**: Feature available only to administrators in event details voting tab
+  - **Layout Update**: Changed button layout from right-aligned to space-between for better organization
+  - **Status**: Streamlined administrative voting process with one-click approval functionality
+
 - **July 28, 2025**: Removed Registration Option from Login Page - USER INTERFACE SIMPLIFICATION
   - **User Request**: Completely removed "Cadastrar" tab and registration functionality from login page
   - **Interface Streamlined**: Login page now shows only login form without tabs or registration options
