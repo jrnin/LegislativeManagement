@@ -126,7 +126,7 @@ export default function VereadorDetalhesModerno() {
           <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
             {/* Avatar */}
             <div className="flex-shrink-0">
-              <Avatar className="w-32 h-32 border-8 border-white/30 shadow-2xl">
+              <Avatar className="rounded-xl w-48 h-48 border-1 border-white/30 shadow-2xl">
                 <AvatarImage src={councilor.profileImageUrl} />
                 <AvatarFallback className="bg-green-600 text-white text-2xl font-bold">
                   {getInitials(councilor.name)}
