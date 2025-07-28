@@ -247,25 +247,25 @@ export function AdminVotingSection({
       
       {/* Barra de ações melhorada */}
       <div className="bg-gray-50 rounded-xl p-4 border">
-        <div className="flex justify-between items-center gap-3">
+        <div className="flex items-center justify-between gap-4">
           {/* Botão Aprovar Oficialmente */}
           <Button
             variant="default"
             onClick={handleApproveAll}
             disabled={isSubmitting || councilors.length === 0}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5"
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5 flex-shrink-0"
           >
             <ThumbsUp className="w-5 h-5 mr-2" />
             Aprovar Oficialmente
           </Button>
           
-          {/* Grupo de botões de ação */}
-          <div className="flex gap-3">
+          {/* Grupo de botões de ação alinhados à direita */}
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
               onClick={() => setSelectedVotes({})}
               disabled={Object.keys(selectedVotes).length === 0}
-              className="border-gray-300 hover:bg-gray-100 transition-colors duration-200"
+              className="border-gray-300 hover:bg-gray-100 transition-colors duration-200 px-4 py-2.5"
             >
               Limpar Seleção
             </Button>
