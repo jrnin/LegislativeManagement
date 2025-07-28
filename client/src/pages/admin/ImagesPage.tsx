@@ -250,22 +250,20 @@ export default function ImagesPage() {
   }, {});
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto p-4 max-w-6xl">
       <Helmet>
         <title>Galeria de Imagens - Sistema Legislativo</title>
       </Helmet>
 
+      {/* Header simplificado */}
       <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Galeria de Imagens</h1>
-          <p className="text-gray-600 mt-2">Gerencie as imagens dos eventos legislativos</p>
-        </div>
+        <h1 className="text-2xl font-semibold text-gray-900">Galeria de Imagens</h1>
         
         <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
               <Plus className="h-4 w-4 mr-2" />
-              Adicionar Imagens
+              Adicionar
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-lg">
@@ -360,39 +358,35 @@ export default function ImagesPage() {
         </Dialog>
       </div>
 
-      {/* Filtros */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Buscar por nome da imagem, legenda ou evento..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="w-full sm:w-64">
-              <Select value={filterEventId} onValueChange={setFilterEventId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filtrar por evento" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os eventos</SelectItem>
-                  {events.map((event: Event) => (
-                    <SelectItem key={event.id} value={event.id.toString()}>
-                      {event.category} #{event.eventNumber}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Filtros simplificados */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar imagens..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-9"
+            />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="w-full sm:w-48">
+          <Select value={filterEventId} onValueChange={setFilterEventId}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Por evento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {events.map((event: Event) => (
+                <SelectItem key={event.id} value={event.id.toString()}>
+                  #{event.eventNumber} - {format(new Date(event.eventDate), "dd/MM")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
       {/* Lista de imagens agrupadas por evento */}
       {isLoading ? (
@@ -412,78 +406,72 @@ export default function ImagesPage() {
             if (!event) return null;
 
             return (
-              <div key={eventId} className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">
-                          {event.category} #{event.eventNumber}
-                        </CardTitle>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mt-2">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {format(new Date(event.eventDate), "dd/MM/yyyy", { locale: ptBR })}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            {event.location}
-                          </div>
+              <div key={eventId} className="mb-8">
+                {/* Header do evento simplificado */}
+                <div className="flex items-center gap-3 mb-4 pb-2 border-b">
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-900">
+                      {event.category} #{event.eventNumber}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {format(new Date(event.eventDate), "dd/MM/yyyy")} • {event.location}
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="text-xs">
+                    {eventImages.length}
+                  </Badge>
+                </div>
+
+                {/* Grid de imagens simplificado */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                  {eventImages.map((image) => (
+                    <div key={image.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                      <img
+                        src={image.imageData}
+                        alt={image.caption || image.fileName}
+                        className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
+                        onClick={() => handleViewImage(image)}
+                      />
+                      
+                      {/* Overlay com ações */}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleViewImage(image)}
+                          >
+                            <Eye className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleEditImage(image)}
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleDeleteImage(image.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">{event.description}</p>
                       </div>
-                      <Badge variant="outline">
-                        {eventImages.length} {eventImages.length === 1 ? 'imagem' : 'imagens'}
-                      </Badge>
+                      
+                      {/* Caption sutil */}
+                      {image.caption && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                          <p className="text-white text-xs truncate">{image.caption}</p>
+                        </div>
+                      )}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {eventImages.map((image) => (
-                        <Card key={image.id} className="overflow-hidden group">
-                          <CardContent className="p-0 relative">
-                            <img
-                              src={image.imageData}
-                              alt={image.caption || image.fileName}
-                              className="w-full h-48 object-cover cursor-pointer transition-transform hover:scale-105"
-                              onClick={() => handleViewImage(image)}
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  onClick={() => handleViewImage(image)}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  onClick={() => handleEditImage(image)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => handleDeleteImage(image.id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                            {image.caption && (
-                              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-2 text-sm">
-                                {image.caption}
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                  ))}
+                </div>
               </div>
             );
           })}

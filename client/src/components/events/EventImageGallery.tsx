@@ -205,17 +205,17 @@ export function EventImageGallery({ eventId, isAdmin = false }: EventImageGaller
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Galeria de Imagens</h3>
+        <h3 className="text-lg font-medium">Galeria de Imagens</h3>
         <div className="flex items-center gap-2">
-          <Badge variant="outline">
-            {images.length}/8 imagens
+          <Badge variant="secondary" className="text-xs">
+            {images.length}/8
           </Badge>
           {isAdmin && (
             <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" disabled={images.length >= 8}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Imagens
+                <Button size="sm" disabled={images.length >= 8} className="h-8">
+                  <Plus className="h-3 w-3 mr-1" />
+                  Adicionar
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
@@ -296,62 +296,61 @@ export function EventImageGallery({ eventId, isAdmin = false }: EventImageGaller
       </div>
 
       {images.length === 0 ? (
-        <Card className="p-8">
-          <div className="text-center text-gray-500">
-            <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <p>Nenhuma imagem adicionada ainda</p>
-            {isAdmin && (
-              <p className="text-sm mt-2">Use o botão "Adicionar Imagens" para enviar imagens</p>
-            )}
-          </div>
-        </Card>
+        <div className="text-center text-gray-500 py-8">
+          <Upload className="h-10 w-10 mx-auto mb-3 text-gray-400" />
+          <p className="text-sm">Nenhuma imagem disponível</p>
+          {isAdmin && (
+            <p className="text-xs mt-1 text-gray-400">Use "Adicionar" para enviar imagens</p>
+          )}
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {images.map((image: EventImage) => (
-            <Card key={image.id} className="overflow-hidden group">
-              <CardContent className="p-0 relative">
-                <img
-                  src={image.imageData}
-                  alt={image.caption || image.fileName}
-                  className="w-full h-48 object-cover cursor-pointer transition-transform hover:scale-105"
-                  onClick={() => handleViewImage(image)}
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleViewImage(image)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    {isAdmin && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleEditImage(image)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteImage(image.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
+            <div key={image.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <img
+                src={image.imageData}
+                alt={image.caption || image.fileName}
+                className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
+                onClick={() => handleViewImage(image)}
+              />
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-8 w-8 p-0"
+                    onClick={() => handleViewImage(image)}
+                  >
+                    <Eye className="h-3 w-3" />
+                  </Button>
+                  {isAdmin && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="h-8 w-8 p-0"
+                        onClick={() => handleEditImage(image)}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="h-8 w-8 p-0"
+                        onClick={() => handleDeleteImage(image.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </>
+                  )}
                 </div>
-                {image.caption && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-2 text-sm">
-                    {image.caption}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+              {image.caption && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                  <p className="text-white text-xs truncate">{image.caption}</p>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       )}
