@@ -110,6 +110,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 28, 2025**: Implemented Cover Image Display - MAJOR INTERFACE SIMPLIFICATION
+  - **Cover Image Only**: Modified galleries to show only one cover image per event instead of full grid layouts
+  - **Compact Layout**: Changed from multi-column grids to single horizontal layout with 24x24px (admin) and 20x20px (events) thumbnails
+  - **Additional Images Indicator**: Added text showing "+X imagens adicionais" when multiple images exist
+  - **View All Button**: Implemented "Ver todas (X)" button for events with multiple images
+  - **Simplified Actions**: Reduced overlay button sizes to 6x6px for cleaner appearance
+  - **Information Display**: Shows image caption or fallback text alongside the cover image
+  - **Space Efficiency**: Dramatically reduced vertical space usage while maintaining all functionality
+  - **Consistent Behavior**: Applied same pattern to both administrative (/images) and event gallery interfaces
+  - **Type Safety**: Added proper type checking to prevent errors when no images are available
+  - **Status**: Clean, minimal interface showing only essential image information with access to full galleries
+
 - **July 28, 2025**: Simplified Images Module Visual Design - USER INTERFACE ENHANCEMENT
   - **Gallery Simplification**: Streamlined image galleries across both administrative and event interfaces
   - **Header Design**: Reduced visual clutter with smaller titles, simplified badges, and compact action buttons

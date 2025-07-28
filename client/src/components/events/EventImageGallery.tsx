@@ -303,57 +303,71 @@ export function EventImageGallery({ eventId, isAdmin = false }: EventImageGaller
             <p className="text-xs mt-1 text-gray-400">Use "Adicionar" para enviar imagens</p>
           )}
         </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {images.map((image: EventImage) => (
-            <div key={image.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
-              <img
-                src={image.imageData}
-                alt={image.caption || image.fileName}
-                className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
-                onClick={() => handleViewImage(image)}
-              />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="h-8 w-8 p-0"
-                    onClick={() => handleViewImage(image)}
-                  >
-                    <Eye className="h-3 w-3" />
-                  </Button>
-                  {isAdmin && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="h-8 w-8 p-0"
-                        onClick={() => handleEditImage(image)}
-                      >
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="h-8 w-8 p-0"
-                        onClick={() => handleDeleteImage(image.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </>
-                  )}
-                </div>
+      ) : images.length > 0 && images[0] ? (
+        <div className="flex items-center gap-4">
+          <div className="relative group w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+            <img
+              src={images[0].imageData}
+              alt={images[0].caption || images[0].fileName}
+              className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
+              onClick={() => handleViewImage(images[0])}
+            />
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleViewImage(images[0])}
+                >
+                  <Eye className="h-3 w-3" />
+                </Button>
+                {isAdmin && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="h-6 w-6 p-0"
+                      onClick={() => handleEditImage(images[0])}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="h-6 w-6 p-0"
+                      onClick={() => handleDeleteImage(images[0].id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </>
+                )}
               </div>
-              {image.caption && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                  <p className="text-white text-xs truncate">{image.caption}</p>
-                </div>
-              )}
             </div>
-          ))}
+          </div>
+          
+          <div className="flex-1">
+            <p className="text-sm text-gray-600">
+              {images[0].caption || "Imagem do evento"}
+            </p>
+            {images.length > 1 && (
+              <p className="text-xs text-gray-500 mt-1">
+                +{images.length - 1} imagens adicionais
+              </p>
+            )}
+          </div>
+          
+          {images.length > 1 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleViewImage(images[0])}
+            >
+              Ver todas ({images.length})
+            </Button>
+          )}
         </div>
-      )}
+      ) : null}
 
       {/* Dialog para visualizar imagem */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
