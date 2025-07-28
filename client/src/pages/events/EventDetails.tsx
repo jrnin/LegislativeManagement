@@ -1041,7 +1041,7 @@ export default function EventDetails() {
                               <TableCell className="font-medium">{document.documentNumber}</TableCell>
                               <TableCell>{document.documentType}</TableCell>
                               <TableCell>
-                                {document.documentDate ? format(new Date(document.documentDate), "dd/MM/yyyy") : "-"}
+                                {document.documentDate ? formatDateSimpleSafe(document.documentDate) : "-"}
                               </TableCell>
                               <TableCell>{document.authorType}</TableCell>
                               <TableCell>

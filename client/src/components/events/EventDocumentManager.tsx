@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, Plus, FileText, Calendar, Download, Eye, X } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDateSimpleSafe } from "@/lib/dateUtils";
 import { addTimelineEntry, timelineActions } from "@/lib/timeline";
 
 interface EventDocumentManagerProps {
@@ -237,7 +238,7 @@ export function EventDocumentManager({ eventId, associatedDocuments }: EventDocu
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <Calendar className="w-3 h-3" />
                                 <span>
-                                  {format(new Date(document.documentDate), "dd/MM/yyyy", { locale: ptBR })}
+                                  {formatDateSimpleSafe(document.documentDate)}
                                 </span>
                               </div>
                             </div>
@@ -297,7 +298,7 @@ export function EventDocumentManager({ eventId, associatedDocuments }: EventDocu
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Calendar className="w-3 h-3" />
                         <span>
-                          {format(new Date(document.documentDate), "dd/MM/yyyy", { locale: ptBR })}
+                          {formatDateSimpleSafe(document.documentDate)}
                         </span>
                       </div>
                     </div>

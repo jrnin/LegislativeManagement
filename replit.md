@@ -136,6 +136,15 @@ Preferred communication style: Simple, everyday language.
   - **Security Enhancement**: Ensured all passwords are properly hashed with bcrypt for security
   - **Status**: Login authentication fully functional for all users with proper password hashing
 
+- **July 28, 2025**: Fixed Document Dates Display in Event Details - DATE FORMATTING FIX
+  - **Root Cause**: Document dates in event details "Documentos" tab were showing one day earlier due to timezone conversion
+  - **Solution**: Updated EventDocumentManager.tsx and EventDetails.tsx to use `formatDateSimpleSafe()` instead of `new Date()` conversion
+  - **Technical Fix**: Replaced `format(new Date(document.documentDate), "dd/MM/yyyy")` with `formatDateSimpleSafe(document.documentDate)`
+  - **Comprehensive Coverage**: Applied fixes to both dialog selection interface and table display of associated documents
+  - **User Interface**: Document dates in event management now display correctly matching database records
+  - **Centralized Solution**: Leveraged existing dateUtils.ts timezone-safe formatting functions consistently
+  - **Status**: All document dates in event details now show accurate dates matching database records
+
 - **July 28, 2025**: Fixed Activity Dates Display in Event Details - DATE FORMATTING FIX
   - **Root Cause**: Activity dates in event details "Atividades" tab were showing one day earlier due to timezone conversion
   - **Solution**: Updated EventActivityManager.tsx to use `formatDateSimpleSafe()` instead of `new Date()` conversion
