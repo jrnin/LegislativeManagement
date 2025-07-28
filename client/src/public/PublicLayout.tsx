@@ -138,7 +138,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       { name: 'Comissões', href: '/comissoes'},
       { name: 'Vereadores', href: '/vereadores?tipo=Vereador' }
     ]},
-    { name: 'Documentos Administrativos', href: '/documentos' },
+    { name: 'Documentos', href: '/documentos' },
     { name: 
       'Atividades Legislativas',
       href: '/atividades',
@@ -171,7 +171,12 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       submenu: [
         { 
           name: 'Licitações', 
-          href: 'http://cidadesmg.com.br/portaltransparencia/faces/user/licitacao.xhtml?Param=CamJaiba',
+          href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/index.xhtml?pagina=Licita%C3%A7%C3%B5es,%20Contrata%C3%A7%C3%B5es%20e%20Compras',
+          external: true
+        },
+        {
+          name: 'Execução Orçamentária', 
+          href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/index.xhtml?pagina=Execu%C3%A7%C3%A3o%20Or%C3%A7ament%C3%A1ria',
           external: true
         },
         { 
@@ -179,9 +184,24 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           href: 'https://radardatransparencia.atricon.org.br/',
           external: true
         },
+        {
+          name: 'Estrutura Organizacional',
+          href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/publica/estruturaOrganizacional/estruturaOrganizacional.xhtml',
+          external: true
+        },
+        {
+          name: 'Prestação de Contas',
+          href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/publica/prestacaoDeContas/prestacaoDeContas.xhtml',
+          external: true
+        },
         { 
           name: 'Recursos Humanos', 
-          href: 'http://cidadesmg.com.br/portaltransparencia/faces/user/folha/FFolhaPagamento.xhtml?Param=CamJaiba',
+          href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/publica/recursosHumanos/recursosHumanos.xhtml',
+          external: true
+        },
+        {
+          name: 'Perguntas e Respostas',
+          href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/publica/perguntasERespostas/perguntasERespostas.xhtml',
           external: true
         }
       ]
