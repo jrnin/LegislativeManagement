@@ -218,10 +218,7 @@ export default function UserList() {
         </Button>
       </div>
       
-      <Card>
-        <CardHeader className="pb-1">
-          <CardTitle>Usuários</CardTitle>
-        </CardHeader>
+      <Card>        
         <CardContent>
           <div className="flex items-center py-4">
             <div className="relative w-full max-w-sm">

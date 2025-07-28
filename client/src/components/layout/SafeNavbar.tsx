@@ -29,15 +29,7 @@ export default function SafeNavbar({ setSidebarOpen }: SafeNavbarProps) {
         </div>
 
         <div className="ml-4 flex items-center md:ml-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="text-slate-600 hover:text-slate-900"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sair
-          </Button>
+          
         </div>
       </div>
     </div>

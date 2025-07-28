@@ -7,11 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardStats, Event, LegislativeActivity } from "@shared/schema";
 import { useIsMobile } from "@/mobile/hooks/useIsMobile";
 import MobileDashboard from "@/mobile/screens/MobileDashboard";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const [, setLocation] = useLocation();
   
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ["/api/dashboard/stats"],
@@ -60,7 +61,10 @@ export default function Dashboard() {
           </div>
           <div className="mt-4 md:mt-0 flex space-x-3">
             
-            <button className="button-primary px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
+            <button 
+              onClick={() => setLocation('/activities/new')}
+              className="button-primary px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:bg-primary-700 transition-colors"
+            >
               Nova Atividade
             </button>
           </div>

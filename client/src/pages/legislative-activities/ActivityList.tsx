@@ -425,10 +425,7 @@ export default function ActivityList() {
         </Button>
       </div>
       
-      <Card>
-        <CardHeader className="pb-1">
-          <CardTitle>Atividades Legislativas</CardTitle>
-        </CardHeader>
+      <Card>        
         <CardContent>
           <div className="flex items-center py-4">
             <div className="relative w-full max-w-sm">

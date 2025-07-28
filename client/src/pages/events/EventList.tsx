@@ -265,9 +265,6 @@ export default function EventList() {
       </div>
       
       <Card>
-        <CardHeader className="pb-1">
-          <CardTitle>Eventos</CardTitle>
-        </CardHeader>
         <CardContent>
           <div className="flex items-center py-4">
             <div className="relative w-full max-w-sm">
