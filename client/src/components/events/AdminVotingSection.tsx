@@ -132,127 +132,177 @@ export function AdminVotingSection({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="max-h-48 overflow-y-auto border rounded-lg p-3 space-y-2">
+    <div className="space-y-6">
+      {/* Lista de vereadores melhorada */}
+      <div className="max-h-64 overflow-y-auto border rounded-xl p-4 bg-gray-50/50 space-y-3">
         {councilors.map((councilor) => {
           const existingVote = getExistingVote(councilor.id);
           const isSelected = isCouncilorSelected(councilor.id);
           
           return (
-            <div key={councilor.id} className="flex items-start space-x-3">
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    handleVoteChange(councilor.id, true);
-                  } else {
-                    setSelectedVotes(prev => {
-                      const newVotes = { ...prev };
-                      delete newVotes[councilor.id];
-                      return newVotes;
-                    });
-                  }
-                }}
-              />
-              
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center space-x-3">
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src={councilor.profileImageUrl || ''} />
-                    <AvatarFallback>{councilor.name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-medium">{councilor.name}</p>
-                    <p className="text-sm text-muted-foreground">{councilor.email}</p>
-                  </div>
-                  
-                  {existingVote && (
-                    <Badge variant={existingVote.vote ? "default" : "destructive"} className="text-xs">
-                      {existingVote.vote ? "Aprovou" : "Rejeitou"}
-                    </Badge>
-                  )}
-                </div>
+            <div key={councilor.id} className={`bg-white rounded-lg p-4 shadow-sm border-l-4 transition-all duration-200 ${
+              isSelected 
+                ? selectedVotes[councilor.id]?.vote 
+                  ? 'border-l-green-500 bg-green-50/50' 
+                  : 'border-l-red-500 bg-red-50/50'
+                : 'border-l-gray-200 hover:border-l-blue-300 hover:shadow-md'
+            }`}>
+              <div className="flex items-start space-x-4">
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleVoteChange(councilor.id, true);
+                    } else {
+                      setSelectedVotes(prev => {
+                        const newVotes = { ...prev };
+                        delete newVotes[councilor.id];
+                        return newVotes;
+                      });
+                    }
+                  }}
+                  className="mt-1"
+                />
                 
-                {isSelected && (
-                  <div className="space-y-2 pl-11">
-                    <div className="flex gap-1">
-                      <Button
-                        variant={selectedVotes[councilor.id]?.vote === true ? "default" : "outline"}
-                        size="sm"
-                        className={`text-xs ${selectedVotes[councilor.id]?.vote === true ? 'bg-green-600 hover:bg-green-700' : ''}`}
-                        onClick={() => handleVoteChange(councilor.id, true)}
-                      >
-                        <ThumbsUp className="w-3 h-3 mr-1" />
-                        Aprovar
-                      </Button>
-                      <Button
-                        variant={selectedVotes[councilor.id]?.vote === false ? "default" : "outline"}
-                        size="sm"
-                        className={`text-xs ${selectedVotes[councilor.id]?.vote === false ? 'bg-red-600 hover:bg-red-700' : ''}`}
-                        onClick={() => handleVoteChange(councilor.id, false)}
-                      >
-                        <ThumbsDown className="w-3 h-3 mr-1" />
-                        Rejeitar
-                      </Button>
+                <div className="flex-1 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="w-10 h-10 border-2 border-white shadow-sm">
+                        <AvatarImage src={councilor.profileImageUrl || ''} />
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
+                          {councilor.name?.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold text-gray-900">{councilor.name}</p>
+                        <p className="text-sm text-gray-500">{councilor.email}</p>
+                      </div>
                     </div>
                     
-                    <div className="space-y-1">
-                      <Label htmlFor={`comment-${councilor.id}`} className="text-xs">
-                        Comentário (opcional):
-                      </Label>
-                      <Textarea
-                        id={`comment-${councilor.id}`}
-                        value={selectedVotes[councilor.id]?.comment || ""}
-                        onChange={(e) => handleCommentChange(councilor.id, e.target.value)}
-                        placeholder="Comentário..."
-                        className="resize-none min-h-[50px] text-xs"
-                      />
-                    </div>
+                    {existingVote && (
+                      <Badge 
+                        variant={existingVote.vote ? "default" : "destructive"} 
+                        className={`text-xs font-medium ${
+                          existingVote.vote 
+                            ? 'bg-green-100 text-green-800 border-green-200' 
+                            : 'bg-red-100 text-red-800 border-red-200'
+                        }`}
+                      >
+                        {existingVote.vote ? "✓ Aprovou" : "✗ Rejeitou"}
+                      </Badge>
+                    )}
                   </div>
-                )}
+                  
+                  {isSelected && (
+                    <div className="space-y-3 pl-4 border-l-2 border-gray-100">
+                      <div className="flex gap-2">
+                        <Button
+                          variant={selectedVotes[councilor.id]?.vote === true ? "default" : "outline"}
+                          size="sm"
+                          className={`flex-1 transition-all duration-200 ${
+                            selectedVotes[councilor.id]?.vote === true 
+                              ? 'bg-green-600 hover:bg-green-700 text-white shadow-md' 
+                              : 'hover:bg-green-50 hover:border-green-300 hover:text-green-700'
+                          }`}
+                          onClick={() => handleVoteChange(councilor.id, true)}
+                        >
+                          <ThumbsUp className="w-4 h-4 mr-2" />
+                          Aprovar
+                        </Button>
+                        <Button
+                          variant={selectedVotes[councilor.id]?.vote === false ? "default" : "outline"}
+                          size="sm"
+                          className={`flex-1 transition-all duration-200 ${
+                            selectedVotes[councilor.id]?.vote === false 
+                              ? 'bg-red-600 hover:bg-red-700 text-white shadow-md' 
+                              : 'hover:bg-red-50 hover:border-red-300 hover:text-red-700'
+                          }`}
+                          onClick={() => handleVoteChange(councilor.id, false)}
+                        >
+                          <ThumbsDown className="w-4 h-4 mr-2" />
+                          Rejeitar
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor={`comment-${councilor.id}`} className="text-sm font-medium text-gray-700">
+                          Comentário (opcional):
+                        </Label>
+                        <Textarea
+                          id={`comment-${councilor.id}`}
+                          value={selectedVotes[councilor.id]?.comment || ""}
+                          onChange={(e) => handleCommentChange(councilor.id, e.target.value)}
+                          placeholder="Digite um comentário sobre sua decisão..."
+                          className="resize-none min-h-[60px] text-sm border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           );
         })}
       </div>
       
-      <div className="flex justify-between gap-2">
-        <Button
-          variant="default"
-          onClick={handleApproveAll}
-          disabled={isSubmitting || councilors.length === 0}
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          <ThumbsUp className="w-4 h-4 mr-2" />
-          Aprovar Oficialmente
-        </Button>
-        
-        <div className="flex gap-2">
+      {/* Barra de ações melhorada */}
+      <div className="bg-gray-50 rounded-xl p-4 border">
+        <div className="flex justify-between items-center gap-3">
+          {/* Botão Aprovar Oficialmente */}
           <Button
-            variant="outline"
-            onClick={() => setSelectedVotes({})}
-            disabled={Object.keys(selectedVotes).length === 0}
+            variant="default"
+            onClick={handleApproveAll}
+            disabled={isSubmitting || councilors.length === 0}
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5"
           >
-            Limpar Seleção
+            <ThumbsUp className="w-5 h-5 mr-2" />
+            Aprovar Oficialmente
           </Button>
-          <Button
-            onClick={handleSubmitVotes}
-            disabled={Object.keys(selectedVotes).length === 0 || isSubmitting}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Registrando...
-              </>
-            ) : (
-              <>
-                <ThumbsUp className="w-4 h-4 mr-2" />
-                Registrar Votos ({Object.keys(selectedVotes).length})
-              </>
-            )}
-          </Button>
+          
+          {/* Grupo de botões de ação */}
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setSelectedVotes({})}
+              disabled={Object.keys(selectedVotes).length === 0}
+              className="border-gray-300 hover:bg-gray-100 transition-colors duration-200"
+            >
+              Limpar Seleção
+            </Button>
+            <Button
+              onClick={handleSubmitVotes}
+              disabled={Object.keys(selectedVotes).length === 0 || isSubmitting}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Registrando...
+                </>
+              ) : (
+                <>
+                  <ThumbsUp className="w-5 h-5 mr-2" />
+                  Registrar Votos ({Object.keys(selectedVotes).length})
+                </>
+              )}
+            </Button>
+          </div>
         </div>
+        
+        {/* Indicador de progresso */}
+        {Object.keys(selectedVotes).length > 0 && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <div className="text-sm text-gray-600 mb-2">
+              {Object.keys(selectedVotes).length} de {councilors.length} vereadores selecionados
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(Object.keys(selectedVotes).length / councilors.length) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
