@@ -507,27 +507,92 @@ export default function ImagesPage() {
         </div>
       )}
 
-      {/* Dialog para visualizar imagem */}
+      {/* Dialog para visualizar todas as imagens */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="sm:max-w-4xl">
+        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {selectedImage?.caption || selectedImage?.fileName}
+              {selectedImage?.event ? `${selectedImage.event.category} #${selectedImage.event.eventNumber} - Galeria Completa` : 'Galeria de Imagens'}
             </DialogTitle>
           </DialogHeader>
-          {selectedImage && (
-            <div className="text-center">
-              <img
-                src={selectedImage.imageData}
-                alt={selectedImage.caption || selectedImage.fileName}
-                className="max-w-full max-h-96 mx-auto rounded"
-              />
-              {selectedImage.caption && (
-                <p className="mt-4 text-gray-600">{selectedImage.caption}</p>
-              )}
-              <div className="mt-4 text-sm text-gray-500">
-                <p>Evento: {selectedImage.event?.category} #{selectedImage.event?.eventNumber}</p>
-                <p>Enviado em: {format(new Date(selectedImage.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
+          {selectedImage && selectedImage.event && (
+            <div className="space-y-6">
+              {/* Informações do evento */}
+              <div className="text-center border-b pb-4">
+                <p className="text-sm text-gray-600">
+                  {format(new Date(selectedImage.event.eventDate), "dd/MM/yyyy")} • {selectedImage.event.location}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">{selectedImage.event.description}</p>
+              </div>
+
+              {/* Grid com todas as imagens do evento */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {(() => {
+                  const eventId = selectedImage.eventId;
+                  const eventImages = Object.entries(imagesByEvent).find(([id]) => id === eventId.toString())?.[1] as EventImage[] || [];
+                  
+                  return eventImages.map((image) => (
+                    <div key={image.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                      <img
+                        src={image.imageData}
+                        alt={image.caption || image.fileName}
+                        className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
+                        onClick={() => {
+                          // Criar nova janela para visualizar imagem individual
+                          const newWindow = window.open('', '_blank');
+                          if (newWindow) {
+                            newWindow.document.write(`
+                              <html>
+                                <head><title>${image.caption || image.fileName}</title></head>
+                                <body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+                                  <img src="${image.imageData}" style="max-width:100%;max-height:100vh;object-fit:contain;" alt="${image.caption || image.fileName}" />
+                                </body>
+                              </html>
+                            `);
+                          }
+                        }}
+                      />
+                      
+                      {/* Overlay com ações */}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleEditImage(image)}
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleDeleteImage(image.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {/* Caption */}
+                      {image.caption && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                          <p className="text-white text-xs truncate">{image.caption}</p>
+                        </div>
+                      )}
+                    </div>
+                  ));
+                })()}
+              </div>
+
+              {/* Contador de imagens */}
+              <div className="text-center text-sm text-gray-500 border-t pt-4">
+                {(() => {
+                  const eventId = selectedImage.eventId;
+                  const eventImages = Object.entries(imagesByEvent).find(([id]) => id === eventId.toString())?.[1] as EventImage[] || [];
+                  return `${eventImages.length} ${eventImages.length === 1 ? 'imagem' : 'imagens'} neste evento`;
+                })()}
               </div>
             </div>
           )}

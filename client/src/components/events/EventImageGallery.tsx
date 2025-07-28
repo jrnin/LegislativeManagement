@@ -369,26 +369,76 @@ export function EventImageGallery({ eventId, isAdmin = false }: EventImageGaller
         </div>
       ) : null}
 
-      {/* Dialog para visualizar imagem */}
+      {/* Dialog para visualizar todas as imagens */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="sm:max-w-4xl">
+        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {selectedImage?.caption || selectedImage?.fileName}
+              Galeria do Evento - Todas as Imagens
             </DialogTitle>
           </DialogHeader>
-          {selectedImage && (
-            <div className="text-center">
-              <img
-                src={selectedImage.imageData}
-                alt={selectedImage.caption || selectedImage.fileName}
-                className="max-w-full max-h-96 mx-auto rounded"
-              />
-              {selectedImage.caption && (
-                <p className="mt-4 text-gray-600">{selectedImage.caption}</p>
-              )}
+          <div className="space-y-6">
+            {/* Grid com todas as imagens */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {images.map((image: EventImage) => (
+                <div key={image.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                  <img
+                    src={image.imageData}
+                    alt={image.caption || image.fileName}
+                    className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
+                    onClick={() => {
+                      // Abrir imagem em nova janela para visualização completa
+                      const newWindow = window.open('', '_blank');
+                      if (newWindow) {
+                        newWindow.document.write(`
+                          <html>
+                            <head><title>${image.caption || image.fileName}</title></head>
+                            <body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+                              <img src="${image.imageData}" style="max-width:100%;max-height:100vh;object-fit:contain;" alt="${image.caption || image.fileName}" />
+                            </body>
+                          </html>
+                        `);
+                      }
+                    }}
+                  />
+                  
+                  {isAdmin && (
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="h-8 w-8 p-0"
+                          onClick={() => handleEditImage(image)}
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="h-8 w-8 p-0"
+                          onClick={() => handleDeleteImage(image.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {image.caption && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                      <p className="text-white text-xs truncate">{image.caption}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+
+            {/* Contador de imagens */}
+            <div className="text-center text-sm text-gray-500 border-t pt-4">
+              {images.length} {images.length === 1 ? 'imagem' : 'imagens'} neste evento
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
