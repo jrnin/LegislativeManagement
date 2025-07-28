@@ -110,6 +110,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 28, 2025**: Fixed "Próximos Eventos" Widget in Dashboard - CRITICAL WIDGET REPAIR
+  - **Root Cause**: getUpcomingEvents method was filtering for future events only, but all system events had past dates
+  - **Solution**: Enhanced method to return recent events when no future events exist for better user experience
+  - **API Fix**: Modified storage method to show most recent events (by date descending) when no upcoming events available
+  - **Dashboard Display**: Widget now properly displays recent events with complete event information
+  - **Fallback Logic**: Implemented intelligent fallback from future events to recent events seamlessly
+  - **User Experience**: Dashboard now shows relevant event data instead of empty "Próximos Eventos" section
+  - **Status**: Dashboard widget fully functional showing most recent events when no future events exist
+
 - **July 28, 2025**: Implemented Cover Image Display - MAJOR INTERFACE SIMPLIFICATION
   - **Cover Image Only**: Modified galleries to show only one cover image per event instead of full grid layouts
   - **Compact Layout**: Changed from multi-column grids to single horizontal layout with 24x24px (admin) and 20x20px (events) thumbnails

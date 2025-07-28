@@ -595,14 +595,27 @@ export class DatabaseStorage implements IStorage {
   
   async getUpcomingEvents(limit: number = 3): Promise<Event[]> {
     // Get events with date >= today, ordered by date, limited
+    // If no future events, get the most recent events
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    return await db
+    const futureEvents = await db
       .select()
       .from(events)
       .where(gte(events.eventDate, today))
       .orderBy(events.eventDate)
+      .limit(limit);
+    
+    // If we have future events, return them
+    if (futureEvents.length > 0) {
+      return futureEvents;
+    }
+    
+    // Otherwise, return the most recent events (last 'limit' events)
+    return await db
+      .select()
+      .from(events)
+      .orderBy(desc(events.eventDate))
       .limit(limit);
   }
   
