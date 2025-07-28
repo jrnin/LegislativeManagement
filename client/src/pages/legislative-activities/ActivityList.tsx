@@ -232,9 +232,7 @@ export default function ActivityList() {
                 {type} Nº {number}/{year}
               </Button>
             </div>
-            <Badge className={`mt-1 ${getActivityTypeBadge(type)}`}>
-              {type}
-            </Badge>
+            
           </div>
         );
       },

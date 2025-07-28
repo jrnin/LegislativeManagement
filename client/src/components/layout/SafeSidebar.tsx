@@ -35,7 +35,9 @@ const navigation = [
   { name: "Usuários", href: "/users", icon: Users },
   { name: "Comissões", href: "/committees", icon: Building },
   { name: "Vereadores", href: "/councilors", icon: UserCheck },
-  { name: "Mesa Diretora", href: "/boards", icon: Gavel },
+  { name: "Mesa Diretora", href: "/boards", icon: Users2Icon },
+  { name: "Legislatura", href: "/legislatures", icon: Gavel },
+  { name: "Noticias", href: "/news", icon: FileText },
   
 ];
 
