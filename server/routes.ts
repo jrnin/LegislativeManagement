@@ -1516,13 +1516,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const type = req.params.type;
       const id = Number(req.params.id);
       
+      console.log(`Tentativa de download de arquivo: tipo=${type}, id=${id}`);
+      
       let filePath, fileName, fileType;
       
       if (type === 'activities') {
         const activity = await storage.getLegislativeActivity(id);
         
-        if (!activity || !activity.filePath) {
-          return res.status(404).json({ message: "Arquivo não encontrado" });
+        console.log(`Atividade encontrada:`, {
+          id: activity?.id,
+          hasFilePath: !!activity?.filePath,
+          filePath: activity?.filePath,
+          fileName: activity?.fileName
+        });
+        
+        if (!activity) {
+          console.log(`Atividade ${id} não encontrada`);
+          return res.status(404).json({ message: "Atividade não encontrada" });
+        }
+        
+        if (!activity.filePath) {
+          console.log(`Atividade ${id} não possui arquivo anexado`);
+          return res.status(404).json({ message: "Arquivo não encontrado para esta atividade" });
         }
         
         filePath = activity.filePath;
@@ -1531,8 +1546,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (type === 'documents') {
         const document = await storage.getDocument(id);
         
-        if (!document || !document.filePath) {
-          return res.status(404).json({ message: "Arquivo não encontrado" });
+        if (!document) {
+          return res.status(404).json({ message: "Documento não encontrado" });
+        }
+        
+        if (!document.filePath) {
+          return res.status(404).json({ message: "Arquivo não encontrado para este documento" });
         }
         
         filePath = document.filePath;
@@ -1542,9 +1561,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Tipo inválido" });
       }
       
+      console.log(`Verificando se arquivo existe: ${filePath}`);
+      
       // Check if file exists
       if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ message: "Arquivo não encontrado" });
+        console.log(`Arquivo não encontrado no sistema de arquivos: ${filePath}`);
+        return res.status(404).json({ message: "Arquivo não encontrado no servidor" });
       }
       
       // Check if download is requested
@@ -1560,6 +1582,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Allow browser to display the file if possible (PDF, images, etc)
         res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName || 'view')}"`);
       }
+      
+      console.log(`Enviando arquivo: ${fileName} (${fileType})`);
       
       // Stream the file
       const fileStream = fs.createReadStream(filePath);
