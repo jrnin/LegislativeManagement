@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,7 +32,7 @@ export function AdminVotingSection({
   const { toast } = useToast();
 
   // Adicionar event listeners para os botões do cabeçalho
-  React.useEffect(() => {
+  useEffect(() => {
     const element = document.querySelector('[data-voting-section]');
     
     const handleApproveAllEvent = () => {
