@@ -31,6 +31,35 @@ export function AdminVotingSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  // Adicionar event listeners para os botões do cabeçalho
+  React.useEffect(() => {
+    const element = document.querySelector('[data-voting-section]');
+    
+    const handleApproveAllEvent = () => {
+      handleApproveAll();
+    };
+    
+    const handleClearSelectionEvent = () => {
+      setSelectedVotes({});
+      toast({
+        title: "Seleção limpa",
+        description: "Todas as seleções foram removidas."
+      });
+    };
+    
+    if (element) {
+      element.addEventListener('approveAll', handleApproveAllEvent);
+      element.addEventListener('clearSelection', handleClearSelectionEvent);
+    }
+    
+    return () => {
+      if (element) {
+        element.removeEventListener('approveAll', handleApproveAllEvent);
+        element.removeEventListener('clearSelection', handleClearSelectionEvent);
+      }
+    };
+  }, [councilors]);
+
   const handleVoteChange = (councilorId: string, vote: boolean) => {
     setSelectedVotes(prev => ({
       ...prev,
@@ -120,7 +149,7 @@ export function AdminVotingSection({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-voting-section>
       {/* Lista de vereadores melhorada */}
       <div className="max-h-64 overflow-y-auto border rounded-xl p-4 bg-gray-50/50 space-y-3">
         {councilors.map((councilor) => {
@@ -220,65 +249,43 @@ export function AdminVotingSection({
         })}
       </div>
       
-      {/* Barra de ações melhorada */}
-      <div className="bg-gray-50 rounded-xl p-4 border">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 items-center">
-          {/* Botão Aprovar Oficialmente */}
-          <Button
-            variant="default"
-            onClick={handleApproveAll}
-            disabled={isSubmitting || councilors.length === 0}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-2"
-          >
-            <ThumbsUp className="w-4 h-4 mr-2" />
-            Aprovar Oficialmente
-          </Button>
-          
-          {/* Botão Limpar Seleção (centro) */}
-          <Button
-            variant="outline"
-            onClick={() => setSelectedVotes({})}
-            disabled={Object.keys(selectedVotes).length === 0}
-            className="border-gray-300 hover:bg-gray-100 transition-colors duration-200 px-4 py-2 justify-self-center"
-          >
-            Limpar Seleção
-          </Button>
-          
-          {/* Botão Registrar Votos (direita) */}
+      {/* Indicador de progresso */}
+      {Object.keys(selectedVotes).length > 0 && (
+        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+          <div className="text-sm text-blue-700 mb-2 font-medium">
+            {Object.keys(selectedVotes).length} de {councilors.length} vereadores selecionados
+          </div>
+          <div className="w-full bg-blue-200 rounded-full h-2">
+            <div 
+              className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${(Object.keys(selectedVotes).length / councilors.length) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+      
+      {/* Botão de registrar votos centralizado */}
+      {Object.keys(selectedVotes).length > 0 && (
+        <div className="flex justify-center pt-2">
           <Button
             onClick={handleSubmitVotes}
             disabled={Object.keys(selectedVotes).length === 0 || isSubmitting}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-2 justify-self-end"
+            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-2.5"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Registrando...
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Registrando Votos...
               </>
             ) : (
               <>
-                <ThumbsUp className="w-4 h-4 mr-2" />
-                Registrar Votos ({Object.keys(selectedVotes).length})
+                <ThumbsUp className="w-5 h-5 mr-2" />
+                Registrar {Object.keys(selectedVotes).length} Voto(s)
               </>
             )}
           </Button>
         </div>
-        
-        {/* Indicador de progresso */}
-        {Object.keys(selectedVotes).length > 0 && (
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <div className="text-sm text-gray-600 mb-2">
-              {Object.keys(selectedVotes).length} de {councilors.length} vereadores selecionados
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(Object.keys(selectedVotes).length / councilors.length) * 100}%` }}
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

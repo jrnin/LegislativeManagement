@@ -1411,21 +1411,55 @@ export default function EventDetails() {
                     <div className="space-y-4 pt-4 border-t">
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium">Registrar Votos dos Vereadores</h4>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={async () => {
-                            try {
-                              const response = await apiRequest<any[]>('/api/councilors');
-                              setCouncilors(response || []);
-                            } catch (error) {
-                              console.error('Error fetching councilors:', error);
-                            }
-                          }}
-                        >
-                          <RefreshCw className="w-4 h-4 mr-1" />
-                          Atualizar Lista
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              // Função para aprovar todos (será passada para AdminVotingSection)
+                              const adminVotingComponent = document.querySelector('[data-voting-section]');
+                              if (adminVotingComponent) {
+                                const event = new CustomEvent('approveAll');
+                                adminVotingComponent.dispatchEvent(event);
+                              }
+                            }}
+                            className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                          >
+                            <ThumbsUp className="w-4 h-4 mr-1" />
+                            Aprovar Oficialmente
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              // Função para limpar seleção (será passada para AdminVotingSection)
+                              const adminVotingComponent = document.querySelector('[data-voting-section]');
+                              if (adminVotingComponent) {
+                                const event = new CustomEvent('clearSelection');
+                                adminVotingComponent.dispatchEvent(event);
+                              }
+                            }}
+                            className="text-gray-600 hover:bg-gray-100"
+                          >
+                            <X className="w-4 h-4 mr-1" />
+                            Limpar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                const response = await apiRequest<any[]>('/api/councilors');
+                                setCouncilors(response || []);
+                              } catch (error) {
+                                console.error('Error fetching councilors:', error);
+                              }
+                            }}
+                          >
+                            <RefreshCw className="w-4 h-4 mr-1" />
+                            Atualizar Lista
+                          </Button>
+                        </div>
                       </div>
                       
                       {councilors.length === 0 && (
