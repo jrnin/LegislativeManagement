@@ -128,7 +128,6 @@ export default function SafeSidebar() {
               </Avatar>
               <div className="ml-3 flex-1 text-left">
                 <p className="text-sm font-medium text-slate-700">{user?.name || "Usuário"}</p>
-                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
               </div>
             </button>
           </DropdownMenuTrigger>

@@ -115,7 +115,6 @@ export default function Navbar({ setSidebarOpen }: NavbarProps) {
                 </Avatar>
                 <div className="hidden sm:flex flex-col items-start">
                   <span className="text-sm font-medium text-slate-700">{user?.name || "Usuário"}</span>
-                  <span className="text-xs text-slate-500">{user?.email}</span>
                 </div>
               </button>
             </DropdownMenuTrigger>
