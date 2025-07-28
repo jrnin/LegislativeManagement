@@ -139,7 +139,10 @@ export default function DocumentDetails() {
               <label className="font-medium text-gray-700">Data de Upload:</label>
               <p className="text-gray-900 flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                {format(new Date(document.uploadDate), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                {document.uploadDate && !isNaN(new Date(document.uploadDate).getTime()) 
+                  ? format(new Date(document.uploadDate), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
+                  : 'Data não disponível'
+                }
               </p>
             </div>
             
@@ -178,7 +181,10 @@ export default function DocumentDetails() {
                         <p className="font-medium">Evento #{document.event.eventNumber}</p>
                         <p className="text-sm text-gray-600">{document.event.category}</p>
                         <p className="text-sm text-gray-500">
-                          {format(new Date(document.event.eventDate), "dd/MM/yyyy", { locale: ptBR })}
+                          {document.event.eventDate && !isNaN(new Date(document.event.eventDate).getTime()) 
+                            ? format(new Date(document.event.eventDate), "dd/MM/yyyy", { locale: ptBR })
+                            : 'Data não disponível'
+                          }
                         </p>
                       </div>
                       <Button variant="outline" size="sm">
