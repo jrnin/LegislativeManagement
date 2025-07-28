@@ -582,7 +582,15 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getAllEvents(): Promise<Event[]> {
-    return await db.select().from(events).orderBy(desc(events.eventDate));
+    const eventsData = await db.select().from(events).orderBy(desc(events.eventDate));
+    return eventsData.map(event => ({
+      ...event,
+      eventDate: event.eventDate instanceof Date 
+        ? event.eventDate.toISOString().split('T')[0] 
+        : (typeof event.eventDate === 'string' && event.eventDate.includes('T'))
+          ? event.eventDate.split('T')[0]
+          : event.eventDate
+    }));
   }
   
   async getUpcomingEvents(limit: number = 3): Promise<Event[]> {
@@ -1271,7 +1279,11 @@ export class DatabaseStorage implements IStorage {
       const event = {
         id: eventData.id,
         eventNumber: eventData.eventNumber,
-        eventDate: eventData.eventDate,
+        eventDate: eventData.eventDate instanceof Date 
+          ? eventData.eventDate.toISOString().split('T')[0] 
+          : (typeof eventData.eventDate === 'string' && eventData.eventDate.includes('T'))
+            ? eventData.eventDate.split('T')[0]
+            : eventData.eventDate,
         eventTime: eventData.eventTime,
         location: eventData.location,
         mapUrl: eventData.mapUrl,
