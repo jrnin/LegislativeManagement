@@ -65,6 +65,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatEventDateSafe } from "@/lib/dateUtils";
 import ActivityDocumentLinker from "@/components/events/ActivityDocumentLinker";
 import EventActivityDocumentManager from "@/components/events/EventActivityDocumentManager";
 import EventActivityManager from "@/components/events/EventActivityManager";
@@ -560,8 +561,7 @@ export default function EventDetails() {
     eventDocuments: eventDetails.documents || []
   };
   
-  const eventDate = new Date(event.eventDate);
-  const formattedDate = format(eventDate, "PPP", { locale: ptBR });
+  const formattedDate = formatEventDateSafe(event.eventDate);
   const formattedTime = event.eventTime;
   
   const mapUrl = event.mapUrl || 
