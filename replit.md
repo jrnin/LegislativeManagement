@@ -110,6 +110,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 28, 2025**: Removed Replit Auth from Login Page - USER INTERFACE SIMPLIFICATION
+  - **User Request**: Completely removed "Entrar com Replit" button and authentication option from login page
+  - **UI Cleanup**: Removed divider line ("ou") and handleReplitLogin function
+  - **Button Update**: Changed button text from "Entrar com Email" to simply "Entrar"
+  - **Interface Streamlined**: Login page now shows only email/password authentication form
+  - **Code Cleanup**: Removed unused Replit Auth integration code from login component
+  - **Status**: Clean, focused login interface with only email/password authentication
+
 - **July 28, 2025**: Fixed Logout Button Functionality - CRITICAL EXIT REPAIR
   - **Root Cause**: Complex logout implementation was not properly clearing session and redirecting user
   - **Solution**: Simplified logout process with direct server call and immediate local data cleanup

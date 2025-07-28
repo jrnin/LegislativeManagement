@@ -46,10 +46,7 @@ export default function LoginPage({ onLogin }: LoginPageProps = {}) {
     },
   });
 
-  // Função de login com Replit Auth
-  const handleReplitLogin = () => {
-    window.location.href = "/api/login";
-  };
+
 
   // Função de login com email/senha
   const handleLogin = async (values: LoginFormValues) => {
@@ -148,24 +145,11 @@ export default function LoginPage({ onLogin }: LoginPageProps = {}) {
                       Entrando...
                     </>
                   ) : (
-                    "Entrar com Email"
+                    "Entrar"
                   )}
                 </Button>
               </form>
             </Form>
-            
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">ou</span>
-              </div>
-            </div>
-            
-            <Button className="w-full" onClick={handleReplitLogin} variant="outline">
-              Entrar com Replit
-            </Button>
           </CardContent>
         </Card>
       </div>
