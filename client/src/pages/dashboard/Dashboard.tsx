@@ -222,11 +222,7 @@ export default function Dashboard() {
                                     <span className="font-medium text-slate-900">
                                       {activity.activityType} Nº {activity.activityNumber}/{new Date(activity.activityDate).getFullYear()}
                                     </span>{" "}
-                                    {activity.needsApproval ? (
-                                      <span className="text-amber-700">foi submetido para aprovação</span>
-                                    ) : (
-                                      <span className="text-green-700">foi registrado</span>
-                                    )}
+                                    <span className="text-green-700">foi registrado</span>
                                   </p>
                                   <p className="mt-1 text-xs text-slate-500">
                                     Autor: {activity.authors ? activity.authors.map(a => a.name).join(", ") : "Não especificado"}

@@ -67,58 +67,77 @@ export function useAuth(shouldFetch: boolean = true) {
     }
   };
 
-  // Função para fazer logout
+  // Função para fazer logout com nova abordagem mais robusta
   const logout = async () => {
     console.log('Iniciando processo de logout...');
     
-    try {
-      setLocalLoading(true);
-      
-      // Fazer requisição de logout para o servidor
-      const response = await apiRequest("POST", "/api/auth/logout");
-      console.log('Resposta do servidor:', response);
-      
+    // Função para limpar todos os dados locais
+    const clearLocalData = () => {
       // Limpar todo o cache do React Query
       queryClient.clear();
       
       // Limpar dados locais do usuário
       queryClient.setQueryData(["/api/auth/user"], null);
       
-      // Forçar limpeza de todos os cookies localmente
-      document.cookie.split(";").forEach((c) => {
-        const eqPos = c.indexOf("=");
-        const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
-        // Limpar cookie com diferentes caminhos para garantir remoção
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+      // Limpar localStorage se houver dados salvos
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Forçar limpeza completa de todos os cookies
+      const cookies = document.cookie.split(";");
+      cookies.forEach((cookie) => {
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        if (name) {
+          // Múltiplas tentativas de limpeza de cookie para garantir remoção
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname}`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.${window.location.hostname}`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; secure`;
+        }
       });
+    };
+
+    // Função para redirecionar forçadamente
+    const forceRedirect = () => {
+      console.log('Redirecionando para página de login...');
+      // Usar replace para evitar voltar com o botão back
+      window.location.replace("/login");
+    };
+
+    try {
+      setLocalLoading(true);
+      
+      // Tentar fazer logout no servidor (não crítico se falhar)
+      try {
+        const response = await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log('Resposta do servidor:', response.status);
+      } catch (serverError) {
+        console.warn('Erro ao comunicar com servidor, continuando logout local:', serverError);
+      }
+      
+      // Limpar dados locais independentemente da resposta do servidor
+      clearLocalData();
       
       setLocalLoading(false);
       console.log('Logout concluído, redirecionando...');
       
-      // Aguardar um pouco para garantir que tudo foi limpo
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 100);
+      // Redirecionar imediatamente
+      forceRedirect();
       
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      console.error("Erro durante logout:", error);
       setLocalLoading(false);
       
-      // Mesmo em caso de erro, limpar tudo e redirecionar
-      queryClient.clear();
-      queryClient.setQueryData(["/api/auth/user"], null);
-      
-      // Limpar cookies mesmo com erro
-      document.cookie.split(";").forEach((c) => {
-        const eqPos = c.indexOf("=");
-        const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-      });
-      
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 100);
+      // Mesmo com erro, limpar tudo e redirecionar
+      clearLocalData();
+      forceRedirect();
     }
   };
 

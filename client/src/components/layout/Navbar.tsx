@@ -4,7 +4,8 @@ import {
   Menu,
   LogOut,
   Mail,
-  User
+  User,
+  Loader2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -19,20 +20,49 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import SearchButton from "@/components/search/SearchButton";
 import NotificationPanel from "@/components/ui/notifications/NotificationPanel";
+import { useToast } from "@/hooks/use-toast";
 
 interface NavbarProps {
   setSidebarOpen: (open: boolean) => void;
 }
 
 export default function Navbar({ setSidebarOpen }: NavbarProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
+  const { toast } = useToast();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const getInitials = (name: string) => {
     return name ? name.split(" ").map(part => part[0]).join("").toUpperCase() : "U";
   };
 
   const handleLogout = async () => {
-    await logout();
+    if (isLoggingOut) return; // Prevenir múltiplos cliques
+    
+    try {
+      setIsLoggingOut(true);
+      
+      toast({
+        title: "Saindo do sistema...",
+        description: "Aguarde enquanto fazemos logout de sua conta.",
+      });
+      
+      await logout();
+    } catch (error) {
+      console.error("Erro no logout:", error);
+      
+      toast({
+        title: "Erro ao sair",
+        description: "Ocorreu um erro, mas você será redirecionado.",
+        variant: "destructive",
+      });
+      
+      // Forçar redirecionamento mesmo com erro
+      setTimeout(() => {
+        window.location.replace("/login");
+      }, 1000);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
   
   return (
@@ -92,10 +122,15 @@ export default function Navbar({ setSidebarOpen }: NavbarProps) {
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={handleLogout}
-                className="px-2 py-1.5 cursor-pointer hover:bg-red-50 text-red-600 hover:text-red-700 rounded-md"
+                disabled={isLoggingOut}
+                className="px-2 py-1.5 cursor-pointer hover:bg-red-50 text-red-600 hover:text-red-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
+                {isLoggingOut ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="mr-2 h-4 w-4" />
+                )}
+                <span>{isLoggingOut ? "Saindo..." : "Sair"}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
