@@ -290,8 +290,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Logout route
-  app.get('/api/logout', (req, res) => {
+  // Custom logout route for email-based auth (avoiding conflict with replitAuth)
+  app.post('/api/auth/logout', (req, res) => {
     try {
       // Clear the session
       req.session.destroy((err) => {
@@ -303,7 +303,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        // Redirect to login page
+        // Clear session cookie
+        res.clearCookie('connect.sid');
+        
         res.json({
           success: true,
           message: 'Logout realizado com sucesso'

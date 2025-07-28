@@ -71,7 +71,7 @@ export function useAuth(shouldFetch: boolean = true) {
   const logout = async () => {
     try {
       setLocalLoading(true);
-      await apiRequest("GET", "/api/logout");
+      await apiRequest("POST", "/api/auth/logout");
       
       // Limpar todo o cache do React Query
       queryClient.clear();
