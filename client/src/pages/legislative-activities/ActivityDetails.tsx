@@ -88,7 +88,7 @@ export default function ActivityDetails() {
     activityNumber: number;
     description: string;
     activityDate: string;
-    status: string;
+    situacao: string;
     createdAt?: string;
     filePath?: string;
     fileName?: string;
@@ -345,16 +345,38 @@ export default function ActivityDetails() {
     deleteMutation.mutate();
   };
 
-  // Obter badge de status
-  const getStatusBadge = () => {
+  // Obter badge de situação
+  const getSituacaoBadge = () => {
     if (!activity) return null;
     
-    if (activity.status === "Aprovado") {
-      return <Badge className="bg-green-100 text-green-800">Aprovado</Badge>;
-    } else if (activity.status === "Rejeitado") {
-      return <Badge className="bg-red-100 text-red-800">Rejeitado</Badge>;
-    } else {
-      return <Badge className="bg-yellow-100 text-yellow-800">Aguardando Aprovação</Badge>;
+    const situacao = activity.situacao;
+    
+    // Mapear situações para cores
+    switch (situacao) {
+      case "Tramitação Finalizada":
+        return <Badge className="bg-green-100 text-green-800">{situacao}</Badge>;
+      case "Arquivado":
+        return <Badge className="bg-gray-100 text-gray-800">{situacao}</Badge>;
+      case "Aguardando Análise":
+        return <Badge className="bg-blue-100 text-blue-800">{situacao}</Badge>;
+      case "Análise de Parecer":
+        return <Badge className="bg-purple-100 text-purple-800">{situacao}</Badge>;
+      case "Aguardando Deliberação":
+        return <Badge className="bg-orange-100 text-orange-800">{situacao}</Badge>;
+      case "Aguardando Despacho do Presidente":
+        return <Badge className="bg-yellow-100 text-yellow-800">{situacao}</Badge>;
+      case "Aguardando Envio ao Executivo":
+        return <Badge className="bg-indigo-100 text-indigo-800">{situacao}</Badge>;
+      case "Devolvida ao Autor":
+        return <Badge className="bg-red-100 text-red-800">{situacao}</Badge>;
+      case "Pronta para Pauta":
+        return <Badge className="bg-emerald-100 text-emerald-800">{situacao}</Badge>;
+      case "Tramitando em Conjunto":
+        return <Badge className="bg-cyan-100 text-cyan-800">{situacao}</Badge>;
+      case "Vetado":
+        return <Badge className="bg-red-100 text-red-800">{situacao}</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800">{situacao || "Não informado"}</Badge>;
     }
   };
 
@@ -607,8 +629,8 @@ export default function ActivityDetails() {
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-sm text-muted-foreground">Status</h3>
-                  <div>{getStatusBadge()}</div>
+                  <h3 className="text-sm text-muted-foreground">Situação</h3>
+                  <div>{getSituacaoBadge()}</div>
                 </div>
               </div>
               
@@ -824,7 +846,7 @@ export default function ActivityDetails() {
                       )}
                       
                       {/* Status de aprovação */}
-                      {activity.status === "Aprovado" && (
+                      {activity.approved && (
                         <div className="relative">
                           <div className="absolute left-0 bg-green-500 rounded-full w-[12px] h-[12px] mt-1.5 -ml-[5px] flex items-center justify-center border-4 border-white z-10">
                           </div>
@@ -847,7 +869,7 @@ export default function ActivityDetails() {
                         </div>
                       )}
                       
-                      {activity.status === "Rejeitado" && (
+                      {activity.approved === false && (
                         <div className="relative">
                           <div className="absolute left-0 bg-red-500 rounded-full w-[12px] h-[12px] mt-1.5 -ml-[5px] flex items-center justify-center border-4 border-white z-10">
                           </div>
@@ -1038,7 +1060,7 @@ export default function ActivityDetails() {
         {/* Coluna lateral */}
         <div className="space-y-6">
           {/* Votação rápida */}
-          {isAuthenticated && activity.status === "Aguardando Votação" && (
+          {isAuthenticated && !activity.approved && activity.situacao !== "Tramitação Finalizada" && activity.situacao !== "Arquivado" && (
             <Card>
               <CardHeader>
                 <CardTitle>Registrar Voto</CardTitle>

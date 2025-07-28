@@ -136,6 +136,16 @@ Preferred communication style: Simple, everyday language.
   - **Security Enhancement**: Ensured all passwords are properly hashed with bcrypt for security
   - **Status**: Login authentication fully functional for all users with proper password hashing
 
+- **July 28, 2025**: Fixed Activity Status Display to Show Database Values - DATA INTEGRITY FIX
+  - **Root Cause**: Activity details were showing hardcoded status values instead of actual database `situacao` field
+  - **Interface Fix**: Updated ActivityType interface to use `situacao` field instead of `status`
+  - **Display Enhancement**: Created comprehensive `getSituacaoBadge()` function mapping all legislative workflow states
+  - **Color Coding**: Implemented proper color scheme for all situacao values (Tramitação Finalizada, Arquivado, etc.)
+  - **Logic Updates**: Fixed approval status checks to use `approved` boolean field instead of status strings
+  - **Field Rename**: Changed "Status" label to "Situação" to match database terminology
+  - **Conditional Display**: Updated voting interface to show based on actual situacao values
+  - **Status**: Activity details now correctly display actual database situacao values with proper color coding
+
 - **July 28, 2025**: Fixed Event Details Navigation Button - NAVIGATION FIX
   - **Root Cause**: Button "Detalhes" in Activities tab was directing to wrong route /legislative-activities instead of /activities
   - **Solution**: Updated EventActivityManager.tsx to use correct route /activities/${activity.id}
