@@ -158,10 +158,15 @@ export default function EventDetailsPage() {
 
   const formatEventDate = (dateString: string) => {
     try {
+      console.log('Data original recebida:', dateString);
       // Parse the date string and handle timezone correctly
       const date = new Date(dateString + 'T12:00:00'); // Add time to avoid UTC conversion issues
-      return format(date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+      console.log('Data após conversão:', date);
+      const formatted = format(date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+      console.log('Data formatada:', formatted);
+      return formatted;
     } catch (error) {
+      console.error('Erro ao formatar data:', error);
       return dateString;
     }
   };
