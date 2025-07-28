@@ -110,6 +110,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 28, 2025**: Disabled Email Notifications for Councilors - SYSTEM CONFIGURATION CHANGE
+  - **User Request**: Temporarily disabled email sending functionality for councilor (vereador) users
+  - **Technical Implementation**: Commented out email notification code in event creation route
+  - **Affected Function**: sendEventNotificationEmail function disabled with comment block
+  - **Log Update**: Changed notification message to indicate email function is disabled
+  - **Scope**: Only affects new event notification emails to councilors
+  - **Future Activation**: Code preserved in comments for easy re-activation when needed
+  - **Status**: Email notifications to councilors temporarily disabled as requested
+
 - **July 28, 2025**: Fixed Users2Icon Import Error in SafeSidebar - CRITICAL RUNTIME ERROR FIX
   - **Root Cause**: Users2Icon was referenced but not imported from lucide-react causing runtime error
   - **Solution**: Added Users2 to imports and corrected navigation array reference

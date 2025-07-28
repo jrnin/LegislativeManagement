@@ -894,10 +894,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const councilors = await storage.getCouncilors();
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         
-        console.log(`Enviando notificação de novo evento para ${councilors.length} vereadores`);
+        console.log(`Notificação de e-mail para vereadores desabilitada temporariamente para ${councilors.length} vereadores`);
         
+        // FUNÇÃO DE E-MAIL DESABILITADA TEMPORARIAMENTE - Solicitação do usuário
         // Send emails to all councilors asynchronously
-        const emailPromises = councilors.map(async (councilor) => {
+        /* const emailPromises = councilors.map(async (councilor) => {
           try {
             const success = await sendEventNotificationEmail(councilor, event, baseUrl);
             if (success) {
@@ -917,7 +918,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           result.status === 'fulfilled' && result.value === true
         ).length;
         
-        console.log(`Notificações enviadas: ${successCount}/${councilors.length}`);
+        console.log(`Notificações enviadas: ${successCount}/${councilors.length}`); */
         
       } catch (emailError) {
         console.error("Erro ao enviar notificações por e-mail:", emailError);
