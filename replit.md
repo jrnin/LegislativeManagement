@@ -110,6 +110,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 28, 2025**: Fixed User Login Issue - CRITICAL AUTHENTICATION REPAIR
+  - **Root Cause**: User "arquivoscamaradejaiba@gmail.com" had password stored as plain text instead of bcrypt hash
+  - **Database Issue**: Password "14725836" was not hashed, causing bcrypt.compare() authentication to fail
+  - **Solution**: Generated proper bcrypt hash for the password and updated database record
+  - **Authentication Fix**: Login system now properly validates hashed passwords for all users
+  - **User Status**: arquivoscamaradejaiba@gmail.com can now successfully log into the system
+  - **Security Enhancement**: Ensured all passwords are properly hashed with bcrypt for security
+  - **Status**: Login authentication fully functional for all users with proper password hashing
+
 - **July 28, 2025**: Fixed "Próximos Eventos" Widget in Dashboard - CRITICAL WIDGET REPAIR
   - **Root Cause**: getUpcomingEvents method was filtering for future events only, but all system events had past dates
   - **Solution**: Enhanced method to return recent events when no future events exist for better user experience
