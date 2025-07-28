@@ -18,6 +18,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Legislature } from "@shared/schema";
 import { Loader2 } from "lucide-react";
 
+// Componente para label com asterisco vermelho indicando campo obrigatório
+const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
+  <span>
+    {children} <span className="text-red-500">*</span>
+  </span>
+);
+
 // Função de formatação de data
 function formatDate(date: Date | string | null | undefined): string {
   if (!date) return '';
@@ -356,7 +363,9 @@ export default function UserForm() {
           <CardDescription>
             {isEditing 
               ? "Altere as informações do usuário nos campos abaixo." 
-              : "Preencha os campos abaixo para criar um novo usuário."}
+              : "Preencha os campos abaixo para criar um novo usuário."} 
+            <br />
+            <span className="text-red-500 font-medium">*</span> indica campos obrigatórios.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -417,7 +426,7 @@ export default function UserForm() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nome Completo</FormLabel>
+                      <FormLabel><RequiredLabel>Nome Completo</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input placeholder="Nome completo" {...field} />
                       </FormControl>
@@ -431,7 +440,7 @@ export default function UserForm() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel><RequiredLabel>Email</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input placeholder="email@exemplo.com" {...field} />
                       </FormControl>
@@ -445,7 +454,7 @@ export default function UserForm() {
                   name="cpf"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>CPF</FormLabel>
+                      <FormLabel><RequiredLabel>CPF</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="000.000.000-00" 
@@ -464,7 +473,7 @@ export default function UserForm() {
                   name="birthDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Data de Nascimento</FormLabel>
+                      <FormLabel><RequiredLabel>Data de Nascimento</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -570,7 +579,7 @@ export default function UserForm() {
                   name="zipCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>CEP</FormLabel>
+                      <FormLabel><RequiredLabel>CEP</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="00000-000" 
@@ -590,7 +599,7 @@ export default function UserForm() {
                   name="address"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Endereço</FormLabel>
+                      <FormLabel><RequiredLabel>Endereço</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input placeholder="Rua/Avenida" {...field} />
                       </FormControl>
@@ -604,7 +613,7 @@ export default function UserForm() {
                   name="number"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Número</FormLabel>
+                      <FormLabel><RequiredLabel>Número</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input placeholder="Número" {...field} />
                       </FormControl>
@@ -618,7 +627,7 @@ export default function UserForm() {
                   name="neighborhood"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bairro</FormLabel>
+                      <FormLabel><RequiredLabel>Bairro</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input placeholder="Bairro" {...field} />
                       </FormControl>
@@ -632,7 +641,7 @@ export default function UserForm() {
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cidade</FormLabel>
+                      <FormLabel><RequiredLabel>Cidade</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input placeholder="Cidade" {...field} />
                       </FormControl>
@@ -646,7 +655,7 @@ export default function UserForm() {
                   name="state"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Estado</FormLabel>
+                      <FormLabel><RequiredLabel>Estado</RequiredLabel></FormLabel>
                       <FormControl>
                         <Input placeholder="UF" maxLength={2} {...field} />
                       </FormControl>
@@ -667,7 +676,7 @@ export default function UserForm() {
                   name="role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Perfil</FormLabel>
+                      <FormLabel><RequiredLabel>Perfil</RequiredLabel></FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         defaultValue={field.value}
@@ -728,7 +737,13 @@ export default function UserForm() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{isEditing ? "Nova Senha" : "Senha"}</FormLabel>
+                        <FormLabel>
+                          {isEditing ? (
+                            "Nova Senha (Opcional)"
+                          ) : (
+                            <RequiredLabel>Senha</RequiredLabel>
+                          )}
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             type="password" 
@@ -751,7 +766,13 @@ export default function UserForm() {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Confirmar Senha</FormLabel>
+                        <FormLabel>
+                          {isEditing ? (
+                            "Confirmar Nova Senha (Opcional)"
+                          ) : (
+                            <RequiredLabel>Confirmar Senha</RequiredLabel>
+                          )}
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             type="password" 

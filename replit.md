@@ -110,6 +110,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 28, 2025**: Enhanced User Form with Required Field Indicators - USER EXPERIENCE IMPROVEMENT
+  - **Visual Enhancement**: Added red asterisks (*) to all required fields in user creation/editing forms
+  - **Required Field Component**: Created reusable RequiredLabel component for consistent visual indication
+  - **Comprehensive Coverage**: Applied required indicators to all mandatory fields:
+    - Nome Completo, Email, CPF, Data de Nascimento (personal info)
+    - CEP, Endereço, Número, Bairro, Cidade, Estado (address info)
+    - Perfil, Senha, Confirmar Senha (system info - creation only)
+  - **Smart Password Handling**: Password fields show as optional during editing mode with clear labeling
+  - **User Guidance**: Added explanatory text "* indica campos obrigatórios" in form description
+  - **Status**: Clear visual hierarchy helps users identify which fields must be completed
+
 - **July 28, 2025**: Removed Registration Option from Login Page - USER INTERFACE SIMPLIFICATION
   - **User Request**: Completely removed "Cadastrar" tab and registration functionality from login page
   - **Interface Streamlined**: Login page now shows only login form without tabs or registration options
