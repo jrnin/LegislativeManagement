@@ -12,7 +12,8 @@ import {
   Image,
   User,
   LogOut,
-  Loader2
+  Loader2,
+  Users2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,7 +36,7 @@ const navigation = [
   { name: "Usuários", href: "/users", icon: Users },
   { name: "Comissões", href: "/committees", icon: Building },
   { name: "Vereadores", href: "/councilors", icon: UserCheck },
-  { name: "Mesa Diretora", href: "/boards", icon: Users2Icon },
+  { name: "Mesa Diretora", href: "/boards", icon: Users2 },
   { name: "Legislatura", href: "/legislatures", icon: Gavel },
   { name: "Noticias", href: "/news", icon: FileText },
   
