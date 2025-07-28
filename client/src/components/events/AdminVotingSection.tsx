@@ -27,7 +27,7 @@ export function AdminVotingSection({
   onVotesRegistered,
   onOptimisticUpdate 
 }: AdminVotingSectionProps) {
-  const [selectedVotes, setSelectedVotes] = useState<Record<string, { vote: boolean; comment: string }>>({});
+  const [selectedVotes, setSelectedVotes] = useState<Record<string, { vote: boolean }>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -35,18 +35,7 @@ export function AdminVotingSection({
     setSelectedVotes(prev => ({
       ...prev,
       [councilorId]: {
-        vote,
-        comment: prev[councilorId]?.comment || ""
-      }
-    }));
-  };
-
-  const handleCommentChange = (councilorId: string, comment: string) => {
-    setSelectedVotes(prev => ({
-      ...prev,
-      [councilorId]: {
-        vote: prev[councilorId]?.vote || true,
-        comment
+        vote
       }
     }));
   };
@@ -55,7 +44,7 @@ export function AdminVotingSection({
     const votesToSubmit = Object.entries(selectedVotes).map(([councilorId, voteData]) => ({
       userId: councilorId,
       vote: voteData.vote,
-      comment: voteData.comment || ""
+      comment: ""
     }));
 
     if (votesToSubmit.length === 0) {
@@ -114,12 +103,11 @@ export function AdminVotingSection({
   };
 
   const handleApproveAll = () => {
-    const allApprovedVotes: Record<string, { vote: boolean; comment: string }> = {};
+    const allApprovedVotes: Record<string, { vote: boolean }> = {};
     
     councilors.forEach((councilor) => {
       allApprovedVotes[councilor.id] = {
-        vote: true, // Todos marcados como aprovado
-        comment: ""
+        vote: true // Todos marcados como aprovado
       };
     });
     
@@ -194,7 +182,7 @@ export function AdminVotingSection({
                   </div>
                   
                   {isSelected && (
-                    <div className="space-y-3 pl-4 border-l-2 border-gray-100">
+                    <div className="pl-4 border-l-2 border-gray-100">
                       <div className="flex gap-2">
                         <Button
                           variant={selectedVotes[councilor.id]?.vote === true ? "default" : "outline"}
@@ -223,19 +211,6 @@ export function AdminVotingSection({
                           Rejeitar
                         </Button>
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor={`comment-${councilor.id}`} className="text-sm font-medium text-gray-700">
-                          Comentário (opcional):
-                        </Label>
-                        <Textarea
-                          id={`comment-${councilor.id}`}
-                          value={selectedVotes[councilor.id]?.comment || ""}
-                          onChange={(e) => handleCommentChange(councilor.id, e.target.value)}
-                          placeholder="Digite um comentário sobre sua decisão..."
-                          className="resize-none min-h-[60px] text-sm border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
-                        />
-                      </div>
                     </div>
                   )}
                 </div>
@@ -247,46 +222,46 @@ export function AdminVotingSection({
       
       {/* Barra de ações melhorada */}
       <div className="bg-gray-50 rounded-xl p-4 border">
-        <div className="flex items-center justify-between gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 items-center">
           {/* Botão Aprovar Oficialmente */}
           <Button
             variant="default"
             onClick={handleApproveAll}
             disabled={isSubmitting || councilors.length === 0}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5 flex-shrink-0"
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-2"
           >
-            <ThumbsUp className="w-5 h-5 mr-2" />
+            <ThumbsUp className="w-4 h-4 mr-2" />
             Aprovar Oficialmente
           </Button>
           
-          {/* Grupo de botões de ação alinhados à direita */}
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setSelectedVotes({})}
-              disabled={Object.keys(selectedVotes).length === 0}
-              className="border-gray-300 hover:bg-gray-100 transition-colors duration-200 px-4 py-2.5"
-            >
-              Limpar Seleção
-            </Button>
-            <Button
-              onClick={handleSubmitVotes}
-              disabled={Object.keys(selectedVotes).length === 0 || isSubmitting}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-2.5"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Registrando...
-                </>
-              ) : (
-                <>
-                  <ThumbsUp className="w-5 h-5 mr-2" />
-                  Registrar Votos ({Object.keys(selectedVotes).length})
-                </>
-              )}
-            </Button>
-          </div>
+          {/* Botão Limpar Seleção (centro) */}
+          <Button
+            variant="outline"
+            onClick={() => setSelectedVotes({})}
+            disabled={Object.keys(selectedVotes).length === 0}
+            className="border-gray-300 hover:bg-gray-100 transition-colors duration-200 px-4 py-2 justify-self-center"
+          >
+            Limpar Seleção
+          </Button>
+          
+          {/* Botão Registrar Votos (direita) */}
+          <Button
+            onClick={handleSubmitVotes}
+            disabled={Object.keys(selectedVotes).length === 0 || isSubmitting}
+            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-2 justify-self-end"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Registrando...
+              </>
+            ) : (
+              <>
+                <ThumbsUp className="w-4 h-4 mr-2" />
+                Registrar Votos ({Object.keys(selectedVotes).length})
+              </>
+            )}
+          </Button>
         </div>
         
         {/* Indicador de progresso */}
