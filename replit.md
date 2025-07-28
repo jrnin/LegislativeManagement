@@ -110,6 +110,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 28, 2025**: Removed Registration Option from Login Page - USER INTERFACE SIMPLIFICATION
+  - **User Request**: Completely removed "Cadastrar" tab and registration functionality from login page
+  - **Interface Streamlined**: Login page now shows only login form without tabs or registration options
+  - **Code Cleanup**: Removed all registration-related schemas, forms, handlers, and UI components
+  - **Simplified Design**: Single card interface showing only email/password login and Replit Auth option
+  - **Status**: Clean, focused login interface with only authentication functionality
+
 - **July 28, 2025**: Resolved Event Date Timezone Issues System-wide - CRITICAL DATE DISPLAY FIX
   - **Root Cause Identified**: UTC timezone conversion causing dates to display one day earlier across all interfaces
   - **Centralized Solution**: Created `dateUtils.ts` utility file with timezone-safe formatting functions
