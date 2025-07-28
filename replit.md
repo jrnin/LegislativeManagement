@@ -136,6 +136,15 @@ Preferred communication style: Simple, everyday language.
   - **Security Enhancement**: Ensured all passwords are properly hashed with bcrypt for security
   - **Status**: Login authentication fully functional for all users with proper password hashing
 
+- **July 28, 2025**: Fixed Activity Dates Display in Event Details - DATE FORMATTING FIX
+  - **Root Cause**: Activity dates in event details "Atividades" tab were showing one day earlier due to timezone conversion
+  - **Solution**: Updated EventActivityManager.tsx to use `formatDateSimpleSafe()` instead of `new Date()` conversion
+  - **Technical Fix**: Replaced `format(new Date(activity.activityDate), "dd/MM/yyyy")` with `formatDateSimpleSafe(activity.activityDate)`
+  - **Database Verification**: Confirmed database shows correct dates (2025-02-03) matching user input expectations
+  - **User Interface**: Activity dates in event management now display correctly (03/02/2025 instead of 02/02/2025)
+  - **Centralized Solution**: Leveraged existing dateUtils.ts timezone-safe formatting functions
+  - **Status**: All activity dates in event details now show accurate dates matching database records
+
 - **July 28, 2025**: Fixed Activity Status Display to Show Database Values - DATA INTEGRITY FIX
   - **Root Cause**: Activity details were showing hardcoded status values instead of actual database `situacao` field
   - **Interface Fix**: Updated ActivityType interface to use `situacao` field instead of `status`

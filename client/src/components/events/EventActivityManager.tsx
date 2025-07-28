@@ -14,6 +14,7 @@ import { Plus, X, Activity, Calendar, Search, FileText, User } from 'lucide-reac
 import { LegislativeActivity } from '@shared/schema';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { formatDateSimpleSafe } from '@/lib/dateUtils';
 import { addTimelineEntry, timelineActions } from '@/lib/timeline';
 
 interface EventActivityManagerProps {
@@ -288,7 +289,7 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
                           <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              {format(new Date(activity.activityDate), "dd/MM/yyyy", { locale: ptBR })}
+                              {formatDateSimpleSafe(activity.activityDate)}
                             </div>
                             <div className="flex items-center gap-1">
                               <FileText className="w-3 h-3" />
@@ -366,7 +367,7 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        {format(new Date(activity.activityDate), "dd/MM/yyyy", { locale: ptBR })}
+                        {formatDateSimpleSafe(activity.activityDate)}
                       </div>
                       <div className="flex items-center gap-1">
                         <FileText className="w-3 h-3" />
