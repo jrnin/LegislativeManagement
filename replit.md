@@ -110,6 +110,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 27, 2025**: Fixed Document Management System Issues - CRITICAL BUG FIXES
+  - **Authentication Fix**: Corrected document editing authentication by replacing `requireAuth` with `requireAdmin` middleware
+  - **Date Validation**: Added robust date validation for document upload dates and event dates in DocumentDetails component
+  - **Error Handling**: Implemented fallback display for invalid dates showing "Data não disponível" instead of crashes
+  - **UI Stability**: Fixed "Invalid time value" errors that prevented document viewing and editing
+  - **Admin Access**: Ensured only administrators can edit documents with proper permission validation
+  - **Middleware Optimization**: Removed duplicate permission checks and streamlined authentication flow
+  - **User Experience**: Document viewing and editing now works seamlessly without date-related crashes
+  - **Status**: Document management module fully operational with robust error handling
+
 - **July 27, 2025**: Implemented Real-time Weather Integration for Jaíba/MG - MAJOR UTILITY ENHANCEMENT
   - **Weather API Integration**: Successfully integrated Open-Meteo API for real-time weather data from Jaíba/MG
   - **Coordinates Configuration**: Configured accurate coordinates (Latitude -15.3372, Longitude -43.6719) for Jaíba city
