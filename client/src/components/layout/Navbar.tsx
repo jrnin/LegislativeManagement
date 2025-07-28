@@ -103,17 +103,20 @@ export default function Navbar({ setSidebarOpen }: NavbarProps) {
           {/* Profile dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-2 p-1.5 rounded-full hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/30">
-                <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
+              <button className="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/30 border border-slate-200">
+                <Avatar className="h-10 w-10 border-2 border-primary-200 shadow-md">
                   <AvatarImage 
                     src={user?.profileImageUrl || ""} 
                     alt={user?.name || "Usuário"} 
                   />
-                  <AvatarFallback className="bg-gradient-to-br from-primary-400 to-primary-600 text-white">
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-sm">
                     {user?.name ? getInitials(user.name) : "U"}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden sm:inline text-sm font-medium text-slate-600">{user?.name || user?.email}</span>
+                <div className="hidden sm:flex flex-col items-start">
+                  <span className="text-sm font-medium text-slate-700">{user?.name || "Usuário"}</span>
+                  <span className="text-xs text-slate-500">{user?.email}</span>
+                </div>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 p-2">
