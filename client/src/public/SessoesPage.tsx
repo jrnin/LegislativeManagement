@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { formatDateSimpleSafe } from "@/lib/dateUtils";
 import { 
   Calendar, 
   Clock, 
@@ -411,7 +412,7 @@ export default function SessoesPage() {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">Data</p>
-                          <p className="font-medium">{formatEventDate(event.eventDate)}</p>
+                          <p className="font-medium">{formatDateSimpleSafe(event.eventDate)}</p>
                         </div>
                       </div>
 

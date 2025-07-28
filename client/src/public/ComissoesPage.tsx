@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Users, Calendar, FileText, ChevronRight, Clock, MapPin, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDateSimpleSafe, formatEventDateSafe } from "@/lib/dateUtils";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -287,7 +288,7 @@ export default function ComissoesPage() {
                     <div className="space-y-2 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        <span>{format(new Date(event.eventDate + 'T12:00:00'), "dd/MM/yyyy", { locale: ptBR })}</span>
+                        <span>{formatDateSimpleSafe(event.eventDate)}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4" />
@@ -334,7 +335,7 @@ export default function ComissoesPage() {
                               <div>
                                 <label className="text-sm font-medium text-gray-700">Data</label>
                                 <p className="text-sm text-gray-600">
-                                  {format(new Date(event.eventDate + 'T12:00:00'), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                                  {formatEventDateSafe(event.eventDate)}
                                 </p>
                               </div>
                               <div>

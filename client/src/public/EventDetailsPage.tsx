@@ -4,6 +4,7 @@ import { useParams, Link } from 'wouter';
 import { Helmet } from 'react-helmet';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { formatEventDateSafe } from "@/lib/dateUtils";
 import { 
   Calendar, 
   Clock, 
@@ -156,15 +157,7 @@ export default function EventDetailsPage() {
   const attendance = eventDetails?.attendance || [];
   const legislature = eventDetails?.legislature;
 
-  const formatEventDate = (dateString: string) => {
-    try {
-      // Parse the date string and handle timezone correctly
-      const date = new Date(dateString + 'T12:00:00'); // Add time to avoid UTC conversion issues
-      return format(date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
-    } catch (error) {
-      return dateString;
-    }
-  };
+  // Using centralized date formatting utility
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -278,7 +271,7 @@ export default function EventDetailsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Data</p>
-                      <p className="font-semibold">{formatEventDate(event.eventDate)}</p>
+                      <p className="font-semibold">{formatEventDateSafe(event.eventDate)}</p>
                     </div>
                   </div>
                   
@@ -383,7 +376,7 @@ export default function EventDetailsPage() {
                             </p>
                           </div>
                           <p className="text-sm opacity-90">
-                            {formatEventDate(event.eventDate)}
+                            {formatEventDateSafe(event.eventDate)}
                           </p>
                         </div>
                       </div>
@@ -392,7 +385,7 @@ export default function EventDetailsPage() {
                     {/* Event title below video */}
                     <div className="mt-3 text-center">
                       <h4 className="font-semibold text-gray-800">
-                        {event.category} #{event.eventNumber} - {formatEventDate(event.eventDate)}
+                        {event.category} #{event.eventNumber} - {formatEventDateSafe(event.eventDate)}
                       </h4>
                       <p className="text-sm text-gray-600 mt-1">
                         {event.description}
@@ -990,7 +983,7 @@ export default function EventDetailsPage() {
                                 <span className="text-sm font-medium">Data do Evento</span>
                               </div>
                               <p className="text-sm text-gray-600">
-                                {formatEventDate(event.eventDate)} às {event.eventTime}
+                                {formatEventDateSafe(event.eventDate)} às {event.eventTime}
                               </p>
                               <p className="text-xs text-gray-500">{event.location}</p>
                             </div>
