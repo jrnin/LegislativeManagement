@@ -1519,40 +1519,6 @@ export default function EventDetails() {
           </div>
           
           <DialogFooter>
-            {user?.role === 'admin' && (
-              <>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => {
-                    approveActivityMutation.mutate({
-                      activityId: selectedActivityId!,
-                      approved: false,
-                      comment: approvalComment
-                    });
-                  }}
-                  disabled={approveActivityMutation.isPending}
-                >
-                  <X className="mr-2 h-4 w-4" />
-                  Rejeitar Oficialmente
-                </Button>
-                <Button
-                  type="button"
-                  variant="default"
-                  onClick={() => {
-                    approveActivityMutation.mutate({
-                      activityId: selectedActivityId!,
-                      approved: true,
-                      comment: approvalComment
-                    });
-                  }}
-                  disabled={approveActivityMutation.isPending}
-                >
-                  <Check className="mr-2 h-4 w-4" />
-                  Aprovar Oficialmente
-                </Button>
-              </>
-            )}
             <Button
               type="button"
               variant="outline"

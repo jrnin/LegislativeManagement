@@ -187,6 +187,13 @@ Preferred communication style: Simple, everyday language.
   - **User Guidance**: Added explanatory text "* indica campos obrigatórios" in form description
   - **Status**: Clear visual hierarchy helps users identify which fields must be completed
 
+- **July 28, 2025**: Removed Official Approval Buttons from Activity Analysis Dialog - USER INTERFACE SIMPLIFICATION
+  - **User Request**: Removed "Rejeitar Oficialmente" and "Aprovar Oficialmente" buttons from activity analysis dialog
+  - **Interface Streamlined**: Dialog footer now contains only "Fechar" button for cleaner interface
+  - **Code Cleanup**: Removed admin-only approval/rejection buttons and associated click handlers
+  - **Dialog Simplification**: Activity analysis dialog now focuses on viewing and voting without official approval actions
+  - **Status**: Simplified dialog interface with reduced button complexity per user preference
+
 - **July 28, 2025**: Enhanced Admin Voting Interface with Improved Visual Design - MAJOR UI/UX IMPROVEMENT
   - **Visual Redesign**: Completely redesigned AdminVotingSection with modern card-based layout and improved spacing
   - **Color-Coded Cards**: Implemented dynamic border colors (green for approved, red for rejected, blue for hover states)
