@@ -358,7 +358,7 @@ export default function CommitteeDetails() {
                           <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              {format(new Date(event.eventDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                              {format(new Date(event.eventDate + 'T12:00:00'), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock className="h-4 w-4" />

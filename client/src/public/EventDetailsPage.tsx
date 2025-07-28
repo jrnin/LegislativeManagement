@@ -158,7 +158,8 @@ export default function EventDetailsPage() {
 
   const formatEventDate = (dateString: string) => {
     try {
-      const date = new Date(dateString);
+      // Parse the date string and handle timezone correctly
+      const date = new Date(dateString + 'T12:00:00'); // Add time to avoid UTC conversion issues
       return format(date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
     } catch (error) {
       return dateString;

@@ -382,7 +382,7 @@ export default function CommitteeList() {
                       <div className="space-y-1 text-xs text-gray-600">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          <span>{format(new Date(event.eventDate), "dd/MM/yyyy", { locale: ptBR })}</span>
+                          <span>{format(new Date(event.eventDate + 'T12:00:00'), "dd/MM/yyyy", { locale: ptBR })}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
