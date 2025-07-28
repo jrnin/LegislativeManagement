@@ -110,6 +110,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 28, 2025**: Resolved Event Date Timezone Issues System-wide - CRITICAL DATE DISPLAY FIX
+  - **Root Cause Identified**: UTC timezone conversion causing dates to display one day earlier across all interfaces
+  - **Centralized Solution**: Created `dateUtils.ts` utility file with timezone-safe formatting functions
+  - **formatEventDateSafe Function**: Adds 'T12:00:00' to prevent UTC conversion, ensuring correct date display
+  - **formatDateSimpleSafe Function**: Provides simple DD/MM/YYYY format with timezone protection
+  - **System-wide Implementation**: Applied fixes to all date displays across public and administrative interfaces:
+    - EventDetailsPage.tsx (public interface) - "27 de julho de 2025" now displays correctly
+    - SessoesPage.tsx (public sessions) - All event dates display accurate dates
+    - ComissoesPage.tsx (public committees) - Committee meeting dates corrected
+    - EventDetails.tsx (administrative) - Administrative event details show proper dates
+  - **Database Integrity**: Event dates stored correctly in database, issue was frontend timezone handling
+  - **User Confirmation**: All interfaces now display consistent, accurate dates as confirmed by user testing
+  - **Technical Solution**: Replaced manual `new Date()` conversions with centralized utility functions
+  - **Status**: Complete timezone issue resolution across entire legislative management system
+
 - **July 27, 2025**: Fixed Document Management System Issues - CRITICAL BUG FIXES
   - **Authentication Fix**: Corrected document editing authentication by replacing `requireAuth` with `requireAdmin` middleware
   - **Date Validation**: Added robust date validation for document upload dates and event dates in DocumentDetails component
