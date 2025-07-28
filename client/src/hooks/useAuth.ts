@@ -88,13 +88,13 @@ export function useAuth(shouldFetch: boolean = true) {
       
       setLocalLoading(false);
       
-      // Fazer redirecionamento completo da página
-      window.location.replace("/login");
+      // Fazer redirecionamento completo da página para garantir limpeza total
+      window.location.href = "/login";
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
       setLocalLoading(false);
       // Mesmo em caso de erro, redirecionar para login
-      window.location.replace("/login");
+      window.location.href = "/login";
     }
   };
 
