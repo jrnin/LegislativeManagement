@@ -69,9 +69,14 @@ export function useAuth(shouldFetch: boolean = true) {
 
   // Função para fazer logout
   const logout = async () => {
+    console.log('Iniciando processo de logout...');
+    
     try {
       setLocalLoading(true);
-      await apiRequest("POST", "/api/auth/logout");
+      
+      // Fazer requisição de logout para o servidor
+      const response = await apiRequest("POST", "/api/auth/logout");
+      console.log('Resposta do servidor:', response);
       
       // Limpar todo o cache do React Query
       queryClient.clear();
@@ -79,22 +84,41 @@ export function useAuth(shouldFetch: boolean = true) {
       // Limpar dados locais do usuário
       queryClient.setQueryData(["/api/auth/user"], null);
       
-      // Forçar limpeza de cookies/sessão localmente
+      // Forçar limpeza de todos os cookies localmente
       document.cookie.split(";").forEach((c) => {
         const eqPos = c.indexOf("=");
-        const name = eqPos > -1 ? c.substr(0, eqPos) : c;
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+        // Limpar cookie com diferentes caminhos para garantir remoção
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
       });
       
       setLocalLoading(false);
+      console.log('Logout concluído, redirecionando...');
       
-      // Fazer redirecionamento completo da página para garantir limpeza total
-      window.location.href = "/login";
+      // Aguardar um pouco para garantir que tudo foi limpo
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 100);
+      
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
       setLocalLoading(false);
-      // Mesmo em caso de erro, redirecionar para login
-      window.location.href = "/login";
+      
+      // Mesmo em caso de erro, limpar tudo e redirecionar
+      queryClient.clear();
+      queryClient.setQueryData(["/api/auth/user"], null);
+      
+      // Limpar cookies mesmo com erro
+      document.cookie.split(";").forEach((c) => {
+        const eqPos = c.indexOf("=");
+        const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+      });
+      
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 100);
     }
   };
 

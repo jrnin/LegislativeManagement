@@ -293,24 +293,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Custom logout route for email-based auth (avoiding conflict with replitAuth)
   app.post('/api/auth/logout', (req, res) => {
     try {
+      console.log('Processando logout personalizado...');
+      
       // Clear the session
-      req.session.destroy((err) => {
-        if (err) {
-          console.error('Erro ao fazer logout:', err);
-          return res.status(500).json({
-            success: false,
-            message: 'Erro ao encerrar a sessão'
+      if (req.session) {
+        req.session.destroy((err) => {
+          if (err) {
+            console.error('Erro ao fazer logout:', err);
+          }
+          
+          // Clear session cookie regardless of destroy result
+          res.clearCookie('connect.sid', { 
+            path: '/',
+            httpOnly: true,
+            secure: false // Set to false for development
           });
-        }
+          
+          console.log('Logout processado com sucesso');
+          res.json({
+            success: true,
+            message: 'Logout realizado com sucesso'
+          });
+        });
+      } else {
+        // No session to destroy, just clear cookie and respond
+        res.clearCookie('connect.sid', { 
+          path: '/',
+          httpOnly: true,
+          secure: false
+        });
         
-        // Clear session cookie
-        res.clearCookie('connect.sid');
-        
+        console.log('Logout processado (sem sessão ativa)');
         res.json({
           success: true,
           message: 'Logout realizado com sucesso'
         });
-      });
+      }
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
       res.status(500).json({
