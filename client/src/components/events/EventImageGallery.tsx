@@ -27,11 +27,13 @@ export function EventImageGallery({ eventId, isAdmin = false }: EventImageGaller
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Carregar imagens do evento
+  // Carregar imagens do evento com cache otimizado
   const { data: imagesData = [], isLoading } = useQuery({
     queryKey: ['/api/events', eventId, 'images'],
     queryFn: () => apiRequest('GET', `/api/events/${eventId}/images`),
     refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    cacheTime: 10 * 60 * 1000, // 10 minutos
   });
 
   // Garantir que images seja sempre um array
@@ -311,6 +313,7 @@ export function EventImageGallery({ eventId, isAdmin = false }: EventImageGaller
               alt={images[0].caption || images[0].fileName}
               className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
               onClick={() => handleViewImage(images[0])}
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
               <div className="flex gap-1">
@@ -386,6 +389,7 @@ export function EventImageGallery({ eventId, isAdmin = false }: EventImageGaller
                     src={image.imageData}
                     alt={image.caption || image.fileName}
                     className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
+                    loading="lazy"
                     onClick={() => {
                       // Abrir imagem em nova janela para visualização completa
                       const newWindow = window.open('', '_blank');

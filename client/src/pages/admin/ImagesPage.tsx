@@ -62,9 +62,11 @@ export default function ImagesPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Carregar todas as imagens com informações do evento
+  // Carregar todas as imagens com informações do evento com cache mais longo
   const { data: imagesData = [], isLoading } = useQuery({
     queryKey: ['/api/admin/images'],
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    cacheTime: 10 * 60 * 1000, // 10 minutos
   });
   
   const images = Array.isArray(imagesData) ? imagesData : [];
@@ -390,13 +392,25 @@ export default function ImagesPage() {
 
       {/* Lista de imagens agrupadas por evento */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="overflow-hidden">
-              <CardContent className="p-0">
-                <div className="w-full h-48 bg-gray-200 animate-pulse"></div>
-              </CardContent>
-            </Card>
+        <div className="space-y-8">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="mb-8">
+              <div className="flex items-center gap-3 mb-4 pb-2 border-b">
+                <div className="flex-1">
+                  <div className="h-5 bg-gray-200 rounded animate-pulse mb-2 w-48"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+                </div>
+                <div className="h-6 w-8 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-24 h-24 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-64"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-32"></div>
+                </div>
+                <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
@@ -431,6 +445,7 @@ export default function ImagesPage() {
                       alt={eventImagesArray[0].caption || eventImagesArray[0].fileName}
                       className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
                       onClick={() => handleViewImage(eventImagesArray[0])}
+                      loading="lazy"
                     />
                     
                     {/* Overlay com ações */}
@@ -537,6 +552,7 @@ export default function ImagesPage() {
                         src={image.imageData}
                         alt={image.caption || image.fileName}
                         className="w-full h-full object-cover cursor-pointer transition-all duration-200 group-hover:scale-105"
+                        loading="lazy"
                         onClick={() => {
                           // Criar nova janela para visualizar imagem individual
                           const newWindow = window.open('', '_blank');
