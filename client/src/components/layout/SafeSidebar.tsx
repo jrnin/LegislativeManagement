@@ -22,7 +22,7 @@ const navigation = [
   { name: "Comissões", href: "/committees", icon: Building },
   { name: "Vereadores", href: "/councilors", icon: UserCheck },
   { name: "Mesa Diretora", href: "/boards", icon: Gavel },
-  { name: "Configurações", href: "/settings", icon: Settings },
+  
 ];
 
 export default function SafeSidebar() {

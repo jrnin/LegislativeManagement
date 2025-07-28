@@ -38,31 +38,42 @@ export default function Navbar({ setSidebarOpen }: NavbarProps) {
   const handleLogout = async () => {
     if (isLoggingOut) return; // Prevenir múltiplos cliques
     
+    setIsLoggingOut(true);
+    
+    console.log('Iniciando logout direto...');
+    
     try {
-      setIsLoggingOut(true);
-      
-      toast({
-        title: "Saindo do sistema...",
-        description: "Aguarde enquanto fazemos logout de sua conta.",
+      // Fazer logout no servidor primeiro
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-      
-      await logout();
+      console.log('Logout do servidor concluído');
     } catch (error) {
-      console.error("Erro no logout:", error);
-      
-      toast({
-        title: "Erro ao sair",
-        description: "Ocorreu um erro, mas você será redirecionado.",
-        variant: "destructive",
-      });
-      
-      // Forçar redirecionamento mesmo com erro
-      setTimeout(() => {
-        window.location.replace("/login");
-      }, 1000);
-    } finally {
-      setIsLoggingOut(false);
+      console.warn('Erro no logout do servidor, continuando:', error);
     }
+    
+    // Limpar dados locais imediatamente
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Limpar todos os cookies
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      if (name) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname}`;
+      }
+    });
+    
+    console.log('Redirecionando para login...');
+    
+    // Redirecionar imediatamente
+    window.location.href = "/login";
   };
   
   return (
