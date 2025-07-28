@@ -391,7 +391,7 @@ export default function EventActivityManager({ eventId, currentActivities, onRef
                         variant="outline" 
                         size="sm"
                         className="gap-1"
-                        onClick={() => window.open(`/legislative-activities/${activity.id}`, '_blank')}
+                        onClick={() => window.open(`/activities/${activity.id}`, '_blank')}
                       >
                         <Activity className="h-3 w-3" />
                         Detalhes

@@ -38,7 +38,7 @@ export function NotificationPanel() {
   const getNotificationUrl = (notification: any) => {
     if (notification.activity && notification.activity.id) {
       if (['activity_vote', 'activity_approval', 'activity_status_change'].includes(notification.type)) {
-        return `/legislative-activities/${notification.activity.id}`;
+        return `/activities/${notification.activity.id}`;
       }
     }
     return '#';

@@ -31,7 +31,7 @@ const NotificationToast = () => {
             <ToastAction 
               altText="Ver"
               onClick={() => {
-                window.location.href = `/legislative-activities/${notification.activity?.id}`;
+                window.location.href = `/activities/${notification.activity?.id}`;
               }}
             >
               Ver

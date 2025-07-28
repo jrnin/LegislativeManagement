@@ -136,6 +136,13 @@ Preferred communication style: Simple, everyday language.
   - **Security Enhancement**: Ensured all passwords are properly hashed with bcrypt for security
   - **Status**: Login authentication fully functional for all users with proper password hashing
 
+- **July 28, 2025**: Fixed Event Details Navigation Button - NAVIGATION FIX
+  - **Root Cause**: Button "Detalhes" in Activities tab was directing to wrong route /legislative-activities instead of /activities
+  - **Solution**: Updated EventActivityManager.tsx to use correct route /activities/${activity.id}
+  - **Navigation Fix**: All activity detail buttons now properly navigate to ActivityDetails page
+  - **User Experience**: Fixed broken navigation flow from event details to individual activity pages
+  - **Status**: Navigation routing now working correctly throughout the system
+
 - **July 28, 2025**: Fixed "Próximos Eventos" Widget in Dashboard - CRITICAL WIDGET REPAIR
   - **Root Cause**: getUpcomingEvents method was filtering for future events only, but all system events had past dates
   - **Solution**: Enhanced method to return recent events when no future events exist for better user experience
