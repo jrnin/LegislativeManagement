@@ -164,7 +164,7 @@ export default function EventForm() {
       
       <Card>
         <CardHeader>
-          <CardTitle>{isEditing ? "Editar Evento" : "Novo Evento"}</CardTitle>
+          <CardTitle>{isEditing ? "Editar Evento" : "Cadastro"}</CardTitle>
           <CardDescription>
             {isEditing 
               ? "Altere as informações do evento nos campos abaixo." 

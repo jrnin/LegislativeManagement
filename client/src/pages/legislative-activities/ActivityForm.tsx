@@ -282,7 +282,7 @@ export default function ActivityForm() {
       
       <Card>
         <CardHeader>
-          <CardTitle>{isEditing ? "Editar Atividade Legislativa" : "Nova Atividade Legislativa"}</CardTitle>
+          <CardTitle>{isEditing ? "Editar Atividade Legislativa" : "Cadastro"}</CardTitle>
           <CardDescription>
             {isEditing 
               ? "Altere as informações da atividade legislativa nos campos abaixo." 

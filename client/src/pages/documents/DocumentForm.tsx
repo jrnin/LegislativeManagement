@@ -369,7 +369,7 @@ export default function DocumentForm() {
       
       <Card>
         <CardHeader>
-          <CardTitle>{isEditing ? "Editar Documento" : "Novo Documento"}</CardTitle>
+          <CardTitle>{isEditing ? "Editar Documento" : "Cadastro"}</CardTitle>
           <CardDescription>
             {isEditing 
               ? "Altere as informações do documento nos campos abaixo." 
