@@ -1017,19 +1017,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // LEGISLATIVE ACTIVITY ROUTES
   
-  // Get all legislative activities with filters
+  // Get all legislative activities (simplified - filtering moved to frontend)
   app.get('/api/activities', requireAuth, async (req, res) => {
     try {
-      const { search, type, author, situation } = req.query;
-      
-      const filters = {
-        search: search as string,
-        type: type as string,
-        author: author as string,
-        situation: situation as string
-      };
-      
-      const activities = await storage.getFilteredLegislativeActivities(filters);
+      const activities = await storage.getAllLegislativeActivities();
       res.json(activities);
     } catch (error) {
       console.error("Error fetching activities:", error);

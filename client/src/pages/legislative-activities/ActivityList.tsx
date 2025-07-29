@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
@@ -84,34 +84,58 @@ export default function ActivityList() {
   
   // Filtros específicos
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedAuthor, setSelectedAuthor] = useState("all");
   const [selectedSituation, setSelectedSituation] = useState("all");
 
-  const { data: activities = [], isLoading } = useQuery<LegislativeActivity[]>({
-    queryKey: ["/api/activities", searchTerm, selectedType, selectedAuthor, selectedSituation],
-    queryFn: async () => {
-      try {
-        const params = new URLSearchParams();
-        if (searchTerm && searchTerm.trim()) params.append('search', searchTerm.trim());
-        if (selectedType && selectedType !== 'all') params.append('type', selectedType);
-        if (selectedAuthor && selectedAuthor !== 'all') params.append('author', selectedAuthor);
-        if (selectedSituation && selectedSituation !== 'all') params.append('situation', selectedSituation);
-        
-        const url = `/api/activities${params.toString() ? `?${params.toString()}` : ''}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      } catch (error) {
-        console.error('Error fetching activities:', error);
-        throw error;
-      }
-    },
-    staleTime: 5000, // Cache for 5 seconds to prevent excessive requests
-    retry: 2
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Buscar todas as atividades uma vez e filtrar no frontend
+  const { data: allActivities = [], isLoading } = useQuery<LegislativeActivity[]>({
+    queryKey: ["/api/activities"],
+    staleTime: 60000, // Cache for 1 minute
   });
+
+  // Filtrar no frontend para melhor performance
+  const activities = useMemo(() => {
+    let filtered = allActivities;
+
+    // Filtro por texto (busca) - usa debounced search
+    if (debouncedSearchTerm && debouncedSearchTerm.trim()) {
+      const search = debouncedSearchTerm.trim().toLowerCase();
+      filtered = filtered.filter(activity => 
+        activity.description.toLowerCase().includes(search) ||
+        activity.activityNumber.toString().includes(search)
+      );
+    }
+
+    // Filtro por tipo
+    if (selectedType && selectedType !== 'all') {
+      filtered = filtered.filter(activity => activity.activityType === selectedType);
+    }
+
+    // Filtro por autor
+    if (selectedAuthor && selectedAuthor !== 'all') {
+      filtered = filtered.filter(activity => 
+        activity.authors?.some(author => author.id === selectedAuthor)
+      );
+    }
+
+    // Filtro por situação
+    if (selectedSituation && selectedSituation !== 'all') {
+      filtered = filtered.filter(activity => activity.situacao === selectedSituation);
+    }
+
+    return filtered;
+  }, [allActivities, debouncedSearchTerm, selectedType, selectedAuthor, selectedSituation]);
 
   // Buscar lista de usuários para filtro de autores
   const { data: users = [] } = useQuery<any[]>({
@@ -543,12 +567,13 @@ export default function ActivityList() {
           </div>
 
           {/* Botão para limpar filtros */}
-          {(searchTerm || selectedType !== 'all' || selectedAuthor !== 'all' || selectedSituation !== 'all') && (
+          {(debouncedSearchTerm || selectedType !== 'all' || selectedAuthor !== 'all' || selectedSituation !== 'all') && (
             <div className="mt-4">
               <Button
                 variant="outline"
                 onClick={() => {
                   setSearchTerm("");
+                  setDebouncedSearchTerm("");
                   setSelectedType("all");
                   setSelectedAuthor("all");
                   setSelectedSituation("all");
