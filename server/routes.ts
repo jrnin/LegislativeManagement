@@ -1567,7 +1567,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if file exists
       if (!fs.existsSync(filePath)) {
         console.log(`Arquivo não encontrado no sistema de arquivos: ${filePath}`);
-        return res.status(404).json({ message: "Arquivo não encontrado no servidor" });
+        
+        // Clean up database record for missing file
+        if (type === 'activities') {
+          try {
+            await storage.updateLegislativeActivity(id, {
+              filePath: null,
+              fileName: null,
+              fileType: null
+            });
+            console.log(`Referência de arquivo removida da atividade ${id} devido a arquivo faltante`);
+          } catch (cleanupError) {
+            console.error(`Erro ao limpar referência de arquivo para atividade ${id}:`, cleanupError);
+          }
+        } else if (type === 'documents') {
+          try {
+            await storage.updateDocument(id, {
+              filePath: null,
+              fileName: null,
+              fileType: null
+            });
+            console.log(`Referência de arquivo removida do documento ${id} devido a arquivo faltante`);
+          } catch (cleanupError) {
+            console.error(`Erro ao limpar referência de arquivo para documento ${id}:`, cleanupError);
+          }
+        }
+        
+        return res.status(404).json({ 
+          message: "Arquivo não encontrado no servidor. A referência foi removida do sistema." 
+        });
       }
       
       // Check if download is requested
@@ -1595,6 +1623,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // SYSTEM MAINTENANCE ROUTES
+  
+  // Check file integrity for activities and documents
+  app.get('/api/system/check-files', requireAdmin, async (req, res) => {
+    try {
+      const results = {
+        activities: { checked: 0, missing: 0, cleaned: 0 },
+        documents: { checked: 0, missing: 0, cleaned: 0 }
+      };
+      
+      // Check activities
+      const activities = await storage.getAllLegislativeActivities();
+      for (const activity of activities) {
+        if (activity.filePath) {
+          results.activities.checked++;
+          if (!fs.existsSync(activity.filePath)) {
+            results.activities.missing++;
+            try {
+              await storage.updateLegislativeActivity(activity.id, {
+                filePath: null,
+                fileName: null,
+                fileType: null
+              });
+              results.activities.cleaned++;
+              console.log(`Limpeza automática: arquivo faltante removido da atividade ${activity.id}`);
+            } catch (error) {
+              console.error(`Erro ao limpar atividade ${activity.id}:`, error);
+            }
+          }
+        }
+      }
+      
+      // Check documents
+      const documentsData = await storage.getAllDocuments();
+      const documents = documentsData.documents || [];
+      for (const document of documents) {
+        if (document.filePath) {
+          results.documents.checked++;
+          if (!fs.existsSync(document.filePath)) {
+            results.documents.missing++;
+            try {
+              await storage.updateDocument(document.id, {
+                filePath: null,
+                fileName: null,
+                fileType: null
+              });
+              results.documents.cleaned++;
+              console.log(`Limpeza automática: arquivo faltante removido do documento ${document.id}`);
+            } catch (error) {
+              console.error(`Erro ao limpar documento ${document.id}:`, error);
+            }
+          }
+        }
+      }
+      
+      res.json(results);
+    } catch (error) {
+      console.error("Error checking file integrity:", error);
+      res.status(500).json({ message: "Erro ao verificar integridade dos arquivos" });
+    }
+  });
+
   // DASHBOARD ROUTES
   
   // Get dashboard stats
