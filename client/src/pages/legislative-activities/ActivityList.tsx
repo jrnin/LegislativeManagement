@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
@@ -46,6 +46,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   CalendarCheck,
   ChevronLeft, 
@@ -74,9 +81,37 @@ export default function ActivityList() {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [showApprovalAlert, setShowApprovalAlert] = useState(false);
   const [approvalAction, setApprovalAction] = useState<boolean>(false);
+  
+  // Filtros específicos
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedAuthor, setSelectedAuthor] = useState("");
+  const [selectedSituation, setSelectedSituation] = useState("");
 
   const { data: activities = [], isLoading } = useQuery<LegislativeActivity[]>({
-    queryKey: ["/api/activities"],
+    queryKey: ["/api/activities", {
+      search: searchTerm,
+      type: selectedType,
+      author: selectedAuthor,
+      situation: selectedSituation
+    }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (selectedType) params.append('type', selectedType);
+      if (selectedAuthor) params.append('author', selectedAuthor);
+      if (selectedSituation) params.append('situation', selectedSituation);
+      
+      const url = `/api/activities${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch activities');
+      return response.json();
+    },
+  });
+
+  // Buscar lista de usuários para filtro de autores
+  const { data: users = [] } = useQuery<any[]>({
+    queryKey: ["/api/users"],
   });
 
   const deleteMutation = useMutation({
@@ -422,6 +457,109 @@ export default function ActivityList() {
           Nova Atividade
         </Button>
       </div>
+
+      {/* Filtros */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Filtros</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Busca por texto */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Buscar</label>
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Número, descrição..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+
+            {/* Filtro por Tipo */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Tipo</label>
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os tipos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos os tipos</SelectItem>
+                  <SelectItem value="Projeto de Lei">Projeto de Lei</SelectItem>
+                  <SelectItem value="Projeto de Resolução">Projeto de Resolução</SelectItem>
+                  <SelectItem value="Projeto de Decreto Legislativo">Projeto de Decreto Legislativo</SelectItem>
+                  <SelectItem value="Indicação">Indicação</SelectItem>
+                  <SelectItem value="Requerimento">Requerimento</SelectItem>
+                  <SelectItem value="Moção">Moção</SelectItem>
+                  <SelectItem value="Emenda">Emenda</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Filtro por Autor */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Autor</label>
+              <Select value={selectedAuthor} onValueChange={setSelectedAuthor}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os autores" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos os autores</SelectItem>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Filtro por Situação */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Situação</label>
+              <Select value={selectedSituation} onValueChange={setSelectedSituation}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas as situações" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todas as situações</SelectItem>
+                  <SelectItem value="Arquivado">Arquivado</SelectItem>
+                  <SelectItem value="Aguardando Análise">Aguardando Análise</SelectItem>
+                  <SelectItem value="Análise de Parecer">Análise de Parecer</SelectItem>
+                  <SelectItem value="Aguardando Deliberação">Aguardando Deliberação</SelectItem>
+                  <SelectItem value="Aguardando Despacho do Presidente">Aguardando Despacho do Presidente</SelectItem>
+                  <SelectItem value="Aguardando Envio ao Executivo">Aguardando Envio ao Executivo</SelectItem>
+                  <SelectItem value="Devolvida ao Autor">Devolvida ao Autor</SelectItem>
+                  <SelectItem value="Pronta para Pauta">Pronta para Pauta</SelectItem>
+                  <SelectItem value="Tramitando em Conjunto">Tramitando em Conjunto</SelectItem>
+                  <SelectItem value="Tramitação Finalizada">Tramitação Finalizada</SelectItem>
+                  <SelectItem value="Vetado">Vetado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Botão para limpar filtros */}
+          {(searchTerm || selectedType || selectedAuthor || selectedSituation) && (
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedType("");
+                  setSelectedAuthor("");
+                  setSelectedSituation("");
+                }}
+              >
+                Limpar Filtros
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
       
       <Card>        
         <CardContent>

@@ -706,6 +706,101 @@ export class DatabaseStorage implements IStorage {
     
     return result.sort((a, b) => new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime());
   }
+
+  async getFilteredLegislativeActivities(filters: {
+    search?: string;
+    type?: string;
+    author?: string;
+    situation?: string;
+  }): Promise<LegislativeActivity[]> {
+    try {
+      let query = db
+        .select({
+          activity: legislativeActivities,
+          author: users
+        })
+        .from(legislativeActivities)
+        .leftJoin(legislativeActivitiesAuthors, eq(legislativeActivities.id, legislativeActivitiesAuthors.activityId))
+        .leftJoin(users, eq(legislativeActivitiesAuthors.userId, users.id));
+
+      const whereConditions = [];
+
+      // Filter by search term (number or description)
+      if (filters.search) {
+        whereConditions.push(
+          or(
+            like(legislativeActivities.description, `%${filters.search}%`),
+            sql`CAST(${legislativeActivities.activityNumber} AS TEXT) LIKE ${`%${filters.search}%`}`
+          )
+        );
+      }
+
+      // Filter by activity type
+      if (filters.type) {
+        whereConditions.push(eq(legislativeActivities.activityType, filters.type));
+      }
+
+      // Filter by author
+      if (filters.author) {
+        whereConditions.push(eq(users.id, filters.author));
+      }
+
+      // Filter by situation
+      if (filters.situation) {
+        whereConditions.push(eq(legislativeActivities.situacao, filters.situation));
+      }
+
+      // Apply where conditions
+      if (whereConditions.length > 0) {
+        query = query.where(and(...whereConditions));
+      }
+
+      const results = await query.orderBy(desc(legislativeActivities.activityDate));
+
+      // Group activities by activityNumber and activityType to avoid duplicates
+      const uniqueActivities = new Map<string, LegislativeActivity>();
+      const activityAuthors = new Map<number, any[]>();
+
+      for (const result of results) {
+        const activity = result.activity;
+        const author = result.author;
+        const key = `${activity.activityNumber}-${activity.activityType}`;
+
+        // Store authors for each activity
+        if (author) {
+          if (!activityAuthors.has(activity.id)) {
+            activityAuthors.set(activity.id, []);
+          }
+          const authors = activityAuthors.get(activity.id)!;
+          if (!authors.find(a => a.id === author.id)) {
+            authors.push(author);
+          }
+        }
+
+        // Keep unique activities (prefer original without eventId)
+        if (!uniqueActivities.has(key) || (!activity.eventId && uniqueActivities.get(key)?.eventId)) {
+          uniqueActivities.set(key, activity);
+        }
+      }
+
+      // Build final result with authors
+      const finalResult: LegislativeActivity[] = [];
+      
+      for (const activity of uniqueActivities.values()) {
+        const authors = activityAuthors.get(activity.id) || [];
+        finalResult.push({
+          ...activity,
+          authors
+        });
+      }
+
+      return finalResult.sort((a, b) => new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime());
+    } catch (error) {
+      console.error("Error in getFilteredLegislativeActivities:", error);
+      // Fallback to all activities if filtering fails
+      return this.getAllLegislativeActivities();
+    }
+  }
   
   async getRecentLegislativeActivities(limit: number = 3): Promise<LegislativeActivity[]> {
     const activities = await db
