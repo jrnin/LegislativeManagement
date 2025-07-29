@@ -730,7 +730,7 @@ export class DatabaseStorage implements IStorage {
         whereConditions.push(
           or(
             like(legislativeActivities.description, `%${filters.search}%`),
-            sql`CAST(${legislativeActivities.activityNumber} AS TEXT) LIKE ${`%${filters.search}%`}`
+            like(sql`CAST(${legislativeActivities.activityNumber} AS TEXT)`, `%${filters.search}%`)
           )
         );
       }

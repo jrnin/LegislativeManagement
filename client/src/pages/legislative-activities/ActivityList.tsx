@@ -89,24 +89,28 @@ export default function ActivityList() {
   const [selectedSituation, setSelectedSituation] = useState("all");
 
   const { data: activities = [], isLoading } = useQuery<LegislativeActivity[]>({
-    queryKey: ["/api/activities", {
-      search: searchTerm,
-      type: selectedType,
-      author: selectedAuthor,
-      situation: selectedSituation
-    }],
+    queryKey: ["/api/activities", searchTerm, selectedType, selectedAuthor, selectedSituation],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (searchTerm) params.append('search', searchTerm);
-      if (selectedType && selectedType !== 'all') params.append('type', selectedType);
-      if (selectedAuthor && selectedAuthor !== 'all') params.append('author', selectedAuthor);
-      if (selectedSituation && selectedSituation !== 'all') params.append('situation', selectedSituation);
-      
-      const url = `/api/activities${params.toString() ? `?${params.toString()}` : ''}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch activities');
-      return response.json();
+      try {
+        const params = new URLSearchParams();
+        if (searchTerm && searchTerm.trim()) params.append('search', searchTerm.trim());
+        if (selectedType && selectedType !== 'all') params.append('type', selectedType);
+        if (selectedAuthor && selectedAuthor !== 'all') params.append('author', selectedAuthor);
+        if (selectedSituation && selectedSituation !== 'all') params.append('situation', selectedSituation);
+        
+        const url = `/api/activities${params.toString() ? `?${params.toString()}` : ''}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+        throw error;
+      }
     },
+    staleTime: 5000, // Cache for 5 seconds to prevent excessive requests
+    retry: 2
   });
 
   // Buscar lista de usuários para filtro de autores
@@ -205,10 +209,6 @@ export default function ActivityList() {
   };
 
   const getApprovalStatusBadge = (activity: LegislativeActivity) => {
-    if (!activity.needsApproval) {
-      return null;
-    }
-    
     if (activity.approved) {
       return <Badge className="bg-green-100 text-green-800">Aprovado</Badge>;
     } else {
@@ -398,14 +398,14 @@ export default function ActivityList() {
                 </DropdownMenuItem>
               )}
               
-              {activity.needsApproval && isAdmin && !activity.approved && (
+              {isAdmin && !activity.approved && (
                 <DropdownMenuItem onClick={() => handleApproval(activity, true)}>
                   <ThumbsUp className="mr-2 h-4 w-4 text-green-600" />
                   Aprovar
                 </DropdownMenuItem>
               )}
               
-              {activity.needsApproval && isAdmin && activity.approved && (
+              {isAdmin && activity.approved && (
                 <DropdownMenuItem onClick={() => handleApproval(activity, false)}>
                   <ThumbsDown className="mr-2 h-4 w-4 text-yellow-600" />
                   Remover Aprovação
