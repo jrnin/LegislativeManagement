@@ -30,6 +30,7 @@ import BoardEdit from "@/pages/boards/BoardEdit";
 import BoardDetails from "@/pages/boards/BoardDetails";
 import ImagesPage from "@/pages/admin/ImagesPage";
 import NewsPage from "@/pages/admin/NewsPage";
+import BackupManager from "@/components/backup/BackupManager";
 import PublicRoutes from "@/public/PublicRoutes";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationProvider } from "@/context/NotificationContext";
@@ -72,6 +73,7 @@ function AuthenticatedApp() {
         <Route path="/boards/:id" component={BoardDetails} />
         <Route path="/images" component={ImagesPage} />
         <Route path="/news" component={NewsPage} />
+        <Route path="/backup" component={BackupManager} />
         <Route component={NotFound} />
       </Switch>
     </SafeLayout>

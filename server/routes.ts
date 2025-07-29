@@ -1602,6 +1602,183 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // BACKUP AND RESTORE ROUTES
+  
+  // Create system backup
+  app.post('/api/system/backup', requireAdmin, async (req, res) => {
+    try {
+      const { spawn } = require('child_process');
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      
+      console.log('Iniciando processo de backup do sistema...');
+      
+      const backup = spawn('bash', ['scripts/backup.sh'], {
+        cwd: process.cwd(),
+        env: { ...process.env }
+      });
+      
+      let output = '';
+      let errorOutput = '';
+      
+      backup.stdout.on('data', (data) => {
+        output += data.toString();
+        console.log(`Backup stdout: ${data}`);
+      });
+      
+      backup.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+        console.error(`Backup stderr: ${data}`);
+      });
+      
+      backup.on('close', (code) => {
+        if (code === 0) {
+          console.log('Backup concluído com sucesso');
+          res.json({
+            success: true,
+            message: 'Backup criado com sucesso',
+            timestamp,
+            output
+          });
+        } else {
+          console.error(`Backup falhou com código: ${code}`);
+          res.status(500).json({
+            success: false,
+            message: 'Erro ao criar backup',
+            error: errorOutput,
+            code
+          });
+        }
+      });
+      
+    } catch (error) {
+      console.error('Erro no processo de backup:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro interno no processo de backup',
+        error: error.message
+      });
+    }
+  });
+  
+  // List available backups
+  app.get('/api/system/backups', requireAdmin, async (req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      const backupDir = path.join(process.cwd(), 'backups');
+      const dbBackupDir = path.join(backupDir, 'database');
+      const filesBackupDir = path.join(backupDir, 'files');
+      
+      const backups = {
+        database: [],
+        files: [],
+        config: [],
+        source: []
+      };
+      
+      // List database backups
+      if (fs.existsSync(dbBackupDir)) {
+        const dbFiles = fs.readdirSync(dbBackupDir)
+          .filter(file => file.endsWith('.sql.gz'))
+          .map(file => {
+            const stats = fs.statSync(path.join(dbBackupDir, file));
+            return {
+              name: file,
+              size: stats.size,
+              created: stats.mtime,
+              path: path.join(dbBackupDir, file)
+            };
+          })
+          .sort((a, b) => b.created - a.created);
+        backups.database = dbFiles;
+      }
+      
+      // List files backups
+      if (fs.existsSync(filesBackupDir)) {
+        const uploadFiles = fs.readdirSync(filesBackupDir)
+          .filter(file => file.startsWith('uploads_') && file.endsWith('.tar.gz'))
+          .map(file => {
+            const stats = fs.statSync(path.join(filesBackupDir, file));
+            return {
+              name: file,
+              size: stats.size,
+              created: stats.mtime,
+              path: path.join(filesBackupDir, file)
+            };
+          })
+          .sort((a, b) => b.created - a.created);
+        backups.files = uploadFiles;
+        
+        // List config backups
+        const configFiles = fs.readdirSync(filesBackupDir)
+          .filter(file => file.startsWith('config_') && file.endsWith('.tar.gz'))
+          .map(file => {
+            const stats = fs.statSync(path.join(filesBackupDir, file));
+            return {
+              name: file,
+              size: stats.size,
+              created: stats.mtime,
+              path: path.join(filesBackupDir, file)
+            };
+          })
+          .sort((a, b) => b.created - a.created);
+        backups.config = configFiles;
+        
+        // List source backups
+        const sourceFiles = fs.readdirSync(filesBackupDir)
+          .filter(file => file.startsWith('source_') && file.endsWith('.tar.gz'))
+          .map(file => {
+            const stats = fs.statSync(path.join(filesBackupDir, file));
+            return {
+              name: file,
+              size: stats.size,
+              created: stats.mtime,
+              path: path.join(filesBackupDir, file)
+            };
+          })
+          .sort((a, b) => b.created - a.created);
+        backups.source = sourceFiles;
+      }
+      
+      res.json(backups);
+    } catch (error) {
+      console.error('Erro ao listar backups:', error);
+      res.status(500).json({ message: 'Erro ao listar backups' });
+    }
+  });
+  
+  // Download backup file
+  app.get('/api/system/backups/download/:type/:filename', requireAdmin, async (req, res) => {
+    try {
+      const { type, filename } = req.params;
+      const path = require('path');
+      const fs = require('fs');
+      
+      let filePath;
+      if (type === 'database') {
+        filePath = path.join(process.cwd(), 'backups', 'database', filename);
+      } else {
+        filePath = path.join(process.cwd(), 'backups', 'files', filename);
+      }
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: 'Arquivo de backup não encontrado' });
+      }
+      
+      const stats = fs.statSync(filePath);
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', stats.size);
+      
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+    } catch (error) {
+      console.error('Erro ao baixar backup:', error);
+      res.status(500).json({ message: 'Erro ao baixar arquivo de backup' });
+    }
+  });
+
   // SYSTEM MAINTENANCE ROUTES
   
   // Check file integrity for activities and documents (REPORT ONLY - NO CLEANUP)
