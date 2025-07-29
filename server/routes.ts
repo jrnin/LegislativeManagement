@@ -1781,6 +1781,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // SYSTEM MAINTENANCE ROUTES
   
+  // List upload directory contents
+  app.get('/api/system/uploads', requireAdmin, async (req, res) => {
+    try {
+      const path = require('path');
+      const fs = require('fs');
+      
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      
+      const getDirectoryContents = (dirPath: string, relativePath: string = '') => {
+        const items: any[] = [];
+        
+        try {
+          const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+          
+          for (const entry of entries) {
+            const fullPath = path.join(dirPath, entry.name);
+            const relPath = path.join(relativePath, entry.name);
+            
+            if (entry.isDirectory()) {
+              items.push({
+                name: entry.name,
+                type: 'directory',
+                path: relPath,
+                children: getDirectoryContents(fullPath, relPath)
+              });
+            } else {
+              const stats = fs.statSync(fullPath);
+              items.push({
+                name: entry.name,
+                type: 'file',
+                path: relPath,
+                size: stats.size,
+                modified: stats.mtime,
+                url: `/uploads/${relPath.replace(/\\/g, '/')}`
+              });
+            }
+          }
+        } catch (error) {
+          console.error(`Error reading directory ${dirPath}:`, error);
+        }
+        
+        return items;
+      };
+      
+      const contents = getDirectoryContents(uploadsDir);
+      
+      res.json({
+        success: true,
+        uploads: contents,
+        totalFiles: contents.reduce((count, item) => {
+          if (item.type === 'file') return count + 1;
+          if (item.children) return count + item.children.filter((child: any) => child.type === 'file').length;
+          return count;
+        }, 0)
+      });
+    } catch (error) {
+      console.error('Error listing uploads:', error);
+      res.status(500).json({ success: false, message: 'Erro ao listar arquivos de upload' });
+    }
+  });
+  
   // Check file integrity for activities and documents (REPORT ONLY - NO CLEANUP)
   app.get('/api/system/check-files', requireAdmin, async (req, res) => {
     try {
