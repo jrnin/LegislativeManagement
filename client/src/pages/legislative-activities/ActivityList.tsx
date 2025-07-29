@@ -84,9 +84,9 @@ export default function ActivityList() {
   
   // Filtros específicos
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [selectedAuthor, setSelectedAuthor] = useState("");
-  const [selectedSituation, setSelectedSituation] = useState("");
+  const [selectedType, setSelectedType] = useState("all");
+  const [selectedAuthor, setSelectedAuthor] = useState("all");
+  const [selectedSituation, setSelectedSituation] = useState("all");
 
   const { data: activities = [], isLoading } = useQuery<LegislativeActivity[]>({
     queryKey: ["/api/activities", {
@@ -98,9 +98,9 @@ export default function ActivityList() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchTerm) params.append('search', searchTerm);
-      if (selectedType) params.append('type', selectedType);
-      if (selectedAuthor) params.append('author', selectedAuthor);
-      if (selectedSituation) params.append('situation', selectedSituation);
+      if (selectedType && selectedType !== 'all') params.append('type', selectedType);
+      if (selectedAuthor && selectedAuthor !== 'all') params.append('author', selectedAuthor);
+      if (selectedSituation && selectedSituation !== 'all') params.append('situation', selectedSituation);
       
       const url = `/api/activities${params.toString() ? `?${params.toString()}` : ''}`;
       const response = await fetch(url);
@@ -487,7 +487,7 @@ export default function ActivityList() {
                   <SelectValue placeholder="Todos os tipos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os tipos</SelectItem>
+                  <SelectItem value="all">Todos os tipos</SelectItem>
                   <SelectItem value="Projeto de Lei">Projeto de Lei</SelectItem>
                   <SelectItem value="Projeto de Resolução">Projeto de Resolução</SelectItem>
                   <SelectItem value="Projeto de Decreto Legislativo">Projeto de Decreto Legislativo</SelectItem>
@@ -507,7 +507,7 @@ export default function ActivityList() {
                   <SelectValue placeholder="Todos os autores" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os autores</SelectItem>
+                  <SelectItem value="all">Todos os autores</SelectItem>
                   {users.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.name}
@@ -525,7 +525,7 @@ export default function ActivityList() {
                   <SelectValue placeholder="Todas as situações" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas as situações</SelectItem>
+                  <SelectItem value="all">Todas as situações</SelectItem>
                   <SelectItem value="Arquivado">Arquivado</SelectItem>
                   <SelectItem value="Aguardando Análise">Aguardando Análise</SelectItem>
                   <SelectItem value="Análise de Parecer">Análise de Parecer</SelectItem>
@@ -543,15 +543,15 @@ export default function ActivityList() {
           </div>
 
           {/* Botão para limpar filtros */}
-          {(searchTerm || selectedType || selectedAuthor || selectedSituation) && (
+          {(searchTerm || selectedType !== 'all' || selectedAuthor !== 'all' || selectedSituation !== 'all') && (
             <div className="mt-4">
               <Button
                 variant="outline"
                 onClick={() => {
                   setSearchTerm("");
-                  setSelectedType("");
-                  setSelectedAuthor("");
-                  setSelectedSituation("");
+                  setSelectedType("all");
+                  setSelectedAuthor("all");
+                  setSelectedSituation("all");
                 }}
               >
                 Limpar Filtros
