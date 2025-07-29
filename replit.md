@@ -110,15 +110,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **July 29, 2025**: Fixed Missing File Attachment Issue - CRITICAL FILE INTEGRITY FIX
-  - **Root Cause**: Some uploaded files exist in database but not in file system causing download failures
-  - **Solution**: Implemented automatic file integrity checking and cleanup system
-  - **Technical Fix**: Added file existence validation in download endpoint with automatic database cleanup
-  - **Maintenance Route**: Created `/api/system/check-files` admin endpoint for system-wide file integrity verification
-  - **Auto-Cleanup**: System now automatically removes database references to missing files
-  - **User Experience**: Clear error messages inform users when files are missing and cleaned up
-  - **Prevention**: Enhanced error handling prevents future file reference inconsistencies
-  - **Status**: File attachment system now maintains database-filesystem consistency automatically
+- **July 29, 2025**: Fixed File Attachment System - CONSERVATIVE APPROACH IMPLEMENTED
+  - **Issue Identified**: Previous automatic cleanup was too aggressive and removed valid file references
+  - **User Feedback**: System incorrectly cleaned all file references requiring re-upload of all documents
+  - **Solution**: Modified system to be conservative - only reports missing files without automatic deletion
+  - **Download Endpoint**: Now returns clear error messages without modifying database records
+  - **Check Files Endpoint**: Changed to report-only mode showing missing files for manual review
+  - **Data Protection**: Database references preserved to prevent accidental data loss
+  - **Admin Control**: Administrators can manually review and decide on cleanup actions
+  - **Status**: File system now protects against accidental data loss while reporting issues
 
 - **July 28, 2025**: Disabled Email Notifications for Councilors - SYSTEM CONFIGURATION CHANGE
   - **User Request**: Temporarily disabled email sending functionality for councilor (vereador) users

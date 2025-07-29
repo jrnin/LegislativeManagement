@@ -1568,33 +1568,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!fs.existsSync(filePath)) {
         console.log(`Arquivo não encontrado no sistema de arquivos: ${filePath}`);
         
-        // Clean up database record for missing file
-        if (type === 'activities') {
-          try {
-            await storage.updateLegislativeActivity(id, {
-              filePath: null,
-              fileName: null,
-              fileType: null
-            });
-            console.log(`Referência de arquivo removida da atividade ${id} devido a arquivo faltante`);
-          } catch (cleanupError) {
-            console.error(`Erro ao limpar referência de arquivo para atividade ${id}:`, cleanupError);
-          }
-        } else if (type === 'documents') {
-          try {
-            await storage.updateDocument(id, {
-              filePath: null,
-              fileName: null,
-              fileType: null
-            });
-            console.log(`Referência de arquivo removida do documento ${id} devido a arquivo faltante`);
-          } catch (cleanupError) {
-            console.error(`Erro ao limpar referência de arquivo para documento ${id}:`, cleanupError);
-          }
-        }
+        // Only log the missing file, DO NOT automatically clean database
+        // This prevents accidental data loss when files are temporarily unavailable
+        console.log(`AVISO: Arquivo referenciado não encontrado para ${type} ID ${id}: ${filePath}`);
         
         return res.status(404).json({ 
-          message: "Arquivo não encontrado no servidor. A referência foi removida do sistema." 
+          message: "Arquivo não encontrado no servidor. Entre em contato com o administrador." 
         });
       }
       
@@ -1625,37 +1604,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // SYSTEM MAINTENANCE ROUTES
   
-  // Check file integrity for activities and documents
+  // Check file integrity for activities and documents (REPORT ONLY - NO CLEANUP)
   app.get('/api/system/check-files', requireAdmin, async (req, res) => {
     try {
       const results = {
-        activities: { checked: 0, missing: 0, cleaned: 0 },
-        documents: { checked: 0, missing: 0, cleaned: 0 }
+        activities: { checked: 0, missing: 0, missingFiles: [] as Array<{id: number, fileName: string, filePath: string}> },
+        documents: { checked: 0, missing: 0, missingFiles: [] as Array<{id: number, fileName: string, filePath: string}> }
       };
       
-      // Check activities
+      // Check activities (REPORT ONLY)
       const activities = await storage.getAllLegislativeActivities();
       for (const activity of activities) {
         if (activity.filePath) {
           results.activities.checked++;
           if (!fs.existsSync(activity.filePath)) {
             results.activities.missing++;
-            try {
-              await storage.updateLegislativeActivity(activity.id, {
-                filePath: null,
-                fileName: null,
-                fileType: null
-              });
-              results.activities.cleaned++;
-              console.log(`Limpeza automática: arquivo faltante removido da atividade ${activity.id}`);
-            } catch (error) {
-              console.error(`Erro ao limpar atividade ${activity.id}:`, error);
-            }
+            results.activities.missingFiles.push({
+              id: activity.id,
+              fileName: activity.fileName || 'Nome não disponível',
+              filePath: activity.filePath
+            });
+            console.log(`RELATÓRIO: Arquivo faltante na atividade ${activity.id}: ${activity.filePath}`);
           }
         }
       }
       
-      // Check documents
+      // Check documents (REPORT ONLY)
       const documentsData = await storage.getAllDocuments();
       const documents = documentsData.documents || [];
       for (const document of documents) {
@@ -1663,17 +1637,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           results.documents.checked++;
           if (!fs.existsSync(document.filePath)) {
             results.documents.missing++;
-            try {
-              await storage.updateDocument(document.id, {
-                filePath: null,
-                fileName: null,
-                fileType: null
-              });
-              results.documents.cleaned++;
-              console.log(`Limpeza automática: arquivo faltante removido do documento ${document.id}`);
-            } catch (error) {
-              console.error(`Erro ao limpar documento ${document.id}:`, error);
-            }
+            results.documents.missingFiles.push({
+              id: document.id,
+              fileName: document.fileName || 'Nome não disponível',
+              filePath: document.filePath
+            });
+            console.log(`RELATÓRIO: Arquivo faltante no documento ${document.id}: ${document.filePath}`);
           }
         }
       }
