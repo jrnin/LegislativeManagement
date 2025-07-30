@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Helmet } from '@/components/Head';
+import { Helmet } from 'react-helmet';
 
 // Interface para atividade legislativa
 interface LegislativeActivity {

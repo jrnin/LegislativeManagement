@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Helmet } from '@/components/Head';
+import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

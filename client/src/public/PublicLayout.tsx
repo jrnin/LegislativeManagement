@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Helmet } from '@/components/Head';
+import { Helmet } from 'react-helmet';
 import logoPath from '@assets/logo.png';
 import { useQuery } from '@tanstack/react-query';
 import { 
