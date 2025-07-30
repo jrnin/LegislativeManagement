@@ -46,6 +46,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Calendar, 
   ChevronLeft, 
@@ -53,12 +54,14 @@ import {
   Clock,
   Edit,
   ExternalLink,
+  Filter,
   MapPin,
   MoreHorizontal,
   Plus,
   Search,
   Trash2,
-  Eye 
+  Eye,
+  X
 } from "lucide-react";
 import { formatDate } from "@/utils/formatters";
 
@@ -70,10 +73,16 @@ export default function EventList() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   const { data: events = [], isLoading } = useQuery<Event[]>({
     queryKey: ["/api/events"],
   });
+
+  // Obter listas únicas de categorias e status para os filtros
+  const uniqueCategories = [...new Set(events.map(event => event.category))].filter(Boolean);
+  const uniqueStatuses = [...new Set(events.map(event => event.status))].filter(Boolean);
 
   const deleteMutation = useMutation({
     mutationFn: async (eventId: number) => {
@@ -266,17 +275,87 @@ export default function EventList() {
       
       <Card>
         <CardContent>
-          <div className="flex items-center py-4">
-            <div className="relative w-full max-w-sm">
+          <div className="flex flex-col lg:flex-row gap-4 py-4">
+            {/* Campo de busca */}
+            <div className="relative w-full lg:max-w-sm">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Filtrar eventos..."
+                placeholder="Buscar por local..."
                 value={(table.getColumn("location")?.getFilterValue() as string) ?? ""}
                 onChange={(event) =>
                   table.getColumn("location")?.setFilterValue(event.target.value)
                 }
                 className="pl-8"
               />
+            </div>
+
+            {/* Filtros */}
+            <div className="flex flex-col sm:flex-row gap-3 lg:ml-auto">
+              {/* Filtro por Categoria */}
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <Select
+                  value={categoryFilter}
+                  onValueChange={(value) => {
+                    setCategoryFilter(value);
+                    table.getColumn("category")?.setFilterValue(value === "todos" ? "" : value);
+                  }}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todas as categorias</SelectItem>
+                    {uniqueCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro por Status */}
+              <div className="flex items-center gap-2">
+                <Select
+                  value={statusFilter}
+                  onValueChange={(value) => {
+                    setStatusFilter(value);
+                    table.getColumn("status")?.setFilterValue(value === "todos" ? "" : value);
+                  }}
+                >
+                  <SelectTrigger className="w-[150px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos os status</SelectItem>
+                    {uniqueStatuses.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Botão para limpar filtros */}
+              {(categoryFilter || statusFilter || table.getColumn("location")?.getFilterValue()) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setCategoryFilter("");
+                    setStatusFilter("");
+                    table.getColumn("category")?.setFilterValue("");
+                    table.getColumn("status")?.setFilterValue("");
+                    table.getColumn("location")?.setFilterValue("");
+                  }}
+                  className="h-9"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Limpar filtros
+                </Button>
+              )}
             </div>
           </div>
           
