@@ -200,6 +200,14 @@ export const handleFileUpload = (fieldName: string = 'file') => {
   return upload.single(fieldName);
 };
 
+export const handleAvatarUpload = (fieldName: string = 'avatar') => {
+  return uploadAvatar.single(fieldName);
+};
+
+export const handleNewsUpload = (fieldName: string = 'coverImage') => {
+  return uploadNews.single(fieldName);
+};
+
 // Enhanced file upload handlers for specific contexts
 export const handleActivityUpload = (fieldName: string = 'file') => {
   return uploadActivities.single(fieldName);
