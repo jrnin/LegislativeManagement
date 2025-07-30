@@ -1448,7 +1448,7 @@ export default function EventDetails() {
                   </div>
                   
                   {/* Seção de votação do usuário */}
-                  {user?.role === 'councilor' && (
+                  {(user?.role === 'councilor' || user?.role === 'admin') && (
                     <div className="space-y-3 pt-4 border-t">
                       <h4 className="font-medium">Seu voto</h4>
                       <div className="space-y-3">
