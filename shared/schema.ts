@@ -54,7 +54,7 @@ export const users = pgTable("users", {
   number: varchar("number"),
   city: varchar("city"),
   state: varchar("state"),
-  role: varchar("role").default("councilor").notNull(), // "admin" or "councilor"
+  role: varchar("role").default("councilor").notNull(), // "admin", "councilor", or "executive"
   legislatureId: integer("legislature_id"),
   maritalStatus: varchar("marital_status"),
   occupation: varchar("occupation"),

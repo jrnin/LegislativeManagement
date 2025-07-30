@@ -260,7 +260,8 @@ export default function CouncilorDetails() {
                         <span className="text-sm text-gray-600 w-40">Cargo</span>
                         <span className="text-sm font-medium">:</span>
                         <span className="text-sm text-gray-900 ml-4">
-                          {councilor?.role === 'admin' ? 'Administrador' : 'Vereador'}
+                          {councilor?.role === 'admin' ? 'Administrador' : 
+                           councilor?.role === 'executive' ? 'Executivo' : 'Vereador'}
                         </span>
                       </div>
                     </div>

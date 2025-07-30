@@ -30,7 +30,7 @@ export default function CouncilorList() {
   const [searchTerm, setSearchTerm] = useState("");
   
   // Buscar lista de vereadores
-  const { data: councilors, isLoading } = useQuery({
+  const { data: councilors, isLoading } = useQuery<Councilor[]>({
     queryKey: ['/api/councilors'],
   });
   
@@ -80,7 +80,7 @@ export default function CouncilorList() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            {councilors?.length > 0 && (
+            {(councilors?.length ?? 0) > 0 && (
               <Button onClick={() => setLocation("/users/new")}>
                 <Plus className="mr-2 h-4 w-4" /> Adicionar
               </Button>
@@ -169,7 +169,12 @@ export default function CouncilorList() {
                         </Avatar>
                         <div>
                           <div className="font-medium">{councilor.name}</div>
-                          <div className="text-xs text-muted-foreground">{councilor.role === 'councilor' ? 'Vereador(a)' : councilor.role === 'admin' ? 'Administrador' : councilor.role}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {councilor.role === 'councilor' ? 'Vereador(a)' : 
+                             councilor.role === 'admin' ? 'Administrador' : 
+                             councilor.role === 'executive' ? 'Executivo' : 
+                             councilor.role}
+                          </div>
                         </div>
                       </div>
                     </TableCell>

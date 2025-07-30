@@ -44,7 +44,7 @@ const createFormSchema = z.object({
   number: z.string().min(1, { message: "Número é obrigatório" }),
   city: z.string().min(2, { message: "Cidade é obrigatória" }),
   state: z.string().length(2, { message: "Estado deve ter 2 caracteres" }),
-  role: z.enum(["admin", "councilor"], { message: "Selecione um perfil válido" }),
+  role: z.enum(["admin", "councilor", "executive"], { message: "Selecione um perfil válido" }),
   legislatureId: z.preprocess(
     val => val === "" || val === null ? undefined : typeof val === "string" ? Number(val) : val,
     z.number().optional()
@@ -71,7 +71,7 @@ const updateFormSchema = z.object({
   number: z.string().min(1, { message: "Número é obrigatório" }),
   city: z.string().min(2, { message: "Cidade é obrigatória" }),
   state: z.string().length(2, { message: "Estado deve ter 2 caracteres" }),
-  role: z.enum(["admin", "councilor"], { message: "Selecione um perfil válido" }),
+  role: z.enum(["admin", "councilor", "executive"], { message: "Selecione um perfil válido" }),
   legislatureId: z.preprocess(
     val => val === "" || val === null ? undefined : typeof val === "string" ? Number(val) : val,
     z.number().optional()
@@ -148,7 +148,7 @@ export default function UserForm() {
         number: user.number || "",
         city: user.city || "",
         state: user.state || "",
-        role: user.role as "admin" | "councilor",
+        role: user.role as "admin" | "councilor" | "executive",
         legislatureId: user.legislatureId ? Number(user.legislatureId) : undefined,
         maritalStatus: user.maritalStatus || "",
         occupation: user.occupation || "",
@@ -689,6 +689,7 @@ export default function UserForm() {
                         <SelectContent>
                           <SelectItem value="admin">Administrador</SelectItem>
                           <SelectItem value="councilor">Vereador</SelectItem>
+                          <SelectItem value="executive">Executivo</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

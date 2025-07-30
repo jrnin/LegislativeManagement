@@ -1542,7 +1542,7 @@ export default function EventDetails() {
                   {user?.role === 'admin' && (
                     <div className="space-y-4 pt-4 border-t">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-medium">Registrar Votos dos Vereadores</h4>
+                        
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
@@ -1558,7 +1558,7 @@ export default function EventDetails() {
                             className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                           >
                             <ThumbsUp className="w-4 h-4 mr-1" />
-                            Aprovar Oficialmente
+                            Selecionar Todos
                           </Button>
                           <Button
                             variant="outline"
@@ -1576,21 +1576,7 @@ export default function EventDetails() {
                             <X className="w-4 h-4 mr-1" />
                             Limpar
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={async () => {
-                              try {
-                                const response = await apiRequest<any[]>('/api/councilors');
-                                setCouncilors(response || []);
-                              } catch (error) {
-                                console.error('Error fetching councilors:', error);
-                              }
-                            }}
-                          >
-                            <RefreshCw className="w-4 h-4 mr-1" />
-                            Atualizar Lista
-                          </Button>
+                          
                         </div>
                       </div>
                       
@@ -1641,19 +1627,7 @@ export default function EventDetails() {
                     </div>
                   )}
                   
-                  {/* Seção de comentário (apenas para administradores) */}
-                  {user?.role === 'admin' && (
-                    <div className="space-y-2 mt-6 pt-4 border-t">
-                      <Label htmlFor="approvalComment">Comentário (opcional):</Label>
-                      <Textarea
-                        id="approvalComment"
-                        value={approvalComment}
-                        onChange={(e) => setApprovalComment(e.target.value)}
-                        placeholder="Digite um comentário sobre sua decisão..."
-                        className="resize-none min-h-[100px]"
-                      />
-                    </div>
-                  )}
+                 
                 </div>
                 
                 {/* Coluna 3 - Visualização do arquivo */}
