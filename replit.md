@@ -110,6 +110,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 30, 2025**: Fixed Critical React Loop Errors and Import Issues - SYSTEM STABILITY REPAIR
+  - **Root Cause**: "Maximum update depth exceeded" React error was caused by infinite setState loops in components
+  - **EventActivityDocumentManager Fix**: Removed circular dependency in activitiesWithDocuments filter that caused infinite re-renders
+  - **AtividadesPage Fix**: Removed location dependency from useEffect to prevent infinite loops on navigation
+  - **Middleware Import Fix**: Added missing handleAvatarUpload and handleNewsUpload function exports to middlewares.ts
+  - **Query Optimization**: Simplified activity filtering to prevent recursive query dependencies
+  - **URL Parameter Fix**: Fixed URL parameter detection to only run on component mount, not on every location change
+  - **System Stabilization**: All components now render without infinite loops or maximum update depth errors
+  - **Import Resolution**: Fixed SyntaxError for missing middleware exports that prevented server startup
+  - **User Experience**: System now loads smoothly without React errors or server crashes
+  - **Status**: Complete system stability achieved with all React loops and import errors resolved
+
 - **July 30, 2025**: Optimized Legislative Activities Performance - MAJOR PERFORMANCE IMPROVEMENT
   - **Root Cause**: System was taking 3+ seconds to load legislative activities due to N+1 query problems
   - **Solution**: Completely optimized database queries with single JOIN operation instead of multiple per-activity queries
