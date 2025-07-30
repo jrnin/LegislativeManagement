@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link, useLocation } from 'wouter';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/Head';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 

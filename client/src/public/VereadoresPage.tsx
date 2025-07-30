@@ -9,7 +9,7 @@ import { getInitials } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/Head';
 
 // Interface para o modelo de Vereador (baseado na tabela users do banco de dados)
 interface Councilor {

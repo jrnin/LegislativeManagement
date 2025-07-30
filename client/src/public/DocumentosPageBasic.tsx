@@ -21,7 +21,7 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/Head';
 
 // Interface para documento
 interface Document {

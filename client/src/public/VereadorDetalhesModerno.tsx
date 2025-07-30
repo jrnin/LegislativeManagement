@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, Mail, Phone, MapPin, Calendar, GraduationCap, Briefcase, Award, FileText, Users, Building2, Download, ExternalLink } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/Head';
 import texturaUrl from '@/assets/textura.jpg';
 
 interface Councilor {

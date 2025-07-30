@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/Head';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatDateSimpleSafe } from "@/lib/dateUtils";
