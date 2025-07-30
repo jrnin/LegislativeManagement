@@ -516,8 +516,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Nenhuma imagem foi enviada" });
       }
       
-      // O middleware handleAvatarUpload já adicionou profileImageUrl ao req.body
-      const avatarUrl = req.body.profileImageUrl;
+      console.log("Avatar upload - arquivo recebido:", req.file);
+      
+      // Construir a URL do avatar baseada no caminho do arquivo salvo
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+      
+      console.log("Avatar upload - URL construída:", avatarUrl);
       
       // Atualizar o usuário com a nova URL do avatar
       const updatedUser = await storage.updateUser(userId, { 
@@ -528,6 +532,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedUser) {
         return res.status(404).json({ message: "Usuário não encontrado" });
       }
+      
+      console.log("Avatar upload - usuário atualizado:", updatedUser.profileImageUrl);
       
       res.json({
         message: "Avatar atualizado com sucesso",
