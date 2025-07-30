@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
-import multer from "multer";
+import multer, { MulterError } from "multer";
 import path from "path";
 import crypto from "crypto";
 import fs from "fs";
@@ -63,7 +63,7 @@ const newsStorage = multer.diskStorage({
 });
 
 // Configure file filter for regular documents
-const documentFileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const documentFileFilter = (req: Request, file: Express.Multer.File, cb: (error: Error | null, acceptFile?: boolean) => void) => {
   // Accept common document formats
   const allowedTypes = [
     "application/pdf",
@@ -86,7 +86,7 @@ const documentFileFilter = (req: Request, file: Express.Multer.File, cb: multer.
 };
 
 // Configure file filter for avatars
-const avatarFileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const avatarFileFilter = (req: Request, file: Express.Multer.File, cb: (error: Error | null, acceptFile?: boolean) => void) => {
   // Accept only image formats for avatars
   const allowedTypes = [
     "image/jpeg",
