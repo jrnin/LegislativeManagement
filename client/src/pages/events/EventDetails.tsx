@@ -294,6 +294,119 @@ export default function EventDetails() {
     }
   });
   
+  // Mutation para remover/cancelar voto
+  const removeVoteMutation = useMutation({
+    mutationFn: async ({ activityId }: { activityId: number }) => {
+      return await apiRequest(
+        "DELETE",
+        `/api/activities/${activityId}/votes`,
+        { eventId }
+      );
+    },
+    onMutate: async ({ activityId }) => {
+      // Optimistic update - decrease vote count immediately
+      const statsKey = `${activityId}-${eventId}`;
+      
+      // Get current vote to determine if it was approve or reject
+      const currentVote = userVotes?.[activityId];
+      
+      if (currentVote !== undefined) {
+        // Get current stats from cache
+        const currentStats = queryClient.getQueryData(["/api/activities", activityId, "votes/stats", eventId]) || {
+          totalVotes: 0,
+          approveCount: 0,
+          rejectCount: 0,
+          approvePercentage: 0,
+          rejectPercentage: 0
+        };
+        
+        // Calculate new stats after removing vote
+        const newStats = {
+          ...currentStats,
+          totalVotes: Math.max(0, currentStats.totalVotes - 1),
+          approveCount: currentVote ? Math.max(0, currentStats.approveCount - 1) : currentStats.approveCount,
+          rejectCount: !currentVote ? Math.max(0, currentStats.rejectCount - 1) : currentStats.rejectCount
+        };
+        
+        // Recalculate percentages
+        if (newStats.totalVotes > 0) {
+          newStats.approvePercentage = Math.round((newStats.approveCount / newStats.totalVotes) * 100);
+          newStats.rejectPercentage = Math.round((newStats.rejectCount / newStats.totalVotes) * 100);
+        } else {
+          newStats.approvePercentage = 0;
+          newStats.rejectPercentage = 0;
+        }
+        
+        // Update local state
+        setLocalVotingStats(prev => ({
+          ...prev,
+          [statsKey]: newStats
+        }));
+        
+        // Clear the user's vote locally
+        setActivityVote(null);
+        
+        return { statsKey, previousStats: currentStats, previousVote: currentVote };
+      }
+    },
+    onSuccess: (_, { activityId }) => {
+      // Remove from user votes
+      setUserVotes(prev => {
+        const newVotes = { ...prev };
+        delete newVotes[activityId];
+        return newVotes;
+      });
+      
+      // Registrar ação na timeline
+      const activity = eventDetails?.activities?.find((a: any) => a.id === activityId);
+      if (activity) {
+        addTimelineEntry(eventId, timelineActions.cancelVote(activityId, `${activity.activityType} ${activity.activityNumber}`));
+      }
+      
+      toast({
+        title: "Voto removido",
+        description: "Seu voto foi removido com sucesso."
+      });
+      
+      // Invalidar todas as consultas relacionadas
+      queryClient.invalidateQueries({ queryKey: ["/api/activities", activityId, "votes/stats", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/activities", selectedActivityId, "votes", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/activities", activityId, "my-vote", eventId] });
+      
+      // Clear local stats after server sync
+      setTimeout(() => {
+        setLocalVotingStats(prev => {
+          const newStats = { ...prev };
+          delete newStats[`${activityId}-${eventId}`];
+          return newStats;
+        });
+      }, 500);
+    },
+    onError: (error, { activityId }, context) => {
+      console.error("Erro ao remover voto:", error);
+      
+      // Revert optimistic update
+      if (context?.statsKey) {
+        setLocalVotingStats(prev => {
+          const newStats = { ...prev };
+          delete newStats[context.statsKey];
+          return newStats;
+        });
+        
+        // Restore previous vote state
+        if (context.previousVote !== undefined) {
+          setActivityVote(context.previousVote);
+        }
+      }
+      
+      toast({
+        title: "Erro",
+        description: "Não foi possível remover seu voto.",
+        variant: "destructive"
+      });
+    }
+  });
+  
   // Mutation for approving activity
   const approveActivityMutation = useMutation({
     mutationFn: async ({ activityId, approved, comment }: { activityId: number, approved: boolean, comment?: string }) => {
@@ -1338,37 +1451,56 @@ export default function EventDetails() {
                   {user?.role === 'councilor' && (
                     <div className="space-y-3 pt-4 border-t">
                       <h4 className="font-medium">Seu voto</h4>
-                      <div className="flex justify-between gap-3">
-                        <Button
-                          variant={activityVote === true ? "default" : "outline"} 
-                          className={`flex-1 ${activityVote === true ? 'bg-green-600 hover:bg-green-700' : ''}`}
-                          onClick={() => {
-                            setActivityVote(true);
-                            activityVoteMutation.mutate({
-                              activityId: selectedActivityId!,
-                              vote: true
-                            });
-                          }}
-                          disabled={activityVoteMutation.isPending}
-                        >
-                          <ThumbsUp className="mr-2 h-4 w-4" />
-                          Aprovar
-                        </Button>
-                        <Button
-                          variant={activityVote === false ? "default" : "outline"}
-                          className={`flex-1 ${activityVote === false ? 'bg-red-600 hover:bg-red-700' : ''}`}
-                          onClick={() => {
-                            setActivityVote(false);
-                            activityVoteMutation.mutate({
-                              activityId: selectedActivityId!,
-                              vote: false
-                            });
-                          }}
-                          disabled={activityVoteMutation.isPending}
-                        >
-                          <ThumbsDown className="mr-2 h-4 w-4" />
-                          Rejeitar
-                        </Button>
+                      <div className="space-y-3">
+                        <div className="flex justify-between gap-3">
+                          <Button
+                            variant={activityVote === true ? "default" : "outline"} 
+                            className={`flex-1 ${activityVote === true ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                            onClick={() => {
+                              setActivityVote(true);
+                              activityVoteMutation.mutate({
+                                activityId: selectedActivityId!,
+                                vote: true
+                              });
+                            }}
+                            disabled={activityVoteMutation.isPending || removeVoteMutation.isPending}
+                          >
+                            <ThumbsUp className="mr-2 h-4 w-4" />
+                            Aprovar
+                          </Button>
+                          <Button
+                            variant={activityVote === false ? "default" : "outline"}
+                            className={`flex-1 ${activityVote === false ? 'bg-red-600 hover:bg-red-700' : ''}`}
+                            onClick={() => {
+                              setActivityVote(false);
+                              activityVoteMutation.mutate({
+                                activityId: selectedActivityId!,
+                                vote: false
+                              });
+                            }}
+                            disabled={activityVoteMutation.isPending || removeVoteMutation.isPending}
+                          >
+                            <ThumbsDown className="mr-2 h-4 w-4" />
+                            Rejeitar
+                          </Button>
+                        </div>
+                        
+                        {/* Botão para desfazer voto - só aparece se o usuário já votou */}
+                        {(activityVote !== null && activityVote !== undefined) && (
+                          <Button
+                            variant="outline"
+                            className="w-full border-orange-300 text-orange-600 hover:bg-orange-50"
+                            onClick={() => {
+                              removeVoteMutation.mutate({
+                                activityId: selectedActivityId!
+                              });
+                            }}
+                            disabled={activityVoteMutation.isPending || removeVoteMutation.isPending}
+                          >
+                            <X className="mr-2 h-4 w-4" />
+                            Desfazer Voto
+                          </Button>
+                        )}
                       </div>
                     </div>
                   )}

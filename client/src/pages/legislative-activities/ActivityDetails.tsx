@@ -459,15 +459,7 @@ export default function ActivityDetails() {
           )}
           {user?.role === "admin" && (
             <Dialog open={showAdminVoteDialog} onOpenChange={setShowAdminVoteDialog}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="secondary"
-                  className="bg-purple-100 text-purple-700 hover:bg-purple-200"
-                >
-                  <Vote className="mr-2 h-4 w-4" />
-                  Registrar Votos
-                </Button>
-              </DialogTrigger>
+              
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Registrar Votos dos Vereadores</DialogTitle>

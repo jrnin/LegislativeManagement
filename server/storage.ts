@@ -1633,6 +1633,17 @@ export class DatabaseStorage implements IStorage {
     return !!result;
   }
   
+  async deleteActivityVoteByUserActivityAndEvent(userId: string, activityId: number, eventId: number): Promise<boolean> {
+    const result = await db.delete(activityVotes).where(
+      and(
+        eq(activityVotes.userId, userId),
+        eq(activityVotes.activityId, activityId),
+        eq(activityVotes.eventId, eventId)
+      )
+    );
+    return !!result;
+  }
+  
   async getActivityVotesStats(activityId: number): Promise<{
     totalVotes: number;
     approveCount: number;

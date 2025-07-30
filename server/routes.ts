@@ -3528,6 +3528,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Remove/cancel vote for an activity
+  app.delete('/api/activities/:activityId/votes', requireAuth, async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      const { eventId } = req.body;
+      
+      // Verificar se o usuário está autenticado
+      if (!req.user && !(req as any).userId) {
+        return res.status(401).json({ message: "Usuário não autenticado" });
+      }
+      
+      // Obter o userId de req.user ou diretamente de req.userId
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || (req as any).userId;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "ID do usuário não disponível" });
+      }
+      
+      // Verificar se a atividade existe
+      const activity = await storage.getLegislativeActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Verificar se o evento foi fornecido
+      if (!eventId) {
+        return res.status(400).json({ message: "O campo 'eventId' é obrigatório para remover o voto" });
+      }
+      
+      // Verificar se existe um voto do usuário para esta atividade no evento específico
+      const existingVote = await storage.getActivityVoteByUserActivityAndEvent(userId, activityId, eventId);
+      if (!existingVote) {
+        return res.status(404).json({ message: "Voto não encontrado para este usuário nesta atividade e evento" });
+      }
+      
+      // Remover o voto
+      const success = await storage.deleteActivityVoteByUserActivityAndEvent(userId, activityId, eventId);
+      if (!success) {
+        return res.status(500).json({ message: "Erro ao remover voto" });
+      }
+      
+      // Registrar no timeline da atividade
+      await storage.createActivityTimeline({
+        activityId,
+        description: "Voto cancelado/removido",
+        eventType: "vote_cancel",
+        createdBy: userId,
+        eventDate: new Date(),
+        metadata: {
+          previousVote: existingVote.vote,
+          comment: existingVote.comment || null
+        }
+      });
+      
+      // Buscar estatísticas atualizadas
+      const stats = await storage.getActivityVotesStatsByEvent(activityId, eventId);
+      
+      // Buscar informações sobre o usuário
+      const voter = await storage.getUser(userId);
+      
+      res.json({
+        message: "Voto removido com sucesso",
+        stats
+      });
+    } catch (error) {
+      console.error("Error removing activity vote:", error);
+      res.status(500).json({ message: "Erro ao remover voto" });
+    }
+  });
+  
   // Get vote statistics for an activity
   app.get('/api/activities/:activityId/votes/stats', requireAuth, async (req, res) => {
     try {
