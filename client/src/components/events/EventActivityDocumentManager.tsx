@@ -43,11 +43,8 @@ export default function EventActivityDocumentManager({ eventId }: EventActivityD
     select: (data: any) => data || []
   });
 
-  // Get available activities (those with documents)
-  const activitiesWithDocuments = activities.filter(activity => {
-    // Check if this activity has any documents
-    return activityDocuments.some(doc => doc.activityId === activity.id) || selectedActivityId === activity.id.toString();
-  });
+  // Get available activities (only return all activities, filtering will be done in UI)
+  const activitiesWithDocuments = activities;
 
   // Get available documents (not yet linked for this activity)
   const availableDocuments = activityDocuments.filter(doc => 

@@ -53,10 +53,10 @@ export default function AtividadesPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const tipoParam = urlParams.get('tipo');
     
-    if (tipoParam) {
+    if (tipoParam && tipoParam !== type) {
       setType(tipoParam);
     }
-  }, [location]);
+  }, []); // Remove location dependency to prevent infinite loops
   
   // Construir query string para filtros
   const getQueryString = () => {
