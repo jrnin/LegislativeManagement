@@ -70,7 +70,7 @@ import {
   Calendar,
   ArrowUpDown
 } from "lucide-react";
-import { formatDate } from "@/utils/formatters";
+import { formatDateSimpleSafe } from "@/lib/dateUtils";
 
 export default function DocumentList() {
   const [, navigate] = useLocation();
@@ -170,23 +170,31 @@ export default function DocumentList() {
   };
 
   // Enhanced filtering logic
-  const filteredDocuments = documents.filter(doc => {
-    const matchesSearch = !searchTerm || 
-      doc.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.documentNumber?.toString().includes(searchTerm);
-    
-    const matchesStatus = !filterStatus || filterStatus === "todos" || doc.status === filterStatus;
-    const matchesType = !filterType || filterType === "todos" || doc.documentType === filterType;
-    const matchesAuthor = !filterAuthor || filterAuthor === "todos" || doc.authorType === filterAuthor;
-    
-    return matchesSearch && matchesStatus && matchesType && matchesAuthor;
-  });
+  const filteredDocuments = useMemo(() => {
+    return documents.filter(doc => {
+      const matchesSearch = !searchTerm || 
+        doc.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.documentNumber?.toString().includes(searchTerm);
+      
+      const matchesStatus = !filterStatus || filterStatus === "todos" || doc.status === filterStatus;
+      const matchesType = !filterType || filterType === "todos" || doc.documentType === filterType;
+      const matchesAuthor = !filterAuthor || filterAuthor === "todos" || doc.authorType === filterAuthor;
+      
+      return matchesSearch && matchesStatus && matchesType && matchesAuthor;
+    });
+  }, [documents, searchTerm, filterStatus, filterType, filterAuthor]);
 
   // Document statistics
-  const totalDocuments = documents.length;
-  const vigentDocuments = documents.filter(doc => doc.status === "Vigente").length;
-  const documentTypes = Array.from(new Set(documents.map(doc => doc.documentType))).filter(type => type && type.trim() !== "");
-  const authorTypes = Array.from(new Set(documents.map(doc => doc.authorType))).filter(type => type && type.trim() !== "");
+  const documentStats = useMemo(() => {
+    const totalDocuments = documents.length;
+    const vigentDocuments = documents.filter(doc => doc.status === "Vigente").length;
+    const documentTypes = Array.from(new Set(documents.map(doc => doc.documentType))).filter(type => type && type.trim() !== "");
+    const authorTypes = Array.from(new Set(documents.map(doc => doc.authorType))).filter(type => type && type.trim() !== "");
+    
+    return { totalDocuments, vigentDocuments, documentTypes, authorTypes };
+  }, [documents]);
+
+  const { totalDocuments, vigentDocuments, documentTypes, authorTypes } = documentStats;
 
   const columns: ColumnDef<Document>[] = [
     {
@@ -221,7 +229,7 @@ export default function DocumentList() {
         return (
           <div className="flex items-center">
             <CalendarDays className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span>{formatDate(date)}</span>
+            <span>{formatDateSimpleSafe(date)}</span>
           </div>
         );
       },
@@ -394,7 +402,7 @@ export default function DocumentList() {
               <div className="flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center">
                   <Calendar className="mr-1 h-3 w-3" />
-                  {doc.documentDate ? formatDate(new Date(doc.documentDate).toISOString()) : 'Data não informada'}
+                  {doc.documentDate ? formatDateSimpleSafe(doc.documentDate) : 'Data não informada'}
                 </div>
                 {getAuthorTypeBadge(doc.authorType || "")}
               </div>
