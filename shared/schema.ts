@@ -459,6 +459,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   occupation: true,
   education: true,
   password: true,
+}).extend({
+  role: z.enum(["admin", "councilor", "executive"]).default("councilor"),
 });
 
 export const insertLegislatureSchema = createInsertSchema(legislatures).pick({
