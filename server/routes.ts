@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth } from "./replitAuth";
-import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload, handleNewsUpload } from "./middlewares";
+import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload, handleNewsUpload, handleActivityUpload, handleDocumentUpload, handleEventUpload } from "./middlewares";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest, sendEventNotificationEmail } from "./sendgrid";
 import { z } from "zod";
 import crypto from "crypto";
@@ -1057,7 +1057,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create legislative activity
-  app.post('/api/activities', requireAuth, handleFileUpload('file'), async (req: any, res) => {
+  app.post('/api/activities', requireAuth, handleActivityUpload('file'), async (req: any, res) => {
     try {
       const schema = z.object({
         activityNumber: z.number().int().positive(),
@@ -1142,7 +1142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update legislative activity
-  app.put('/api/activities/:id', requireAuth, handleFileUpload('file'), async (req: any, res) => {
+  app.put('/api/activities/:id', requireAuth, handleActivityUpload('file'), async (req: any, res) => {
     try {
       const activityId = Number(req.params.id);
       
@@ -1352,7 +1352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create document
-  app.post('/api/documents', requireAuth, handleFileUpload('file'), async (req: any, res) => {
+  app.post('/api/documents', requireAuth, handleDocumentUpload('file'), async (req: any, res) => {
     try {
       const schema = z.object({
         documentNumber: z.number().int().positive(),
@@ -1408,7 +1408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update document
-  app.put('/api/documents/:id', requireAdmin, handleFileUpload('file'), async (req: any, res) => {
+  app.put('/api/documents/:id', requireAdmin, handleDocumentUpload('file'), async (req: any, res) => {
     try {
       const documentId = Number(req.params.id);
       
