@@ -118,7 +118,11 @@ Preferred communication style: Simple, everyday language.
   - **TypeScript Safety**: Fixed all type errors and null checking issues in user management components  
   - **Complete CRUD**: Executive users can now be created, edited, and displayed throughout the system
   - **User Testing**: Confirmed successful creation of executive user with proper role assignment and email notification
-  - **Status**: Three-tier user system fully operational (admin, councilor, executive) with complete interface support
+  - **ActivityForm Integration**: Enhanced legislative activity authorship to include Executive users alongside councilors
+  - **Author Selection Enhancement**: Updated ActivityForm to filter and display both councilors and executives with role indicators
+  - **User Interface Improvement**: Added role labels (Vereador(a)/Executivo) in author selection for clear identification
+  - **Form Description Update**: Modified form descriptions to clarify that both councilors and executive representatives can be authors
+  - **Status**: Three-tier user system fully operational (admin, councilor, executive) with complete interface support and legislative authorship integration
 
 - **July 30, 2025**: Implemented Event Filter in Legislative Activities - USER INTERFACE ENHANCEMENT
   - **Event Selection Filter**: Added dropdown filter in /activities to show activities related to specific events
