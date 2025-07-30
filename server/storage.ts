@@ -672,39 +672,55 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getAllLegislativeActivities(): Promise<LegislativeActivity[]> {
-    const activities = await db.select().from(legislativeActivities).orderBy(desc(legislativeActivities.activityDate));
-    
-    // Group activities by activityNumber and activityType to avoid duplicates
+    // Single optimized query to get all activities with authors
+    const results = await db
+      .select({
+        activity: legislativeActivities,
+        author: users
+      })
+      .from(legislativeActivities)
+      .leftJoin(legislativeActivitiesAuthors, eq(legislativeActivities.id, legislativeActivitiesAuthors.activityId))
+      .leftJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
+      .orderBy(desc(legislativeActivities.activityDate));
+
+    // Group activities and their authors
+    const activitiesMap = new Map<number, LegislativeActivity>();
+
+    for (const result of results) {
+      const activity = result.activity;
+      const author = result.author;
+
+      if (!activitiesMap.has(activity.id)) {
+        activitiesMap.set(activity.id, {
+          ...activity,
+          authors: []
+        });
+      }
+
+      const existingActivity = activitiesMap.get(activity.id)!;
+      
+      // Add author if exists and not already added
+      if (author && !existingActivity.authors?.find(a => a.id === author.id)) {
+        existingActivity.authors = existingActivity.authors || [];
+        existingActivity.authors.push(author);
+      }
+    }
+
+    // Convert to array and filter unique activities by number+type
+    const allActivities = Array.from(activitiesMap.values());
     const uniqueActivities = new Map<string, LegislativeActivity>();
     
-    for (const activity of activities) {
+    for (const activity of allActivities) {
       const key = `${activity.activityNumber}-${activity.activityType}`;
       
-      // Se ainda não temos essa atividade, ou se esta é a versão original (sem eventId)
+      // Prefer original activities (without eventId) over duplicates
       if (!uniqueActivities.has(key) || (!activity.eventId && uniqueActivities.get(key)?.eventId)) {
         uniqueActivities.set(key, activity);
       }
     }
     
-    // For each unique activity, get the authors
-    const result: LegislativeActivity[] = [];
-    
-    for (const activity of uniqueActivities.values()) {
-      const authors = await db
-        .select({
-          user: users
-        })
-        .from(legislativeActivitiesAuthors)
-        .innerJoin(users, eq(legislativeActivitiesAuthors.userId, users.id))
-        .where(eq(legislativeActivitiesAuthors.activityId, activity.id));
-      
-      result.push({
-        ...activity,
-        authors: authors.map(a => a.user)
-      });
-    }
-    
-    return result.sort((a, b) => new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime());
+    return Array.from(uniqueActivities.values())
+      .sort((a, b) => new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime());
   }
 
   async getFilteredLegislativeActivities(filters: {
