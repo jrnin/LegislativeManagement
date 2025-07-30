@@ -62,8 +62,8 @@ export default function ActivityForm() {
     queryKey: ["/api/users"],
   });
 
-  // Filter only councilors for authorship
-  const councilors = users.filter(user => user.role === "councilor");
+  // Filter councilors and executives for authorship
+  const authors = users.filter(user => user.role === "councilor" || user.role === "executive");
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -497,7 +497,7 @@ export default function ActivityForm() {
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-lg font-medium">Autores</h3>
+                <h3 className="text-lg font-medium">Autores das Atividades</h3>
                 <Separator />
               </div>
               
@@ -508,31 +508,38 @@ export default function ActivityForm() {
                   <FormItem>
                     <FormLabel>Autores</FormLabel>
                     <FormDescription>
-                      Selecione um ou mais vereadores como autores desta atividade
+                      Selecione um ou mais vereadores ou representantes do executivo como autores desta atividade
                     </FormDescription>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
-                      {councilors.map((councilor) => (
-                        <div key={councilor.id} className="flex items-center space-x-2">
+                      {authors.map((author) => (
+                        <div key={author.id} className="flex items-center space-x-2">
                           <Checkbox
-                            id={`author-${councilor.id}`}
-                            checked={field.value.includes(councilor.id)}
+                            id={`author-${author.id}`}
+                            checked={field.value.includes(author.id)}
                             onCheckedChange={(checked) => {
                               if (checked) {
-                                field.onChange([...field.value, councilor.id]);
+                                field.onChange([...field.value, author.id]);
                               } else {
-                                field.onChange(field.value.filter(id => id !== councilor.id));
+                                field.onChange(field.value.filter(id => id !== author.id));
                               }
                             }}
                           />
                           <label
-                            htmlFor={`author-${councilor.id}`}
+                            htmlFor={`author-${author.id}`}
                             className="flex items-center space-x-2 text-sm font-medium leading-none cursor-pointer"
                           >
                             <Avatar className="h-6 w-6">
-                              <AvatarImage src={councilor.profileImageUrl || ""} />
-                              <AvatarFallback>{councilor.name ? councilor.name.charAt(0) : "U"}</AvatarFallback>
+                              <AvatarImage src={author.profileImageUrl || ""} />
+                              <AvatarFallback>{author.name ? author.name.charAt(0) : "U"}</AvatarFallback>
                             </Avatar>
-                            <span>{councilor.name}</span>
+                            <div className="flex flex-col">
+                              <span>{author.name}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {author.role === 'councilor' ? 'Vereador(a)' : 
+                                 author.role === 'executive' ? 'Executivo' : 
+                                 author.role}
+                              </span>
+                            </div>
                           </label>
                         </div>
                       ))}
