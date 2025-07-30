@@ -899,19 +899,11 @@ export default function ActivityDetails() {
             
             <TabsContent value="votes" className="pt-4">
               <Card>
-                <CardHeader className="flex flex-row items-start justify-between">
-                  <div>
-                    <CardTitle>Votações da Atividade</CardTitle>
-                    <CardDescription>
-                      Registro de votos da atividade legislativa
-                    </CardDescription>
-                  </div>
-                  
-                  {isAuthenticated && !userVote && (
-                    <Button onClick={() => setShowVoteDialog(true)}>
-                      Votar
-                    </Button>
-                  )}
+                <CardHeader>
+                  <CardTitle>Votações da Atividade</CardTitle>
+                  <CardDescription>
+                    Registro de votos da atividade legislativa
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {loadingVotes ? (
@@ -1059,57 +1051,7 @@ export default function ActivityDetails() {
         
         {/* Coluna lateral */}
         <div className="space-y-6">
-          {/* Votação rápida */}
-          {isAuthenticated && !activity.approved && activity.situacao !== "Tramitação Finalizada" && activity.situacao !== "Arquivado" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Registrar Voto</CardTitle>
-                <CardDescription>
-                  Vote nesta atividade legislativa
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {userVote ? (
-                  <div className="text-center py-2">
-                    <Badge className={`mb-2 ${userVote.vote ? 
-                      'bg-green-100 text-green-800' : 
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {userVote.vote ? 'Você aprovou' : 'Você rejeitou'}
-                    </Badge>
-                    <p className="text-sm text-muted-foreground">
-                      Você já registrou seu voto nesta atividade
-                    </p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    <Button 
-                      className="bg-green-600 hover:bg-green-700 text-white w-full"
-                      size="lg"
-                      onClick={() => {
-                        setActivityVote(true);
-                        setShowVoteDialog(true);
-                      }}
-                    >
-                      <ThumbsUp className="mr-2 h-5 w-5" />
-                      Aprovar
-                    </Button>
-                    <Button 
-                      className="bg-red-600 hover:bg-red-700 text-white w-full"
-                      size="lg"
-                      onClick={() => {
-                        setActivityVote(false);
-                        setShowVoteDialog(true);
-                      }}
-                    >
-                      <ThumbsDown className="mr-2 h-5 w-5" />
-                      Rejeitar
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+
           
           {/* Estatísticas */}
           {votes && votes.length > 0 && (
