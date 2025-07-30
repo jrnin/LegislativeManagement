@@ -110,13 +110,6 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **July 30, 2025**: Removed "Registrar Votos" Button from Activity Details - USER INTERFACE CLEANUP
-  - **UI Simplification**: Removed "Registrar Voto" card from sidebar in ActivityDetails.tsx
-  - **Button Cleanup**: Removed "Votar" button from votes tab header
-  - **Interface Streamlined**: Activity details now focus on viewing information without voting action buttons
-  - **User Request**: Eliminated voting registration buttons from legislative activity detail pages per user preference
-  - **Status**: Clean activity details interface without voting action buttons
-
 - **July 30, 2025**: Added Event Filtering System - ENHANCED USER INTERFACE
   - **Categoria Filter**: Added dropdown filter to filter events by category (Sessão Ordinária, Extraordinária, Reunião Comissão)
   - **Status Filter**: Added dropdown filter to filter events by status (Aberto, Andamento, Concluído, Cancelado)
