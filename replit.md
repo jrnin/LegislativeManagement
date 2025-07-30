@@ -110,6 +110,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 30, 2025**: Added Event Filtering System - ENHANCED USER INTERFACE
+  - **Categoria Filter**: Added dropdown filter to filter events by category (Sessão Ordinária, Extraordinária, Reunião Comissão)
+  - **Status Filter**: Added dropdown filter to filter events by status (Aberto, Andamento, Concluído, Cancelado)
+  - **Improved Search**: Enhanced existing location search with better placeholder text
+  - **Responsive Design**: Organized filters in responsive layout for desktop and mobile devices
+  - **Clear Filters Button**: Added "Limpar filtros" button that appears when any filter is active
+  - **Real-time Filtering**: All filters work instantly with the data table without page refresh
+  - **Dynamic Options**: Filter dropdowns populate automatically from available event data
+  - **User Experience**: Enhanced event management interface with intuitive filtering controls
+  - **Status**: Complete filtering system operational in /events module
+
 - **July 30, 2025**: Fixed Critical React Loop Errors and Import Issues - SYSTEM STABILITY REPAIR
   - **Root Cause**: "Maximum update depth exceeded" React error was caused by infinite setState loops in components
   - **EventActivityDocumentManager Fix**: Removed circular dependency in activitiesWithDocuments filter that caused infinite re-renders
