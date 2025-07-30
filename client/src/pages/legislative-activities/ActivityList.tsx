@@ -68,7 +68,7 @@ import {
   Users,
   Download
 } from "lucide-react";
-import { formatDate } from "@/utils/formatters";
+import { formatDateSimpleSafe } from "@/lib/dateUtils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ActivityList() {
@@ -88,6 +88,7 @@ export default function ActivityList() {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedAuthor, setSelectedAuthor] = useState("all");
   const [selectedSituation, setSelectedSituation] = useState("all");
+  const [selectedEvent, setSelectedEvent] = useState("all");
 
   // Debounce search term
   useEffect(() => {
@@ -134,12 +135,23 @@ export default function ActivityList() {
       filtered = filtered.filter(activity => activity.situacao === selectedSituation);
     }
 
+    // Filtro por evento
+    if (selectedEvent && selectedEvent !== 'all') {
+      const eventId = parseInt(selectedEvent);
+      filtered = filtered.filter(activity => activity.eventId === eventId);
+    }
+
     return filtered;
-  }, [allActivities, debouncedSearchTerm, selectedType, selectedAuthor, selectedSituation]);
+  }, [allActivities, debouncedSearchTerm, selectedType, selectedAuthor, selectedSituation, selectedEvent]);
 
   // Buscar lista de usuários para filtro de autores
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/users"],
+  });
+
+  // Buscar lista de eventos para filtro de eventos
+  const { data: events = [] } = useQuery<any[]>({
+    queryKey: ["/api/events"],
   });
 
   const deleteMutation = useMutation({
@@ -304,7 +316,7 @@ export default function ActivityList() {
         return (
           <div className="flex items-center">
             <CalendarCheck className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span>{formatDate(date)}</span>
+            <span>{formatDateSimpleSafe(date)}</span>
           </div>
         );
       },
@@ -488,7 +500,7 @@ export default function ActivityList() {
           <CardTitle className="text-lg">Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Busca por texto */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Buscar</label>
@@ -564,10 +576,28 @@ export default function ActivityList() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Filtro por Evento */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Evento</label>
+              <Select value={selectedEvent} onValueChange={setSelectedEvent}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os eventos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os eventos</SelectItem>
+                  {events.map((event) => (
+                    <SelectItem key={event.id} value={event.id.toString()}>
+                      {event.eventCategory} Nº {event.eventNumber} - {formatDateSimpleSafe(event.eventDate)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Botão para limpar filtros */}
-          {(debouncedSearchTerm || selectedType !== 'all' || selectedAuthor !== 'all' || selectedSituation !== 'all') && (
+          {(debouncedSearchTerm || selectedType !== 'all' || selectedAuthor !== 'all' || selectedSituation !== 'all' || selectedEvent !== 'all') && (
             <div className="mt-4">
               <Button
                 variant="outline"
@@ -577,6 +607,7 @@ export default function ActivityList() {
                   setSelectedType("all");
                   setSelectedAuthor("all");
                   setSelectedSituation("all");
+                  setSelectedEvent("all");
                 }}
               >
                 Limpar Filtros
