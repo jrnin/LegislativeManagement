@@ -110,6 +110,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 30, 2025**: Implemented Event Filter in Legislative Activities - USER INTERFACE ENHANCEMENT
+  - **Event Selection Filter**: Added dropdown filter in /activities to show activities related to specific events
+  - **Real-time Filtering**: Users can select events and instantly see only activities linked to that event
+  - **Enhanced Grid Layout**: Updated filter section to 5-column responsive layout (search, type, author, situation, event)
+  - **Smart Event Display**: Event options show category, number, and formatted date (e.g., "Sessão Ordinária Nº 11 - 26/06/2025")
+  - **Clear Filters Integration**: "Limpar Filtros" button now includes event filter reset functionality
+  - **Database Integration**: Filter uses eventId field to match activities with their associated events
+  - **Performance Optimized**: Client-side filtering with proper memoization for instant response
+  - **Date Formatting Fix**: Used formatDateSimpleSafe() to prevent timezone conversion issues in event dates
+  - **User Experience**: Seamless integration with existing filters allowing combined filtering by event + type + author + situation
+  - **Status**: Complete event filtering system operational allowing users to focus on activities from specific legislative sessions
+
 - **July 30, 2025**: Added Event Filtering System - ENHANCED USER INTERFACE
   - **Categoria Filter**: Added dropdown filter to filter events by category (Sessão Ordinária, Extraordinária, Reunião Comissão)
   - **Status Filter**: Added dropdown filter to filter events by status (Aberto, Andamento, Concluído, Cancelado)
