@@ -110,6 +110,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 31, 2025**: Added "Projeto de Decreto Legislativo" as New Legislative Activity Type - SYSTEM ENHANCEMENT
+  - **New Activity Type**: Successfully integrated "Projeto de Decreto Legislativo" as a new legislative activity type across all system components
+  - **Form Integration**: Updated ActivityForm.tsx to include the new type in dropdown selection options
+  - **Color Coding System**: Added pink color scheme (bg-pink-100 text-pink-800) for visual consistency across all components
+  - **Component Updates**: Enhanced ActivityList.tsx, EventDocumentManager.tsx, and DocumentDetails.tsx with proper color coding
+  - **Database Schema**: Updated shared/schema.ts comments to reflect the new activity type
+  - **System Consistency**: Maintained visual and functional consistency across administrative and public interfaces
+  - **TypeScript Fixes**: Resolved all LSP diagnostics and type checking errors in ActivityForm component
+  - **User Experience**: New legislative activity type now available for creation, editing, and display throughout the system
+  - **Status**: Complete integration confirmed - "Projeto de Decreto Legislativo" fully operational across all modules
+
 - **July 31, 2025**: Implemented Real Database Integration for Events Display - USER INTERFACE ENHANCEMENT
   - **Homepage Enhancement**: Updated "Eventos do Mês" card to show 5 most recent events from database instead of empty display
   - **API Optimization**: Modified `/api/public/events` endpoint to return latest events ordered by creation date (most recent first)

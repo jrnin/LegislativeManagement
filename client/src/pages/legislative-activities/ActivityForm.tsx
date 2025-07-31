@@ -89,7 +89,7 @@ export default function ActivityForm() {
           ? activity.activityDate.split('T')[0] 
           : "",
         description: activity.description || "",
-        eventId: activity.eventId,
+        eventId: activity.eventId || undefined,
         activityType: activity.activityType || "",
         situacao: activity.situacao || "Aguardando Análise",
         regimeTramitacao: activity.regimeTramitacao || "Ordinária",
@@ -108,7 +108,7 @@ export default function ActivityForm() {
       formData.append("activityNumber", data.activityNumber.toString());
       formData.append("activityDate", data.activityDate);
       formData.append("description", data.description);
-      if (data.eventId && data.eventId !== "none") {
+      if (data.eventId && typeof data.eventId === 'number') {
         formData.append("eventId", data.eventId.toString());
       }
       formData.append("activityType", data.activityType);
@@ -168,7 +168,7 @@ export default function ActivityForm() {
       if (data.activityNumber) formData.append("activityNumber", data.activityNumber.toString());
       if (data.activityDate) formData.append("activityDate", data.activityDate);
       if (data.description) formData.append("description", data.description);
-      if (data.eventId && data.eventId !== "none") formData.append("eventId", data.eventId.toString());
+      if (data.eventId && typeof data.eventId === 'number') formData.append("eventId", data.eventId.toString());
       if (data.activityType) formData.append("activityType", data.activityType);
       if (data.situacao) formData.append("situacao", data.situacao);
       if (data.regimeTramitacao) formData.append("regimeTramitacao", data.regimeTramitacao);
