@@ -4305,13 +4305,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // Rota pública para obter eventos do mês atual (sem autenticação)
+  // Rota pública para obter os 5 últimos eventos cadastrados (sem autenticação)
   app.get('/api/public/events', async (req, res) => {
     try {
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      
       // Buscar todos os eventos do sistema
       const allEvents = await storage.getAllEvents();
       
@@ -4319,19 +4315,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json([]);
       }
       
-      // Filtrar eventos do mês atual
-      const currentMonthEvents = allEvents.filter(event => {
-        const eventDate = new Date(event.eventDate);
-        return eventDate >= startOfMonth && eventDate <= endOfMonth;
+      // Ordenar por data de criação (mais recentes primeiro) e pegar os 5 últimos
+      const sortedEvents = allEvents.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(a.eventDate);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(b.eventDate);
+        return dateB.getTime() - dateA.getTime();
       });
-      
-      // Ordenar por data (mais próximos primeiro)
-      currentMonthEvents.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      const latestEvents = sortedEvents.slice(0, 5);
       
       // Formatar eventos para o frontend público
-      const formattedEvents = currentMonthEvents.map(event => ({
+      const formattedEvents = latestEvents.map(event => ({
         id: event.id,
-        title: `${event.category} #${event.eventNumber}`,
+        title: `${event.category} Nº ${event.eventNumber}`,
         date: format(new Date(event.eventDate), 'dd/MM/yyyy'),
         time: event.eventTime || '00:00',
         location: event.location || 'Local não informado',

@@ -763,11 +763,11 @@ export default function HomePage() {
             
             {/* Coluna da direita (sidebar) - ocupa 1/3 do espaço */}
             
-              {/* Próximos eventos */}
+              {/* Últimos eventos cadastrados */}
               <div className="bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
                   <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
-                  Eventos do Mês
+                  Últimos Eventos
                 </h3>
                 
                 {eventsLoading ? (
