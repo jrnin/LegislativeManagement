@@ -148,19 +148,31 @@ export default function AtividadesPage() {
     }
   };
 
-  // Determinar cor do badge de status
+  // Determinar cor do badge de status - atualizado conforme banco de dados
   const getStatusBadgeClass = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'aprovada':
+    switch (status) {
+      case 'Tramitação Finalizada':
         return 'bg-green-100 text-green-800';
-      case 'rejeitada':
-        return 'bg-red-100 text-red-800';
-      case 'em discussão':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'pendente':
-        return 'bg-orange-100 text-orange-800';
-      case 'tramitando':
+      case 'Arquivado':
+        return 'bg-gray-100 text-gray-800';
+      case 'Aguardando Análise':
         return 'bg-blue-100 text-blue-800';
+      case 'Análise de Parecer':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Aguardando Deliberação':
+        return 'bg-orange-100 text-orange-800';
+      case 'Aguardando Despacho do Presidente':
+        return 'bg-purple-100 text-purple-800';
+      case 'Aguardando Envio ao Executivo':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'Devolvida ao Autor':
+        return 'bg-red-100 text-red-800';
+      case 'Pronta para Pauta':
+        return 'bg-cyan-100 text-cyan-800';
+      case 'Tramitando em Conjunto':
+        return 'bg-teal-100 text-teal-800';
+      case 'Vetado':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }

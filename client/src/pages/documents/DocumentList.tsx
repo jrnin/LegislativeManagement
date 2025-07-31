@@ -214,9 +214,7 @@ export default function DocumentList() {
                 {type} Nº {number}/{year}
               </span>
             </div>
-            <Badge className={`mt-1 ${getDocumentTypeBadge(type)}`}>
-              {type}
-            </Badge>
+            
           </div>
         );
       },

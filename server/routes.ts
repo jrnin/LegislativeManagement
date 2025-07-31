@@ -4215,10 +4215,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (status) {
         filteredActivities = filteredActivities.filter(activity => {
-          // Mapear status baseado na aprovação
-          const activityStatus = activity.approved === true ? 'aprovada' : 
-                               activity.approved === false ? 'rejeitada' : 'pendente';
-          return activityStatus === status;
+          // Usar o campo situacao do banco de dados para filtrar
+          return activity.situacao === status;
         });
       }
       
@@ -4244,15 +4242,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Transformar dados para o formato esperado pelo frontend
       const formattedActivities = paginatedActivities.map(activity => {
         const year = new Date(activity.activityDate).getFullYear();
-        const activityStatus = activity.approved === true ? 'aprovada' : 
-                             activity.approved === false ? 'rejeitada' : 'pendente';
         
         return {
           id: activity.id,
           title: `${activity.activityType} Nº ${activity.activityNumber}/${year}`,
           description: activity.description,
           type: activity.activityType,
-          status: activityStatus,
+          status: activity.situacao || 'Aguardando Análise', // Usar o campo situacao do banco de dados
           sessionDate: activity.activityDate,
           authors: activity.authors || []
         };
@@ -4260,7 +4256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Obter tipos únicos de atividade e status para filtros
       const uniqueActivityTypes = [...new Set(allActivities.map(a => a.activityType))];
-      const uniqueStatusTypes = ['aprovada', 'pendente', 'rejeitada'];
+      const uniqueStatusTypes = [...new Set(allActivities.map(a => a.situacao).filter(Boolean))];
       
       const response = {
         activities: formattedActivities,
