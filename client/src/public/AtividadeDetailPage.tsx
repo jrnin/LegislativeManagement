@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRoute } from 'wouter';
+import { useRoute, useLocation } from 'wouter';
 import { ArrowLeft, Calendar, FileText, User, Download, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,10 +31,17 @@ interface LegislativeActivity {
 }
 
 export default function AtividadeDetailPage() {
-  const [match, params] = useRoute('/atividades/:id');
+  const [location] = useLocation();
   const [activity, setActivity] = useState<LegislativeActivity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Extrair ID da URL (funciona tanto para /atividades/:id quanto /public/atividades/:id)
+  const getActivityId = () => {
+    const pathSegments = location.split('/');
+    const lastSegment = pathSegments[pathSegments.length - 1];
+    return lastSegment && !isNaN(Number(lastSegment)) ? lastSegment : null;
+  };
 
   // Função para download do arquivo
   const handleDownload = () => {
@@ -54,19 +61,31 @@ export default function AtividadeDetailPage() {
     return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
   };
 
-  // Determinar cor do badge de status
+  // Determinar cor do badge de status (usar mesma lógica da HomePage)
   const getStatusBadgeClass = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'aprovada':
+    switch (status) {
+      case 'Tramitação Finalizada':
         return 'bg-green-100 text-green-800';
-      case 'rejeitada':
-        return 'bg-red-100 text-red-800';
-      case 'em discussão':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'pendente':
-        return 'bg-orange-100 text-orange-800';
-      case 'tramitando':
+      case 'Arquivado':
+        return 'bg-gray-100 text-gray-800';
+      case 'Aguardando Análise':
         return 'bg-blue-100 text-blue-800';
+      case 'Análise de Parecer':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Aguardando Deliberação':
+        return 'bg-orange-100 text-orange-800';
+      case 'Aguardando Despacho do Presidente':
+        return 'bg-purple-100 text-purple-800';
+      case 'Aguardando Envio ao Executivo':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'Devolvida ao Autor':
+        return 'bg-red-100 text-red-800';
+      case 'Pronta para Pauta':
+        return 'bg-cyan-100 text-cyan-800';
+      case 'Tramitando em Conjunto':
+        return 'bg-teal-100 text-teal-800';
+      case 'Vetado':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -92,12 +111,13 @@ export default function AtividadeDetailPage() {
 
   useEffect(() => {
     const fetchActivity = async () => {
-      if (!params?.id) return;
+      const activityId = getActivityId();
+      if (!activityId) return;
 
       try {
         setIsLoading(true);
         
-        const response = await fetch(`/api/public/legislative-activities/${params.id}`);
+        const response = await fetch(`/api/public/legislative-activities/${activityId}`);
         
         if (!response.ok) {
           if (response.status === 404) {
@@ -110,22 +130,18 @@ export default function AtividadeDetailPage() {
         
         const activityData = await response.json();
         
-        // Transform the API response to match our interface
+        // Use the API response directly as it's already formatted
         const transformedActivity = {
           id: activityData.id,
-          title: `${activityData.activityType} Nº ${activityData.activityNumber}/${new Date(activityData.activityDate).getFullYear()}`,
+          title: activityData.title || `${activityData.activityType} Nº ${activityData.activityNumber}/${new Date(activityData.activityDate).getFullYear()}`,
           description: activityData.description,
           type: activityData.activityType,
-          status: activityData.approved ? 'aprovada' : 'tramitando',
-          sessionDate: activityData.activityDate,
+          status: activityData.status || activityData.situacao || 'Status não informado',
+          sessionDate: activityData.sessionDate || activityData.activityDate,
           activityNumber: activityData.activityNumber,
           filePath: activityData.filePath,
           fileName: activityData.fileName,
-          event: activityData.event ? {
-            id: activityData.event.id,
-            name: activityData.event.name,
-            eventDate: activityData.event.startDate
-          } : undefined,
+          event: activityData.event,
           authors: activityData.authors || []
         };
         
@@ -139,7 +155,7 @@ export default function AtividadeDetailPage() {
     };
 
     fetchActivity();
-  }, [params?.id]);
+  }, [location]);
 
   if (isLoading) {
     return (

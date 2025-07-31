@@ -4177,7 +4177,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Atividade não encontrada" });
       }
       
-      res.json(activity);
+      // Buscar informações do evento se existir
+      let eventInfo = null;
+      if (activity.eventId) {
+        eventInfo = await storage.getEvent(activity.eventId);
+      }
+      
+      // Criar resposta padronizada para frontend
+      const response = {
+        ...activity,
+        title: `${activity.activityType} Nº ${activity.activityNumber}/${new Date(activity.activityDate).getFullYear()}`,
+        status: activity.situacao || 'Status não informado',
+        sessionDate: activity.activityDate,
+        event: eventInfo ? {
+          id: eventInfo.id,
+          name: eventInfo.name,
+          startDate: eventInfo.startDate
+        } : null
+      };
+      
+      res.json(response);
     } catch (error) {
       console.error(`Erro ao buscar atividade ${req.params.id}:`, error);
       res.status(500).json({ message: "Erro ao buscar atividade" });
