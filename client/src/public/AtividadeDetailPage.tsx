@@ -3,9 +3,8 @@ import { useRoute, useLocation } from 'wouter';
 import { ArrowLeft, Calendar, FileText, User, Download, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Helmet } from 'react-helmet';
+import { formatDateSimpleSafe } from '@/lib/dateUtils';
 
 // Interface para atividade legislativa
 interface LegislativeActivity {
@@ -56,9 +55,9 @@ export default function AtividadeDetailPage() {
     document.body.removeChild(link);
   };
 
-  // Formatar data para exibição
+  // Usar função segura para formatação de data
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
+    return formatDateSimpleSafe(dateString);
   };
 
   // Determinar cor do badge de status (usar mesma lógica da HomePage)
