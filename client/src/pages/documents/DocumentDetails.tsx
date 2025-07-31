@@ -62,6 +62,8 @@ export default function DocumentDetails() {
     switch (type) {
       case 'Projeto de Lei':
         return 'bg-blue-100 text-blue-800';
+      case 'Projeto de Decreto Legislativo':
+        return 'bg-pink-100 text-pink-800';
       case 'Emenda':
         return 'bg-green-100 text-green-800';
       case 'Requerimento':

@@ -238,7 +238,8 @@ export default function ActivityList() {
       "Resolução": "bg-indigo-100 text-indigo-800",
       "Mensagem": "bg-yellow-100 text-yellow-800",
       "Moção": "bg-orange-100 text-orange-800",
-      "Projeto de Lei": "bg-red-100 text-red-800"
+      "Projeto de Lei": "bg-red-100 text-red-800",
+      "Projeto de Decreto Legislativo": "bg-pink-100 text-pink-800"
     };
     
     return typeColors[type] || "bg-gray-100 text-gray-800";

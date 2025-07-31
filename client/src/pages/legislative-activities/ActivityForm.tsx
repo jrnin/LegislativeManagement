@@ -241,6 +241,7 @@ export default function ActivityForm() {
     "Mensagem", 
     "Moção", 
     "Projeto de Lei",
+    "Projeto de Decreto Legislativo",
     "Projeto de Resolução",
     "Projeto de Emenda",
     "Ata"
