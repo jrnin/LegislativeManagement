@@ -110,6 +110,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 30, 2025**: Implemented New Relic Monitoring System - PRODUCTION MONITORING ENHANCEMENT
+  - **APM Integration**: Successfully configured New Relic Application Performance Monitoring for the legislative system
+  - **Dynamic Loading**: Implemented ES module-compatible New Relic initialization using dynamic imports
+  - **Environment Configuration**: Set up monitoring with proper environment variable configuration for deployment
+  - **Application Name**: Configured as "Sistema Legislativo Jaíba" for clear identification in New Relic dashboard
+  - **Distributed Tracing**: Enabled distributed tracing for comprehensive performance monitoring across the application
+  - **Error Tracking**: Automatic error detection and reporting capabilities integrated into the system
+  - **Performance Metrics**: Real-time monitoring of response times, database queries, and application performance
+  - **Production Ready**: Monitoring system configured for both development and production environments
+  - **Status**: New Relic monitoring fully operational and ready for deployment with comprehensive application insights
+
 - **July 30, 2025**: Fixed Database Connection Issues for Deployment - CRITICAL PRODUCTION STABILITY
   - **Root Cause**: WebSocket connection to Neon PostgreSQL causing instability and connection timeouts in production
   - **Solution**: Switched from neon-serverless Pool to neon HTTP connection for better stability

@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
+import { initializeMonitoring } from "./monitoring";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
@@ -87,6 +88,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Inicializar monitoramento New Relic
+  await initializeMonitoring();
+  
   // Configurar usuário root na inicialização
   await setupRootUser();
   
