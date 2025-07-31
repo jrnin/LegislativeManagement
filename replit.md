@@ -110,6 +110,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 31, 2025**: Implemented Real Database Integration for Events Display - USER INTERFACE ENHANCEMENT
+  - **Homepage Enhancement**: Updated "Eventos do Mês" card to show 5 most recent events from database instead of empty display
+  - **API Optimization**: Modified `/api/public/events` endpoint to return latest events ordered by creation date (most recent first)
+  - **Data Accuracy**: Events now display real information from database including event number, category, date, time, location, and status
+  - **Title Update**: Changed card title from "Eventos do Mês" to "Últimos Eventos" to better reflect content
+  - **Performance**: Events sorted by created_at field with fallback to event_date for proper chronological ordering
+  - **User Experience**: Homepage now shows actual legislative events (Sessões Ordinárias) with complete information
+  - **Status**: Complete integration confirmed working with real database events displayed in homepage widget
+
 - **July 31, 2025**: Fixed AtividadeDetailPage Loading Issues - CRITICAL RUNTIME ERROR RESOLUTION
   - **Root Cause**: Multiple runtime errors were preventing the activity detail page from loading ("Invalid time value", "Cannot read properties of undefined")
   - **Date Formatting Fix**: Updated dateUtils.ts functions to handle null/undefined values safely with proper fallback messages
