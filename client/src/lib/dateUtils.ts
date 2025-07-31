@@ -5,8 +5,13 @@ import { ptBR } from "date-fns/locale";
  * Função utilitária para formatação segura de datas
  * Resolve problemas de timezone convertendo qualquer data para string local
  */
-export const formatDateSafe = (dateInput: string | Date, formatString: string = "dd/MM/yyyy"): string => {
+export const formatDateSafe = (dateInput: string | Date | null | undefined, formatString: string = "dd/MM/yyyy"): string => {
   try {
+    // Verificar se o input é válido
+    if (!dateInput) {
+      return 'Data não disponível';
+    }
+    
     let date: Date;
     
     if (typeof dateInput === 'string') {
@@ -30,27 +35,27 @@ export const formatDateSafe = (dateInput: string | Date, formatString: string = 
     
     // Verifica se a data é válida
     if (isNaN(date.getTime())) {
-      return dateInput.toString();
+      return 'Data inválida';
     }
     
     return format(date, formatString, { locale: ptBR });
   } catch (error) {
     console.warn('Erro ao formatar data:', error, 'Input:', dateInput);
-    return dateInput.toString();
+    return 'Data não disponível';
   }
 };
 
 /**
  * Formata data para exibição completa (ex: "sexta-feira, 27 de julho de 2025")
  */
-export const formatEventDateSafe = (dateInput: string | Date): string => {
+export const formatEventDateSafe = (dateInput: string | Date | null | undefined): string => {
   return formatDateSafe(dateInput, "EEEE, dd 'de' MMMM 'de' yyyy");
 };
 
 /**
  * Formata data simples (ex: "27/07/2025")
  */
-export const formatDateSimpleSafe = (dateInput: string | Date): string => {
+export const formatDateSimpleSafe = (dateInput: string | Date | null | undefined): string => {
   return formatDateSafe(dateInput, "dd/MM/yyyy");
 };
 
