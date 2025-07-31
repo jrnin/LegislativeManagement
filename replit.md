@@ -110,6 +110,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 31, 2025**: Fixed AtividadeDetailPage Loading Issues - CRITICAL RUNTIME ERROR RESOLUTION
+  - **Root Cause**: Multiple runtime errors were preventing the activity detail page from loading ("Invalid time value", "Cannot read properties of undefined")
+  - **Date Formatting Fix**: Updated dateUtils.ts functions to handle null/undefined values safely with proper fallback messages
+  - **API Enhancement**: Fixed `/api/public/legislative-activities/:id` endpoint to return complete activity data including event information
+  - **URL Parameter Extraction**: Implemented robust ID extraction supporting both `/atividades/:id` and `/public/atividades/:id` routes
+  - **Error Prevention**: Added comprehensive null checking and safe date formatting throughout AtividadeDetailPage.tsx
+  - **User Experience**: Activity detail pages now load without runtime errors and display proper "situacao" status values
+  - **Status**: Complete fix confirmed working - public activity detail pages fully operational
+
 - **July 31, 2025**: Fixed Public Legislative Activities Status Display System - CRITICAL DATA ACCURACY FIX
   - **Root Cause**: Public API was converting database "situacao" field to hardcoded status values ("aprovada", "rejeitada", "pendente")
   - **Database Field Fix**: Updated API to return actual "situacao" field values from database instead of converted status
