@@ -110,6 +110,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 31, 2025**: Fixed Public Legislative Activities Status Display System - CRITICAL DATA ACCURACY FIX
+  - **Root Cause**: Public API was converting database "situacao" field to hardcoded status values ("aprovada", "rejeitada", "pendente")
+  - **Database Field Fix**: Updated API to return actual "situacao" field values from database instead of converted status
+  - **Status Mapping Update**: Fixed filtering and display to use real legislative workflow statuses
+  - **HomePage Widget Enhancement**: Updated "Últimas Atividades Legislativas" card to display real-time data from database
+  - **Real Data Integration**: Widget now fetches 3 most recent activities with correct status colors and descriptions
+  - **Status Color Coding**: Applied comprehensive color scheme for all situacao values (Tramitação Finalizada, Aguardando Análise, etc.)
+  - **Performance Optimization**: Limited API calls to 3 activities for homepage widget efficiency
+  - **Navigation Fix**: Updated activity links to point to correct public activity detail pages
+  - **User Experience**: Public users now see accurate legislative status information matching administrative interface
+  - **Status**: Complete fix ensuring data consistency between administrative and public interfaces
+
 - **July 30, 2025**: Implemented New Relic Monitoring System - PRODUCTION MONITORING ENHANCEMENT
   - **APM Integration**: Successfully configured New Relic Application Performance Monitoring for the legislative system
   - **Dynamic Loading**: Implemented ES module-compatible New Relic initialization using dynamic imports

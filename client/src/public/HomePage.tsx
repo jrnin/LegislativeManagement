@@ -69,23 +69,17 @@ const getInitials = (name: string) => {
 // Componente para exibir as últimas atividades legislativas
 const LegislativeActivitiesWidget = () => {
   const { data: activities, isLoading } = useQuery({
-    queryKey: ['/api/public/legislative-activities'],
+    queryKey: ['/api/public/legislative-activities', { limit: 3 }],
+    queryFn: async () => {
+      const response = await fetch('/api/public/legislative-activities?limit=3&page=1');
+      if (!response.ok) {
+        throw new Error('Erro ao buscar atividades');
+      }
+      return response.json();
+    },
     select: (data: any) => {
       const rawActivities = data?.activities || [];
-      return rawActivities.map((activity: any) => {
-        // Use fallback values and ensure proper date handling
-        const activityType = activity.activityType || 'Atividade';
-        const activityNumber = activity.activityNumber || 1;
-        const year = activity.activityDate ? new Date(activity.activityDate).getFullYear() : new Date().getFullYear();
-        
-        return {
-          ...activity,
-          title: `${activityType} Nº ${activityNumber}/${year}`,
-          type: activityType,
-          status: activity.approved === true ? 'aprovado' : 'em_tramitacao',
-          date: activity.activityDate || activity.createdAt
-        };
-      });
+      return rawActivities.slice(0, 3); // Garantir apenas 3 atividades mais recentes
     }
   });
 
@@ -98,33 +92,36 @@ const LegislativeActivitiesWidget = () => {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'aprovado':
+    switch (status) {
+      case 'Tramitação Finalizada':
         return 'bg-green-100 text-green-800';
-      case 'em_tramitacao':
+      case 'Arquivado':
+        return 'bg-gray-100 text-gray-800';
+      case 'Aguardando Análise':
         return 'bg-blue-100 text-blue-800';
-      case 'rejeitado':
-        return 'bg-red-100 text-red-800';
-      case 'pendente':
+      case 'Análise de Parecer':
         return 'bg-yellow-100 text-yellow-800';
+      case 'Aguardando Deliberação':
+        return 'bg-orange-100 text-orange-800';
+      case 'Aguardando Despacho do Presidente':
+        return 'bg-purple-100 text-purple-800';
+      case 'Aguardando Envio ao Executivo':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'Devolvida ao Autor':
+        return 'bg-red-100 text-red-800';
+      case 'Pronta para Pauta':
+        return 'bg-cyan-100 text-cyan-800';
+      case 'Tramitando em Conjunto':
+        return 'bg-teal-100 text-teal-800';
+      case 'Vetado':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusText = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'em_tramitacao':
-        return 'Em Tramitação';
-      case 'aprovado':
-        return 'Aprovado';
-      case 'rejeitado':
-        return 'Rejeitado';
-      case 'pendente':
-        return 'Pendente';
-      default:
-        return status;
-    }
+    return status || 'Status não informado';
   };
 
   if (isLoading) {
@@ -137,8 +134,8 @@ const LegislativeActivitiesWidget = () => {
 
   return (
     <div className="space-y-4">
-      {activities?.slice(0, 3).map((activity: any) => (
-        <Link key={activity.id} href={`/atividades/${activity.id}`}>
+      {activities?.map((activity: any) => (
+        <Link key={activity.id} href={`/public/atividades/${activity.id}`}>
           <Card className="hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-8 border-l-green-700">
             <CardContent className="p-4">
               <div className="space-y-3">
@@ -165,7 +162,7 @@ const LegislativeActivitiesWidget = () => {
                 <div className="flex items-center justify-between text-xs text-gray-500 ">
                   <div className="flex items-center">
                     <Clock size={12} className="mr-1" />
-                    {formatDate(activity.date || activity.createdAt)}
+                    {formatDate(activity.sessionDate || activity.date || activity.createdAt)}
                   </div>
                   <div className="flex items-center">
                     <Eye size={12} className="mr-1" />
