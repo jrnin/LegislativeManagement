@@ -706,16 +706,15 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Convert to array and filter unique activities by number+type
+    // Convert to array and filter unique activities by ID (not by number+type)
     const allActivities = Array.from(activitiesMap.values());
-    const uniqueActivities = new Map<string, LegislativeActivity>();
+    const uniqueActivities = new Map<number, LegislativeActivity>();
     
     for (const activity of allActivities) {
-      const key = `${activity.activityNumber}-${activity.activityType}`;
-      
-      // Prefer original activities (without eventId) over duplicates
-      if (!uniqueActivities.has(key) || (!activity.eventId && uniqueActivities.get(key)?.eventId)) {
-        uniqueActivities.set(key, activity);
+      // Use ID as key to avoid filtering out legitimate different activities
+      // Only filter true duplicates based on eventId preference
+      if (!uniqueActivities.has(activity.id) || (!activity.eventId && uniqueActivities.get(activity.id)?.eventId)) {
+        uniqueActivities.set(activity.id, activity);
       }
     }
     
