@@ -21,7 +21,7 @@ Preferred communication style: Simple, everyday language.
 - **Database Schema**: Comprehensive schema including Users, Legislatures, Events, Legislative Activities, Documents, Committees, News System, Voting System, and Timeline.
 - **Authentication**: Replit Auth, session-based authentication, role-based access control (admin, councilor, public), email verification, and password reset.
 - **File Management**: Multi-tier upload system, validation, organized directory structure, download, and preview.
-- **Legislative Activity Management**: Supports various activity types, detailed workflow statuses, 1:N relationship with events (allowing an activity to exist in multiple events), and a "Regime de Tramitação" field.
+- **Legislative Activity Management**: Supports various activity types, detailed workflow statuses, 1:N relationship with events (allowing an activity to exist in multiple events), "Regime de Tramitação" field, and complete exercise year system allowing duplicate activity numbers across different exercise years (2024, 2025).
 - **Event Management**: Comprehensive CRUD, association with legislative activities and documents, attendance tracking, and committee meeting integration.
 - **Voting System**: Event-category based voting, individual and administrative voting interfaces, real-time statistics, and optimistic updates.
 - **News System**: Public and administrative interfaces, image uploads, category filtering, and social sharing.
