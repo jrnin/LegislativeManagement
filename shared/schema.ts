@@ -131,6 +131,7 @@ export const legislativeActivities = pgTable("legislative_activities", {
   activityType: varchar("activity_type").notNull(), // "Pauta", "Indicação", "Requerimento", "Resolução", "Mensagem", "Moção", "Projeto de Lei", "Projeto de Decreto Legislativo"
   situacao: varchar("situacao").notNull().default("Aguardando Análise"), // "Arquivado", "Aguardando Análise", "Análise de Parecer", "Aguardando Deliberação", "Aguardando Despacho do Presidente", "Aguardando Envio ao Executivo", "Devolvida ao Autor", "Pronta para Pauta", "Tramitando em Conjunto", "Tramitação Finalizada", "Vetado"
   regimeTramitacao: varchar("regime_tramitacao").notNull().default("Ordinária"), // "Ordinária", "Urgente"
+  exercicio: varchar("exercicio").notNull().default("2025"), // "2025", "2024", etc.
   filePath: varchar("file_path"),
   fileName: varchar("file_name"),
   fileType: varchar("file_type"),
@@ -490,6 +491,7 @@ export const insertLegislativeActivitySchema = createInsertSchema(legislativeAct
   activityType: true,
   situacao: true,
   regimeTramitacao: true,
+  exercicio: true,
   approvalType: true,
 });
 

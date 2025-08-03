@@ -1073,6 +1073,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activityType: z.string(),
         situacao: z.string(),
         regimeTramitacao: z.string(),
+        exercicio: z.string(),
         approvalType: z.string().optional(),
         authorIds: z.array(z.string()).min(1, "Pelo menos um autor deve ser selecionado"),
       });
@@ -1176,6 +1177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activityType: z.string().optional(),
         situacao: z.string().optional(),
         regimeTramitacao: z.string().optional(),
+        exercicio: z.string().optional(),
         needsApproval: z.boolean().optional(),
         approved: z.boolean().optional(),
         authorIds: z.array(z.string()).min(1, "Pelo menos um autor deve ser selecionado").optional(),

@@ -29,6 +29,7 @@ const formSchema = z.object({
   activityType: z.string().min(1, { message: "Tipo de atividade é obrigatório" }),
   situacao: z.string().min(1, { message: "Situação é obrigatória" }),
   regimeTramitacao: z.string().min(1, { message: "Regime de Tramitação é obrigatório" }),
+  exercicio: z.string().min(1, { message: "Exercício é obrigatório" }),
   approvalType: z.string().optional(),
   authorIds: z.array(z.string()).min(1, { message: "Pelo menos um autor deve ser selecionado" }),
   file: z.any().optional(),
@@ -75,6 +76,7 @@ export default function ActivityForm() {
       activityType: "",
       situacao: "Aguardando Análise",
       regimeTramitacao: "Ordinária",
+      exercicio: "2025",
       approvalType: "",
       authorIds: [],
       file: undefined,
@@ -93,6 +95,7 @@ export default function ActivityForm() {
         activityType: activity.activityType || "",
         situacao: activity.situacao || "Aguardando Análise",
         regimeTramitacao: activity.regimeTramitacao || "Ordinária",
+        exercicio: activity.exercicio || "2025",
         approvalType: activity.approvalType || "",
         authorIds: activity.authors ? activity.authors.map(author => author.id) : [],
         file: undefined,
@@ -114,6 +117,7 @@ export default function ActivityForm() {
       formData.append("activityType", data.activityType);
       formData.append("situacao", data.situacao);
       formData.append("regimeTramitacao", data.regimeTramitacao);
+      formData.append("exercicio", data.exercicio);
       if (data.approvalType && data.approvalType !== "none" && data.approvalType !== "") {
         formData.append("approvalType", data.approvalType);
       } else {
@@ -172,6 +176,7 @@ export default function ActivityForm() {
       if (data.activityType) formData.append("activityType", data.activityType);
       if (data.situacao) formData.append("situacao", data.situacao);
       if (data.regimeTramitacao) formData.append("regimeTramitacao", data.regimeTramitacao);
+      if (data.exercicio) formData.append("exercicio", data.exercicio);
       if (data.approvalType && data.approvalType !== "none") {
         formData.append("approvalType", data.approvalType);
       } else if (data.approvalType === "none") {
@@ -264,6 +269,11 @@ export default function ActivityForm() {
   const regimeTramitacaoOptions = [
     "Ordinária",
     "Urgente"
+  ];
+
+  const exercicioOptions = [
+    "2025",
+    "2024"
   ];
 
   if (activityLoading) {
@@ -404,6 +414,34 @@ export default function ActivityForm() {
                           {regimeTramitacaoOptions.map((regime) => (
                             <SelectItem key={regime} value={regime}>
                               {regime}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="exercicio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exercício</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o exercício" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {exercicioOptions.map((exercicio) => (
+                            <SelectItem key={exercicio} value={exercicio}>
+                              {exercicio}
                             </SelectItem>
                           ))}
                         </SelectContent>
