@@ -89,6 +89,7 @@ export default function ActivityList() {
   const [selectedAuthor, setSelectedAuthor] = useState("all");
   const [selectedSituation, setSelectedSituation] = useState("all");
   const [selectedEvent, setSelectedEvent] = useState("all");
+  const [selectedExercicio, setSelectedExercicio] = useState("all");
 
   // Debounce search term
   useEffect(() => {
@@ -141,8 +142,13 @@ export default function ActivityList() {
       filtered = filtered.filter(activity => activity.eventId === eventId);
     }
 
+    // Filtro por exercício
+    if (selectedExercicio && selectedExercicio !== 'all') {
+      filtered = filtered.filter(activity => (activity.exercicio || "2025") === selectedExercicio);
+    }
+
     return filtered;
-  }, [allActivities, debouncedSearchTerm, selectedType, selectedAuthor, selectedSituation, selectedEvent]);
+  }, [allActivities, debouncedSearchTerm, selectedType, selectedAuthor, selectedSituation, selectedEvent, selectedExercicio]);
 
   // Buscar lista de usuários para filtro de autores
   const { data: users = [] } = useQuery<any[]>({
@@ -287,8 +293,7 @@ export default function ActivityList() {
       cell: ({ row }) => {
         const number = row.getValue("activityNumber") as number;
         const type = row.original.activityType;
-        const activityDate = row.original.activityDate;
-        const year = new Date(activityDate).getFullYear();
+        const exercicio = row.original.exercicio || "2025";
         
         const id = row.original.id;
         
@@ -301,7 +306,7 @@ export default function ActivityList() {
                 className="h-auto p-0 font-medium"
                 onClick={() => navigate(`/activities/${id}`)}
               >
-                {type} Nº {number}/{year}
+                {type} Nº {number}/{exercicio}
               </Button>
             </div>
             
@@ -501,7 +506,7 @@ export default function ActivityList() {
           <CardTitle className="text-lg">Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
             {/* Busca por texto */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Buscar</label>
@@ -595,10 +600,25 @@ export default function ActivityList() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Filtro por Exercício */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Exercício</label>
+              <Select value={selectedExercicio} onValueChange={setSelectedExercicio}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os exercícios" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os exercícios</SelectItem>
+                  <SelectItem value="2025">2025</SelectItem>
+                  <SelectItem value="2024">2024</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Botão para limpar filtros */}
-          {(debouncedSearchTerm || selectedType !== 'all' || selectedAuthor !== 'all' || selectedSituation !== 'all' || selectedEvent !== 'all') && (
+          {(debouncedSearchTerm || selectedType !== 'all' || selectedAuthor !== 'all' || selectedSituation !== 'all' || selectedEvent !== 'all' || selectedExercicio !== 'all') && (
             <div className="mt-4">
               <Button
                 variant="outline"
@@ -609,6 +629,7 @@ export default function ActivityList() {
                   setSelectedAuthor("all");
                   setSelectedSituation("all");
                   setSelectedEvent("all");
+                  setSelectedExercicio("all");
                 }}
               >
                 Limpar Filtros

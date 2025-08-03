@@ -383,9 +383,8 @@ export default function ActivityDetails() {
   // Formatar o título da atividade
   const getActivityTitle = () => {
     if (!activity) return "";
-    const date = new Date(activity.activityDate);
-    const year = date.getFullYear();
-    return `${activity.activityType} Nº ${activity.activityNumber}/${year}`;
+    const exercicio = activity.exercicio || "2025";
+    return `${activity.activityType} Nº ${activity.activityNumber}/${exercicio}`;
   };
 
   if (loadingActivity) {
@@ -612,6 +611,10 @@ export default function ActivityDetails() {
                 <div className="space-y-1">
                   <h3 className="text-sm text-muted-foreground">Número</h3>
                   <p className="font-medium">{activity.activityNumber}</p>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm text-muted-foreground">Exercício</h3>
+                  <p className="font-medium">{activity.exercicio || "2025"}</p>
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-sm text-muted-foreground">Data</h3>
