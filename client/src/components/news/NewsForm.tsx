@@ -157,6 +157,7 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
 
   const saveNewsMutation = useMutation({
     mutationFn: async (data: NewsFormData) => {
+      console.log("SaveNewsMutation called with:", data);
       setIsUploading(true);
       
       try {
@@ -181,21 +182,33 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
         const url = news ? `/api/news/${news.id}` : "/api/news";
         const method = news ? "PUT" : "POST";
         
+        console.log("Making request to:", url, "with method:", method);
+        
         const response = await fetch(url, {
           method,
           body: formData,
         });
 
+        console.log("Response status:", response.status);
+
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Server error:", errorText);
           throw new Error("Erro ao salvar notícia");
         }
 
-        return response.json();
+        const result = await response.json();
+        console.log("Success response:", result);
+        return result;
+      } catch (error) {
+        console.error("Mutation error:", error);
+        throw error;
       } finally {
         setIsUploading(false);
       }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      console.log("Mutation success:", result);
       queryClient.invalidateQueries({ queryKey: ["/api/news"] });
       toast({
         title: "Sucesso",
@@ -213,6 +226,8 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
   });
 
   const onSubmit = (data: NewsFormData) => {
+    console.log("NewsForm onSubmit called with data:", data);
+    console.log("Form errors:", form.formState.errors);
     saveNewsMutation.mutate(data);
   };
 
@@ -606,7 +621,15 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
         <Button type="button" variant="outline" onClick={onSuccess}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={saveNewsMutation.isPending || isUploading}>
+        <Button 
+          type="submit" 
+          disabled={saveNewsMutation.isPending || isUploading}
+          onClick={(e) => {
+            console.log("Submit button clicked");
+            console.log("Form is valid:", form.formState.isValid);
+            console.log("Form errors:", form.formState.errors);
+          }}
+        >
           {saveNewsMutation.isPending || isUploading ? (
             <>
               <Upload className="h-4 w-4 mr-2 animate-spin" />
