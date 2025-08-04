@@ -149,6 +149,36 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         external: false
       },
       {
+        name: 'Requerimentos', 
+        href: '/atividades?tipo=Requerimento',
+        external: false
+      },
+      {
+        name: 'Moção', 
+        href: '/atividades?tipo=Moção',
+        external: false
+      },
+      {
+        name: 'Projeto de Lei', 
+        href: '/atividades?tipo=Projeto%20de%20Lei',
+        external: false
+      },
+      {
+        name: 'Projeto de Resolução', 
+        href: '/atividades?tipo=Projeto%20de%20Resolução',
+        external: false
+      },
+      {
+        name: 'Projeto de Resolução', 
+        href: '/atividades?tipo=Projeto%20de%20Emenda',
+        external: false
+      },
+      {
+        name: 'Projeto de Resolução', 
+        href: '/atividades?tipo=Projeto%20de%20Decreto%20Legislativo',
+        external: false
+      },
+      {
         name: 'Sessões Legislativas', 
         href: '/sessoes',
           external: true

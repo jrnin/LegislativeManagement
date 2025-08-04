@@ -3,6 +3,7 @@ import { Activity, Search, Filter, X, Calendar, User, Download, FileText, Loader
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
@@ -43,10 +44,12 @@ interface ActivitiesResponse {
 export default function AtividadesPage() {
   const [location] = useLocation();
   
-  // Estados para filtros
+  // Estados para filtros e paginação
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
   
   // Effect para detectar parâmetros de URL e aplicar filtros automaticamente
   useEffect(() => {
@@ -58,18 +61,25 @@ export default function AtividadesPage() {
     }
   }, []); // Remove location dependency to prevent infinite loops
   
-  // Construir query string para filtros
+  // Resetar página quando filtros mudam
+  useEffect(() => {
+    setPage(1);
+  }, [search, type, status]);
+
+  // Construir query string para filtros e paginação
   const getQueryString = () => {
     const params = new URLSearchParams();
     if (search) params.append('search', search);
     if (type) params.append('activityType', type);
     if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('limit', ITEMS_PER_PAGE.toString());
     return params.toString();
   };
   
   // Query para buscar atividades em tempo real
   const { data: response, isLoading, error } = useQuery<ActivitiesResponse>({
-    queryKey: ['/api/public/legislative-activities', search, type, status],
+    queryKey: ['/api/public/legislative-activities', search, type, status, page],
     queryFn: async () => {
       const queryString = getQueryString();
       const url = `/api/public/legislative-activities${queryString ? `?${queryString}` : ''}`;
@@ -95,7 +105,8 @@ export default function AtividadesPage() {
   // Extrair dados da resposta
   const activities = response?.activities || [];
   const filterOptions = response?.filters || { activityTypes: [], statusTypes: [] };
-  const totalActivities = response?.pagination?.total || 0;
+  const pagination = response?.pagination || { total: 0, page: 1, limit: ITEMS_PER_PAGE, pages: 1 };
+  const totalActivities = pagination.total;
   
   // Formatar data para exibição
   const formatDate = (dateString: string) => {
@@ -469,6 +480,18 @@ export default function AtividadesPage() {
                   Não foram encontradas atividades com os filtros selecionados. Tente ajustar os critérios de busca.
                 </p>
               </motion.div>
+            )}
+            
+            {/* Paginação */}
+            {activities.length > 0 && (
+              <Pagination
+                currentPage={page}
+                totalPages={pagination.pages}
+                totalItems={totalActivities}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={setPage}
+                itemName="atividades"
+              />
             )}
           </div>
         )}

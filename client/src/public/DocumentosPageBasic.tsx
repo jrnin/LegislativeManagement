@@ -3,6 +3,7 @@ import { FileText, Loader2, Search, Filter, X, Download, Eye } from 'lucide-reac
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import { 
   Select, 
   SelectContent, 
@@ -63,19 +64,33 @@ export default function DocumentosPageBasic() {
     statusTypes: []
   });
   
-  // Estados para filtros
+  // Estados para filtros e paginação
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
-  const [totalDocuments, setTotalDocuments] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 8,
+    pages: 1
+  });
+  const ITEMS_PER_PAGE = 8;
+  const totalDocuments = pagination.total;
   
-  // Construir query string para filtros
+  // Resetar página quando filtros mudam
+  useEffect(() => {
+    setPage(1);
+  }, [search, type, status]);
+
+  // Construir query string para filtros e paginação
   const getQueryString = () => {
     const params = new URLSearchParams();
-    // Remover limite para mostrar todos os documentos
     if (search) params.append('search', search);
     if (type) params.append('type', type);
     if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('limit', ITEMS_PER_PAGE.toString());
     return params.toString();
   };
   
@@ -113,7 +128,7 @@ export default function DocumentosPageBasic() {
         documentTypes: data.filters?.documentTypes || [],
         statusTypes: data.filters?.statusTypes || []
       });
-      setTotalDocuments(data.pagination?.total || 0);
+      setPagination(data.pagination || { total: 0, page: 1, limit: ITEMS_PER_PAGE, pages: 1 });
       setError(null);
     } catch (err) {
       console.error('Erro ao buscar documentos:', err);
@@ -123,10 +138,10 @@ export default function DocumentosPageBasic() {
     }
   };
   
-  // Efeito para carregar documentos na inicialização
+  // Efeito para carregar documentos na inicialização e quando filtros/página mudam
   useEffect(() => {
     fetchDocuments();
-  }, []);
+  }, [search, type, status, page]);
 
   // Determinar cor do badge de status
   const getStatusBadgeClass = (status: string) => {
@@ -444,6 +459,18 @@ export default function DocumentosPageBasic() {
                   Não foram encontrados documentos com os filtros selecionados. Tente ajustar os critérios de busca.
                 </p>
               </motion.div>
+            )}
+            
+            {/* Paginação */}
+            {documents.length > 0 && (
+              <Pagination
+                currentPage={page}
+                totalPages={pagination.pages}
+                totalItems={totalDocuments}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={setPage}
+                itemName="documentos"
+              />
             )}
           </div>
         )}
