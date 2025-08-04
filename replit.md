@@ -24,7 +24,7 @@ Preferred communication style: Simple, everyday language.
 - **Legislative Activity Management**: Supports various activity types, detailed workflow statuses, 1:N relationship with events (allowing an activity to exist in multiple events), "Regime de Tramitação" field, and complete exercise year system allowing duplicate activity numbers across different exercise years (2024, 2025).
 - **Event Management**: Comprehensive CRUD, association with legislative activities and documents, attendance tracking, and committee meeting integration.
 - **Voting System**: Event-category based voting, individual and administrative voting interfaces, real-time statistics, and optimistic updates.
-- **News System**: Public and administrative interfaces, image uploads, category filtering, and social sharing.
+- **News System**: Public and administrative interfaces, complete Object Storage integration for image uploads with automatic ACL policy configuration, category filtering, and social sharing.
 - **Comments System**: Advanced comment functionality with mentions (@events, #activities, !documents) and deletion.
 - **Timeline System**: Comprehensive audit trail tracking user actions across major system components (activities, documents, voting, attendance, comments).
 - **User Management**: Support for admin, councilor, and executive roles with comprehensive profile information display.
@@ -35,7 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Dashboard Widgets**: Displays recent events and legislative activities.
 - **Search and Filtering**: Robust search and filtering capabilities across activities, events, and news.
 - **Backup System**: Automated shell scripts for database and file backups, with an administrative web interface and retention policy.
-- **Object Storage**: Persistent cloud storage integration using Replit Object Storage with Google Cloud Storage backend, ACL policies, presigned URLs for direct uploads, seamless migration from local file system, full document module compatibility with 101 files (24.3 MB) successfully migrated, and avatar cleanup capabilities with complete file removal from cloud storage.
+- **Object Storage**: Persistent cloud storage integration using Replit Object Storage with Google Cloud Storage backend, ACL policies, presigned URLs for direct uploads, seamless migration from local file system, full document module compatibility with 101 files (24.3 MB) successfully migrated, avatar cleanup capabilities with complete file removal from cloud storage, and complete news image management with public ACL policies for transparent access.
 - **Real-time Features**: WebSocket support for notifications.
 
 ## External Dependencies
