@@ -161,35 +161,64 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
       setIsUploading(true);
       
       try {
-        const formData = new FormData();
+        let imageUrl = news?.imageUrl; // Keep existing image URL by default
         
-        // Add cover image if selected
+        // Upload new image if selected
         if (coverImage) {
-          formData.append("coverImage", coverImage);
-        }
-        
-        // Add form data
-        Object.entries(data).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            if (key === "tags") {
-              formData.append(key, JSON.stringify(value));
-            } else {
-              formData.append(key, value.toString());
-            }
+          console.log("Uploading new cover image...");
+          
+          // Step 1: Get upload URL
+          const uploadResponse = await fetch('/api/news/upload-url', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to get upload URL');
           }
-        });
+
+          const { uploadURL } = await uploadResponse.json() as { uploadURL: string };
+          console.log("Got upload URL:", uploadURL);
+
+          // Step 2: Upload file directly to Object Storage
+          const uploadFileResponse = await fetch(uploadURL, {
+            method: 'PUT',
+            body: coverImage,
+            headers: {
+              'Content-Type': coverImage.type,
+            },
+          });
+
+          if (!uploadFileResponse.ok) {
+            throw new Error('Failed to upload image');
+          }
+
+          // Step 3: Convert uploaded URL to object path
+          imageUrl = uploadURL.split('?')[0]; // Remove query parameters
+          console.log("Image uploaded successfully, URL:", imageUrl);
+        }
+
+        // Prepare form data with image URL
+        const payload = {
+          ...data,
+          imageUrl: imageUrl,
+        };
 
         const url = news ? `/api/news/${news.id}` : "/api/news";
         const method = news ? "PUT" : "POST";
         
         console.log("Making request to:", url, "with method:", method);
+        console.log("Payload:", payload);
         
         const response = await fetch(url, {
           method,
-          body: formData,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
         });
-
-        console.log("Response status:", response.status);
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -198,6 +227,7 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
         }
 
         const result = await response.json();
+
         console.log("Success response:", result);
         return result;
       } catch (error) {

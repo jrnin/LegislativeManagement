@@ -60,6 +60,28 @@ export const handleObjectActivityUpload = async (req: UploadRequest, res: Respon
   }
 };
 
+// News upload middleware for Object Storage
+export const handleObjectNewsUpload = async (req: UploadRequest, res: Response, next: NextFunction) => {
+  try {
+    const objectStorageService = new ObjectStorageService();
+    
+    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    
+    req.uploadedFile = {
+      cloudPath: '',
+      originalName: req.body.originalName || 'news-image',
+      size: 0,
+      mimeType: req.body.mimeType || 'image/jpeg'
+    };
+    
+    req.body.uploadURL = uploadURL;
+    next();
+  } catch (error) {
+    console.error('Error preparing news upload:', error);
+    res.status(500).json({ error: 'Failed to prepare file upload' });
+  }
+};
+
 // Document upload middleware for Object Storage
 export const handleObjectDocumentUpload = async (req: UploadRequest, res: Response, next: NextFunction) => {
   try {
