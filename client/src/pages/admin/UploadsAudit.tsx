@@ -115,7 +115,32 @@ export default function UploadsAudit() {
   };
 
   const formatDateTime = (dateString: string) => {
-    return format(new Date(dateString), 'dd/MM/yyyy HH:mm:ss', { locale: ptBR });
+    try {
+      // Convert timestamp format "2025-08-04T02-02-09" to proper ISO format
+      const isoString = dateString.replace(/[\-T]/g, (match, offset) => {
+        if (offset < 10) return '-';  // Keep date separators
+        if (offset === 10) return 'T'; // Replace first T
+        return ':'; // Replace remaining dashes with colons for time
+      });
+      
+      const date = new Date(isoString);
+      if (isNaN(date.getTime())) {
+        // Fallback: parse manually if ISO conversion fails
+        const parts = dateString.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})/);
+        if (parts) {
+          const [, year, month, day, hour, minute, second] = parts;
+          const validDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 
+                                   parseInt(hour), parseInt(minute), parseInt(second));
+          return format(validDate, 'dd/MM/yyyy HH:mm:ss', { locale: ptBR });
+        }
+        return dateString; // Return original if all parsing fails
+      }
+      
+      return format(date, 'dd/MM/yyyy HH:mm:ss', { locale: ptBR });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateString;
+    }
   };
 
   return (
