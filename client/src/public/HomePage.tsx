@@ -516,7 +516,7 @@ const mockEvents = [
 const servicesData = {
   servicos: [
     { title: "Nota Fiscal Eletrônica", icon: FileBarChart, color: "bg-blue-600", url: "https://jaibamg.webiss.com.br/" },
-    { title: "Agendamento eletrônico - Tesourinha", icon: Scissors, color: "bg-blue-600" },
+    { title: "Farmácia Básica da Saúde", icon: Scissors, color: "bg-blue-600", url: "https://jaiba.mg.gov.br/farmacia-basica-da-saude/" },
     { title: "Cartão Estacionamento Idoso - PCD", icon: Car, color: "bg-blue-600" },
     { title: "Consulta de Multas", icon: CreditCard, color: "bg-green-600" },
     { title: "Consulta de Processos Físicos", icon: FolderOpen, color: "bg-blue-600" },
@@ -1130,10 +1130,10 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Vídeo 1 */}
             <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=aZNrMCohdRw', '_blank')}>
+              <div className="relative aspect-video bg-gray-200 cursor-pointer group" onClick={() => window.open('https://www.youtube.com/watch?v=CtQ_cixDOpE', '_blank')}>
                 <img 
                   src="https://img.youtube.com/vi/aZNrMCohdRw/maxresdefault.jpg"
-                  alt="10ª Reunião Ordinária"
+                  alt="12ª Reunião Ordinária"
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.src = "https://img.youtube.com/vi/aZNrMCohdRw/hqdefault.jpg";
@@ -1149,7 +1149,7 @@ export default function HomePage() {
               </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-base mb-2" style={{color: '#48654e'}}>
-                  10ª Reunião Ordinária 02/06/2025
+                  12ª Reunião Ordinária 01/08/2025
                 </h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                   Acompanhe a sessão ordinária com as principais deliberações e votações da Câmara Municipal.
