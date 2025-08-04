@@ -210,7 +210,7 @@ export default function NewsPage() {
               <div>
                 <p className="text-sm text-gray-600">Publicadas</p>
                 <p className="text-2xl font-bold">
-                  {newsArticles.filter(n => n.status === "published").length}
+                  {newsArticles.filter((n: NewsArticle) => n.status === "published").length}
                 </p>
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function NewsPage() {
               <div>
                 <p className="text-sm text-gray-600">Rascunhos</p>
                 <p className="text-2xl font-bold">
-                  {newsArticles.filter(n => n.status === "draft").length}
+                  {newsArticles.filter((n: NewsArticle) => n.status === "draft").length}
                 </p>
               </div>
             </div>
@@ -267,7 +267,7 @@ export default function NewsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas as categorias</SelectItem>
-                {categories.map((category) => (
+                {categories.map((category: NewsCategory) => (
                   <SelectItem key={category.id} value={category.slug}>
                     {category.name}
                   </SelectItem>
@@ -296,7 +296,7 @@ export default function NewsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((category) => (
+            {categories.map((category: NewsCategory) => (
               <div key={category.id} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center gap-2">
                   <div
@@ -360,7 +360,7 @@ export default function NewsPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {newsArticles.map((article) => (
+              {newsArticles.map((article: NewsArticle) => (
                 <div key={article.id} className="border rounded-lg p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
