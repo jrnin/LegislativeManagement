@@ -1671,8 +1671,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // List available backups
   app.get('/api/system/backups', requireAdmin, async (req, res) => {
     try {
-      const fs = require('fs');
-      const path = require('path');
+      const fs = await import('fs');
+      const path = await import('path');
       
       const backupDir = path.join(process.cwd(), 'backups');
       const dbBackupDir = path.join(backupDir, 'database');
@@ -1760,8 +1760,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/system/backups/download/:type/:filename', requireAdmin, async (req, res) => {
     try {
       const { type, filename } = req.params;
-      const path = require('path');
-      const fs = require('fs');
+      const path = await import('path');
+      const fs = await import('fs');
       
       let filePath;
       if (type === 'database') {
@@ -1792,8 +1792,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // List upload directory contents
   app.get('/api/system/uploads', requireAdmin, async (req, res) => {
     try {
-      const path = require('path');
-      const fs = require('fs');
+      const path = await import('path');
+      const fs = await import('fs');
       
       const uploadsDir = path.join(process.cwd(), 'uploads');
       
