@@ -15,6 +15,7 @@ import ContatoPage from './ContatoPageFunctional';
 import ComissoesPage from './ComissoesPageBasic';
 import ComissaoDetalhePage from './ComissaoDetalhePage';
 import MesaDiretoraPage from './MesaDiretoraPage';
+import DocumentDetails from './DocumentDetails';
 import NotFound from '@/pages/not-found';
 
 export default function PublicRoutes() {
@@ -33,8 +34,8 @@ export default function PublicRoutes() {
         <Route path="/public/documentos" component={DocumentosPage} />
         <Route path="/documentos" component={DocumentosPage} />
         
-        <Route path="/public/documentos/:id" component={() => <div>Detalhes do Documento</div>} />
-        <Route path="/documentos/:id" component={() => <div>Detalhes do Documento</div>} />
+        <Route path="/public/documentos/:id" component={DocumentDetails} />
+        <Route path="/documentos/:id" component={DocumentDetails} />
         
         <Route path="/public/atividades" component={AtividadesPage} />
         <Route path="/atividades" component={AtividadesPage} />

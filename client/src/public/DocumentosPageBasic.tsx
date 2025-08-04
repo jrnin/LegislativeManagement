@@ -411,7 +411,7 @@ export default function DocumentosPageBasic() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => window.open(`/documentos/${doc.id}`, '_blank')}
+                              onClick={() => setLocation(`/documentos/${doc.id}`)}
                               className="flex items-center gap-2"
                             >
                               <Eye className="h-4 w-4" />

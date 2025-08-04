@@ -4128,6 +4128,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter um documento específico por ID (sem autenticação)
+  app.get('/api/public/documents/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Validar se o ID é um número
+      const documentId = parseInt(id, 10);
+      if (isNaN(documentId)) {
+        return res.status(400).json({ message: "ID do documento inválido" });
+      }
+      
+      console.log(`Buscando documento público com ID: ${documentId}`);
+      
+      // Buscar o documento
+      const document = await storage.getDocument(documentId);
+      
+      if (!document) {
+        return res.status(404).json({ message: "Documento não encontrado" });
+      }
+      
+      res.json(document);
+    } catch (error) {
+      console.error(`Erro ao buscar documento ${req.params.id}:`, error);
+      res.status(500).json({ message: "Erro ao buscar documento", error: error.message });
+    }
+  });
+
   // Rota pública para obter detalhes de um vereador específico (sem autenticação)
   app.get('/api/public/councilors/:id', async (req, res) => {
     try {
