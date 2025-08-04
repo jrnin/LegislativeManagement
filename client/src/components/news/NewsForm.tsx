@@ -624,10 +624,18 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
         <Button 
           type="submit" 
           disabled={saveNewsMutation.isPending || isUploading}
-          onClick={(e) => {
+          onClick={async (e) => {
             console.log("Submit button clicked");
             console.log("Form is valid:", form.formState.isValid);
             console.log("Form errors:", form.formState.errors);
+            console.log("Form values:", form.getValues());
+            console.log("Form dirty fields:", form.formState.dirtyFields);
+            console.log("Form touched fields:", form.formState.touchedFields);
+            
+            // Force validation
+            const isValid = await form.trigger();
+            console.log("After trigger - Form is valid:", isValid);
+            console.log("After trigger - Form errors:", form.formState.errors);
           }}
         >
           {saveNewsMutation.isPending || isUploading ? (
