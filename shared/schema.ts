@@ -178,7 +178,7 @@ export const newsArticles = pgTable("news_articles", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   authorId: varchar("author_id").notNull(),
-  categoryId: integer("category_id").notNull(),
+  categoryId: integer("category_id"),
   publishedAt: timestamp("published_at"),
   status: varchar("status", { length: 20 }).notNull().default("draft"), // draft, published, archived
   featured: boolean("featured").default(false),

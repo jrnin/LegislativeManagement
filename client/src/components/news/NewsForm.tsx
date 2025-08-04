@@ -38,7 +38,7 @@ const newsFormSchema = z.object({
   slug: z.string().min(1, "URL amigável é obrigatória").max(255, "URL muito longa"),
   excerpt: z.string().min(1, "Resumo é obrigatório").max(500, "Resumo muito longo"),
   content: z.string().min(1, "Conteúdo é obrigatório"),
-  categoryId: z.number().optional(),
+  categoryId: z.number().optional().nullable(),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   featured: z.boolean().default(false),
   tags: z.array(z.string()).default([]),
@@ -666,6 +666,12 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
             const isValid = await form.trigger();
             console.log("After trigger - Form is valid:", isValid);
             console.log("After trigger - Form errors:", form.formState.errors);
+            
+            if (!isValid) {
+              e.preventDefault();
+              console.log("Form validation failed, preventing submission");
+              return;
+            }
           }}
         >
           {saveNewsMutation.isPending || isUploading ? (
