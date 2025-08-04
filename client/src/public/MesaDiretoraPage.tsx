@@ -132,6 +132,9 @@ const MesaDiretoraPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+         
+          
           {/* Board Information */}
           <Card className="h-fit">
             <CardHeader>
@@ -180,7 +183,52 @@ const MesaDiretoraPage = () => {
                 )}
               </div>
             </CardContent>
-          </Card>
+            <CardHeader>
+              <CardTitle>Sobre a Mesa Diretora</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                A Mesa Diretora é o órgão colegiado responsável pela direção dos trabalhos legislativos 
+                e pelos serviços administrativos da Câmara Municipal. É composta por Presidente, 
+                Vice-Presidente, 1º Secretário(a) e 2º Secretário(a), eleitos entre os vereadores 
+                para um mandato de dois anos.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <Crown className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
+                  <h4 className="font-semibold text-yellow-800">Presidente</h4>
+                  <p className="text-sm text-yellow-700 mt-1">
+                    Dirige as sessões e representa a Câmara
+                  </p>
+                </div>
+
+                <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <UserCheck className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                  <h4 className="font-semibold text-blue-800">Vice-Presidente</h4>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Substitui o Presidente em sua ausência
+                  </p>
+                </div>
+
+                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                  <FileText className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                  <h4 className="font-semibold text-green-800">1º Secretário(a)</h4>
+                  <p className="text-sm text-green-700 mt-1">
+                    Responsável pelas atas e correspondências
+                  </p>
+                </div>
+
+                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                  <FileText className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                  <h4 className="font-semibold text-green-800">2º Secretário(a)</h4>
+                  <p className="text-sm text-green-700 mt-1">
+                    Auxilia nas funções secretariais
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>          
 
           {/* Members List */}
           <div className="space-y-4">
@@ -267,54 +315,7 @@ const MesaDiretoraPage = () => {
           </div>
         </div>
 
-        {/* Additional Information */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Sobre a Mesa Diretora</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              A Mesa Diretora é o órgão colegiado responsável pela direção dos trabalhos legislativos 
-              e pelos serviços administrativos da Câmara Municipal. É composta por Presidente, 
-              Vice-Presidente, 1º Secretário(a) e 2º Secretário(a), eleitos entre os vereadores 
-              para um mandato de dois anos.
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-              <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                <Crown className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-                <h4 className="font-semibold text-yellow-800">Presidente</h4>
-                <p className="text-sm text-yellow-700 mt-1">
-                  Dirige as sessões e representa a Câmara
-                </p>
-              </div>
-              
-              <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <UserCheck className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <h4 className="font-semibold text-blue-800">Vice-Presidente</h4>
-                <p className="text-sm text-blue-700 mt-1">
-                  Substitui o Presidente em sua ausência
-                </p>
-              </div>
-              
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                <FileText className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <h4 className="font-semibold text-green-800">1º Secretário(a)</h4>
-                <p className="text-sm text-green-700 mt-1">
-                  Responsável pelas atas e correspondências
-                </p>
-              </div>
-              
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                <FileText className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <h4 className="font-semibold text-green-800">2º Secretário(a)</h4>
-                <p className="text-sm text-green-700 mt-1">
-                  Auxilia nas funções secretariais
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      
       </div>
     </div>
   );

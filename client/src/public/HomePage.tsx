@@ -515,7 +515,7 @@ const mockEvents = [
 // Dados dos serviços por categoria
 const servicesData = {
   servicos: [
-    { title: "Agendamento eletrônico - ITBI", icon: Calendar, color: "bg-blue-600" },
+    { title: "Nota Fiscal Eletrônica", icon: FileBarChart, color: "bg-blue-600", url: "https://jaibamg.webiss.com.br/" },
     { title: "Agendamento eletrônico - Tesourinha", icon: Scissors, color: "bg-blue-600" },
     { title: "Cartão Estacionamento Idoso - PCD", icon: Car, color: "bg-blue-600" },
     { title: "Consulta de Multas", icon: CreditCard, color: "bg-green-600" },
@@ -1317,7 +1317,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {servicesData[activeServiceTab as keyof typeof servicesData].map((service, index) => {
               const IconComponent = service.icon;
-              return (
+              const cardContent = (
                 <Card key={index} className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50 cursor-pointer">
                   <div className="flex items-start space-x-4">
                     <div className={`w-12 h-12 rounded-full ${service.color} flex items-center justify-center flex-shrink-0`}>
@@ -1331,6 +1331,23 @@ export default function HomePage() {
                   </div>
                 </Card>
               );
+
+              // Se o serviço tem URL, envolver com link
+              if ((service as any).url) {
+                return (
+                  <a 
+                    key={index} 
+                    href={(service as any).url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    {cardContent}
+                  </a>
+                );
+              }
+
+              return cardContent;
             })}
           </div>
 

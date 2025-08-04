@@ -169,12 +169,12 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         external: false
       },
       {
-        name: 'Projeto de Resolução', 
+        name: 'Projeto de Emenda', 
         href: '/atividades?tipo=Projeto%20de%20Emenda',
         external: false
       },
       {
-        name: 'Projeto de Resolução', 
+        name: 'Projeto de Decreto Legislativo', 
         href: '/atividades?tipo=Projeto%20de%20Decreto%20Legislativo',
         external: false
       },
