@@ -2649,6 +2649,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       const article = await storage.createNewsArticle(articleData);
+      
+      // Set ACL policy for the uploaded image if present
+      if (req.body.imageUrl) {
+        try {
+          const objectStorageService = new ObjectStorageService();
+          await objectStorageService.trySetObjectEntityAclPolicy(
+            req.body.imageUrl,
+            {
+              owner: req.user.id,
+              visibility: "public", // News images should be publicly accessible
+              aclRules: []
+            }
+          );
+          console.log("ACL policy set for news image:", req.body.imageUrl);
+        } catch (aclError) {
+          console.error("Error setting ACL policy for news image:", aclError);
+          // Don't fail the entire request if ACL setting fails
+        }
+      }
+      
       res.json(article);
     } catch (error) {
       console.error("Error creating news article:", error);
@@ -2704,6 +2724,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.imageUrl) {
         const objectStorageService = new ObjectStorageService();
         updateData.imageUrl = objectStorageService.normalizeObjectEntityPath(req.body.imageUrl);
+        
+        // Set ACL policy for the uploaded image
+        try {
+          await objectStorageService.trySetObjectEntityAclPolicy(
+            req.body.imageUrl,
+            {
+              owner: req.user.id,
+              visibility: "public", // News images should be publicly accessible
+              aclRules: []
+            }
+          );
+          console.log("ACL policy set for updated news image:", req.body.imageUrl);
+        } catch (aclError) {
+          console.error("Error setting ACL policy for updated news image:", aclError);
+          // Don't fail the entire request if ACL setting fails
+        }
       }
 
       const article = await storage.updateNewsArticle(id, updateData);
