@@ -2644,7 +2644,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         publishedAt: publishedAt ? new Date(publishedAt) : undefined,
         imageUrl: req.body.imageUrl ? (() => {
           const objectStorageService = new ObjectStorageService();
-          return objectStorageService.normalizeObjectEntityPath(req.body.imageUrl);
+          const normalizedPath = objectStorageService.normalizeObjectEntityPath(req.body.imageUrl);
+          // Convert to public path for news images so they work without authentication
+          return normalizedPath.replace('/objects/', '/public-objects/');
         })() : undefined
       };
 
@@ -2723,7 +2725,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add image URL if provided and normalize it
       if (req.body.imageUrl) {
         const objectStorageService = new ObjectStorageService();
-        updateData.imageUrl = objectStorageService.normalizeObjectEntityPath(req.body.imageUrl);
+        const normalizedPath = objectStorageService.normalizeObjectEntityPath(req.body.imageUrl);
+        // Convert to public path for news images so they work without authentication
+        updateData.imageUrl = normalizedPath.replace('/objects/', '/public-objects/');
         
         // Set ACL policy for the uploaded image
         try {
@@ -5661,10 +5665,35 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     const filePath = req.params.filePath;
     const objectStorageService = new ObjectStorageService();
     try {
-      const file = await objectStorageService.searchPublicObject(filePath);
+      // First try to search in public directories
+      let file = await objectStorageService.searchPublicObject(filePath);
+      
+      // If not found in public directories, try to get it from private directory as public object
+      if (!file && filePath.startsWith('uploads/')) {
+        try {
+          const privatePath = `/objects/${filePath}`;
+          file = await objectStorageService.getObjectEntityFile(privatePath);
+          
+          // Check if this object has public visibility
+          const canAccess = await objectStorageService.canAccessObjectEntity({
+            objectFile: file,
+            userId: undefined, // No user authentication for public access
+            requestedPermission: ObjectPermission.READ,
+          });
+          
+          if (!canAccess) {
+            file = null; // Reset to null if not publicly accessible
+          }
+        } catch (privateError) {
+          console.log("Object not found in private storage either:", privateError.message);
+          file = null;
+        }
+      }
+      
       if (!file) {
         return res.status(404).json({ error: "File not found" });
       }
+      
       objectStorageService.downloadObject(file, res);
     } catch (error) {
       console.error("Error searching for public object:", error);
