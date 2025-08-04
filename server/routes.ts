@@ -4,6 +4,7 @@ import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth } from "./replitAuth";
 import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload, handleNewsUpload, handleActivityUpload, handleDocumentUpload, handleEventUpload } from "./middlewares";
+import { handleObjectDocumentUpload } from "./objectUploadMiddlewares";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest, sendEventNotificationEmail } from "./sendgrid";
 import { z } from "zod";
 import crypto from "crypto";
@@ -1464,11 +1465,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           fileName: req.file.originalname,
           fileType: req.file.mimetype,
         };
-        
-        // If there was a previous file, delete it
-        if (currentDocument.filePath && fs.existsSync(currentDocument.filePath)) {
-          fs.unlinkSync(currentDocument.filePath);
-        }
       }
       
       // Update document
@@ -1502,19 +1498,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const documentId = Number(req.params.id);
       
-      // Get document to delete associated file
+      // Get document to verify it exists
       const document = await storage.getDocument(documentId);
       
       if (!document) {
         return res.status(404).json({ message: "Documento não encontrado" });
       }
       
-      // Delete associated file if it exists
-      if (document.filePath && fs.existsSync(document.filePath)) {
-        fs.unlinkSync(document.filePath);
-      }
+      // Note: Files are stored in Object Storage and don't need manual cleanup
+      // The cloud storage handles file lifecycle management
       
-      // Delete document
+      // Delete document from database
       await storage.deleteDocument(documentId);
       
       res.json({ message: "Documento excluído com sucesso" });
