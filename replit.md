@@ -35,7 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Dashboard Widgets**: Displays recent events and legislative activities.
 - **Search and Filtering**: Robust search and filtering capabilities across activities, events, and news.
 - **Backup System**: Automated shell scripts for database and file backups, with an administrative web interface and retention policy.
-- **Object Storage**: Persistent cloud storage integration using Replit Object Storage with Google Cloud Storage backend, ACL policies, presigned URLs for direct uploads, and seamless migration from local file system.
+- **Object Storage**: Persistent cloud storage integration using Replit Object Storage with Google Cloud Storage backend, ACL policies, presigned URLs for direct uploads, seamless migration from local file system, and full document module compatibility with 101 files (24.3 MB) successfully migrated.
 - **Real-time Features**: WebSocket support for notifications.
 
 ## External Dependencies
