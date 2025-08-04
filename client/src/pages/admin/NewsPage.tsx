@@ -398,6 +398,10 @@ export default function NewsPage() {
                             src={article.imageUrl}
                             alt={article.title}
                             className="w-full h-full object-cover rounded-lg"
+                            onError={(e) => {
+                              console.log("Image load error:", article.imageUrl);
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         </div>
                       )}
