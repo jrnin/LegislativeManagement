@@ -5401,5 +5401,152 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // UPLOADS AUDIT ROUTES
+  
+  // Generate uploads audit report
+  app.post('/api/admin/uploads/audit', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const { days = 7 } = req.body;
+      
+      if (isNaN(days) || days <= 0 || days > 365) {
+        return res.status(400).json({ 
+          message: "Número de dias deve ser entre 1 e 365" 
+        });
+      }
+      
+      const { spawn } = await import('child_process');
+      const path = await import('path');
+      
+      const scriptPath = path.join(process.cwd(), 'scripts', 'uploads-audit.cjs');
+      const child = spawn('node', [scriptPath, days.toString()]);
+      
+      let output = '';
+      let errorOutput = '';
+      
+      child.stdout.on('data', (data: Buffer) => {
+        output += data.toString();
+      });
+      
+      child.stderr.on('data', (data: Buffer) => {
+        errorOutput += data.toString();
+      });
+      
+      child.on('close', (code: number) => {
+        if (code !== 0) {
+          console.error('Erro ao executar script de auditoria:', errorOutput);
+          return res.status(500).json({ 
+            message: "Erro ao gerar relatório de auditoria",
+            error: errorOutput
+          });
+        }
+        
+        // Extrair informações do output
+        const lines = output.split('\n');
+        const summaryLine = lines.find(line => line.includes('Arquivos encontrados:'));
+        const sizeLine = lines.find(line => line.includes('Tamanho total:'));
+        const logLine = lines.find(line => line.includes('- Texto:'));
+        const jsonLine = lines.find(line => line.includes('- JSON:'));
+        
+        const filesCount = summaryLine ? summaryLine.match(/(\d+)/)?.[1] : '0';
+        const totalSize = sizeLine ? sizeLine.split('Tamanho total: ')[1] : '0 B';
+        const logFile = logLine ? logLine.split('- Texto: ')[1] : '';
+        const jsonFile = jsonLine ? jsonLine.split('- JSON: ')[1] : '';
+        
+        res.json({
+          success: true,
+          auditPeriod: `${days} dias`,
+          filesCount: parseInt(filesCount || '0'),
+          totalSize,
+          reports: {
+            textFile: logFile,
+            jsonFile: jsonFile
+          },
+          output
+        });
+      });
+      
+    } catch (error) {
+      console.error("Error generating uploads audit:", error);
+      res.status(500).json({ 
+        message: "Erro ao gerar relatório de auditoria",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Get list of available audit reports
+  app.get('/api/admin/uploads/audit/reports', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      const files = fs.readdirSync(process.cwd())
+        .filter((file: string) => file.startsWith('uploads-audit-') && (file.endsWith('.log') || file.endsWith('.json')))
+        .map((file: string) => {
+          const stats = fs.statSync(path.join(process.cwd(), file));
+          const match = file.match(/uploads-audit-(.+)\.(log|json)$/);
+          return {
+            filename: file,
+            timestamp: match ? match[1] : '',
+            type: match ? match[2] : '',
+            size: stats.size,
+            created: stats.birthtime,
+            modified: stats.mtime
+          };
+        })
+        .sort((a: any, b: any) => new Date(b.modified).getTime() - new Date(a.modified).getTime());
+      
+      res.json(files);
+    } catch (error) {
+      console.error("Error listing audit reports:", error);
+      res.status(500).json({ 
+        message: "Erro ao listar relatórios de auditoria",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Download audit report
+  app.get('/api/admin/uploads/audit/download/:filename', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      const filename = req.params.filename;
+      
+      // Validar nome do arquivo por segurança
+      if (!filename.match(/^uploads-audit-[\d\-T]+\.(log|json)$/)) {
+        return res.status(400).json({ 
+          message: "Nome de arquivo inválido" 
+        });
+      }
+      
+      const filePath = path.join(process.cwd(), filename);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ 
+          message: "Arquivo não encontrado" 
+        });
+      }
+      
+      const stats = fs.statSync(filePath);
+      const contentType = filename.endsWith('.json') ? 'application/json' : 'text/plain';
+      
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', stats.size);
+      
+      const readStream = fs.createReadStream(filePath);
+      readStream.pipe(res);
+      
+    } catch (error) {
+      console.error("Error downloading audit report:", error);
+      res.status(500).json({ 
+        message: "Erro ao baixar relatório",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   return httpServer;
 }

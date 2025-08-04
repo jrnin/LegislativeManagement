@@ -12,7 +12,9 @@ import {
   UsersRound,
   Shield,
   Image,
-  Newspaper
+  Newspaper,
+  Database,
+  FolderTree
 } from "lucide-react";
 import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -35,6 +37,7 @@ export default function Sidebar() {
     { name: "Comissões", href: "/committees", icon: UsersRound },
     { name: "Mesa Diretora", href: "/boards", icon: Shield },
     { name: "Legislaturas", href: "/legislatures", icon: Building },
+    { name: "Auditoria Uploads", href: "/uploads-audit", icon: FolderTree },
   ];
 
   const getInitials = (name: string) => {
