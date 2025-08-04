@@ -38,10 +38,18 @@ const storage_config = multer.diskStorage({
     cb(null, targetDir);
   },
   filename: function (req, file, cb) {
-    // Generate unique filename with timestamp and random string
-    const uniqueSuffix = Date.now() + "-" + crypto.randomBytes(6).toString("hex");
+    // Generate unique filename with complete date/time and hash
+    const now = new Date();
+    const dateTime = now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0') +
+      now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0') +
+      now.getSeconds().toString().padStart(2, '0') +
+      now.getMilliseconds().toString().padStart(3, '0');
+    const hash = crypto.randomBytes(8).toString("hex");
     const ext = path.extname(file.originalname);
-    cb(null, uniqueSuffix + ext);
+    cb(null, `${dateTime}-${hash}${ext}`);
   },
 });
 
@@ -63,10 +71,18 @@ const avatarStorage = multer.diskStorage({
     cb(null, avatarDir);
   },
   filename: function (req, file, cb) {
-    // Generate unique filename with original extension
-    const uniqueSuffix = Date.now() + "-" + crypto.randomBytes(6).toString("hex");
+    // Generate unique filename with complete date/time and hash
+    const now = new Date();
+    const dateTime = now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0') +
+      now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0') +
+      now.getSeconds().toString().padStart(2, '0') +
+      now.getMilliseconds().toString().padStart(3, '0');
+    const hash = crypto.randomBytes(8).toString("hex");
     const ext = path.extname(file.originalname);
-    cb(null, "avatar-" + uniqueSuffix + ext);
+    cb(null, `avatar-${dateTime}-${hash}${ext}`);
   },
 });
 
@@ -76,10 +92,18 @@ const newsStorage = multer.diskStorage({
     cb(null, newsDir);
   },
   filename: function (req, file, cb) {
-    // Generate unique filename with original extension
-    const uniqueSuffix = Date.now() + "-" + crypto.randomBytes(6).toString("hex");
+    // Generate unique filename with complete date/time and hash
+    const now = new Date();
+    const dateTime = now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0') +
+      now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0') +
+      now.getSeconds().toString().padStart(2, '0') +
+      now.getMilliseconds().toString().padStart(3, '0');
+    const hash = crypto.randomBytes(8).toString("hex");
     const ext = path.extname(file.originalname);
-    cb(null, "news-" + uniqueSuffix + ext);
+    cb(null, `news-${dateTime}-${hash}${ext}`);
   },
 });
 
@@ -169,10 +193,18 @@ const createOrganizedStorage = (baseSubDir: string) => {
       cb(null, targetDir);
     },
     filename: function (req, file, cb) {
-      // Generate unique filename with timestamp and random string
-      const uniqueSuffix = Date.now() + "-" + crypto.randomBytes(6).toString("hex");
+      // Generate unique filename with complete date/time and hash
+      const now = new Date();
+      const dateTime = now.getFullYear().toString() +
+        (now.getMonth() + 1).toString().padStart(2, '0') +
+        now.getDate().toString().padStart(2, '0') +
+        now.getHours().toString().padStart(2, '0') +
+        now.getMinutes().toString().padStart(2, '0') +
+        now.getSeconds().toString().padStart(2, '0') +
+        now.getMilliseconds().toString().padStart(3, '0');
+      const hash = crypto.randomBytes(8).toString("hex");
       const ext = path.extname(file.originalname);
-      cb(null, uniqueSuffix + ext);
+      cb(null, `${dateTime}-${hash}${ext}`);
     },
   });
 };
