@@ -20,7 +20,7 @@ Preferred communication style: Simple, everyday language.
 - **Mobile**: React Native with Expo, React Native Paper for UI, React Navigation v6, and Context API for authentication.
 - **Database Schema**: Comprehensive schema including Users, Legislatures, Events, Legislative Activities, Documents, Committees, News System, Voting System, and Timeline.
 - **Authentication**: Replit Auth, session-based authentication, role-based access control (admin, councilor, public), email verification, and password reset.
-- **File Management**: Multi-tier upload system, validation, organized directory structure, download, and preview.
+- **File Management**: Multi-tier upload system with Object Storage integration, validation, organized directory structure, download, preview, and persistent cloud storage.
 - **Legislative Activity Management**: Supports various activity types, detailed workflow statuses, 1:N relationship with events (allowing an activity to exist in multiple events), "Regime de Tramitação" field, and complete exercise year system allowing duplicate activity numbers across different exercise years (2024, 2025).
 - **Event Management**: Comprehensive CRUD, association with legislative activities and documents, attendance tracking, and committee meeting integration.
 - **Voting System**: Event-category based voting, individual and administrative voting interfaces, real-time statistics, and optimistic updates.
@@ -35,6 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Dashboard Widgets**: Displays recent events and legislative activities.
 - **Search and Filtering**: Robust search and filtering capabilities across activities, events, and news.
 - **Backup System**: Automated shell scripts for database and file backups, with an administrative web interface and retention policy.
+- **Object Storage**: Persistent cloud storage integration using Replit Object Storage with Google Cloud Storage backend, ACL policies, presigned URLs for direct uploads, and seamless migration from local file system.
 - **Real-time Features**: WebSocket support for notifications.
 
 ## External Dependencies

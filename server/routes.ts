@@ -22,6 +22,11 @@ import {
   insertBoardSchema
 } from "@shared/schema";
 import { eq, and, inArray } from 'drizzle-orm';
+import {
+  ObjectStorageService,
+  ObjectNotFoundError,
+} from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
 
 // Declarar a função sendNotification que será inicializada no escopo global
 let sendNotification: (target: 'all' | string | string[], notification: any) => void;
@@ -5545,6 +5550,90 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
         message: "Erro ao baixar relatório",
         error: error instanceof Error ? error.message : String(error)
       });
+    }
+  });
+
+  // OBJECT STORAGE ROUTES
+  
+  // Serve public assets from object storage
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Serve protected objects with authentication
+  app.get("/objects/:objectPath(*)", requireAuth, async (req, res) => {
+    const userId = req.user?.id;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+        requestedPermission: ObjectPermission.READ,
+      });
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Get upload URL for object storage
+  app.post("/api/objects/upload", requireAuth, async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  // Update file reference after upload
+  app.put("/api/objects/set-file", requireAuth, async (req, res) => {
+    if (!req.body.fileURL) {
+      return res.status(400).json({ error: "fileURL is required" });
+    }
+
+    const userId = req.user?.id;
+    const { fileURL, entityType, entityId, visibility = "private" } = req.body;
+
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        fileURL,
+        {
+          owner: userId,
+          visibility: visibility, // "public" for profile images, "private" for documents
+          aclRules: visibility === "private" ? [{
+            group: { type: "admin_only" as any, id: "admin" },
+            permission: ObjectPermission.READ
+          }] : undefined
+        }
+      );
+
+      res.status(200).json({ objectPath });
+    } catch (error) {
+      console.error("Error setting file policy:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
