@@ -14,7 +14,8 @@ import {
   Image,
   Newspaper,
   Database,
-  FolderTree
+  FolderTree,
+  ArrowUpDown
 } from "lucide-react";
 import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -38,6 +39,7 @@ export default function Sidebar() {
     { name: "Mesa Diretora", href: "/boards", icon: Shield },
     { name: "Legislaturas", href: "/legislatures", icon: Building },
     { name: "Auditoria Uploads", href: "/uploads-audit", icon: FolderTree },
+    { name: "Migração Arquivos", href: "/file-migration", icon: ArrowUpDown },
   ];
 
   const getInitials = (name: string) => {

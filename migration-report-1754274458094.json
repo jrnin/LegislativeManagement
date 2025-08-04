@@ -1,0 +1,632 @@
+{
+  "startTime": "2025-08-04T02:26:57.867Z",
+  "categories": {
+    "avatars": {
+      "description": "User profile images",
+      "visibility": "public",
+      "totalFiles": 47,
+      "totalSize": 17387925,
+      "migrated": 47,
+      "errors": []
+    },
+    "news": {
+      "description": "News article images",
+      "visibility": "public",
+      "totalFiles": 4,
+      "totalSize": 2325285,
+      "migrated": 4,
+      "errors": []
+    },
+    "activities": {
+      "description": "Legislative activity documents",
+      "visibility": "private",
+      "totalFiles": 46,
+      "totalSize": 5425517,
+      "migrated": 46,
+      "errors": []
+    },
+    "documents": {
+      "description": "Official documents",
+      "visibility": "private",
+      "totalFiles": 1,
+      "totalSize": 346742,
+      "migrated": 1,
+      "errors": []
+    }
+  },
+  "totalFiles": 98,
+  "totalSize": 25485469,
+  "errors": [],
+  "success": [
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747182621490-604cffc2d68e.jpeg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747182621490-604cffc2d68e.jpeg",
+      "category": "avatars",
+      "size": 1482445
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747182656576-1289e3e15a66.png",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747182656576-1289e3e15a66.png",
+      "category": "avatars",
+      "size": 142272
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747182706576-2f8a556b37d4.png",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747182706576-2f8a556b37d4.png",
+      "category": "avatars",
+      "size": 263269
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747182781496-13e35a9313d3.png",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747182781496-13e35a9313d3.png",
+      "category": "avatars",
+      "size": 619234
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747182803141-bfc9862418ec.webp",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747182803141-bfc9862418ec.webp",
+      "category": "avatars",
+      "size": 110628
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747438492875-694b46a4c8db.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747438492875-694b46a4c8db.jpg",
+      "category": "avatars",
+      "size": 411808
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747438730753-7fd4521094f8.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747438730753-7fd4521094f8.jpg",
+      "category": "avatars",
+      "size": 705924
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747438813536-26d45d2be972.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747438813536-26d45d2be972.jpg",
+      "category": "avatars",
+      "size": 506341
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747438922154-c6fddc6b93ed.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747438922154-c6fddc6b93ed.jpg",
+      "category": "avatars",
+      "size": 345122
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747439070538-b59123cbf300.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747439070538-b59123cbf300.jpg",
+      "category": "avatars",
+      "size": 638109
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747439080137-b158b9ef0e6d.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747439080137-b158b9ef0e6d.jpg",
+      "category": "avatars",
+      "size": 515678
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747439212002-61be5b6901d6.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747439212002-61be5b6901d6.jpg",
+      "category": "avatars",
+      "size": 515704
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747439227383-49c56004ebb8.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747439227383-49c56004ebb8.jpg",
+      "category": "avatars",
+      "size": 371431
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747439523969-70f88cb54895.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747439523969-70f88cb54895.jpg",
+      "category": "avatars",
+      "size": 514370
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747439538247-a855b1c5e92a.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747439538247-a855b1c5e92a.jpg",
+      "category": "avatars",
+      "size": 398411
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747439551173-3d93fbfe58d1.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747439551173-3d93fbfe58d1.jpg",
+      "category": "avatars",
+      "size": 598202
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1747439562193-6e95eb38b6b5.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1747439562193-6e95eb38b6b5.jpg",
+      "category": "avatars",
+      "size": 686317
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748642820408-65cea446cd93.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748642820408-65cea446cd93.jpg",
+      "category": "avatars",
+      "size": 393275
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748642833788-543e6848c9cd.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748642833788-543e6848c9cd.jpg",
+      "category": "avatars",
+      "size": 307225
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748642855238-7550624b6e2e.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748642855238-7550624b6e2e.jpg",
+      "category": "avatars",
+      "size": 265108
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748642870548-4b0392484ce9.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748642870548-4b0392484ce9.jpg",
+      "category": "avatars",
+      "size": 376898
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748648632114-13cfbb760ab4.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748648632114-13cfbb760ab4.jpg",
+      "category": "avatars",
+      "size": 222525
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748648642440-1c215f3cfe9a.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748648642440-1c215f3cfe9a.jpg",
+      "category": "avatars",
+      "size": 268896
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748648656214-ff6defd47ef0.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748648656214-ff6defd47ef0.jpg",
+      "category": "avatars",
+      "size": 235496
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748648670993-810ea235213e.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748648670993-810ea235213e.jpg",
+      "category": "avatars",
+      "size": 236980
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748648683782-45ab315202b6.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748648683782-45ab315202b6.jpg",
+      "category": "avatars",
+      "size": 221308
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748648694630-ed67ebf37931.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748648694630-ed67ebf37931.jpg",
+      "category": "avatars",
+      "size": 380700
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748648717234-99bb4990c947.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748648717234-99bb4990c947.jpg",
+      "category": "avatars",
+      "size": 218041
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1748648813670-173d2f2353f1.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1748648813670-173d2f2353f1.jpg",
+      "category": "avatars",
+      "size": 245166
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750433901904-d176c3a8af21.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750433901904-d176c3a8af21.jpg",
+      "category": "avatars",
+      "size": 276529
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438607704-1653a183d13a.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438607704-1653a183d13a.jpg",
+      "category": "avatars",
+      "size": 403281
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438619535-7af5275fa8d2.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438619535-7af5275fa8d2.jpg",
+      "category": "avatars",
+      "size": 272933
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438631836-4046a7efb97d.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438631836-4046a7efb97d.jpg",
+      "category": "avatars",
+      "size": 342531
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438642554-41d600fda6f4.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438642554-41d600fda6f4.jpg",
+      "category": "avatars",
+      "size": 282133
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438658119-04b058284497.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438658119-04b058284497.jpg",
+      "category": "avatars",
+      "size": 281241
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438669317-ce59f38247d8.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438669317-ce59f38247d8.jpg",
+      "category": "avatars",
+      "size": 332337
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438684147-40ddda0bdabe.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438684147-40ddda0bdabe.jpg",
+      "category": "avatars",
+      "size": 313376
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438701087-73883bffb78b.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438701087-73883bffb78b.jpg",
+      "category": "avatars",
+      "size": 380871
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438715703-8d78a902138d.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438715703-8d78a902138d.jpg",
+      "category": "avatars",
+      "size": 284729
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438811547-7540fd9c43f9.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438811547-7540fd9c43f9.jpg",
+      "category": "avatars",
+      "size": 283384
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1750438861838-96ae6801a26d.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1750438861838-96ae6801a26d.jpg",
+      "category": "avatars",
+      "size": 307775
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1752851059543-99a951e1fc68.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1752851059543-99a951e1fc68.jpg",
+      "category": "avatars",
+      "size": 399953
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1752851071752-de4355270d2d.jpg",
+      "cloudPath": "/public-objects/public/avatars/avatar-1752851071752-de4355270d2d.jpg",
+      "category": "avatars",
+      "size": 349393
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1753896160618-4a18a779df80.png",
+      "cloudPath": "/public-objects/public/avatars/avatar-1753896160618-4a18a779df80.png",
+      "category": "avatars",
+      "size": 166871
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1753896947180-0120d8673ec6.png",
+      "cloudPath": "/public-objects/public/avatars/avatar-1753896947180-0120d8673ec6.png",
+      "category": "avatars",
+      "size": 166871
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1753896988086-463b22b296f8.png",
+      "cloudPath": "/public-objects/public/avatars/avatar-1753896988086-463b22b296f8.png",
+      "category": "avatars",
+      "size": 173417
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/avatars/avatar-1753897226373-2298644fd815.png",
+      "cloudPath": "/public-objects/public/avatars/avatar-1753897226373-2298644fd815.png",
+      "category": "avatars",
+      "size": 173417
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/news/news-1752861409118-50da7b0c6c4a.jpg",
+      "cloudPath": "/public-objects/public/news/news-1752861409118-50da7b0c6c4a.jpg",
+      "category": "news",
+      "size": 1605363
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/news/news-1752882168902-54deaabf18c6.png",
+      "cloudPath": "/public-objects/public/news/news-1752882168902-54deaabf18c6.png",
+      "category": "news",
+      "size": 103625
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/news/news-1752882298758-a5fb03b340e0.png",
+      "cloudPath": "/public-objects/public/news/news-1752882298758-a5fb03b340e0.png",
+      "category": "news",
+      "size": 310492
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/news/news-1752882453043-a26d352dee3e.png",
+      "cloudPath": "/public-objects/public/news/news-1752882453043-a26d352dee3e.png",
+      "category": "news",
+      "size": 305805
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753843750426-659a3f7c3e96.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753843750426-659a3f7c3e96.pdf",
+      "category": "activities",
+      "size": 110068
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874115691-90bffcb2c994.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874115691-90bffcb2c994.pdf",
+      "category": "activities",
+      "size": 77565
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874226243-e86b53bb8b52.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874226243-e86b53bb8b52.pdf",
+      "category": "activities",
+      "size": 84591
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874259802-506a9779f8c1.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874259802-506a9779f8c1.pdf",
+      "category": "activities",
+      "size": 78135
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874282306-1d5bcb56fdce.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874282306-1d5bcb56fdce.pdf",
+      "category": "activities",
+      "size": 104437
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874348643-7761eda43f71.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874348643-7761eda43f71.pdf",
+      "category": "activities",
+      "size": 92723
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874404535-28602eceb46f.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874404535-28602eceb46f.pdf",
+      "category": "activities",
+      "size": 106660
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874459485-7515d7257edb.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874459485-7515d7257edb.pdf",
+      "category": "activities",
+      "size": 89382
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874480440-111a6cddb239.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874480440-111a6cddb239.pdf",
+      "category": "activities",
+      "size": 108327
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874499288-496dd86ccfb2.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874499288-496dd86ccfb2.pdf",
+      "category": "activities",
+      "size": 99621
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874705962-d7482a2811d1.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874705962-d7482a2811d1.pdf",
+      "category": "activities",
+      "size": 157285
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874750968-72ec1213be55.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874750968-72ec1213be55.pdf",
+      "category": "activities",
+      "size": 94582
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874802689-1eb9226e122f.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874802689-1eb9226e122f.pdf",
+      "category": "activities",
+      "size": 95268
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874830949-d9fbdc9012e1.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874830949-d9fbdc9012e1.pdf",
+      "category": "activities",
+      "size": 74412
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874847756-f2b477ceb175.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874847756-f2b477ceb175.pdf",
+      "category": "activities",
+      "size": 81297
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874865246-d0da4a299ef2.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874865246-d0da4a299ef2.pdf",
+      "category": "activities",
+      "size": 78774
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874894488-cd69fe097248.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874894488-cd69fe097248.pdf",
+      "category": "activities",
+      "size": 169125
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874909983-d40ae520b980.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874909983-d40ae520b980.pdf",
+      "category": "activities",
+      "size": 105750
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874928164-c4932b0798ec.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874928164-c4932b0798ec.pdf",
+      "category": "activities",
+      "size": 97500
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874949954-9b5e8a544b55.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874949954-9b5e8a544b55.pdf",
+      "category": "activities",
+      "size": 92473
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874970905-86c9e84ee226.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874970905-86c9e84ee226.pdf",
+      "category": "activities",
+      "size": 95894
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753874987219-5827927a4f25.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753874987219-5827927a4f25.pdf",
+      "category": "activities",
+      "size": 80053
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753875002914-73360bf465ab.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753875002914-73360bf465ab.pdf",
+      "category": "activities",
+      "size": 98943
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753875019432-c0f1612d2a47.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753875019432-c0f1612d2a47.pdf",
+      "category": "activities",
+      "size": 95709
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753875039854-6b47cd674d71.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753875039854-6b47cd674d71.pdf",
+      "category": "activities",
+      "size": 106715
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753875064858-29ffe87c926e.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753875064858-29ffe87c926e.pdf",
+      "category": "activities",
+      "size": 93968
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753875079208-1c239e97bb79.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753875079208-1c239e97bb79.pdf",
+      "category": "activities",
+      "size": 110998
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753875095161-f15e0fda99fd.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753875095161-f15e0fda99fd.pdf",
+      "category": "activities",
+      "size": 113007
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753875110742-321e556ed23d.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753875110742-321e556ed23d.pdf",
+      "category": "activities",
+      "size": 186495
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753877636069-f4773d8d9835.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753877636069-f4773d8d9835.pdf",
+      "category": "activities",
+      "size": 94241
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753877932423-b52c3285ecb2.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753877932423-b52c3285ecb2.pdf",
+      "category": "activities",
+      "size": 110581
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753878194199-e9520b7c078c.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753878194199-e9520b7c078c.pdf",
+      "category": "activities",
+      "size": 94977
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753878553878-8738b7777af2.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753878553878-8738b7777af2.pdf",
+      "category": "activities",
+      "size": 100377
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753878831260-52ecfb4235b4.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753878831260-52ecfb4235b4.pdf",
+      "category": "activities",
+      "size": 109753
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753880160307-bce32ca82c41.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753880160307-bce32ca82c41.pdf",
+      "category": "activities",
+      "size": 218049
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753890592534-c7daef17a495.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753890592534-c7daef17a495.pdf",
+      "category": "activities",
+      "size": 175755
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753890637705-f9e48087d430.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753890637705-f9e48087d430.pdf",
+      "category": "activities",
+      "size": 81907
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753890667516-edcc10cc6d82.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753890667516-edcc10cc6d82.pdf",
+      "category": "activities",
+      "size": 109538
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753902228130-fc15aaa2d8ca.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753902228130-fc15aaa2d8ca.pdf",
+      "category": "activities",
+      "size": 95255
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753902876251-13928552cb01.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753902876251-13928552cb01.pdf",
+      "category": "activities",
+      "size": 210362
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753904838739-7537dbe04865.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753904838739-7537dbe04865.pdf",
+      "category": "activities",
+      "size": 89785
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753905271351-9aee6590e308.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753905271351-9aee6590e308.pdf",
+      "category": "activities",
+      "size": 115624
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/07/1753905860048-d149112156ae.pdf",
+      "cloudPath": "/objects/.private/activities/2025/07/1753905860048-d149112156ae.pdf",
+      "category": "activities",
+      "size": 121608
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/08/1754255823580-7b3dfa08b0a7.pdf",
+      "cloudPath": "/objects/.private/activities/2025/08/1754255823580-7b3dfa08b0a7.pdf",
+      "category": "activities",
+      "size": 237665
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/08/1754256261240-6eda041b1bee.pdf",
+      "cloudPath": "/objects/.private/activities/2025/08/1754256261240-6eda041b1bee.pdf",
+      "category": "activities",
+      "size": 237665
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/activities/2025/08/20250804015554797-d47e3d3250459b33.pdf",
+      "cloudPath": "/objects/.private/activities/2025/08/20250804015554797-d47e3d3250459b33.pdf",
+      "category": "activities",
+      "size": 242618
+    },
+    {
+      "localPath": "/home/runner/workspace/uploads/documents/2025/07/1753885392972-01804123ae4d.pdf",
+      "cloudPath": "/objects/.private/documents/2025/07/1753885392972-01804123ae4d.pdf",
+      "category": "documents",
+      "size": 346742
+    }
+  ],
+  "endTime": "2025-08-04T02:27:38.091Z",
+  "duration": 40224
+}

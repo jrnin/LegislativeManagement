@@ -32,6 +32,7 @@ import ImagesPage from "@/pages/admin/ImagesPage";
 import NewsPage from "@/pages/admin/NewsPage";
 import UploadsAudit from "@/pages/admin/UploadsAudit";
 import ObjectStorageTest from "@/pages/admin/ObjectStorageTest";
+import FileMigration from "@/pages/admin/FileMigration";
 import BackupManager from "@/components/backup/BackupManager";
 import PublicRoutes from "@/public/PublicRoutes";
 import { useAuth } from "@/hooks/useAuth";
@@ -77,6 +78,7 @@ function AuthenticatedApp() {
         <Route path="/news" component={NewsPage} />
         <Route path="/uploads-audit" component={UploadsAudit} />
         <Route path="/object-storage-test" component={ObjectStorageTest} />
+        <Route path="/file-migration" component={FileMigration} />
         <Route path="/backup" component={BackupManager} />
         <Route component={NotFound} />
       </Switch>

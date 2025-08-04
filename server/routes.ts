@@ -5637,5 +5637,112 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // Migrate database file references to Object Storage paths
+  app.post("/api/admin/migrate-file-references", requireAdmin, async (req, res) => {
+    try {
+      const migrationResults = {
+        users: { updated: 0, errors: 0 },
+        activities: { updated: 0, errors: 0 },
+        documents: { updated: 0, errors: 0 },
+        news: { updated: 0, errors: 0 }
+      };
+
+      // Map old upload paths to new Object Storage paths
+      const mapUploadPath = (originalPath: string): string => {
+        if (!originalPath) return originalPath;
+        
+        const pathMappings = {
+          '/uploads/avatars/': '/public-objects/public/avatars/',
+          '/uploads/news/': '/public-objects/public/news/',
+          '/uploads/activities/': '/objects/.private/activities/',
+          '/uploads/documents/': '/objects/.private/documents/',
+        };
+
+        for (const [oldPath, newPath] of Object.entries(pathMappings)) {
+          if (originalPath.startsWith(oldPath)) {
+            return originalPath.replace(oldPath, newPath);
+          }
+        }
+        return originalPath;
+      };
+
+      // Update user avatars
+      const users = await storage.getAllUsers();
+      for (const user of users) {
+        if (user.profileImageUrl && user.profileImageUrl.startsWith('/uploads/')) {
+          try {
+            const newPath = mapUploadPath(user.profileImageUrl);
+            await storage.updateUser(user.id, { profileImageUrl: newPath });
+            migrationResults.users.updated++;
+          } catch (error) {
+            console.error(`Error updating user ${user.id}:`, error);
+            migrationResults.users.errors++;
+          }
+        }
+      }
+
+      // Update legislative activities
+      const activities = await storage.getAllLegislativeActivities();
+      for (const activity of activities) {
+        if (activity.filePath && activity.filePath.startsWith('/uploads/')) {
+          try {
+            const newPath = mapUploadPath(activity.filePath);
+            await storage.updateLegislativeActivity(activity.id, { filePath: newPath });
+            migrationResults.activities.updated++;
+          } catch (error) {
+            console.error(`Error updating activity ${activity.id}:`, error);
+            migrationResults.activities.errors++;
+          }
+        }
+      }
+
+      // Update documents  
+      const documents = await storage.getAllDocuments();
+      for (const doc of documents) {
+        if (doc.filePath && doc.filePath.startsWith('/uploads/')) {
+          try {
+            const newPath = mapUploadPath(doc.filePath);
+            await storage.updateDocument(doc.id, { filePath: newPath });
+            migrationResults.documents.updated++;
+          } catch (error) {
+            console.error(`Error updating document ${doc.id}:`, error);
+            migrationResults.documents.errors++;
+          }
+        }
+      }
+
+      // Update news articles
+      const newsArticles = await storage.getAllNews();
+      for (const article of newsArticles) {
+        if (article.imageUrl && article.imageUrl.startsWith('/uploads/')) {
+          try {
+            const newPath = mapUploadPath(article.imageUrl);
+            await storage.updateNews(article.id, { imageUrl: newPath });
+            migrationResults.news.updated++;
+          } catch (error) {
+            console.error(`Error updating news ${article.id}:`, error);
+            migrationResults.news.errors++;
+          }
+        }
+      }
+
+      res.json({
+        success: true,
+        message: "File references migration completed",
+        results: migrationResults,
+        totalUpdated: Object.values(migrationResults).reduce((sum, r) => sum + r.updated, 0),
+        totalErrors: Object.values(migrationResults).reduce((sum, r) => sum + r.errors, 0)
+      });
+
+    } catch (error) {
+      console.error("Error migrating file references:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Migration failed", 
+        error: error instanceof Error ? error.message : String(error) 
+      });
+    }
+  });
+
   return httpServer;
 }
