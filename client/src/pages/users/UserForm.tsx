@@ -283,7 +283,7 @@ export default function UserForm() {
     }
   };
   
-  // Função para upload de avatar
+  // Função para upload de avatar usando Object Storage
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0 || !userId) {
       return;
@@ -300,24 +300,60 @@ export default function UserForm() {
       return;
     }
     
+    // Validar tipo de arquivo
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        variant: "destructive",
+        title: "Formato não suportado",
+        description: "Por favor, use arquivos JPG, PNG, GIF ou WebP.",
+      });
+      return;
+    }
+    
     setIsUploadingAvatar(true);
     
     try {
-      const formData = new FormData();
-      formData.append('avatar', file);
-      
-      const response = await fetch(`/api/users/${userId}/avatar`, {
+      // Passo 1: Obter URL de upload do Object Storage
+      const uploadUrlResponse = await fetch(`/api/users/${userId}/avatar/upload-url`, {
         method: 'POST',
-        body: formData,
-        // Não incluir Content-Type, ele será definido automaticamente com o boundary
       });
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Erro ao fazer upload de imagem');
+      if (!uploadUrlResponse.ok) {
+        const error = await uploadUrlResponse.json();
+        throw new Error(error.message || 'Erro ao obter URL de upload');
       }
       
-      const data = await response.json();
+      const { uploadURL } = await uploadUrlResponse.json();
+      
+      // Passo 2: Upload direto para Object Storage
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+      
+      if (!uploadResponse.ok) {
+        throw new Error('Erro ao fazer upload para o Object Storage');
+      }
+      
+      // Passo 3: Atualizar usuário com nova URL do avatar
+      const updateResponse = await fetch(`/api/users/${userId}/avatar`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ avatarURL: uploadURL }),
+      });
+      
+      if (!updateResponse.ok) {
+        const error = await updateResponse.json();
+        throw new Error(error.message || 'Erro ao atualizar avatar do usuário');
+      }
+      
+      const data = await updateResponse.json();
       
       // Atualizar o cache do usuário com a nova URL de imagem
       queryClient.setQueryData([`/api/users/${userId}`], (oldData: any) => {
