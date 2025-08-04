@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { FileText, Loader2, Search, Filter, X, Download, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,9 @@ interface DocumentsResponse {
 }
 
 export default function DocumentosPageBasic() {
+  // Hook para navegação
+  const [, setLocation] = useLocation();
+  
   // Estados para filtros e paginação
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
