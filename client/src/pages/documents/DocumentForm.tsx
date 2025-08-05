@@ -636,11 +636,31 @@ export default function DocumentForm() {
                       maxNumberOfFiles={1}
                       maxFileSize={5242880} // 5MB
                       onGetUploadParameters={async () => {
-                        const response = await apiRequest("/api/documents/upload-url", "POST") as unknown as { uploadURL: string };
-                        return {
-                          method: "PUT" as const,
-                          url: response.uploadURL
-                        };
+                        try {
+                          console.log('Getting upload parameters...');
+                          const response = await fetch("/api/documents/upload-url", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            credentials: "include",
+                          });
+                          
+                          if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                          }
+                          
+                          const data = await response.json() as { uploadURL: string };
+                          console.log('Upload URL received:', data.uploadURL);
+                          
+                          return {
+                            method: "PUT" as const,
+                            url: data.uploadURL
+                          };
+                        } catch (error) {
+                          console.error('Error getting upload parameters:', error);
+                          throw error;
+                        }
                       }}
                       onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
                         console.log('Upload completed:', result);
