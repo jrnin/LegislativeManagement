@@ -4149,7 +4149,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/public/councilors', async (req, res) => {
     try {
       const councilors = await storage.getUsersByRole('councilor');
-      res.json(councilors);
+      
+      // Convert avatar URLs to public format for display without authentication
+      const publicCouncilors = councilors.map(councilor => ({
+        ...councilor,
+        profileImageUrl: councilor.profileImageUrl ? 
+          councilor.profileImageUrl.replace('/objects/', '/public-objects/') : 
+          councilor.profileImageUrl
+      }));
+      
+      res.json(publicCouncilors);
     } catch (error) {
       console.error("Erro ao buscar vereadores para exibição pública:", error);
       res.status(500).json({ message: "Erro ao buscar vereadores" });
