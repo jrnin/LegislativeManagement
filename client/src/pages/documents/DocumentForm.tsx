@@ -636,31 +636,61 @@ export default function DocumentForm() {
                       maxNumberOfFiles={1}
                       maxFileSize={5242880} // 5MB
                       onGetUploadParameters={async () => {
-                        const response = await apiRequest("/api/documents/upload-url", "POST");
+                        const response = await apiRequest("/api/documents/upload-url", "POST") as unknown as { uploadURL: string };
                         return {
                           method: "PUT" as const,
                           url: response.uploadURL
                         };
                       }}
                       onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-                        if (result.successful.length > 0) {
+                        console.log('Upload completed:', result);
+                        if (result.successful && result.successful.length > 0) {
                           const uploadedFile = result.successful[0];
+                          console.log('Uploaded file:', uploadedFile);
+                          
                           // The uploadURL contains the presigned URL used for upload
                           // We need to convert it to the final object URL
                           const presignedUrl = uploadedFile.uploadURL || "";
-                          // Extract the object path from the presigned URL
-                          // Format: https://storage.googleapis.com/bucket-name/object-path?signatures...
-                          const url = new URL(presignedUrl);
-                          const finalObjectUrl = `${url.protocol}//${url.host}${url.pathname}`;
+                          if (!presignedUrl) {
+                            console.error('No upload URL found in uploaded file');
+                            toast({
+                              title: "Erro no upload",
+                              description: "URL do arquivo não encontrada.",
+                              variant: "destructive"
+                            });
+                            return;
+                          }
                           
-                          setUploadedFileURL(finalObjectUrl);
-                          setUploadedFileName(uploadedFile.name || "");
-                          // Mark that a file was uploaded without creating a full File object
-                          setFormFile({name: uploadedFile.name || ""} as File);
-                          
+                          try {
+                            // Extract the object path from the presigned URL
+                            // Format: https://storage.googleapis.com/bucket-name/object-path?signatures...
+                            const url = new URL(presignedUrl);
+                            const finalObjectUrl = `${url.protocol}//${url.host}${url.pathname}`;
+                            console.log('Final object URL:', finalObjectUrl);
+                            
+                            setUploadedFileURL(finalObjectUrl);
+                            setUploadedFileName(uploadedFile.name || "");
+                            // Mark that a file was uploaded without creating a full File object
+                            setFormFile({name: uploadedFile.name || ""} as File);
+                            
+                            toast({
+                              title: "Arquivo carregado",
+                              description: `${uploadedFile.name} foi carregado com sucesso.`,
+                            });
+                          } catch (error) {
+                            console.error('Error processing upload URL:', error);
+                            toast({
+                              title: "Erro no upload",
+                              description: "Erro ao processar URL do arquivo.",
+                              variant: "destructive"
+                            });
+                          }
+                        } else if (result.failed && result.failed.length > 0) {
+                          console.error('Upload failed:', result.failed);
                           toast({
-                            title: "Arquivo carregado",
-                            description: `${uploadedFile.name} foi carregado com sucesso.`,
+                            title: "Erro no upload",
+                            description: "Falha ao fazer upload do arquivo.",
+                            variant: "destructive"
                           });
                         }
                       }}
