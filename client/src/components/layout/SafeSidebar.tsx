@@ -14,7 +14,8 @@ import {
   LogOut,
   Loader2,
   Users2,
-  Shield
+  Shield,
+  Upload
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,6 +42,7 @@ const navigation = [
   { name: "Legislatura", href: "/legislatures", icon: Gavel },
   { name: "Noticias", href: "/news", icon: FileText },
   { name: "Sistema de Backup", href: "/backup", icon: Shield },
+  { name: "Migração Documentos", href: "/document-migration", icon: Upload },
   
 ];
 
