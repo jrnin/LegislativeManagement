@@ -1,0 +1,35 @@
+react-dom_client.js?v=c742761d:2160 In HTML, <a> cannot be a descendant of <a>.
+This will cause a hydration error.
+
+  ...
+    <Route data-replit-metadata="client/src..." data-component-name="Route" path="/dashboard" ...>
+      <Dashboard params={{}}>
+        <div data-replit-metadata="client/src..." data-component-name="div" className="py-8">
+          <div>
+          <div data-replit-metadata="client/src..." data-component-name="div" className="max-w-7xl ...">
+            <div data-replit-metadata="client/src..." data-component-name="div">
+              <div data-replit-metadata="client/src..." data-component-name="div" className="grid grid-...">
+                <StatCard data-replit-metadata="client/src..." data-component-name="StatCard" title="Legislaturas" ...>
+                  <_c data-replit-metadata="client/src..." data-component-name="Card" className="dashboard-...">
+                    <div data-replit-metadata="client/src..." data-component-name="Card" ref={null} ...>
+                      <_c9 data-replit-metadata="client/src..." data-component-name="CardContent" className="p-0">
+                        <div data-replit-metadata="client/src..." data-component-name="CardContent" ref={null} ...>
+                          <div data-replit-metadata="client/src..." data-component-name="div" className="relative p-6">
+                            <div>
+                            <div>
+                            <div data-replit-metadata="client/src..." data-component-name="div" className="mt-6 pt-4 ...">
+>                             <a
+>                               data-replit-metadata="client/src/pages/dashboard/StatCard.tsx:76:12"
+>                               data-component-name="Link"
+>                               onClick={function}
+>                               href="/legislatures"
+>                               className={undefined}
+>                               ref={null}
+>                             >
+>                               <a
+>                                 data-replit-metadata="client/src/pages/dashboard/StatCard.tsx:77:14"
+>                                 data-component-name="a"
+>                                 className="flex items-center justify-between text-sm font-medium text-primary-600 ho..."
+>                               >
+                ...
+              ...

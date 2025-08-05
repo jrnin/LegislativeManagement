@@ -54,11 +54,9 @@ export default function StatCard({ title, value, icon, href, color }: StatCardPr
           </div>
           
           <div className="mt-6 pt-4 border-t border-slate-100">
-            <Link href={href}>
-              <a className="flex items-center justify-between text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors group">
-                <span>Ver {title.toLowerCase()}</span>
-                <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
-              </a>
+            <Link href={href} className="flex items-center justify-between text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors group">
+              <span>Ver {title.toLowerCase()}</span>
+              <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>
