@@ -82,12 +82,13 @@ export const handleObjectNewsUpload = async (req: UploadRequest, res: Response, 
   }
 };
 
-// Document upload middleware for Object Storage
+// Document upload middleware for Object Storage with organized structure
 export const handleObjectDocumentUpload = async (req: UploadRequest, res: Response, next: NextFunction) => {
   try {
     const objectStorageService = new ObjectStorageService();
     
-    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    // Use organized document upload URL with year/month structure
+    const uploadURL = await objectStorageService.getDocumentUploadURL();
     
     req.uploadedFile = {
       cloudPath: '',
@@ -100,28 +101,6 @@ export const handleObjectDocumentUpload = async (req: UploadRequest, res: Respon
     next();
   } catch (error) {
     console.error('Error preparing document upload:', error);
-    res.status(500).json({ error: 'Failed to prepare file upload' });
-  }
-};
-
-// News upload middleware for Object Storage
-export const handleObjectNewsUpload = async (req: UploadRequest, res: Response, next: NextFunction) => {
-  try {
-    const objectStorageService = new ObjectStorageService();
-    
-    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-    
-    req.uploadedFile = {
-      cloudPath: '',
-      originalName: req.body.originalName || 'news-image',
-      size: 0,
-      mimeType: req.body.mimeType || 'image/jpeg'
-    };
-    
-    req.body.uploadURL = uploadURL;
-    next();
-  } catch (error) {
-    console.error('Error preparing news upload:', error);
     res.status(500).json({ error: 'Failed to prepare file upload' });
   }
 };

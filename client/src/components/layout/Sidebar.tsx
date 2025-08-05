@@ -40,6 +40,7 @@ export default function Sidebar() {
     { name: "Legislaturas", href: "/legislatures", icon: Building },
     { name: "Auditoria Uploads", href: "/uploads-audit", icon: FolderTree },
     { name: "Migração Arquivos", href: "/file-migration", icon: ArrowUpDown },
+    { name: "Migração Documentos", href: "/document-migration", icon: FolderTree },
   ];
 
   const getInitials = (name: string) => {

@@ -1392,7 +1392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create document
-  app.post('/api/documents', requireAuth, handleDocumentUpload('file'), async (req: any, res) => {
+  app.post('/api/documents', requireAuth, handleObjectDocumentUpload, async (req: any, res) => {
     try {
       const schema = z.object({
         documentNumber: z.number().int().positive(),
@@ -1417,14 +1417,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = schema.parse(data);
       
-      // Handle file upload if present
+      // Handle Object Storage file upload if present
       let fileInfo = {};
       
-      if (req.file) {
+      if (req.body.uploadedFileURL) {
+        const objectStorageService = new ObjectStorageService();
+        const userId = req.user?.id || req.user?.claims?.sub;
+        
+        // Set ACL policy and get normalized path
+        const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
+          req.body.uploadedFileURL,
+          {
+            owner: userId,
+            visibility: 'private',
+            aclRules: [{
+              group: { type: 'admin_only' as any, id: 'admin' },
+              permission: ObjectPermission.READ
+            }]
+          }
+        );
+        
         fileInfo = {
-          filePath: req.file.path,
-          fileName: req.file.originalname,
-          fileType: req.file.mimetype,
+          filePath: cloudPath,
+          fileName: req.body.originalFileName || 'document',
+          fileType: req.body.mimeType || 'application/pdf',
         };
       }
       
@@ -1448,7 +1464,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update document
-  app.put('/api/documents/:id', requireAdmin, handleDocumentUpload('file'), async (req: any, res) => {
+  app.put('/api/documents/:id', requireAdmin, handleObjectDocumentUpload, async (req: any, res) => {
     try {
       const documentId = Number(req.params.id);
       
@@ -1482,14 +1498,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = schema.parse(data);
       
-      // Handle file upload if present
+      // Handle Object Storage file upload if present
       let fileInfo = {};
       
-      if (req.file) {
+      if (req.body.uploadedFileURL) {
+        const objectStorageService = new ObjectStorageService();
+        const userId = req.user?.id || req.user?.claims?.sub;
+        
+        // Set ACL policy and get normalized path
+        const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
+          req.body.uploadedFileURL,
+          {
+            owner: userId,
+            visibility: 'private',
+            aclRules: [{
+              group: { type: 'admin_only' as any, id: 'admin' },
+              permission: ObjectPermission.READ
+            }]
+          }
+        );
+        
         fileInfo = {
-          filePath: req.file.path,
-          fileName: req.file.originalname,
-          fileType: req.file.mimetype,
+          filePath: cloudPath,
+          fileName: req.body.originalFileName || 'document',
+          fileType: req.body.mimeType || 'application/pdf',
         };
       }
       
@@ -5516,6 +5548,37 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
       res.status(500).json({ 
         error: 'Erro ao buscar previsão do tempo',
         forecast: []
+      });
+    }
+  });
+
+  // DOCUMENT MIGRATION ROUTES
+  
+  // Migrate documents to Object Storage with organized structure
+  app.post('/api/admin/documents/migrate-to-object-storage', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const { migrateDocumentsToObjectStorage } = await import('../scripts/migrate-documents-to-object-storage');
+      
+      console.log('📦 Iniciando migração de documentos para Object Storage...');
+      const result = await migrateDocumentsToObjectStorage();
+      
+      res.json({
+        success: true,
+        message: 'Migração de documentos concluída',
+        result: {
+          totalDocuments: result.totalDocuments,
+          documentsWithFiles: result.documentsWithFiles,
+          migratedSuccessfully: result.migratedSuccessfully,
+          migrationErrors: result.migrationErrors,
+          errors: result.errors
+        }
+      });
+    } catch (error) {
+      console.error('❌ Erro na migração de documentos:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao executar migração de documentos',
+        error: error.message
       });
     }
   });
