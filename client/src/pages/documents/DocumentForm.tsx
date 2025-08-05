@@ -18,8 +18,6 @@ import { Document, LegislativeActivity, Event } from "@shared/schema";
 import { formatDate } from "@/utils/formatters";
 import { File, FileCheck, Upload, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import type { UploadResult } from '@uppy/core';
 
 const formSchema = z.object({
   documentNumber: z.coerce.number().int().positive({ message: "Número do documento deve ser positivo" }),
@@ -44,10 +42,6 @@ export default function DocumentForm() {
   const isEditing = !!documentId;
   const { toast } = useToast();
   const [formFile, setFormFile] = useState<File | null>(null);
-  const [uploadedFileUrl, setUploadedFileUrl] = useState<string>("");
-  const [uploadedFileName, setUploadedFileName] = useState<string>("");
-  const [uploadedFileType, setUploadedFileType] = useState<string>("");
-  const [isUploading, setIsUploading] = useState(false);
   const [documentHistory, setDocumentHistory] = useState<Document[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   
@@ -133,28 +127,38 @@ export default function DocumentForm() {
 
   const createMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const requestData = {
-        documentNumber: data.documentNumber,
-        documentType: data.documentType,
-        documentDate: data.documentDate,
-        authorType: data.authorType,
-        authorId: data.authorId,
-        description: data.description,
-        status: data.status,
-        activityId: data.activityId && data.activityId !== 0 ? data.activityId : undefined,
-        eventId: data.eventId && data.eventId !== 0 ? data.eventId : undefined,
-        parentDocumentId: data.parentDocumentId && data.parentDocumentId !== 0 ? data.parentDocumentId : undefined,
-        fileUrl: uploadedFileUrl || undefined,
-        fileName: uploadedFileName || undefined,
-        fileType: uploadedFileType || undefined,
-      };
-
+      const formData = new FormData();
+      
+      // Append basic fields
+      formData.append("documentNumber", data.documentNumber.toString());
+      formData.append("documentType", data.documentType);
+      formData.append("documentDate", data.documentDate);
+      formData.append("authorType", data.authorType);
+      if (data.authorId) {
+        formData.append("authorId", data.authorId);
+      }
+      formData.append("description", data.description);
+      formData.append("status", data.status);
+      
+      // Append optional fields if present
+      if (data.activityId && data.activityId !== 0) {
+        formData.append("activityId", data.activityId.toString());
+      }
+      if (data.eventId && data.eventId !== 0) {
+        formData.append("eventId", data.eventId.toString());
+      }
+      if (data.parentDocumentId && data.parentDocumentId !== 0) {
+        formData.append("parentDocumentId", data.parentDocumentId.toString());
+      }
+      
+      // Append file if present
+      if (formFile) {
+        formData.append("file", formFile);
+      }
+      
       const response = await fetch("/api/documents", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
+        body: formData,
         credentials: "include",
       });
       
@@ -184,27 +188,35 @@ export default function DocumentForm() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const requestData = {
-        documentNumber: data.documentNumber,
-        documentType: data.documentType,
-        documentDate: data.documentDate,
-        authorType: data.authorType,
-        description: data.description,
-        status: data.status,
-        activityId: data.activityId && data.activityId !== 0 ? data.activityId : undefined,
-        eventId: data.eventId && data.eventId !== 0 ? data.eventId : undefined,
-        parentDocumentId: data.parentDocumentId && data.parentDocumentId !== 0 ? data.parentDocumentId : undefined,
-        fileUrl: uploadedFileUrl || undefined,
-        fileName: uploadedFileName || undefined,
-        fileType: uploadedFileType || undefined,
-      };
-
+      const formData = new FormData();
+      
+      // Append basic fields
+      if (data.documentNumber) formData.append("documentNumber", data.documentNumber.toString());
+      if (data.documentType) formData.append("documentType", data.documentType);
+      if (data.documentDate) formData.append("documentDate", data.documentDate);
+      if (data.authorType) formData.append("authorType", data.authorType);
+      if (data.description) formData.append("description", data.description);
+      if (data.status) formData.append("status", data.status);
+      
+      // Append optional fields if present
+      if (data.eventId && data.eventId !== 0) {
+        formData.append("eventId", data.eventId.toString());
+      }
+      if (data.activityId && data.activityId !== 0) {
+        formData.append("activityId", data.activityId.toString());
+      }
+      if (data.parentDocumentId && data.parentDocumentId !== 0) {
+        formData.append("parentDocumentId", data.parentDocumentId.toString());
+      }
+      
+      // Append file if present
+      if (formFile) {
+        formData.append("file", formFile);
+      }
+      
       const response = await fetch(`/api/documents/${documentId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
+        body: formData,
         credentials: "include",
       });
       
@@ -245,56 +257,6 @@ export default function DocumentForm() {
     if (e.target.files && e.target.files[0]) {
       setFormFile(e.target.files[0]);
     }
-  };
-
-  const handleGetUploadParameters = async () => {
-    try {
-      setIsUploading(true);
-      const response = await fetch('/api/documents/upload-url', {
-        method: 'POST',
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get upload URL');
-      }
-      
-      const { uploadURL } = await response.json();
-      return {
-        method: 'PUT' as const,
-        url: uploadURL,
-      };
-    } catch (error) {
-      console.error('Error getting upload parameters:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro no upload",
-        description: "Não foi possível obter URL de upload",
-      });
-      throw error;
-    }
-  };
-
-  const handleUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-    setIsUploading(false);
-    
-    if (result.successful && result.successful.length > 0) {
-      const uploadedFile = result.successful[0];
-      setUploadedFileUrl(uploadedFile.uploadURL || "");
-      setUploadedFileName(uploadedFile.name || "");
-      setUploadedFileType(uploadedFile.type || "");
-      
-      toast({
-        title: "Upload concluído",
-        description: "Arquivo enviado com sucesso",
-      });
-    }
-  };
-
-  const clearUploadedFile = () => {
-    setUploadedFileUrl("");
-    setUploadedFileName("");
-    setUploadedFileType("");
   };
 
   const documentTypes = [
@@ -700,66 +662,42 @@ export default function DocumentForm() {
                 <Separator />
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="bg-gray-50 p-4 rounded-md border border-dashed border-gray-300">
-                  <div className="flex flex-col items-center justify-center space-y-3">
+                  <div className="flex flex-col items-center justify-center space-y-2">
                     <div className="p-3 bg-primary-50 rounded-full">
                       <Upload className="h-6 w-6 text-primary" />
                     </div>
                     <div className="space-y-1 text-center">
                       <h4 className="text-sm font-medium">Anexar documento</h4>
                       <p className="text-xs text-muted-foreground">
-                        PDF, DOC, DOCX ou TXT (máx. 10MB)
+                        PDF, DOC, DOCX ou TXT (máx. 5MB)
                       </p>
                     </div>
                     
-                    <div className="w-full max-w-xs">
-                      <ObjectUploader
-                        maxNumberOfFiles={1}
-                        maxFileSize={10 * 1024 * 1024} // 10MB
-                        onGetUploadParameters={handleGetUploadParameters}
-                        onComplete={handleUploadComplete}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Upload className="h-4 w-4" />
-                          <span>Selecionar Arquivo</span>
-                        </div>
-                      </ObjectUploader>
-                    </div>
+                    <Input
+                      type="file"
+                      id="file"
+                      className="w-full max-w-xs"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={handleFileChange}
+                    />
                     
-                    {isUploading && (
-                      <div className="flex items-center space-x-2 text-sm text-blue-600">
-                        <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
-                        <span>Enviando arquivo...</span>
+                    {formFile && (
+                      <div className="flex items-center space-x-2 text-sm">
+                        <FileCheck className="h-4 w-4 text-green-500" />
+                        <span>{formFile.name}</span>
                       </div>
                     )}
                     
-                    {uploadedFileName && (
-                      <div className="flex items-center justify-between space-x-2 text-sm bg-green-50 p-2 rounded w-full max-w-xs">
-                        <div className="flex items-center space-x-2">
-                          <FileCheck className="h-4 w-4 text-green-500" />
-                          <span className="truncate">{uploadedFileName}</span>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={clearUploadedFile}
-                          className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                        >
-                          ×
-                        </Button>
-                      </div>
-                    )}
-                    
-                    {isEditing && document?.fileName && !uploadedFileName && (
-                      <div className="flex items-center space-x-2 text-sm bg-blue-50 p-2 rounded w-full max-w-xs">
+                    {isEditing && document?.fileName && !formFile && (
+                      <div className="flex items-center space-x-2 text-sm">
                         <File className="h-4 w-4 text-primary" />
                         <a 
-                          href={`/api/download/documents/${documentId}`} 
+                          href={`/api/files/documents/${documentId}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline truncate"
+                          className="text-primary hover:underline"
                         >
                           {document.fileName}
                         </a>

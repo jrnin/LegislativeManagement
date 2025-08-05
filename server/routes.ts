@@ -1391,20 +1391,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get document upload URL
-  app.post('/api/documents/upload-url', requireAuth, async (req, res) => {
-    try {
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      res.json({ uploadURL });
-    } catch (error) {
-      console.error("Error generating upload URL:", error);
-      res.status(500).json({ message: "Erro ao gerar URL de upload" });
-    }
-  });
-
   // Create document
-  app.post('/api/documents', requireAuth, async (req: any, res) => {
+  app.post('/api/documents', requireAuth, handleDocumentUpload('file'), async (req: any, res) => {
     try {
       const schema = z.object({
         documentNumber: z.number().int().positive(),
@@ -1416,9 +1404,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activityId: z.number().int().positive().optional(),
         eventId: z.number().int().positive().optional(),
         parentDocumentId: z.number().int().positive().optional(),
-        fileUrl: z.string().optional(),
-        fileName: z.string().optional(),
-        fileType: z.string().optional(),
       });
       
       // Parse form data
@@ -1435,30 +1420,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle file upload if present
       let fileInfo = {};
       
-      if (validated.fileUrl && validated.fileName) {
-        const objectStorageService = new ObjectStorageService();
-        const normalizedPath = objectStorageService.normalizeObjectEntityPath(validated.fileUrl);
-        
-        // Set ACL policy for the uploaded file
-        try {
-          await objectStorageService.trySetObjectEntityAclPolicy(
-            validated.fileUrl,
-            {
-              owner: req.user?.claims?.sub || req.user?.id,
-              visibility: "private", // Documents should be private by default
-              aclRules: []
-            }
-          );
-          console.log("ACL policy set for document file:", validated.fileUrl);
-        } catch (aclError) {
-          console.error("Error setting ACL policy for document file:", aclError);
-          // Don't fail the entire request if ACL setting fails
-        }
-        
+      if (req.file) {
         fileInfo = {
-          filePath: normalizedPath,
-          fileName: validated.fileName,
-          fileType: validated.fileType || 'application/octet-stream',
+          filePath: req.file.path,
+          fileName: req.file.originalname,
+          fileType: req.file.mimetype,
         };
       }
       
@@ -1482,7 +1448,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update document
-  app.put('/api/documents/:id', requireAdmin, async (req: any, res) => {
+  app.put('/api/documents/:id', requireAdmin, handleDocumentUpload('file'), async (req: any, res) => {
     try {
       const documentId = Number(req.params.id);
       
@@ -1503,9 +1469,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activityId: z.number().int().positive().optional(),
         eventId: z.number().int().positive().optional(),
         parentDocumentId: z.number().int().positive().optional(),
-        fileUrl: z.string().optional(),
-        fileName: z.string().optional(),
-        fileType: z.string().optional(),
       });
       
       // Parse form data
@@ -1522,30 +1485,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle file upload if present
       let fileInfo = {};
       
-      if (validated.fileUrl && validated.fileName) {
-        const objectStorageService = new ObjectStorageService();
-        const normalizedPath = objectStorageService.normalizeObjectEntityPath(validated.fileUrl);
-        
-        // Set ACL policy for the uploaded file
-        try {
-          await objectStorageService.trySetObjectEntityAclPolicy(
-            validated.fileUrl,
-            {
-              owner: req.user?.claims?.sub || req.user?.id,
-              visibility: "private", // Documents should be private by default
-              aclRules: []
-            }
-          );
-          console.log("ACL policy set for updated document file:", validated.fileUrl);
-        } catch (aclError) {
-          console.error("Error setting ACL policy for updated document file:", aclError);
-          // Don't fail the entire request if ACL setting fails
-        }
-        
+      if (req.file) {
         fileInfo = {
-          filePath: normalizedPath,
-          fileName: validated.fileName,
-          fileType: validated.fileType || 'application/octet-stream',
+          filePath: req.file.path,
+          fileName: req.file.originalname,
+          fileType: req.file.mimetype,
         };
       }
       
@@ -1651,55 +1595,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Tipo inválido" });
       }
       
-      console.log(`Verificando arquivo: ${filePath}`);
+      console.log(`Verificando se arquivo existe: ${filePath}`);
       
-      // Check if it's an Object Storage path
-      if (filePath.startsWith('/objects/')) {
-        try {
-          const objectStorageService = new ObjectStorageService();
-          const objectFile = await objectStorageService.getObjectEntityFile(filePath);
-          
-          // Check if user can access this object
-          const canAccess = await objectStorageService.canAccessObjectEntity({
-            objectFile,
-            userId: req.user?.claims?.sub || req.user?.id,
-            requestedPermission: ObjectPermission.READ,
-          });
-          
-          if (!canAccess) {
-            return res.status(403).json({ 
-              message: "Você não tem permissão para acessar este arquivo." 
-            });
-          }
-          
-          // Check if download is requested
-          const isDownload = req.query.download === 'true';
-          
-          // Set appropriate headers
-          res.setHeader('Content-Type', fileType ? fileType : 'application/octet-stream');
-          
-          if (isDownload) {
-            // Force download with attachment disposition
-            res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName || 'download')}"`);
-          } else {
-            // Allow browser to display the file if possible (PDF, images, etc)
-            res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName || 'view')}"`);
-          }
-          
-          console.log(`Enviando arquivo do Object Storage: ${fileName} (${fileType})`);
-          
-          // Stream the file from Object Storage
-          objectStorageService.downloadObject(objectFile, res);
-          return;
-        } catch (storageError) {
-          console.error(`Erro ao acessar arquivo no Object Storage: ${storageError.message}`);
-          return res.status(404).json({ 
-            message: "Arquivo não encontrado no Object Storage." 
-          });
-        }
-      }
-      
-      // Fallback to local filesystem (for legacy files)
+      // Check if file exists
       if (!fs.existsSync(filePath)) {
         console.log(`Arquivo não encontrado no sistema de arquivos: ${filePath}`);
         
@@ -1726,7 +1624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName || 'view')}"`);
       }
       
-      console.log(`Enviando arquivo local: ${fileName} (${fileType})`);
+      console.log(`Enviando arquivo: ${fileName} (${fileType})`);
       
       // Stream the file
       const fileStream = fs.createReadStream(filePath);
@@ -1737,107 +1635,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Document migration endpoint
-  app.post('/api/admin/migrate-documents', requireAdmin, async (req, res) => {
-    try {
-      const { documentIds } = req.body;
-      
-      if (!Array.isArray(documentIds) || documentIds.length === 0) {
-        return res.status(400).json({ message: "Lista de IDs de documentos é obrigatória" });
-      }
-
-      const objectStorageService = new ObjectStorageService();
-      const migratedDocuments = [];
-      const errors = [];
-
-      for (const documentId of documentIds) {
-        try {
-          const document = await storage.getDocument(documentId);
-          
-          if (!document) {
-            errors.push({ documentId, error: "Documento não encontrado" });
-            continue;
-          }
-
-          if (!document.filePath || document.filePath.startsWith('/objects/')) {
-            errors.push({ documentId, error: "Documento já migrado ou sem arquivo" });
-            continue;
-          }
-
-          // Check if local file exists
-          if (!fs.existsSync(document.filePath)) {
-            errors.push({ documentId, error: "Arquivo local não encontrado" });
-            continue;
-          }
-
-          // Read the file
-          const fileBuffer = fs.readFileSync(document.filePath);
-          
-          // Get upload URL from Object Storage
-          const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-          
-          // Upload file to Object Storage
-          const uploadResponse = await fetch(uploadURL, {
-            method: 'PUT',
-            body: fileBuffer,
-            headers: {
-              'Content-Type': document.fileType || 'application/octet-stream',
-            },
-          });
-
-          if (!uploadResponse.ok) {
-            errors.push({ documentId, error: "Falha no upload para Object Storage" });
-            continue;
-          }
-
-          // Get the normalized path
-          const normalizedPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
-          
-          // Set ACL policy
-          await objectStorageService.trySetObjectEntityAclPolicy(
-            uploadURL,
-            {
-              owner: req.user?.claims?.sub || req.user?.id,
-              visibility: "private",
-              aclRules: []
-            }
-          );
-
-          // Update document with new path
-          const updatedDocument = await storage.updateDocument(documentId, {
-            filePath: normalizedPath,
-          });
-
-          migratedDocuments.push({
-            documentId,
-            fileName: document.fileName,
-            oldPath: document.filePath,
-            newPath: normalizedPath
-          });
-
-          console.log(`Documento ${documentId} migrado com sucesso: ${document.filePath} -> ${normalizedPath}`);
-
-        } catch (error) {
-          console.error(`Erro migrando documento ${documentId}:`, error);
-          errors.push({ 
-            documentId, 
-            error: error instanceof Error ? error.message : 'Erro desconhecido' 
-          });
-        }
-      }
-
-      res.json({
-        message: `Migração concluída. ${migratedDocuments.length} documento(s) migrado(s), ${errors.length} erro(s)`,
-        migratedDocuments,
-        errors
-      });
-
-    } catch (error) {
-      console.error("Error migrating documents:", error);
-      res.status(500).json({ message: "Erro interno do servidor" });
-    }
-  });
-
   // BACKUP AND RESTORE ROUTES
   
   // Create system backup
