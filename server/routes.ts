@@ -1391,8 +1391,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get upload URL for documents (Object Storage)
+  app.post('/api/documents/upload-url', requireAuth, async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getDocumentUploadURL();
+      
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting document upload URL:", error);
+      res.status(500).json({ message: "Erro ao obter URL de upload" });
+    }
+  });
+  
   // Create document
-  app.post('/api/documents', requireAuth, handleObjectDocumentUpload, async (req: any, res) => {
+  app.post('/api/documents', requireAuth, async (req: any, res) => {
     try {
       const schema = z.object({
         documentNumber: z.number().int().positive(),
@@ -1464,7 +1477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update document
-  app.put('/api/documents/:id', requireAdmin, handleObjectDocumentUpload, async (req: any, res) => {
+  app.put('/api/documents/:id', requireAdmin, async (req: any, res) => {
     try {
       const documentId = Number(req.params.id);
       

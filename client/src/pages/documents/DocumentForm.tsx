@@ -18,6 +18,8 @@ import { Document, LegislativeActivity, Event } from "@shared/schema";
 import { formatDate } from "@/utils/formatters";
 import { File, FileCheck, Upload, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
 
 const formSchema = z.object({
   documentNumber: z.coerce.number().int().positive({ message: "Número do documento deve ser positivo" }),
@@ -42,6 +44,8 @@ export default function DocumentForm() {
   const isEditing = !!documentId;
   const { toast } = useToast();
   const [formFile, setFormFile] = useState<File | null>(null);
+  const [uploadedFileURL, setUploadedFileURL] = useState<string>("");
+  const [uploadedFileName, setUploadedFileName] = useState<string>("");
   const [documentHistory, setDocumentHistory] = useState<Document[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   
@@ -127,47 +131,30 @@ export default function DocumentForm() {
 
   const createMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const formData = new FormData();
+      // Use Object Storage approach
+      const payload = {
+        documentNumber: data.documentNumber,
+        documentType: data.documentType,
+        documentDate: data.documentDate,
+        authorType: data.authorType,
+        authorId: data.authorId,
+        description: data.description,
+        status: data.status,
+        activityId: data.activityId !== 0 ? data.activityId : undefined,
+        eventId: data.eventId !== 0 ? data.eventId : undefined,
+        parentDocumentId: data.parentDocumentId !== 0 ? data.parentDocumentId : undefined,
+        uploadedFileURL: uploadedFileURL || undefined,
+        originalFileName: uploadedFileName || undefined,
+        mimeType: formFile?.type || 'application/pdf'
+      };
       
-      // Append basic fields
-      formData.append("documentNumber", data.documentNumber.toString());
-      formData.append("documentType", data.documentType);
-      formData.append("documentDate", data.documentDate);
-      formData.append("authorType", data.authorType);
-      if (data.authorId) {
-        formData.append("authorId", data.authorId);
-      }
-      formData.append("description", data.description);
-      formData.append("status", data.status);
-      
-      // Append optional fields if present
-      if (data.activityId && data.activityId !== 0) {
-        formData.append("activityId", data.activityId.toString());
-      }
-      if (data.eventId && data.eventId !== 0) {
-        formData.append("eventId", data.eventId.toString());
-      }
-      if (data.parentDocumentId && data.parentDocumentId !== 0) {
-        formData.append("parentDocumentId", data.parentDocumentId.toString());
-      }
-      
-      // Append file if present
-      if (formFile) {
-        formData.append("file", formFile);
-      }
-      
-      const response = await fetch("/api/documents", {
+      return apiRequest("/api/documents", {
         method: "POST",
-        body: formData,
-        credentials: "include",
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
-      
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error);
-      }
-      
-      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -188,44 +175,30 @@ export default function DocumentForm() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const formData = new FormData();
+      // Use Object Storage approach
+      const payload = {
+        documentNumber: data.documentNumber,
+        documentType: data.documentType,
+        documentDate: data.documentDate,
+        authorType: data.authorType,
+        authorId: data.authorId,
+        description: data.description,
+        status: data.status,
+        activityId: data.activityId !== 0 ? data.activityId : undefined,
+        eventId: data.eventId !== 0 ? data.eventId : undefined,
+        parentDocumentId: data.parentDocumentId !== 0 ? data.parentDocumentId : undefined,
+        uploadedFileURL: uploadedFileURL || undefined,
+        originalFileName: uploadedFileName || undefined,
+        mimeType: formFile?.type || 'application/pdf'
+      };
       
-      // Append basic fields
-      if (data.documentNumber) formData.append("documentNumber", data.documentNumber.toString());
-      if (data.documentType) formData.append("documentType", data.documentType);
-      if (data.documentDate) formData.append("documentDate", data.documentDate);
-      if (data.authorType) formData.append("authorType", data.authorType);
-      if (data.description) formData.append("description", data.description);
-      if (data.status) formData.append("status", data.status);
-      
-      // Append optional fields if present
-      if (data.eventId && data.eventId !== 0) {
-        formData.append("eventId", data.eventId.toString());
-      }
-      if (data.activityId && data.activityId !== 0) {
-        formData.append("activityId", data.activityId.toString());
-      }
-      if (data.parentDocumentId && data.parentDocumentId !== 0) {
-        formData.append("parentDocumentId", data.parentDocumentId.toString());
-      }
-      
-      // Append file if present
-      if (formFile) {
-        formData.append("file", formFile);
-      }
-      
-      const response = await fetch(`/api/documents/${documentId}`, {
+      return apiRequest(`/api/documents/${documentId}`, {
         method: "PUT",
-        body: formData,
-        credentials: "include",
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
-      
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error);
-      }
-      
-      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -253,11 +226,7 @@ export default function DocumentForm() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormFile(e.target.files[0]);
-    }
-  };
+  // File upload is now handled by ObjectUploader component
 
   const documentTypes = [
     "Pauta", 
@@ -675,22 +644,47 @@ export default function DocumentForm() {
                       </p>
                     </div>
                     
-                    <Input
-                      type="file"
-                      id="file"
-                      className="w-full max-w-xs"
-                      accept=".pdf,.doc,.docx,.txt"
-                      onChange={handleFileChange}
-                    />
+                    <ObjectUploader
+                      maxNumberOfFiles={1}
+                      maxFileSize={5242880} // 5MB
+                      onGetUploadParameters={async () => {
+                        const response = await apiRequest("/api/documents/upload-url", {
+                          method: "POST"
+                        });
+                        return {
+                          method: "PUT" as const,
+                          url: response.uploadURL
+                        };
+                      }}
+                      onComplete={(result: UploadResult) => {
+                        if (result.successful.length > 0) {
+                          const uploadedFile = result.successful[0];
+                          setUploadedFileURL(uploadedFile.uploadURL || "");
+                          setUploadedFileName(uploadedFile.name || "");
+                          setFormFile(new File([], uploadedFile.name || ""));
+                          
+                          toast({
+                            title: "Arquivo carregado",
+                            description: `${uploadedFile.name} foi carregado com sucesso.`,
+                          });
+                        }
+                      }}
+                      buttonClassName="w-full max-w-xs"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Upload className="h-4 w-4" />
+                        <span>Selecionar Arquivo</span>
+                      </div>
+                    </ObjectUploader>
                     
-                    {formFile && (
+                    {uploadedFileName && (
                       <div className="flex items-center space-x-2 text-sm">
                         <FileCheck className="h-4 w-4 text-green-500" />
-                        <span>{formFile.name}</span>
+                        <span>{uploadedFileName}</span>
                       </div>
                     )}
                     
-                    {isEditing && document?.fileName && !formFile && (
+                    {isEditing && document?.fileName && !uploadedFileName && (
                       <div className="flex items-center space-x-2 text-sm">
                         <File className="h-4 w-4 text-primary" />
                         <a 
