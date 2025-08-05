@@ -204,6 +204,11 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/index.xhtml?pagina=Licita%C3%A7%C3%B5es,%20Contrata%C3%A7%C3%B5es%20e%20Compras',
           external: true
         },
+        { 
+          name: 'Diárias', 
+          href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/publica/execucaoOrcamentaria/diarias/diarias.xhtml',
+          external: true
+        },
         {
           name: 'Execução Orçamentária', 
           href: 'https://cmjaiba.cidadesmg.com.br/portaltransparencia/index.xhtml?pagina=Execu%C3%A7%C3%A3o%20Or%C3%A7ament%C3%A1ria',
