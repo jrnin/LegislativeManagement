@@ -147,7 +147,7 @@ export default function DocumentForm() {
         mimeType: formFile?.type || 'application/pdf'
       };
       
-      return apiRequest("/api/documents", "POST", payload);
+      return apiRequest("POST", "/api/documents", payload);
     },
     onSuccess: () => {
       toast({
@@ -185,7 +185,7 @@ export default function DocumentForm() {
         mimeType: formFile?.type || 'application/pdf'
       };
       
-      return apiRequest(`/api/documents/${documentId}`, "PUT", payload);
+      return apiRequest("PUT", `/api/documents/${documentId}`, payload);
     },
     onSuccess: () => {
       toast({
