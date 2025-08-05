@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth } from "./replitAuth";
-import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload, handleNewsUpload, handleActivityUpload, handleDocumentUpload, handleEventUpload } from "./middlewares";
+import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload, handleNewsUpload, handleActivityUpload, handleEventUpload } from "./middlewares";
 import { handleObjectDocumentUpload, handleObjectNewsUpload } from "./objectUploadMiddlewares";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail, sendActivityApprovalRequest, sendEventNotificationEmail } from "./sendgrid";
 import { z } from "zod";

@@ -645,7 +645,15 @@ export default function DocumentForm() {
                       onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
                         if (result.successful.length > 0) {
                           const uploadedFile = result.successful[0];
-                          setUploadedFileURL(uploadedFile.uploadURL || "");
+                          // The uploadURL contains the presigned URL used for upload
+                          // We need to convert it to the final object URL
+                          const presignedUrl = uploadedFile.uploadURL || "";
+                          // Extract the object path from the presigned URL
+                          // Format: https://storage.googleapis.com/bucket-name/object-path?signatures...
+                          const url = new URL(presignedUrl);
+                          const finalObjectUrl = `${url.protocol}//${url.host}${url.pathname}`;
+                          
+                          setUploadedFileURL(finalObjectUrl);
                           setUploadedFileName(uploadedFile.name || "");
                           // Mark that a file was uploaded without creating a full File object
                           setFormFile({name: uploadedFile.name || ""} as File);
