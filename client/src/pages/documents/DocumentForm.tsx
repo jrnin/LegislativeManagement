@@ -18,8 +18,7 @@ import { Document, LegislativeActivity, Event } from "@shared/schema";
 import { formatDate } from "@/utils/formatters";
 import { File, FileCheck, Upload, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import type { UploadResult } from "@uppy/core";
+import { SimpleFileUploader } from "@/components/SimpleFileUploader";
 
 const formSchema = z.object({
   documentNumber: z.coerce.number().int().positive({ message: "Número do documento deve ser positivo" }),
@@ -214,7 +213,7 @@ export default function DocumentForm() {
     }
   };
 
-  // File upload is now handled by ObjectUploader component
+  // File upload is now handled by SimpleFileUploader component
 
   const documentTypes = [
     "Pauta", 
@@ -620,131 +619,31 @@ export default function DocumentForm() {
               </div>
               
               <div className="space-y-2">
-                <div className="bg-gray-50 p-4 rounded-md border border-dashed border-gray-300">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="p-3 bg-primary-50 rounded-full">
-                      <Upload className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="space-y-1 text-center">
-                      <h4 className="text-sm font-medium">Anexar documento</h4>
-                      <p className="text-xs text-muted-foreground">
-                        PDF, DOC, DOCX ou TXT (máx. 5MB)
-                      </p>
-                    </div>
-                    
-                    <ObjectUploader
-                      maxNumberOfFiles={1}
-                      maxFileSize={5242880} // 5MB
-                      onGetUploadParameters={async () => {
-                        try {
-                          console.log('Getting upload parameters...');
-                          const response = await fetch("/api/documents/upload-url", {
-                            method: "POST",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            credentials: "include",
-                          });
-                          
-                          if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                          }
-                          
-                          const data = await response.json() as { uploadURL: string };
-                          console.log('Upload URL received:', data.uploadURL);
-                          
-                          return {
-                            method: "PUT" as const,
-                            url: data.uploadURL
-                          };
-                        } catch (error) {
-                          console.error('Error getting upload parameters:', error);
-                          throw error;
-                        }
-                      }}
-                      onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-                        console.log('Upload completed:', result);
-                        if (result.successful && result.successful.length > 0) {
-                          const uploadedFile = result.successful[0];
-                          console.log('Uploaded file:', uploadedFile);
-                          
-                          // The uploadURL contains the presigned URL used for upload
-                          // We need to convert it to the final object URL
-                          const presignedUrl = uploadedFile.uploadURL || "";
-                          if (!presignedUrl) {
-                            console.error('No upload URL found in uploaded file');
-                            toast({
-                              title: "Erro no upload",
-                              description: "URL do arquivo não encontrada.",
-                              variant: "destructive"
-                            });
-                            return;
-                          }
-                          
-                          try {
-                            // Extract the object path from the presigned URL
-                            // Format: https://storage.googleapis.com/bucket-name/object-path?signatures...
-                            const url = new URL(presignedUrl);
-                            const finalObjectUrl = `${url.protocol}//${url.host}${url.pathname}`;
-                            console.log('Final object URL:', finalObjectUrl);
-                            
-                            setUploadedFileURL(finalObjectUrl);
-                            setUploadedFileName(uploadedFile.name || "");
-                            // Mark that a file was uploaded without creating a full File object
-                            setFormFile({name: uploadedFile.name || ""} as File);
-                            
-                            toast({
-                              title: "Arquivo carregado",
-                              description: `${uploadedFile.name} foi carregado com sucesso.`,
-                            });
-                          } catch (error) {
-                            console.error('Error processing upload URL:', error);
-                            toast({
-                              title: "Erro no upload",
-                              description: "Erro ao processar URL do arquivo.",
-                              variant: "destructive"
-                            });
-                          }
-                        } else if (result.failed && result.failed.length > 0) {
-                          console.error('Upload failed:', result.failed);
-                          toast({
-                            title: "Erro no upload",
-                            description: "Falha ao fazer upload do arquivo.",
-                            variant: "destructive"
-                          });
-                        }
-                      }}
-                      buttonClassName="w-full max-w-xs"
+                <SimpleFileUploader
+                  onUploadComplete={(fileUrl, fileName) => {
+                    setUploadedFileURL(fileUrl);
+                    setUploadedFileName(fileName);
+                    setFormFile({name: fileName} as File);
+                  }}
+                  maxFileSize={5242880} // 5MB
+                  acceptedTypes=".pdf,.doc,.docx,.txt"
+                  className="w-full"
+                />
+                
+                {isEditing && document?.fileName && !uploadedFileName && (
+                  <div className="flex items-center space-x-2 text-sm mt-2">
+                    <File className="h-4 w-4 text-primary" />
+                    <a 
+                      href={`/api/files/documents/${documentId}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
                     >
-                      <div className="flex items-center space-x-2">
-                        <Upload className="h-4 w-4" />
-                        <span>Selecionar Arquivo</span>
-                      </div>
-                    </ObjectUploader>
-                    
-                    {uploadedFileName && (
-                      <div className="flex items-center space-x-2 text-sm">
-                        <FileCheck className="h-4 w-4 text-green-500" />
-                        <span>{uploadedFileName}</span>
-                      </div>
-                    )}
-                    
-                    {isEditing && document?.fileName && !uploadedFileName && (
-                      <div className="flex items-center space-x-2 text-sm">
-                        <File className="h-4 w-4 text-primary" />
-                        <a 
-                          href={`/api/files/documents/${documentId}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline"
-                        >
-                          {document.fileName}
-                        </a>
-                        <span className="text-xs text-muted-foreground">(atual)</span>
-                      </div>
-                    )}
+                      {document.fileName}
+                    </a>
+                    <span className="text-xs text-muted-foreground">(atual)</span>
                   </div>
-                </div>
+                )}
               </div>
               
               <div className="flex justify-end space-x-2">
