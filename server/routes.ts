@@ -1412,11 +1412,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         documentType: z.string(),
         documentDate: z.string().refine(val => !isNaN(Date.parse(val))),
         authorType: z.string(),
+        authorId: z.string().optional(),
         description: z.string(),
         status: z.string(),
         activityId: z.number().int().positive().optional(),
         eventId: z.number().int().positive().optional(),
         parentDocumentId: z.number().int().positive().optional(),
+        uploadedFileURL: z.string().optional(),
+        originalFileName: z.string().optional(),
+        mimeType: z.string().optional(),
       });
       
       // Parse form data
@@ -1428,32 +1432,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         parentDocumentId: req.body.parentDocumentId ? Number(req.body.parentDocumentId) : undefined,
       };
       
+      console.log('Creating document with data:', data);
+      
       const validated = schema.parse(data);
       
       // Handle Object Storage file upload if present
       let fileInfo = {};
       
-      if (req.body.uploadedFileURL) {
+      if (validated.uploadedFileURL) {
+        console.log('Processing uploaded file:', validated.uploadedFileURL);
         const objectStorageService = new ObjectStorageService();
-        const userId = req.user?.id || req.user?.claims?.sub;
+        const userId = req.user?.id || 'admin';
         
         // Set ACL policy and get normalized path
         const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
-          req.body.uploadedFileURL,
+          validated.uploadedFileURL,
           {
             owner: userId,
-            visibility: 'private',
-            aclRules: [{
-              group: { type: 'admin_only' as any, id: 'admin' },
-              permission: ObjectPermission.READ
-            }]
+            visibility: 'private'
           }
         );
         
+        console.log('Cloud path set:', cloudPath);
+        
         fileInfo = {
           filePath: cloudPath,
-          fileName: req.body.originalFileName || 'document',
-          fileType: req.body.mimeType || 'application/pdf',
+          fileName: validated.originalFileName || 'document',
+          fileType: validated.mimeType || 'application/pdf',
         };
       }
       
