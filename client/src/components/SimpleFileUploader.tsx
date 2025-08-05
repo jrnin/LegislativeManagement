@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, FileCheck, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 interface SimpleFileUploaderProps {
   onUploadComplete: (fileUrl: string, fileName: string) => void;
@@ -37,32 +38,25 @@ export function SimpleFileUploader({
     setIsUploading(true);
 
     try {
-      console.log('Getting upload URL...');
+      console.log('Getting upload URL for file:', file.name, 'size:', file.size);
       
-      // Get upload URL from backend
-      const response = await fetch("/api/documents/upload-url", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao obter URL de upload: ${response.status}`);
-      }
-
-      const { uploadURL } = await response.json() as { uploadURL: string };
+      // Get upload URL from backend using apiRequest for proper authentication
+      const response = await apiRequest("POST", "/api/documents/upload-url", {});
+      const data = await response.json() as { uploadURL: string };
+      const { uploadURL } = data;
       console.log('Upload URL received:', uploadURL);
 
       // Upload file directly to Object Storage
+      console.log('Uploading file to:', uploadURL);
       const uploadResponse = await fetch(uploadURL, {
         method: "PUT",
         body: file,
         headers: {
-          "Content-Type": file.type
+          "Content-Type": file.type || "application/octet-stream"
         }
       });
+      
+      console.log('Upload response status:', uploadResponse.status);
 
       if (!uploadResponse.ok) {
         throw new Error(`Erro no upload: ${uploadResponse.status}`);
@@ -114,29 +108,38 @@ export function SimpleFileUploader({
               accept={acceptedTypes}
               onChange={handleFileSelect}
               disabled={isUploading}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+              className="hidden"
               id="file-upload"
+              ref={(input) => {
+                if (input) {
+                  (window as any).fileInput = input;
+                }
+              }}
             />
             <Button 
               disabled={isUploading}
               className="w-full max-w-xs"
-              asChild
+              onClick={() => {
+                const input = document.getElementById('file-upload') as HTMLInputElement;
+                if (input) {
+                  input.click();
+                }
+              }}
+              type="button"
             >
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <div className="flex items-center space-x-2">
-                  {isUploading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Carregando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-4 w-4" />
-                      <span>Selecionar Arquivo</span>
-                    </>
-                  )}
-                </div>
-              </label>
+              <div className="flex items-center space-x-2">
+                {isUploading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Carregando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" />
+                    <span>Selecionar Arquivo</span>
+                  </>
+                )}
+              </div>
             </Button>
           </div>
           
