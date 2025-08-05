@@ -118,7 +118,7 @@ export default function DocumentForm() {
         documentType: document.documentType || "",
         documentDate: document.documentDate ? new Date(document.documentDate).toISOString().split('T')[0] : "",
         authorType: document.authorType || "",
-        authorId: document.authorId || "",
+        authorId: document.authorType === "Vereador" ? String(document.activityId) : "",
         description: document.description || "",
         status: document.status || "",
         activityId: document.activityId ?? undefined,
@@ -148,13 +148,7 @@ export default function DocumentForm() {
         mimeType: formFile?.type || 'application/pdf'
       };
       
-      return apiRequest("/api/documents", {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+      return apiRequest("/api/documents", "POST", payload);
     },
     onSuccess: () => {
       toast({
@@ -192,13 +186,7 @@ export default function DocumentForm() {
         mimeType: formFile?.type || 'application/pdf'
       };
       
-      return apiRequest(`/api/documents/${documentId}`, {
-        method: "PUT",
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+      return apiRequest(`/api/documents/${documentId}`, "PUT", payload);
     },
     onSuccess: () => {
       toast({
@@ -457,7 +445,7 @@ export default function DocumentForm() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="none">Nenhum vereador selecionado</SelectItem>
-                          {councilors.map((councilor: any) => (
+                          {Array.isArray(councilors) && councilors.map((councilor: any) => (
                             <SelectItem key={councilor.id} value={councilor.id}>
                               {councilor.name}
                             </SelectItem>
@@ -648,20 +636,19 @@ export default function DocumentForm() {
                       maxNumberOfFiles={1}
                       maxFileSize={5242880} // 5MB
                       onGetUploadParameters={async () => {
-                        const response = await apiRequest("/api/documents/upload-url", {
-                          method: "POST"
-                        });
+                        const response = await apiRequest("/api/documents/upload-url", "POST");
                         return {
                           method: "PUT" as const,
                           url: response.uploadURL
                         };
                       }}
-                      onComplete={(result: UploadResult) => {
+                      onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
                         if (result.successful.length > 0) {
                           const uploadedFile = result.successful[0];
                           setUploadedFileURL(uploadedFile.uploadURL || "");
                           setUploadedFileName(uploadedFile.name || "");
-                          setFormFile(new File([], uploadedFile.name || ""));
+                          // Mark that a file was uploaded without creating a full File object
+                          setFormFile({name: uploadedFile.name || ""} as File);
                           
                           toast({
                             title: "Arquivo carregado",
