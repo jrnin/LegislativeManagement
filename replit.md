@@ -20,7 +20,7 @@ Preferred communication style: Simple, everyday language.
 - **Mobile**: React Native with Expo, React Native Paper for UI, React Navigation v6, and Context API for authentication.
 - **Database Schema**: Comprehensive schema including Users, Legislatures, Events, Legislative Activities, Documents, Committees, News System, Voting System, and Timeline.
 - **Authentication**: Replit Auth, session-based authentication, role-based access control (admin, councilor, public), email verification, and password reset.
-- **File Management**: Multi-tier upload system with Object Storage integration, validation, organized directory structure, download, preview, and persistent cloud storage.
+- **File Management**: Complete Object Storage integration with organized directory structure (/documents/YYYY/MM), SimpleFileUploader component replacing Uppy, presigned URL uploads, ACL policy management, and seamless document creation workflow.
 - **Legislative Activity Management**: Supports various activity types, detailed workflow statuses, 1:N relationship with events (allowing an activity to exist in multiple events), "Regime de Tramitação" field, and complete exercise year system allowing duplicate activity numbers across different exercise years (2024, 2025).
 - **Event Management**: Comprehensive CRUD, association with legislative activities and documents, attendance tracking, and committee meeting integration.
 - **Voting System**: Event-category based voting, individual and administrative voting interfaces, real-time statistics, and optimistic updates.
@@ -35,7 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Dashboard Widgets**: Displays recent events and legislative activities.
 - **Search and Filtering**: Robust search and filtering capabilities across activities, events, and news.
 - **Backup System**: Automated shell scripts for database and file backups, with an administrative web interface and retention policy.
-- **Object Storage**: Persistent cloud storage integration using Replit Object Storage with Google Cloud Storage backend, ACL policies, presigned URLs for direct uploads, seamless migration from local file system, full document module compatibility with 101 files (24.3 MB) successfully migrated, avatar cleanup capabilities with complete file removal from cloud storage, complete news image management with public ACL policies for transparent access, and public councilor avatar access without authentication for deployment compatibility.
+- **Object Storage**: Full production-ready integration with Google Cloud Storage backend, organized directory structure (/documents/YYYY/MM/), SimpleFileUploader component with native file input, presigned URL direct uploads, ACL policy management, seamless document creation workflow, 101 legacy files (24.3 MB) migrated, avatar cleanup capabilities, complete news image management with public ACL, and public councilor avatar access for deployment compatibility. Successfully tested with PORTARIA document upload and creation (January 2025).
 - **Real-time Features**: WebSocket support for notifications.
 
 ## External Dependencies
