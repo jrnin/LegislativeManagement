@@ -428,10 +428,11 @@ const quickServices = [
       external: true,
   },
   {
-    title: "Audiências",
-    description: "Calendário de audiências públicas, consultas e participação cidadã",
+    title: "Diárias",
+    description: "Confira as Diárias do legislativo, consultas e transparência",
     icon: Building,
-    href: "/public/audiencias"
+    href: "https://cmjaiba.cidadesmg.com.br/portaltransparencia/publica/execucaoOrcamentaria/diarias/diarias.xhtml",
+      external: true,
   }
 ];
 
