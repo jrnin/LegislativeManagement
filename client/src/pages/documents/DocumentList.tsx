@@ -207,7 +207,10 @@ export default function DocumentList() {
         const year = new Date(date).getFullYear();
         
         return (
-          <div className="flex flex-col">
+          <div 
+            className="flex flex-col cursor-pointer hover:text-blue-600 transition-colors"
+            onClick={() => navigate(`/documents/${row.original.id}`)}
+          >
             <div className="flex items-center">
               <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
               <span className="font-medium">
@@ -338,7 +341,11 @@ export default function DocumentList() {
   const GridView = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredDocuments.map((doc) => (
-        <Card key={doc.id} className="hover:shadow-lg transition-shadow duration-200">
+        <Card 
+          key={doc.id} 
+          className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+          onClick={() => navigate(`/documents/${doc.id}`)}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="space-y-1">
