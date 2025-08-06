@@ -16,7 +16,8 @@ import {
   Database,
   FolderTree,
   ArrowUpDown,
-  Cloud
+  Cloud,
+  HardDrive
 } from "lucide-react";
 import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -41,6 +42,7 @@ export default function Sidebar() {
     { name: "Legislaturas", href: "/legislatures", icon: Building },
     { name: "Auditoria Uploads", href: "/uploads-audit", icon: FolderTree },
     { name: "Saúde Object Storage", href: "/object-storage-health", icon: Cloud },
+    { name: "Backups do Sistema", href: "/system-backups", icon: HardDrive },
     { name: "Migração Arquivos", href: "/file-migration", icon: ArrowUpDown },
     { name: "Migração Documentos", href: "/document-migration", icon: FolderTree },
   ];

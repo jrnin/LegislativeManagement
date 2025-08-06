@@ -246,12 +246,12 @@ export default function VereadorDetalhesModerno() {
                   </div>
                 )}
                 
-                {councilor.address && (
+                {councilor.partido && (
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <MapPin className="h-5 w-5 text-green-600" />
                     <div>
-                      <p className="text-sm text-gray-600">Endereço</p>
-                      <p className="text-gray-900 font-medium">{councilor.address}</p>
+                      <p className="text-sm text-gray-600">Partido</p>
+                      <p className="text-gray-900 font-medium">{councilor.partido}</p>
                     </div>
                   </div>
                 )}
@@ -267,7 +267,7 @@ export default function VereadorDetalhesModerno() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {councilor.birthDate && (
+                {/* {councilor.birthDate && (
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <Calendar className="h-5 w-5 text-blue-600" />
                     <div>
@@ -277,7 +277,7 @@ export default function VereadorDetalhesModerno() {
                       </p>
                     </div>
                   </div>
-                )}
+                )} */}
                 
                 {councilor.education && (
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">

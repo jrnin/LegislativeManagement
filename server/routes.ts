@@ -1841,7 +1841,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create system backup
   app.post('/api/system/backup', requireAdmin, async (req, res) => {
     try {
-      const { spawn } = require('child_process');
+      const { spawn } = await import('child_process');
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
       
       console.log('Iniciando processo de backup do sistema...');
@@ -1884,7 +1884,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro no processo de backup:', error);
       res.status(500).json({
         success: false,

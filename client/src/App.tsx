@@ -34,6 +34,7 @@ import UploadsAudit from "@/pages/admin/UploadsAudit";
 import ObjectStorageTest from "@/pages/admin/ObjectStorageTest";
 import FileMigration from "@/pages/admin/FileMigration";
 import ObjectStorageHealth from "@/pages/admin/ObjectStorageHealth";
+import SystemBackups from "@/pages/admin/SystemBackups";
 import BackupManager from "@/components/backup/BackupManager";
 import DocumentMigrationPage from "@/pages/admin/DocumentMigrationPage";
 import PublicRoutes from "@/public/PublicRoutes";
@@ -83,6 +84,7 @@ function AuthenticatedApp() {
         <Route path="/file-migration" component={FileMigration} />
         <Route path="/object-storage-health" component={ObjectStorageHealth} />
         <Route path="/document-migration" component={DocumentMigrationPage} />
+        <Route path="/system-backups" component={SystemBackups} />
         <Route path="/backup" component={BackupManager} />
         <Route component={NotFound} />
       </Switch>
