@@ -283,6 +283,8 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return next();
   }
 
+  console.log(`[DEBUG AUTH] Checking auth for ${req.method} ${req.path}`);
+
   // Verificar primeiramente se o usuário está autenticado pelo Replit
   if (req.isAuthenticated && req.isAuthenticated()) {
     console.log("Usuário autenticado pelo Replit:", req.user);
@@ -292,8 +294,10 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 
   // Se não estiver autenticado pelo Replit, verificar autenticação pela sessão
   const userId = (req.session as any).userId;
+  console.log(`[DEBUG AUTH] Session userId: ${userId}`);
 
   if (!userId) {
+    console.log(`[DEBUG AUTH] No authentication found for ${req.method} ${req.path}`);
     return res.status(401).json({ message: "Você precisa estar autenticado para acessar este recurso." });
   }
 

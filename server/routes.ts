@@ -1596,6 +1596,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Download file
   app.get('/api/files/:type/:id', requireAuth, async (req, res) => {
+    console.log(`[DEBUG] Download request: ${req.method} ${req.path}`);
     try {
       const type = req.params.type;
       const id = Number(req.params.id);
