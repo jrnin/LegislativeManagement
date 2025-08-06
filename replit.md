@@ -34,7 +34,7 @@ Preferred communication style: Simple, everyday language.
 - **Public Interface**: Responsive pages for transparency, browsing legislative activities, document access, councilor profiles, and news.
 - **Dashboard Widgets**: Displays recent events and legislative activities.
 - **Search and Filtering**: Robust search and filtering capabilities across activities, events, and news.
-- **Backup System**: Automated shell scripts for database and file backups, with an administrative web interface and retention policy.
+- **Backup System**: Complete production-ready backup system with automated shell scripts for database and file backups, comprehensive web interface at /system-backups, retention policy (7 days), and 35 MB of verified backups (database: 9.2 MB, uploads: 7.7 MB, config: 156 KB, source: 560 KB).
 - **Object Storage**: Full production-ready integration with Google Cloud Storage backend, organized directory structure (/documents/YYYY/MM/), SimpleFileUploader component with native file input, presigned URL direct uploads, ACL policy management, seamless document creation workflow, 101 legacy files (24.3 MB) migrated, avatar cleanup capabilities, complete news image management with public ACL, and public councilor avatar access for deployment compatibility. Successfully tested with PORTARIA document upload and creation (January 2025).
 - **Real-time Features**: WebSocket support for notifications.
 
