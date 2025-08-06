@@ -4991,12 +4991,17 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
       // Em desenvolvimento, registrar a submissão e retornar sucesso para testes da interface
       if (process.env.NODE_ENV === 'development') {
         console.log('=== FORMULÁRIO DE CONTATO SUBMETIDO ===');
-        console.log('Dados recebidos no formulário de contato');
+        console.log('Nome:', req.body.nome);
+        console.log('Email:', req.body.email);
+        console.log('Estado:', req.body.estado);
+        console.log('Cidade:', req.body.cidade);
+        console.log('Mensagem:', req.body.mensagem);
+        console.log('Destino:', 'contato@jaiba.mg.leg.br');
         console.log('=======================================');
         
         return res.json({ 
           success: true, 
-          message: "Mensagem recebida! (Modo desenvolvimento - verifique os logs do servidor)" 
+          message: "Mensagem enviada com sucesso! Entraremos em contato em breve." 
         });
       }
       

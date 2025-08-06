@@ -59,6 +59,7 @@ export default function ContatoPageFunctional() {
           mensagem: ''
         });
       } else {
+        console.error('Erro na resposta:', data);
         setMessage(data.message || 'Erro ao enviar mensagem. Tente novamente.');
       }
     } catch (error) {

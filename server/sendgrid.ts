@@ -91,7 +91,7 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       
       // Para ambiente de desenvolvimento, simular sucesso após log do erro
       if (process.env.NODE_ENV === 'development') {
-        console.log('MODO DESENVOLVIMENTO: Simulando envio bem-sucedido');
+        console.log('MODO DESENVOLVIMENTO: Email simulado (SendGrid com restrição de IP)');
         return true;
       }
       
