@@ -4449,12 +4449,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rota pública para obter detalhes de um vereador específico (sem autenticação)
-  app.get('/api/public/councilors/:id', async (req, res) => {
+  // Rota pública para obter detalhes de um vereador específico por ID ou slug (sem autenticação)
+  app.get('/api/public/councilors/:identifier', async (req, res) => {
     try {
-      const { id } = req.params;
-      // Buscar o vereador primeiro
-      const user = await storage.getUser(id);
+      const { identifier } = req.params;
+      
+      // Tentar buscar por slug primeiro, depois por ID
+      let user = await storage.getUserBySlug(identifier);
+      
+      if (!user) {
+        user = await storage.getUser(identifier);
+      }
       
       if (!user) {
         return res.status(404).json({ message: "Vereador não encontrado" });
@@ -4465,21 +4470,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Vereador não encontrado" });
       }
       
-      // Buscar apenas as atividades e comissões relacionadas
-      const activities = await storage.getLegislativeActivitiesByAuthor(id);
-      const committees = await storage.getCommitteesByMember(id);
-      
-      // Montar o objeto de resposta
-      const councilor = {
+      // Converter avatar URL para formato público para exibição sem autenticação
+      const publicUser = {
         ...user,
-        activities,
-        documents: [], // Retornamos um array vazio para evitar erros
-        committees
+        profileImageUrl: user.profileImageUrl ? 
+          user.profileImageUrl.replace('/objects/', '/public-objects/') : 
+          user.profileImageUrl
       };
       
-      res.json(councilor);
+      res.json(publicUser);
     } catch (error) {
-      console.error(`Erro ao buscar detalhes do vereador ${req.params.id}:`, error);
+      console.error(`Erro ao buscar detalhes do vereador ${req.params.identifier}:`, error);
       res.status(500).json({ message: "Erro ao buscar detalhes do vereador" });
     }
   });
@@ -5125,13 +5126,17 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
-  // Rota pública para obter documentos de um vereador específico (sem autenticação)
-  app.get('/api/public/councilors/:id/documents', async (req, res) => {
+  // Rota pública para obter documentos de um vereador específico por ID ou slug (sem autenticação)
+  app.get('/api/public/councilors/:identifier/documents', async (req, res) => {
     try {
-      const { id } = req.params;
+      const { identifier } = req.params;
       
-      // Verificar se o vereador existe
-      const user = await storage.getUser(id);
+      // Tentar buscar por slug primeiro, depois por ID
+      let user = await storage.getUserBySlug(identifier);
+      
+      if (!user) {
+        user = await storage.getUser(identifier);
+      }
       
       if (!user) {
         return res.status(404).json({ message: "Vereador não encontrado" });
@@ -5143,7 +5148,7 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
       }
       
       // Buscar documentos relacionados ao vereador usando o método do storage
-      const userDocuments = await storage.getDocumentsByUser(id);
+      const userDocuments = await storage.getDocumentsByUser(user.id);
       
       // Filtrar apenas documentos públicos ou aprovados para a visualização pública
       const publicDocuments = userDocuments.filter(doc => 
@@ -5157,13 +5162,17 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
-  // Rota pública para obter atividades legislativas de um vereador específico (sem autenticação)
-  app.get('/api/public/councilors/:id/activities', async (req, res) => {
+  // Rota pública para obter atividades legislativas de um vereador específico por ID ou slug (sem autenticação)
+  app.get('/api/public/councilors/:identifier/activities', async (req, res) => {
     try {
-      const { id } = req.params;
+      const { identifier } = req.params;
       
-      // Verificar se o vereador existe
-      const user = await storage.getUser(id);
+      // Tentar buscar por slug primeiro, depois por ID
+      let user = await storage.getUserBySlug(identifier);
+      
+      if (!user) {
+        user = await storage.getUser(identifier);
+      }
       
       if (!user) {
         return res.status(404).json({ message: "Vereador não encontrado" });
@@ -5174,12 +5183,12 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
         return res.status(404).json({ message: "Vereador não encontrado" });
       }
       
-      console.log(`Buscando atividades legislativas para o usuário ${id}`);
+      console.log(`Buscando atividades legislativas para o usuário ${user.id}`);
       
       // Buscar atividades legislativas do vereador
-      const activities = await storage.getLegislativeActivitiesByAuthor(id);
+      const activities = await storage.getLegislativeActivitiesByAuthor(user.id);
       
-      console.log(`Encontradas ${activities.length} atividades para o usuário ${id}`);
+      console.log(`Encontradas ${activities.length} atividades para o usuário ${user.id}`);
       
       res.json(activities);
     } catch (error) {
@@ -5188,13 +5197,17 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
-  // Rota pública para obter comissões de um vereador específico (sem autenticação)
-  app.get('/api/public/councilors/:id/committees', async (req, res) => {
+  // Rota pública para obter comissões de um vereador específico por ID ou slug (sem autenticação)
+  app.get('/api/public/councilors/:identifier/committees', async (req, res) => {
     try {
-      const { id } = req.params;
+      const { identifier } = req.params;
       
-      // Verificar se o vereador existe
-      const user = await storage.getUser(id);
+      // Tentar buscar por slug primeiro, depois por ID
+      let user = await storage.getUserBySlug(identifier);
+      
+      if (!user) {
+        user = await storage.getUser(identifier);
+      }
       
       if (!user) {
         return res.status(404).json({ message: "Vereador não encontrado" });
@@ -5206,9 +5219,9 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
       }
       
       // Buscar comissões do vereador
-      const committees = await storage.getCommitteesByMember(id);
+      const committees = await storage.getCommitteesByMember(user.id);
       
-      console.log(`Usuário ${id} ${committees.length > 0 ? 'é membro de' : 'não é membro de nenhuma'} ${committees.length > 0 ? committees.length + ' comissões' : 'comissão'}`);
+      console.log(`Usuário ${user.id} ${committees.length > 0 ? 'é membro de' : 'não é membro de nenhuma'} ${committees.length > 0 ? committees.length + ' comissões' : 'comissão'}`);
       
       res.json(committees);
     } catch (error) {

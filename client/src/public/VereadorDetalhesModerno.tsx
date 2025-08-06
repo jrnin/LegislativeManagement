@@ -13,6 +13,7 @@ import texturaUrl from '@/assets/textura.jpg';
 interface Councilor {
   id: string;
   name: string;
+  slug?: string;
   profileImageUrl?: string;
   email: string;
   role: string;

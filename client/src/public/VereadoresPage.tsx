@@ -15,6 +15,7 @@ import { Helmet } from 'react-helmet';
 interface Councilor {
   id: string;
   name: string;
+  slug?: string;
   profileImageUrl?: string;
   email: string;
   role: string;
@@ -25,7 +26,7 @@ interface Councilor {
 
 // Componente para o cartão de perfil de vereador
 const CouncilorCard = ({ councilor }: { councilor: Councilor }) => (
-  <Link href={`/vereadores/${councilor.id}`}>
+  <Link href={`/vereadores/${councilor.slug || councilor.id}`}>
     <Card className="text-center hover:shadow-lg transition-all h-full cursor-pointer">
       <CardHeader className="pb-2 pt-6">
         <div className="flex justify-center mb-4">
