@@ -95,37 +95,83 @@ export class ObjectStorageService {
   }
 
   // Downloads an object to the response.
-  async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
+  async downloadObject(file: File, res: Response, options: { 
+    cacheTtlSec?: number, 
+    fileName?: string, 
+    forceDownload?: boolean 
+  } = {}) {
+    const { cacheTtlSec = 300, fileName, forceDownload = false } = options; // Reduced cache to 5 minutes
+
     try {
+      // Verify file exists before attempting download
+      const [exists] = await file.exists();
+      if (!exists) {
+        console.error(`File does not exist: ${file.name}`);
+        throw new ObjectNotFoundError();
+      }
+
       // Get file metadata
       const [metadata] = await file.getMetadata();
+      console.log(`Downloading file: ${file.name}, size: ${metadata.size}, contentType: ${metadata.contentType}`);
+      
       // Get the ACL policy for the object.
       const aclPolicy = await getObjectAclPolicy(file);
       const isPublic = aclPolicy?.visibility === "public";
+      
       // Set appropriate headers
-      res.set({
+      const headers: Record<string, string> = {
         "Content-Type": metadata.contentType || "application/octet-stream",
-        "Content-Length": metadata.size,
-        "Cache-Control": `${
-          isPublic ? "public" : "private"
-        }, max-age=${cacheTtlSec}`,
-      });
+        "Content-Length": metadata.size?.toString() || "0",
+        "Cache-Control": `${isPublic ? "public" : "private"}, max-age=${cacheTtlSec}`,
+        "ETag": metadata.etag || `"${Date.now()}"`,
+      };
 
-      // Stream the file to the response
+      // Set Content-Disposition header
+      if (fileName) {
+        const disposition = forceDownload ? "attachment" : "inline";
+        headers["Content-Disposition"] = `${disposition}; filename="${encodeURIComponent(fileName)}"`;
+      }
+
+      res.set(headers);
+
+      // Stream the file to the response with better error handling
       const stream = file.createReadStream();
+      
+      let streamEnded = false;
 
       stream.on("error", (err) => {
-        console.error("Stream error:", err);
+        console.error("Stream error during file download:", err);
+        streamEnded = true;
         if (!res.headersSent) {
-          res.status(500).json({ error: "Error streaming file" });
+          res.status(500).json({ error: "Erro ao transmitir arquivo", details: err.message });
+        } else {
+          res.destroy();
+        }
+      });
+
+      stream.on("end", () => {
+        streamEnded = true;
+        console.log(`File download completed: ${file.name}`);
+      });
+
+      // Handle response close/abort
+      res.on("close", () => {
+        if (!streamEnded) {
+          console.log(`Response closed before stream ended: ${file.name}`);
+          stream.destroy();
         }
       });
 
       stream.pipe(res);
-    } catch (error) {
+      
+    } catch (error: any) {
       console.error("Error downloading file:", error);
       if (!res.headersSent) {
-        res.status(500).json({ error: "Error downloading file" });
+        if (error instanceof ObjectNotFoundError) {
+          res.status(404).json({ error: "Arquivo não encontrado", details: "O arquivo pode ter sido movido ou excluído" });
+        } else {
+          res.status(500).json({ error: "Erro ao baixar arquivo", details: error?.message || "Erro desconhecido" });
+        }
       }
     }
   }
@@ -185,12 +231,16 @@ export class ObjectStorageService {
 
   // Gets the object entity file from the object path.
   async getObjectEntityFile(objectPath: string): Promise<File> {
+    console.log(`[ObjectStorage] Getting file for path: ${objectPath}`);
+    
     if (!objectPath.startsWith("/objects/")) {
+      console.error(`[ObjectStorage] Invalid path format: ${objectPath}`);
       throw new ObjectNotFoundError();
     }
 
     const parts = objectPath.slice(1).split("/");
     if (parts.length < 2) {
+      console.error(`[ObjectStorage] Invalid path parts: ${parts}`);
       throw new ObjectNotFoundError();
     }
 
@@ -199,15 +249,30 @@ export class ObjectStorageService {
     if (!entityDir.endsWith("/")) {
       entityDir = `${entityDir}/`;
     }
+    
     const objectEntityPath = `${entityDir}${entityId}`;
+    console.log(`[ObjectStorage] Full entity path: ${objectEntityPath}`);
+    
     const { bucketName, objectName } = parseObjectPath(objectEntityPath);
+    console.log(`[ObjectStorage] Bucket: ${bucketName}, Object: ${objectName}`);
+    
     const bucket = objectStorageClient.bucket(bucketName);
     const objectFile = bucket.file(objectName);
-    const [exists] = await objectFile.exists();
-    if (!exists) {
+    
+    try {
+      const [exists] = await objectFile.exists();
+      console.log(`[ObjectStorage] File exists: ${exists}`);
+      
+      if (!exists) {
+        console.error(`[ObjectStorage] File not found in bucket: ${bucketName}/${objectName}`);
+        throw new ObjectNotFoundError();
+      }
+      
+      return objectFile;
+    } catch (error: any) {
+      console.error(`[ObjectStorage] Error checking file existence:`, error);
       throw new ObjectNotFoundError();
     }
-    return objectFile;
   }
 
   normalizeObjectEntityPath(

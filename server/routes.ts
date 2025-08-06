@@ -28,6 +28,7 @@ import {
   ObjectNotFoundError,
 } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
+import { ObjectStorageDiagnostics } from "./objectStorageDiagnostics";
 import { ObjectPermission } from "./objectAcl";
 
 // Declarar a função sendNotification que será inicializada no escopo global
@@ -1746,10 +1747,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName || 'view')}"`);
           }
           
-          console.log(`Baixando arquivo do Object Storage: ${fileName} (${fileType})`);
+          console.log(`[Download] Serving Object Storage file: ${filePath}, download: ${isDownload}`);
           
-          // Use ObjectStorageService to download the file
-          await objectStorageService.downloadObject(objectFile, res);
+          await objectStorageService.downloadObject(objectFile, res, {
+            fileName: fileName || 'document',
+            forceDownload: isDownload,
+            cacheTtlSec: 300 // 5 minutes cache
+          });
           
         } catch (objectError) {
           console.error("Error accessing Object Storage file:", objectError);
@@ -1801,6 +1805,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // OBJECT STORAGE DIAGNOSTICS ROUTES
+  
+  // Get Object Storage health report
+  app.get('/api/admin/object-storage/health', requireAdmin, async (req, res) => {
+    try {
+      const diagnostics = new ObjectStorageDiagnostics();
+      const healthReport = await diagnostics.getHealthReport();
+      res.json(healthReport);
+    } catch (error: any) {
+      console.error("Error getting Object Storage health report:", error);
+      res.status(500).json({ message: "Erro ao obter relatório de saúde do Object Storage" });
+    }
+  });
+
+  // Cleanup missing Object Storage references
+  app.get('/api/admin/object-storage/cleanup', requireAdmin, async (req, res) => {
+    try {
+      const diagnostics = new ObjectStorageDiagnostics();
+      const dryRun = req.query.dryRun !== 'false'; // Default to dry run
+      const result = await diagnostics.cleanupMissingReferences(dryRun);
+      res.json({ 
+        ...result, 
+        dryRun,
+        message: dryRun ? "Simulação executada. Use ?dryRun=false para executar a limpeza." : "Limpeza executada com sucesso."
+      });
+    } catch (error: any) {
+      console.error("Error cleaning up Object Storage references:", error);
+      res.status(500).json({ message: "Erro ao limpar referências do Object Storage" });
+    }
+  });
+
   // BACKUP AND RESTORE ROUTES
   
   // Create system backup

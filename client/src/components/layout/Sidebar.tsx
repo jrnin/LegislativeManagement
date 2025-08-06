@@ -15,7 +15,8 @@ import {
   Newspaper,
   Database,
   FolderTree,
-  ArrowUpDown
+  ArrowUpDown,
+  Cloud
 } from "lucide-react";
 import logoPath from '@assets/logo.png';
 import { useAuth } from "@/hooks/useAuth";
@@ -39,6 +40,7 @@ export default function Sidebar() {
     { name: "Mesa Diretora", href: "/boards", icon: Shield },
     { name: "Legislaturas", href: "/legislatures", icon: Building },
     { name: "Auditoria Uploads", href: "/uploads-audit", icon: FolderTree },
+    { name: "Saúde Object Storage", href: "/object-storage-health", icon: Cloud },
     { name: "Migração Arquivos", href: "/file-migration", icon: ArrowUpDown },
     { name: "Migração Documentos", href: "/document-migration", icon: FolderTree },
   ];
