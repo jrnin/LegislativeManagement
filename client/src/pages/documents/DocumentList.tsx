@@ -263,58 +263,7 @@ export default function DocumentList() {
         return getStatusBadge(status);
       },
     },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        const document = row.original;
-        const isAdmin = user?.role === "admin";
-        
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Abrir menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              
-              {document.filePath && (
-                <DropdownMenuItem 
-                  onClick={() => window.open(`/api/files/documents/${document.id}`, '_blank')}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Baixar Arquivo
-                </DropdownMenuItem>
-              )}
-              
-              <DropdownMenuItem onClick={() => navigate(`/documents/${document.id}`)}>
-                <History className="mr-2 h-4 w-4" />
-                Ver Histórico
-              </DropdownMenuItem>
-              
-              {isAdmin && (
-                <DropdownMenuItem onClick={() => navigate(`/documents/${document.id}/edit`)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Editar
-                </DropdownMenuItem>
-              )}
-              
-              {isAdmin && (
-                <DropdownMenuItem
-                  onClick={() => handleDeleteDocument(document)}
-                  className="text-destructive"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Excluir
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    },
+
   ];
 
   const table = useReactTable({
