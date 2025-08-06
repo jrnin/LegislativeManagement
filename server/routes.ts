@@ -1645,40 +1645,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Tipo inválido" });
       }
       
-      console.log(`Verificando se arquivo existe: ${filePath}`);
+      console.log(`Verificando arquivo: ${filePath}`);
       
-      // Check if file exists
-      if (!fs.existsSync(filePath)) {
-        console.log(`Arquivo não encontrado no sistema de arquivos: ${filePath}`);
+      // Check if this is an Object Storage file path (starts with /objects/)
+      if (filePath.startsWith('/objects/')) {
+        console.log(`Arquivo está no Object Storage: ${filePath}`);
         
-        // Only log the missing file, DO NOT automatically clean database
-        // This prevents accidental data loss when files are temporarily unavailable
-        console.log(`AVISO: Arquivo referenciado não encontrado para ${type} ID ${id}: ${filePath}`);
-        
-        return res.status(404).json({ 
-          message: "Arquivo não encontrado no servidor. Entre em contato com o administrador." 
-        });
-      }
-      
-      // Check if download is requested
-      const isDownload = req.query.download === 'true';
-      
-      // Set appropriate headers
-      res.setHeader('Content-Type', fileType ? fileType : 'application/octet-stream');
-      
-      if (isDownload) {
-        // Force download with attachment disposition
-        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName || 'download')}"`);
+        try {
+          const objectStorageService = new ObjectStorageService();
+          const objectFile = await objectStorageService.getObjectEntityFile(filePath);
+          
+          // Check if download is requested
+          const isDownload = req.query.download === 'true';
+          
+          // Set appropriate headers
+          if (isDownload) {
+            // Force download with attachment disposition
+            res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName || 'download')}"`);
+          } else {
+            // Allow browser to display the file if possible (PDF, images, etc)
+            res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName || 'view')}"`);
+          }
+          
+          console.log(`Baixando arquivo do Object Storage: ${fileName} (${fileType})`);
+          
+          // Use ObjectStorageService to download the file
+          await objectStorageService.downloadObject(objectFile, res);
+          
+        } catch (objectError) {
+          console.error("Error accessing Object Storage file:", objectError);
+          return res.status(404).json({ 
+            message: "Arquivo não encontrado no Object Storage. Entre em contato com o administrador." 
+          });
+        }
       } else {
-        // Allow browser to display the file if possible (PDF, images, etc)
-        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName || 'view')}"`);
+        // Legacy local file system check
+        console.log(`Verificando arquivo local: ${filePath}`);
+        
+        // Check if file exists
+        if (!fs.existsSync(filePath)) {
+          console.log(`Arquivo não encontrado no sistema de arquivos: ${filePath}`);
+          
+          // Only log the missing file, DO NOT automatically clean database
+          // This prevents accidental data loss when files are temporarily unavailable
+          console.log(`AVISO: Arquivo referenciado não encontrado para ${type} ID ${id}: ${filePath}`);
+          
+          return res.status(404).json({ 
+            message: "Arquivo não encontrado no servidor. Entre em contato com o administrador." 
+          });
+        }
+        
+        // Check if download is requested
+        const isDownload = req.query.download === 'true';
+        
+        // Set appropriate headers
+        res.setHeader('Content-Type', fileType ? fileType : 'application/octet-stream');
+        
+        if (isDownload) {
+          // Force download with attachment disposition
+          res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName || 'download')}"`);
+        } else {
+          // Allow browser to display the file if possible (PDF, images, etc)
+          res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName || 'view')}"`);
+        }
+        
+        console.log(`Enviando arquivo local: ${fileName} (${fileType})`);
+        
+        // Stream the file
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(res);
       }
       
-      console.log(`Enviando arquivo: ${fileName} (${fileType})`);
-      
-      // Stream the file
-      const fileStream = fs.createReadStream(filePath);
-      fileStream.pipe(res);
     } catch (error) {
       console.error("Error downloading file:", error);
       res.status(500).json({ message: "Erro ao baixar arquivo" });
