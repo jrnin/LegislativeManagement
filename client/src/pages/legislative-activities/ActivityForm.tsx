@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LegislativeActivity, Event, User } from "@shared/schema";
 import { formatDate } from "@/utils/formatters";
 import { File, FileCheck, Upload } from "lucide-react";
+import { SimpleFileUploader } from "@/components/SimpleFileUploader";
 
 const formSchema = z.object({
   activityNumber: z.coerce.number().int().positive({ message: "Número da atividade deve ser positivo" }),
@@ -44,6 +45,8 @@ export default function ActivityForm() {
   const isEditing = !!activityId;
   const { toast } = useToast();
   const [formFile, setFormFile] = useState<File | null>(null);
+  const [uploadedFileURL, setUploadedFileURL] = useState<string>("");
+  const [uploadedFileName, setUploadedFileName] = useState<string>("");
 
   // Definir um tipo personalizado para a data da atividade que pode ser uma string
   interface ActivityWithStringDate extends Omit<LegislativeActivity, 'activityDate'> {
@@ -129,9 +132,11 @@ export default function ActivityForm() {
         formData.append("authorIds", authorId);
       });
       
-      // Append file if present
-      if (formFile) {
-        formData.append("file", formFile);
+      // Append Object Storage file info if present
+      if (uploadedFileURL) {
+        formData.append("uploadedFileURL", uploadedFileURL);
+        formData.append("originalFileName", uploadedFileName);
+        formData.append("fileType", formFile?.type || "application/pdf");
       }
       
       const response = await fetch("/api/activities", {
@@ -188,9 +193,11 @@ export default function ActivityForm() {
         formData.append("authorIds", authorId);
       });
       
-      // Append file if present
-      if (formFile) {
-        formData.append("file", formFile);
+      // Append Object Storage file info if present
+      if (uploadedFileURL) {
+        formData.append("uploadedFileURL", uploadedFileURL);
+        formData.append("originalFileName", uploadedFileName);
+        formData.append("fileType", formFile?.type || "application/pdf");
       }
       
       const response = await fetch(`/api/activities/${activityId}`, {
@@ -597,41 +604,17 @@ export default function ActivityForm() {
                 <div>
                   <FormLabel htmlFor="file">Documento</FormLabel>
                   <div className="mt-2">
-                    <div className="flex items-center justify-center w-full">
-                      <label 
-                        htmlFor="file-upload" 
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                      >
-                        {formFile ? (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <FileCheck className="w-8 h-8 mb-3 text-green-500" />
-                            <p className="mb-2 text-sm text-gray-500">
-                              <span className="font-semibold">{formFile.name}</span>
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {(formFile.size / 1024 / 1024).toFixed(2)} MB
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Upload className="w-8 h-8 mb-3 text-gray-400" />
-                            <p className="mb-2 text-sm text-gray-500">
-                              <span className="font-semibold">Clique para enviar</span> ou arraste e solte
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT (max. 10MB)
-                            </p>
-                          </div>
-                        )}
-                        <input 
-                          id="file-upload" 
-                          type="file" 
-                          className="hidden" 
-                          onChange={handleFileChange}
-                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-                        />
-                      </label>
-                    </div>
+                    <SimpleFileUploader
+                      uploadUrlEndpoint="/api/activities/upload-url"
+                      onUploadSuccess={(uploadedFileURL: string, fileName: string) => {
+                        setUploadedFileURL(uploadedFileURL);
+                        setUploadedFileName(fileName);
+                        console.log("File uploaded successfully:", { uploadedFileURL, fileName });
+                      }}
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                      maxSizeMB={10}
+                      description="PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT (max. 10MB)"
+                    />
                   </div>
                   {activity && activity.fileName && (
                     <div className="mt-4">

@@ -28,6 +28,7 @@ import {
   ObjectNotFoundError,
 } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
+import { ObjectPermission } from "./objectAcl";
 
 // Declarar a função sendNotification que será inicializada no escopo global
 let sendNotification: (target: 'all' | string | string[], notification: any) => void;
@@ -1094,8 +1095,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Create legislative activity
-  app.post('/api/activities', requireAuth, handleActivityUpload('file'), async (req: any, res) => {
+  // Create legislative activity with Object Storage support
+  app.post('/api/activities', requireAuth, async (req: any, res) => {
     try {
       const schema = z.object({
         activityNumber: z.number().int().positive(),
@@ -1121,15 +1122,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = schema.parse(data);
       
-      // Handle file upload if present
+      // Handle Object Storage file upload if present
       let fileInfo = {};
       
-      if (req.file) {
-        fileInfo = {
-          filePath: req.file.path,
-          fileName: req.file.originalname,
-          fileType: req.file.mimetype,
-        };
+      if (req.body.uploadedFileURL) {
+        console.log(`[DEBUG] Processing file upload for new activity:`, req.body.uploadedFileURL);
+        
+        try {
+          const objectStorageService = new ObjectStorageService();
+          const userId = req.user?.id;
+          
+          // Set ACL policy for uploaded file
+          const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
+            req.body.uploadedFileURL,
+            {
+              owner: userId,
+              visibility: 'private',
+              aclRules: [{
+                group: { type: 'admin_only' as any, id: 'admin' },
+                permission: ObjectPermission.READ
+              }]
+            }
+          );
+          
+          fileInfo = {
+            filePath: cloudPath,
+            fileName: req.body.originalFileName || 'document.pdf',
+            fileType: req.body.fileType || 'application/pdf',
+          };
+          
+          console.log(`[DEBUG] File stored in Object Storage:`, { cloudPath, fileName: fileInfo.fileName });
+          
+        } catch (error) {
+          console.error(`[ERROR] Failed to process Object Storage upload:`, error);
+          return res.status(500).json({ message: "Erro ao processar upload do arquivo" });
+        }
       }
       
       // Create activity
@@ -1180,8 +1207,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Update legislative activity
-  app.put('/api/activities/:id', requireAuth, handleActivityUpload('file'), async (req: any, res) => {
+  // Update legislative activity with Object Storage support
+  app.put('/api/activities/:id', requireAuth, async (req: any, res) => {
     try {
       const activityId = Number(req.params.id);
       
@@ -1229,19 +1256,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = schema.parse(data);
       
-      // Handle file upload if present
+      // Handle Object Storage file upload if present
       let fileInfo = {};
       
-      if (req.file) {
-        fileInfo = {
-          filePath: req.file.path,
-          fileName: req.file.originalname,
-          fileType: req.file.mimetype,
-        };
+      if (req.body.uploadedFileURL) {
+        console.log(`[DEBUG] Processing file upload for activity ${activityId}:`, req.body.uploadedFileURL);
         
-        // If there was a previous file, delete it
-        if (currentActivity.filePath && fs.existsSync(currentActivity.filePath)) {
-          fs.unlinkSync(currentActivity.filePath);
+        try {
+          const objectStorageService = new ObjectStorageService();
+          const userId = req.user?.id;
+          
+          // Set ACL policy for uploaded file
+          const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
+            req.body.uploadedFileURL,
+            {
+              owner: userId,
+              visibility: 'private',
+              aclRules: [{
+                group: { type: 'admin_only' as any, id: 'admin' },
+                permission: ObjectPermission.READ
+              }]
+            }
+          );
+          
+          fileInfo = {
+            filePath: cloudPath,
+            fileName: req.body.originalFileName || 'document.pdf',
+            fileType: req.body.fileType || 'application/pdf',
+          };
+          
+          console.log(`[DEBUG] File stored in Object Storage:`, { cloudPath, fileName: fileInfo.fileName });
+          
+          // Clean up old file if it exists and is not an Object Storage path
+          if (currentActivity.filePath && 
+              !currentActivity.filePath.startsWith('/objects/') && 
+              fs.existsSync(currentActivity.filePath)) {
+            console.log(`[DEBUG] Cleaning up old local file: ${currentActivity.filePath}`);
+            fs.unlinkSync(currentActivity.filePath);
+          }
+          
+        } catch (error) {
+          console.error(`[ERROR] Failed to process Object Storage upload:`, error);
+          return res.status(500).json({ message: "Erro ao processar upload do arquivo" });
         }
       }
       
@@ -1305,6 +1361,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting activity:", error);
       res.status(500).json({ message: "Erro ao excluir atividade" });
+    }
+  });
+  
+  // Get upload URL for activities
+  app.post('/api/activities/upload-url', requireAuth, async (req, res) => {
+    try {
+      console.log(`[DEBUG] Generating upload URL for activity`);
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      console.log(`[DEBUG] Generated upload URL for activity:`, uploadURL);
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error generating upload URL:", error);
+      res.status(500).json({ message: "Erro ao gerar URL de upload" });
     }
   });
   
