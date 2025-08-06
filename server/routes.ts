@@ -1630,6 +1630,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (type === 'documents') {
         const document = await storage.getDocument(id);
         
+        console.log(`Documento encontrado:`, {
+          id: document?.id,
+          hasFilePath: !!document?.filePath,
+          filePath: document?.filePath,
+          fileName: document?.fileName,
+          fileType: document?.fileType
+        });
+        
         if (!document) {
           return res.status(404).json({ message: "Documento não encontrado" });
         }
