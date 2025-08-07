@@ -546,17 +546,38 @@ export default function SessoesPage() {
                   </div>
 
                   <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const page = totalPages <= 5 
-                        ? i + 1 
-                        : Math.max(1, Math.min(
-                            currentPage - 2 + i,
-                            totalPages - 4 + i
-                          ));
+                    {(() => {
+                      const pages = [];
+                      const maxVisiblePages = 5;
                       
-                      if (page > totalPages) return null;
+                      if (totalPages <= maxVisiblePages) {
+                        // Show all pages if total is small
+                        for (let i = 1; i <= totalPages; i++) {
+                          pages.push(i);
+                        }
+                      } else {
+                        // Show pages around current page
+                        let startPage = Math.max(1, currentPage - 2);
+                        let endPage = Math.min(totalPages, currentPage + 2);
+                        
+                        // Adjust if we're near the beginning
+                        if (startPage <= 3) {
+                          startPage = 1;
+                          endPage = Math.min(maxVisiblePages, totalPages);
+                        }
+                        
+                        // Adjust if we're near the end
+                        if (endPage >= totalPages - 2) {
+                          endPage = totalPages;
+                          startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+                        }
+                        
+                        for (let i = startPage; i <= endPage; i++) {
+                          pages.push(i);
+                        }
+                      }
                       
-                      return (
+                      return pages.map((page) => (
                         <Button
                           key={page}
                           variant={currentPage === page ? "default" : "outline"}
@@ -566,22 +587,8 @@ export default function SessoesPage() {
                         >
                           {page}
                         </Button>
-                      );
-                    })}
-                    
-                    {totalPages > 5 && currentPage < totalPages - 2 && (
-                      <>
-                        {currentPage < totalPages - 3 && <span className="px-2">...</span>}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => goToPage(totalPages)}
-                          className="w-10"
-                        >
-                          {totalPages}
-                        </Button>
-                      </>
-                    )}
+                      ));
+                    })()}
                   </div>
 
                   <div className="flex items-center gap-2">
