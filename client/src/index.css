@@ -150,6 +150,14 @@
   }
 }
 
+/* Custom Rich Text Editor Placeholder */
+[contenteditable][data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-style: italic;
+  pointer-events: none;
+}
+
 /* Estilos para Alto Contraste */
 .high-contrast {
   filter: contrast(150%) !important;

@@ -25,7 +25,7 @@ import {
   X
 } from "lucide-react";
 
-// Rich text editor component
+// Rich text editor component with Flowbite styling
 const RichTextEditor = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
   const [editorValue, setEditorValue] = useState(value || '');
 
@@ -34,93 +34,124 @@ const RichTextEditor = ({ value, onChange }: { value: string; onChange: (value: 
     onChange(content);
   };
 
+  const toolbarButtonClass = "p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600";
+
   return (
-    <div className="border border-gray-300 rounded-lg">
-      <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap gap-1">
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => document.execCommand('bold')}
-        >
-          <strong>B</strong>
-        </button>
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => document.execCommand('italic')}
-        >
-          <em>I</em>
-        </button>
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => document.execCommand('underline')}
-        >
-          <u>U</u>
-        </button>
-        <div className="border-l border-gray-300 mx-1"></div>
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => document.execCommand('formatBlock', false, 'h1')}
-        >
-          H1
-        </button>
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => document.execCommand('formatBlock', false, 'h2')}
-        >
-          H2
-        </button>
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => document.execCommand('formatBlock', false, 'h3')}
-        >
-          H3
-        </button>
-        <div className="border-l border-gray-300 mx-1"></div>
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => document.execCommand('insertUnorderedList')}
-        >
-          UL
-        </button>
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => document.execCommand('insertOrderedList')}
-        >
-          OL
-        </button>
-        <button
-          type="button"
-          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
-          onClick={() => {
-            const url = prompt('Digite a URL do link:');
-            if (url) document.execCommand('createLink', false, url);
-          }}
-        >
-          Link
-        </button>
+    <div className="w-full border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+      <div className="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
+        <div className="flex flex-wrap items-center divide-gray-200 sm:divide-x dark:divide-gray-600">
+          <div className="flex items-center space-x-1 sm:pr-4">
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => document.execCommand('bold')}
+              title="Negrito"
+            >
+              <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6V4Zm0 8h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6v-8Z"/>
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => document.execCommand('italic')}
+              title="Itálico"
+            >
+              <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m8.874 19 6.143-14M6 19h6m-7-14h6"/>
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => document.execCommand('underline')}
+              title="Sublinhado"
+            >
+              <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M6 19h12M8 5v9a4 4 0 0 0 8 0V5M6 5h4m4 0h4"/>
+              </svg>
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center space-x-1 sm:pl-4">
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => document.execCommand('formatBlock', false, 'h1')}
+              title="Título 1"
+            >
+              <span className="text-sm font-bold">H1</span>
+            </button>
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => document.execCommand('formatBlock', false, 'h2')}
+              title="Título 2"
+            >
+              <span className="text-sm font-bold">H2</span>
+            </button>
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => document.execCommand('formatBlock', false, 'h3')}
+              title="Título 3"
+            >
+              <span className="text-sm font-bold">H3</span>
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center space-x-1 sm:pl-4">
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => document.execCommand('insertUnorderedList')}
+              title="Lista com marcadores"
+            >
+              <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M9 8h10M9 12h10M9 16h10M4.99 8H5m-.02 4h.01m0 4H5"/>
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => document.execCommand('insertOrderedList')}
+              title="Lista numerada"
+            >
+              <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6h8m-8 6h8m-8 6h8M4 16a2 2 0 1 1 3.321 1.5L4 20h5M4 5l2-1v6m-2 0h4"/>
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={toolbarButtonClass}
+              onClick={() => {
+                const url = prompt('Digite a URL do link:');
+                if (url) document.execCommand('createLink', false, url);
+              }}
+              title="Inserir link"
+            >
+              <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.213 9.787a3.391 3.391 0 0 0-4.795 0l-3.425 3.426a3.39 3.39 0 0 0 4.795 4.794l.321-.304m-.321-4.49a3.39 3.39 0 0 0 4.795 0l3.424-3.426a3.39 3.39 0 0 0-4.794-4.795l-1.028.961"/>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
-      <div
-        contentEditable
-        suppressContentEditableWarning={true}
-        className="min-h-[250px] p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
-        style={{ whiteSpace: 'pre-wrap' }}
-        dangerouslySetInnerHTML={{ __html: editorValue }}
-        onInput={(e) => {
-          const content = e.currentTarget.innerHTML;
-          handleChange(content);
-        }}
-        onBlur={(e) => {
-          const content = e.currentTarget.innerHTML;
-          handleChange(content);
-        }}
-      />
+      <div className="px-4 py-2 bg-white rounded-b-lg dark:bg-gray-800">
+        <div
+          contentEditable
+          suppressContentEditableWarning={true}
+          className="min-h-[300px] block w-full px-0 text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white"
+          data-placeholder="Escreva o conteúdo da notícia aqui..."
+          dangerouslySetInnerHTML={{ __html: editorValue }}
+          onInput={(e) => {
+            const content = e.currentTarget.innerHTML;
+            handleChange(content);
+          }}
+          onBlur={(e) => {
+            const content = e.currentTarget.innerHTML;
+            handleChange(content);
+          }}
+        />
+      </div>
     </div>
   );
 };

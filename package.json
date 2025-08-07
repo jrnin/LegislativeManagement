@@ -70,6 +70,8 @@
     "expo": "^53.0.20",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "flowbite": "^3.1.2",
+    "flowbite-react": "^0.12.6",
     "framer-motion": "^11.18.2",
     "google-auth-library": "^10.2.0",
     "input-otp": "^1.4.2",
