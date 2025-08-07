@@ -15,7 +15,9 @@ import {
   ChevronDown,
   Eye,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,6 +60,10 @@ export default function SessoesPage() {
   const [selectedLegislature, setSelectedLegislature] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // Fetch all events
   const { data: allEvents = [], isLoading: eventsLoading, error: eventsError } = useQuery({
@@ -106,6 +112,17 @@ export default function SessoesPage() {
     });
   }, [allEvents, searchTerm, selectedType, selectedStatus, selectedLegislature, startDate, endDate]);
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentEvents = filteredEvents.slice(startIndex, endIndex);
+
+  // Reset pagination when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedType, selectedStatus, selectedLegislature, startDate, endDate]);
+
   // Get unique event types for filter
   const eventTypes = useMemo(() => {
     const types = [...new Set(allEvents.map((event: Event) => event.category))];
@@ -150,6 +167,25 @@ export default function SessoesPage() {
     setSelectedLegislature('all');
     setStartDate('');
     setEndDate('');
+    setCurrentPage(1);
+  };
+
+  // Pagination controls
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goToPrevious = () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
   };
 
   const downloadEventDocuments = async (eventId: number) => {
@@ -355,10 +391,31 @@ export default function SessoesPage() {
               <div className="flex justify-between items-center">
                 <p className="text-sm text-gray-600">
                   {filteredEvents.length} sessão(ões) encontrada(s)
+                  {filteredEvents.length > 0 && (
+                    <span className="ml-2 text-gray-500">
+                      • Página {currentPage} de {totalPages}
+                    </span>
+                  )}
                 </p>
-                <Button variant="outline" onClick={clearFilters} size="sm">
-                  Limpar Filtros
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Select value={itemsPerPage.toString()} onValueChange={(value) => {
+                    setItemsPerPage(Number(value));
+                    setCurrentPage(1);
+                  }}>
+                    <SelectTrigger className="w-20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" onClick={clearFilters} size="sm">
+                    Limpar Filtros
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -381,7 +438,7 @@ export default function SessoesPage() {
                 </CardContent>
               </Card>
             ) : (
-              filteredEvents.map((event: Event) => (
+              currentEvents.map((event: Event) => (
                 <Card key={event.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -470,6 +527,84 @@ export default function SessoesPage() {
               ))
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {filteredEvents.length > itemsPerPage && (
+            <Card className="mt-6">
+              <CardContent className="py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={goToPrevious}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Anterior
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const page = totalPages <= 5 
+                        ? i + 1 
+                        : Math.max(1, Math.min(
+                            currentPage - 2 + i,
+                            totalPages - 4 + i
+                          ));
+                      
+                      if (page > totalPages) return null;
+                      
+                      return (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => goToPage(page)}
+                          className="w-10"
+                        >
+                          {page}
+                        </Button>
+                      );
+                    })}
+                    
+                    {totalPages > 5 && currentPage < totalPages - 2 && (
+                      <>
+                        {currentPage < totalPages - 3 && <span className="px-2">...</span>}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => goToPage(totalPages)}
+                          className="w-10"
+                        >
+                          {totalPages}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={goToNext}
+                      disabled={currentPage === totalPages}
+                    >
+                      Próximo
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="text-center mt-3">
+                  <p className="text-sm text-gray-600">
+                    Exibindo {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} de {filteredEvents.length} sessões
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </>
