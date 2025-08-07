@@ -326,7 +326,7 @@ export default function DocumentosPage() {
   return (
 
     
-    <div className="container mx-auto py-12 px-4">
+    <div className="max-w-7xl mx-auto py-12 px-4">
       <Helmet>
         <title>Documentos Públicos - Sistema Legislativo</title>
         <meta name="description" content="Acesse documentos oficiais, decretos, leis, e outros documentos públicos do Sistema Legislativo." />

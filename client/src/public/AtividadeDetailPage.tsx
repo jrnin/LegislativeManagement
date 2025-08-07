@@ -159,7 +159,7 @@ export default function AtividadeDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto py-8 px-4">
+        <div className="max-w-7xl mx-auto py-8 px-4">
           <div className="flex justify-center py-20">
             <div className="flex flex-col items-center">
               <div className="animate-spin w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full mb-4"></div>
@@ -174,7 +174,7 @@ export default function AtividadeDetailPage() {
   if (error || !activity) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto py-8 px-4">
+        <div className="max-w-7xl mx-auto py-8 px-4">
           <div className="text-center py-20">
             <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-medium text-gray-700 mb-2">Atividade não encontrada</h2>
@@ -199,7 +199,7 @@ export default function AtividadeDetailPage() {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="text-white py-12" style={{background: 'linear-gradient(to right, #7FA653, #63783D)'}}>
-          <div className="container mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center mb-4">
               <Button 
                 variant="ghost" 
@@ -240,7 +240,7 @@ export default function AtividadeDetailPage() {
         </div>
 
         {/* Conteúdo Principal */}
-        <div className="container mx-auto py-8 px-4">
+        <div className="max-w-7xl mx-auto py-8 px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Conteúdo Principal */}
             <div className="lg:col-span-2">

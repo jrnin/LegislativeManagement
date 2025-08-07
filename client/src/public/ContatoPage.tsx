@@ -113,7 +113,7 @@ export default function ContatoPage() {
 
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="text-center">
             <h1 className="text-3xl font-bold" style={{color: '#48654e'}}>
               Entre em Contato
@@ -126,7 +126,7 @@ export default function ContatoPage() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             

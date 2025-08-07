@@ -198,7 +198,7 @@ const NoticiaDetalhePage = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <Link href="/noticias">
             <Button variant="ghost" size="sm" className="mb-4">
               <ArrowLeft size={16} className="mr-2" />
@@ -208,7 +208,7 @@ const NoticiaDetalhePage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Article Header */}
           <div className="bg-white rounded-lg shadow-sm p-8 mb-6">

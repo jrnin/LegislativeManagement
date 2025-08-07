@@ -238,7 +238,7 @@ export default function AtividadesPage() {
         </div>
       </div>
 
-      <div className="container mx-auto py-8 px-4">
+      <div className="max-w-7xl mx-auto py-8 px-4">
         {/* Barra de Busca Principal */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-4 items-end">

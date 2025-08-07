@@ -229,7 +229,7 @@ export default function EventDetailsPage() {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white border-b">
-          <div className="container mx-auto px-4 py-6">
+          <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
               <Link href="/">
                 <Button variant="ghost" size="sm">
@@ -246,7 +246,7 @@ export default function EventDetailsPage() {
         </div>
 
         {/* Content */}
-        <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
             {/* Event Header */}
             <Card className="mb-8">

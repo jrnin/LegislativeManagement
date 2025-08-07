@@ -389,7 +389,7 @@ const quickServices = [
     external: true
   },
   {
-    title: "Atividades Legislativas",
+    title: "Atividades",
     description: "Consulte atividades, projetos de lei e deliberações em andamento",
     icon: Gavel,
     href: "/public/atividades"
@@ -401,7 +401,7 @@ const quickServices = [
     href: "/public/sessoes"
   },
   {
-    title: "Atas e Documentos",
+    title: "Documentos",
     description: "Acesse documentos oficiais, atas de reuniões e registros públicos",
     icon: FileText,
     href: "/public/documentos"
@@ -435,84 +435,6 @@ const quickServices = [
       external: true,
   }
 ];
-
-
-
-// Vereadores mockados
-const mockCouncilors = [
-  {
-    id: "1",
-    name: "Ana Silva",
-    role: "Presidente",
-    party: "Partido A",
-    imageUrl: "https://randomuser.me/api/portraits/women/32.jpg"
-  },
-  {
-    id: "2",
-    name: "Carlos Santos",
-    role: "Vice-Presidente",
-    party: "Partido B",
-    imageUrl: "https://randomuser.me/api/portraits/men/41.jpg"
-  },
-  {
-    id: "3",
-    name: "Mariana Oliveira",
-    role: "Secretária",
-    party: "Partido C",
-    imageUrl: "https://randomuser.me/api/portraits/women/45.jpg"
-  },
-  {
-    id: "4",
-    name: "Ricardo Almeida",
-    role: "Vereador",
-    party: "Partido D",
-    imageUrl: "https://randomuser.me/api/portraits/men/55.jpg"
-  },
-  {
-    id: "5",
-    name: "Fernanda Costa",
-    role: "Vereadora",
-    party: "Partido E",
-    imageUrl: "https://randomuser.me/api/portraits/women/28.jpg"
-  }
-];
-
-// Eventos mockados
-const mockEvents = [
-  {
-    id: 1,
-    title: "Sessão Ordinária da Câmara Municipal",
-    date: "15/05/2023",
-    time: "09:00",
-    location: "Plenário Principal",
-    type: "Sessão Ordinária"
-  },
-  {
-    id: 2,
-    title: "Audiência Pública - Orçamento 2024",
-    date: "18/05/2023",
-    time: "14:00",
-    location: "Auditório da Câmara",
-    type: "Audiência Pública"
-  },
-  {
-    id: 3,
-    title: "Reunião da Comissão de Finanças",
-    date: "22/05/2023",
-    time: "10:30",
-    location: "Sala de Reuniões",
-    type: "Comissão"
-  },
-  {
-    id: 4,
-    title: "Sessão Extraordinária",
-    date: "26/05/2023",
-    time: "15:00",
-    location: "Plenário Principal",
-    type: "Sessão Plenária"
-  }
-];
-
 // Dados dos serviços por categoria
 const servicesData = {
   servicos: [
@@ -1028,7 +950,7 @@ export default function HomePage() {
                           </div>
                           
                           <div className="space-y-1">
-                            <h4 className="text-xs font-bold group-hover:opacity-80 transition-opacity duration-300" style={{color: '#48654e'}}>
+                            <h4 className="text-xs font-medium group-hover:opacity-80 transition-opacity duration-300" style={{color: '#48654e'}}>
                               {councilor.name}
                             </h4>
                             <p className="text-xs text-gray-600">
@@ -1223,7 +1145,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center text-xs text-gray-500">
                   <Users className="h-3 w-3 mr-1" />
-                  <span>Participação Cidadã</span>
+                  <span>Participação Cidadão</span>
                 </div>
               </CardContent>
             </Card>

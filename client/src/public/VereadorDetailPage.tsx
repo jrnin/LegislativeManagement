@@ -179,7 +179,7 @@ export default function VereadorDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-20 px-4 text-center">
+      <div className="max-w-7xl mx-auto py-20 px-4 text-center">
         <Loader2 className="h-8 w-8 mx-auto text-blue-600 animate-spin" />
         <p className="mt-4 text-gray-500">Carregando informações do vereador...</p>
       </div>
@@ -188,7 +188,7 @@ export default function VereadorDetailPage() {
 
   if (error || !councilor) {
     return (
-      <div className="container mx-auto py-20 px-4 text-center">
+      <div className="max-w-7xl mx-auto py-20 px-4 text-center">
         <p className="text-red-500 mb-4">Ocorreu um erro ao carregar as informações do vereador.</p>
         <Button onClick={() => window.location.reload()} variant="outline" className="mx-auto">
           Tentar novamente
@@ -209,7 +209,7 @@ export default function VereadorDetailPage() {
     <div className="min-h-screen flex flex-col">
       {/* Cabeçalho com fundo azul */}
       <header className="bg-blue-600 text-white w-full py-6 px-4">
-        <div className="container mx-auto">
+        <div className="max-w-7xl mx-auto px-4">
           <Link href="/public/vereadores">
             <a className="text-white hover:text-blue-100 inline-flex items-center mb-6">
               <ChevronLeft className="h-5 w-5 mr-1" />
@@ -265,7 +265,7 @@ export default function VereadorDetailPage() {
       
       {/* Conteúdo principal */}
       <main className="flex-grow bg-gray-50 py-6">
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Coluna de informações pessoais */}
             <div className="lg:col-span-1">

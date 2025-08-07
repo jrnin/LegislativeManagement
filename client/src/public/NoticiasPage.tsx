@@ -75,7 +75,7 @@ const NoticiasPage = () => {
 
   if (loadingNews || loadingCategories) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Carregando notícias...</p>
@@ -88,7 +88,7 @@ const NoticiasPage = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4" style={{color: '#48654e'}}>
               Notícias da Câmara Municipal
@@ -100,7 +100,7 @@ const NoticiasPage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <div className="flex flex-wrap gap-4 items-center">

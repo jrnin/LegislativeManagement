@@ -137,8 +137,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       { name: 'Mesa Diretora', href: '/mesa-diretora' },
       { name: 'Comissões', href: '/comissoes'},
       { name: 'Vereadores', href: '/vereadores?tipo=Vereador' }
-    ]},
-    { name: 'Documentos', href: '/documentos' },
+    ]},    
     { name: 
       'Atividades Legislativas',
       href: '/atividades',
@@ -392,7 +391,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
-                    placeholder="Pesquisar no site..."
+                    placeholder="Pesquise aqui..."
                     className={`pl-9 pr-4 rounded-full ${
                       location === '/public' && !isScrolled
                         ? 'bg-white/20 border-white/30 placeholder:text-white/70 text-white'
@@ -409,14 +408,14 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                     <DropdownMenu key={link.name}>
                       <DropdownMenuTrigger asChild>
                         <button className={`px-3 py-2 rounded-[10px] text-base
- font-medium transition-colors cursor-pointer flex items-center ${
+ font-normal transition-colors cursor-pointer flex items-center ${
                           location === link.href 
                             ? 'text-white' 
                             : location === '/public' && !isScrolled
                               ? 'text-white hover:bg-white/20'
                               : isDarkMode 
                                 ? 'text-gray-300 hover:bg-slate-400 hover:text-white' 
-                                : 'hover:opacity-80'
+                                : 'hover:opacity-100'
                         }`} style={location === link.href ? {backgroundColor: '#48654e'} : {color: '#253529'}}>
                           {link.name}
                           <ChevronDown className="ml-1 h-4 w-4" />
@@ -445,7 +444,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                     </DropdownMenu>
                   ) : (
                     <Link key={link.href} href={link.href}>
-                      <button className={`px-3 py-2 rounded-[10px] text-base font-medium transition-colors cursor-pointer ${
+                      <button className={`px-3 py-2 rounded-[10px] text-base font-normal transition-colors cursor-pointer ${
                         location === link.href 
                           ? 'text-white' 
                           : location === '/public' && !isScrolled
