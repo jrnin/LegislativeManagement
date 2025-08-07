@@ -625,7 +625,7 @@ export default function DocumentForm() {
                     setUploadedFileName(fileName);
                     setFormFile({name: fileName} as File);
                   }}
-                  maxFileSize={5242880} // 5MB
+                  maxFileSize={10485760} // 10MB
                   acceptedTypes=".pdf,.doc,.docx,.txt"
                   className="w-full"
                 />

@@ -13,7 +13,7 @@ interface SimpleFileUploaderProps {
 
 export function SimpleFileUploader({
   onUploadComplete,
-  maxFileSize = 5242880, // 5MB
+  maxFileSize = 10485760, // 10MB
   acceptedTypes = ".pdf,.doc,.docx,.txt",
   className
 }: SimpleFileUploaderProps) {
