@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import SearchButton from '@/components/search/SearchButton';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -387,18 +388,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
               {/* Barra de pesquisa - visível apenas em telas médias ou maiores */}
               <div className="hidden md:flex flex-1 max-w-md mx-6">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Pesquise aqui..."
-                    className={`pl-9 pr-4 rounded-full ${
-                      location === '/public' && !isScrolled
-                        ? 'bg-white/20 border-white/30 placeholder:text-white/70 text-white'
-                        : 'border-gray-300'
-                    }`}
-                  />
-                </div>
+                <SearchButton />
               </div>
 
               {/* Menu para desktop */}
@@ -490,14 +480,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                       
                       {/* Barra de pesquisa para mobile */}
                       <div className="py-4">
-                        <div className="relative w-full">
-                          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="search"
-                            placeholder="Pesquisar no site..."
-                            className="pl-9 pr-4 rounded-full border-gray-300"
-                          />
-                        </div>
+                        <SearchButton />
                       </div>
                       
                       <nav className="flex flex-col space-y-1 py-4">
