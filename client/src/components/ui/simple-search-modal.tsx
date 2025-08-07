@@ -70,10 +70,10 @@ export function SimpleSearchModal({ isOpen, onClose }: SimpleSearchModalProps) {
     };
   }, [isOpen, onClose]);
 
-  // Search API call
+  // Search API call using public endpoint
   const { data: searchResults = [], isLoading } = useQuery<SearchResult[]>({
-    queryKey: ['/api/search', debouncedQuery],
-    queryFn: () => fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}`).then(res => res.json()),
+    queryKey: ['/api/public/search', debouncedQuery],
+    queryFn: () => fetch(`/api/public/search?q=${encodeURIComponent(debouncedQuery)}`).then(res => res.json()),
     enabled: debouncedQuery.length >= 2,
   });
 

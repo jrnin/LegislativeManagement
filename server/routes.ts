@@ -2621,7 +2621,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // SEARCH ROUTES
   
-  // Global search across all entities
+  // Global search across all entities (public)
+  app.get('/api/public/search', async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      const type = req.query.type as string | undefined;
+      
+      if (!query || query.length < 3) {
+        return res.json([]);
+      }
+      
+      const results = await storage.searchGlobal(query, type);
+      res.json(results);
+    } catch (error) {
+      console.error('Error performing search:', error);
+      res.status(500).json({ message: 'Erro ao realizar busca' });
+    }
+  });
+
+  // Global search across all entities (authenticated)
   app.get('/api/search', requireAuth, async (req, res) => {
     try {
       const query = req.query.q as string;
