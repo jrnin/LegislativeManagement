@@ -190,7 +190,7 @@ export default function DocumentosPageBasic() {
       
       {/* Hero Section */}
       <div className="text-white py-16" style={{background: 'linear-gradient(to right, #7FA653, #63783D)'}}>
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-4">Documentos Públicos</h1>
@@ -208,7 +208,7 @@ export default function DocumentosPageBasic() {
         </div>
       </div>
 
-      <div className="container mx-auto py-8 px-4">
+      <div className="max-w-7xl mx-auto py-8 px-4">
         {/* Barra de Busca Principal */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-4 items-end">
