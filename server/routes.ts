@@ -2,6 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import { eventAttendance, events, activityVotes } from "@shared/schema";
 import { setupAuth } from "./replitAuth";
 import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload, handleNewsUpload, handleActivityUpload, handleEventUpload } from "./middlewares";
 import { handleObjectDocumentUpload, handleObjectNewsUpload } from "./objectUploadMiddlewares";
@@ -29,7 +32,6 @@ import {
 } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
 import { ObjectStorageDiagnostics } from "./objectStorageDiagnostics";
-import { ObjectPermission } from "./objectAcl";
 
 // Declarar a função sendNotification que será inicializada no escopo global
 let sendNotification: (target: 'all' | string | string[], notification: any) => void;
@@ -5159,6 +5161,121 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     } catch (error) {
       console.error("Erro ao buscar documentos do vereador:", error);
       res.status(500).json({ message: "Erro ao buscar documentos", error: error.message });
+    }
+  });
+
+  // Buscar métricas de um vereador específico (rota pública)
+  app.get('/api/public/councilors/:identifier/metrics', async (req, res) => {
+    try {
+      const { identifier } = req.params;
+      
+      console.log(`Buscando métricas para o usuário ${identifier}`);
+      
+      // Buscar usuário por slug ou ID
+      let user = await storage.getUserBySlug(identifier);
+      if (!user) {
+        user = await storage.getUser(identifier);
+      }
+      
+      if (!user) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      const userId = user.id;
+      
+      // Buscar dados de presença em eventos
+      const attendanceData = await db.select({
+        eventId: eventAttendance.eventId,
+        status: eventAttendance.status,
+        eventDate: events.eventDate,
+      })
+      .from(eventAttendance)
+      .innerJoin(events, eq(events.id, eventAttendance.eventId))
+      .where(eq(eventAttendance.userId, userId));
+      
+      // Calcular métricas de presença
+      const totalEvents = attendanceData.length;
+      const presentEvents = attendanceData.filter(a => a.status === 'Presente').length;
+      const absences = totalEvents - presentEvents;
+      const attendanceRate = totalEvents > 0 ? (presentEvents / totalEvents) * 100 : 0;
+      
+      // Buscar dados de votação em atividades
+      const votingData = await db.select({
+        vote: activityVotes.vote,
+        activityId: activityVotes.activityId,
+      })
+      .from(activityVotes)
+      .where(eq(activityVotes.userId, userId));
+      
+      // Calcular métricas de votação
+      const totalVotes = votingData.length;
+      const favorableVotes = votingData.filter(v => v.vote === 'Favorável').length;
+      const unfavorableVotes = votingData.filter(v => v.vote === 'Contrário').length;
+      const abstentions = votingData.filter(v => v.vote === 'Abstenção').length;
+      
+      // Buscar atividades legislativas do vereador
+      const userActivities = await storage.getLegislativeActivitiesByAuthor(userId);
+      
+      // Contar atividades por tipo
+      const activitiesByType = userActivities.reduce((acc: Record<string, number>, activity: any) => {
+        acc[activity.activityType] = (acc[activity.activityType] || 0) + 1;
+        return acc;
+      }, {});
+      
+      const activitiesByTypeArray = Object.entries(activitiesByType).map(([type, count]) => ({
+        type,
+        count: count as number
+      }));
+      
+      // Presença mensal (últimos 6 meses)
+      const monthlyAttendance = [];
+      const now = new Date();
+      for (let i = 5; i >= 0; i--) {
+        const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthStr = month.toLocaleString('pt-BR', { month: 'short', year: 'numeric' });
+        
+        const monthEvents = attendanceData.filter(a => {
+          const eventDate = new Date(a.eventDate);
+          return eventDate.getMonth() === month.getMonth() && 
+                 eventDate.getFullYear() === month.getFullYear();
+        });
+        
+        const present = monthEvents.filter(a => a.status === 'Presente').length;
+        const total = monthEvents.length;
+        
+        monthlyAttendance.push({
+          month: monthStr,
+          present,
+          total
+        });
+      }
+      
+      const metrics = {
+        attendance: {
+          totalEvents,
+          presentEvents,
+          absences,
+          attendanceRate: Math.round(attendanceRate * 100) / 100
+        },
+        voting: {
+          totalVotes,
+          favorableVotes,
+          unfavorableVotes,
+          abstentions
+        },
+        activities: {
+          totalActivities: userActivities.length,
+          activitiesByType: activitiesByTypeArray
+        },
+        monthlyAttendance
+      };
+      
+      console.log(`Métricas calculadas para ${identifier}:`, metrics);
+      
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching councilor metrics:", error);
+      res.status(500).json({ message: "Erro ao buscar métricas do vereador" });
     }
   });
 

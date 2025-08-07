@@ -5,10 +5,11 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Mail, Phone, MapPin, Calendar, GraduationCap, Briefcase, Award, FileText, Users, Building2, Download, ExternalLink } from 'lucide-react';
+import { Loader2, ArrowLeft, Mail, Phone, MapPin, Calendar, GraduationCap, Briefcase, Award, FileText, Users, Building2, Download, ExternalLink, TrendingUp, CheckCircle, XCircle, Minus, BarChart3 } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { Helmet } from 'react-helmet';
 import texturaUrl from '@/assets/textura.jpg';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface Councilor {
   id: string;
@@ -42,6 +43,26 @@ interface Activity {
   description: string;
 }
 
+interface CouncilorMetrics {
+  attendance: {
+    totalEvents: number;
+    presentEvents: number;
+    absences: number;
+    attendanceRate: number;
+  };
+  voting: {
+    totalVotes: number;
+    favorableVotes: number;
+    unfavorableVotes: number;
+    abstentions: number;
+  };
+  activities: {
+    totalActivities: number;
+    activitiesByType: Array<{ type: string; count: number }>;
+  };
+  monthlyAttendance: Array<{ month: string; present: number; total: number }>;
+}
+
 export default function VereadorDetalhesModerno() {
   const { id } = useParams<{ id: string }>();
 
@@ -65,6 +86,12 @@ export default function VereadorDetalhesModerno() {
   // Buscar comissões do vereador
   const { data: commissions = [], isLoading: isCommissionsLoading } = useQuery({
     queryKey: [`/api/public/councilors/${id}/committees`],
+    enabled: !!id,
+  });
+
+  // Buscar métricas do vereador
+  const { data: metrics, isLoading: isMetricsLoading } = useQuery<CouncilorMetrics>({
+    queryKey: [`/api/public/councilors/${id}/metrics`],
     enabled: !!id,
   });
 
@@ -211,6 +238,180 @@ export default function VereadorDetalhesModerno() {
         
       </div>
 
+      {/* Métricas do Vereador */}
+      {metrics && !isMetricsLoading && (
+        <div className="bg-gray-50 py-8">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Métricas de Desempenho</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Métricas de Presença */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+                    Presença em Eventos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">{metrics.attendance.presentEvents}</div>
+                      <div className="text-sm text-gray-600">Presentes</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">{metrics.attendance.absences}</div>
+                      <div className="text-sm text-gray-600">Ausências</div>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                      <span>Taxa de Presença</span>
+                      <span>{metrics.attendance.attendanceRate.toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-green-600 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${metrics.attendance.attendanceRate}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  {metrics.monthlyAttendance.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Presença Mensal</h4>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <BarChart data={metrics.monthlyAttendance}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="present" fill="#16a34a" name="Presente" />
+                          <Bar dataKey="total" fill="#dc2626" name="Total" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Métricas de Votação */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+                    Votações em Atividades
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-green-600">{metrics.voting.favorableVotes}</div>
+                      <div className="text-xs text-gray-600">Favorável</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-red-600">{metrics.voting.unfavorableVotes}</div>
+                      <div className="text-xs text-gray-600">Contrário</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-yellow-600">{metrics.voting.abstentions}</div>
+                      <div className="text-xs text-gray-600">Abstenção</div>
+                    </div>
+                  </div>
+                  
+                  {metrics.voting.totalVotes > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Distribuição de Votos</h4>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: 'Favorável', value: metrics.voting.favorableVotes, fill: '#16a34a' },
+                              { name: 'Contrário', value: metrics.voting.unfavorableVotes, fill: '#dc2626' },
+                              { name: 'Abstenção', value: metrics.voting.abstentions, fill: '#ca8a04' }
+                            ]}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={40}
+                            outerRadius={80}
+                            dataKey="value"
+                          >
+                            {[
+                              { name: 'Favorável', value: metrics.voting.favorableVotes, fill: '#16a34a' },
+                              { name: 'Contrário', value: metrics.voting.unfavorableVotes, fill: '#dc2626' },
+                              { name: 'Abstenção', value: metrics.voting.abstentions, fill: '#ca8a04' }
+                            ].map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.fill} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                  
+                  {metrics.voting.totalVotes === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <XCircle className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                      <p>Nenhuma votação registrada</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Atividades por Tipo */}
+            {metrics.activities.activitiesByType.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <TrendingUp className="h-5 w-5 mr-2 text-purple-600" />
+                    Atividades por Tipo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Total: {metrics.activities.totalActivities} atividades</h4>
+                      <div className="space-y-2">
+                        {metrics.activities.activitiesByType.map((item, index) => (
+                          <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                            <span className="text-sm font-medium">{item.type}</span>
+                            <Badge variant="secondary">{item.count}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                          <Pie
+                            data={metrics.activities.activitiesByType}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            dataKey="count"
+                            label={({ type, count }) => `${type}: ${count}`}
+                          >
+                            {metrics.activities.activitiesByType.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={`hsl(${index * 137.5 % 360}, 70%, 50%)`} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Conteúdo principal */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -229,7 +430,7 @@ export default function VereadorDetalhesModerno() {
                   <Mail className="h-5 w-5 text-green-600" />
                   <div>
                     <p className="text-sm text-gray-600">E-mail</p>
-                    <a href={`mailto:${councilor.email}`} className="text-green-700 hover:underline font-medium">
+                    <a href={`mailto:${councilor.email}`} className="text-green-700 hover:underline font-normal">
                       {councilor.email}
                     </a>
                   </div>
@@ -252,7 +453,7 @@ export default function VereadorDetalhesModerno() {
                     <MapPin className="h-5 w-5 text-green-600" />
                     <div>
                       <p className="text-sm text-gray-600">Partido</p>
-                      <p className="text-gray-900 font-medium">{councilor.partido}</p>
+                      <p className="text-gray-900 font-normal">{councilor.partido}</p>
                     </div>
                   </div>
                 )}
@@ -306,50 +507,7 @@ export default function VereadorDetalhesModerno() {
           {/* Coluna direita - Documentos e Atividades */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Documentos */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <FileText className="h-5 w-5 text-green-600" />
-                  Documentos Recentes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {documents.length > 0 ? (
-                  <div className="space-y-3">
-                    {documents.slice(0, 5).map((doc: any) => (
-                      <div key={doc.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{doc.description || doc.title}</h4>
-                          <p className="text-sm text-gray-600">
-                            {doc.documentType || doc.type} • {
-                              (doc.documentDate || doc.date) ? 
-                              new Date(doc.documentDate || doc.date).toLocaleDateString('pt-BR') : 
-                              'Data não informada'
-                            }
-                          </p>
-                        </div>
-                        {(doc.filePath || doc.file) && (
-                          <a 
-                            href={`/api/public/documents/${doc.id}/download`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-4"
-                          >
-                            <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50">
-                              <Download className="h-4 w-4 mr-2" />
-                              Download
-                            </Button>
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-600 text-center py-8">Nenhum documento encontrado</p>
-                )}
-              </CardContent>
-            </Card>
+            
 
             {/* Atividades */}
             <Card className="shadow-lg">
