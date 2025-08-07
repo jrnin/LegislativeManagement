@@ -123,7 +123,7 @@ export default function VereadorDetalhesModerno() {
           <div className="absolute bottom-10 right-1/3 w-20 h-20 bg-white/5 rounded-lg rotate-12" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 py-12">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-12">
           <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
             {/* Avatar */}
             <div className="flex-shrink-0">
@@ -212,7 +212,7 @@ export default function VereadorDetalhesModerno() {
       </div>
 
       {/* Conteúdo principal */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Coluna esquerda - Informações pessoais */}
