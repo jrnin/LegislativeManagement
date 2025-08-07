@@ -6329,5 +6329,156 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // Search endpoint - Global site search
+  app.get('/api/search', async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      
+      if (!query || query.length < 2) {
+        return res.json([]);
+      }
+
+      const searchTerm = `%${query.toLowerCase()}%`;
+      const results = [];
+
+      // Search in legislative activities
+      const activities = await db.select({
+        id: legislativeActivities.id,
+        activityNumber: legislativeActivities.activityNumber,
+        title: legislativeActivities.title,
+        activityType: legislativeActivities.activityType,
+        summary: legislativeActivities.summary,
+        status: legislativeActivities.status,
+        createdAt: legislativeActivities.createdAt,
+        exerciseYear: legislativeActivities.exerciseYear
+      })
+      .from(legislativeActivities)
+      .where(or(
+        ilike(legislativeActivities.title, searchTerm),
+        ilike(legislativeActivities.summary, searchTerm),
+        ilike(legislativeActivities.activityType, searchTerm)
+      ))
+      .orderBy(desc(legislativeActivities.createdAt))
+      .limit(10);
+
+      activities.forEach(activity => {
+        results.push({
+          id: `activity-${activity.id}`,
+          type: 'activity',
+          title: `${activity.activityType} ${activity.activityNumber}/${activity.exerciseYear} - ${activity.title}`,
+          description: activity.summary || 'Atividade legislativa',
+          url: `/public/atividade/${activity.id}`,
+          date: activity.createdAt.toISOString(),
+          category: activity.activityType
+        });
+      });
+
+      // Search in events
+      const eventsData = await db.select({
+        id: events.id,
+        eventNumber: events.eventNumber,
+        eventType: events.eventType,
+        eventDate: events.eventDate,
+        description: events.description,
+        summary: events.summary,
+        createdAt: events.createdAt
+      })
+      .from(events)
+      .where(or(
+        ilike(events.eventType, searchTerm),
+        ilike(events.description, searchTerm),
+        ilike(events.summary, searchTerm)
+      ))
+      .orderBy(desc(events.eventDate))
+      .limit(10);
+
+      eventsData.forEach(event => {
+        results.push({
+          id: `event-${event.id}`,
+          type: 'event',
+          title: `${event.eventType} ${event.eventNumber} - ${event.description || 'Evento'}`,
+          description: event.summary || event.description || 'Evento do calendário legislativo',
+          url: `/public/evento/${event.id}`,
+          date: event.eventDate.toISOString(),
+          category: event.eventType
+        });
+      });
+
+      // Search in documents
+      const documentsData = await db.select({
+        id: documents.id,
+        documentNumber: documents.documentNumber,
+        documentType: documents.documentType,
+        title: documents.title,
+        description: documents.description,
+        createdAt: documents.createdAt,
+        exerciseYear: documents.exerciseYear
+      })
+      .from(documents)
+      .where(or(
+        ilike(documents.title, searchTerm),
+        ilike(documents.description, searchTerm),
+        ilike(documents.documentType, searchTerm)
+      ))
+      .orderBy(desc(documents.createdAt))
+      .limit(10);
+
+      documentsData.forEach(document => {
+        results.push({
+          id: `document-${document.id}`,
+          type: 'document',
+          title: `${document.documentType} ${document.documentNumber}/${document.exerciseYear} - ${document.title}`,
+          description: document.description || 'Documento oficial',
+          url: `/public/documento/${document.id}`,
+          date: document.createdAt.toISOString(),
+          category: document.documentType
+        });
+      });
+
+      // Search in news articles
+      const newsArticles = await db.select({
+        id: news.id,
+        title: news.title,
+        slug: news.slug,
+        excerpt: news.excerpt,
+        content: news.content,
+        publishedAt: news.publishedAt,
+        category: newsCategories.name
+      })
+      .from(news)
+      .leftJoin(newsCategories, eq(news.categoryId, newsCategories.id))
+      .where(and(
+        eq(news.isPublished, true),
+        or(
+          ilike(news.title, searchTerm),
+          ilike(news.excerpt, searchTerm),
+          ilike(news.content, searchTerm)
+        )
+      ))
+      .orderBy(desc(news.publishedAt))
+      .limit(10);
+
+      newsArticles.forEach(article => {
+        results.push({
+          id: `news-${article.id}`,
+          type: 'news',
+          title: article.title,
+          description: article.excerpt || 'Notícia publicada',
+          url: `/public/noticia/${article.slug}`,
+          date: article.publishedAt?.toISOString(),
+          category: article.category || 'Notícias'
+        });
+      });
+
+      // Sort results by date (newest first) and limit to 20 total results
+      results.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+      
+      res.json(results.slice(0, 20));
+    } catch (error) {
+      console.error('Erro na busca:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   return httpServer;
 }

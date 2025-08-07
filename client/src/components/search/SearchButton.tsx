@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import SearchDialog from './SearchDialog';
+import { SearchModal } from '@/components/ui/search-modal';
 import { useIsMobile } from '@/mobile/hooks/useIsMobile';
 
 export default function SearchButton() {
@@ -41,9 +41,9 @@ export default function SearchButton() {
         )}
       </Button>
       
-      <SearchDialog 
-        open={isSearchOpen} 
-        onOpenChange={setIsSearchOpen} 
+      <SearchModal 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
       />
     </>
   );
