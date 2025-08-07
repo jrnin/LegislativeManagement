@@ -353,7 +353,7 @@ export default function VereadorDetalhesModerno() {
                   </div>
                 ) : activities.length > 0 ? (
                   <div className="space-y-4">
-                    {activities.slice(0, 5).map((activity: any) => (
+                    {activities.slice(0, 3).map((activity: any) => (
                       <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3 flex items-start justify-between">
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
