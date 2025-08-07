@@ -24,7 +24,8 @@ import {
   Upload,
   X
 } from "lucide-react";
-import { AdvancedEditor } from "@/components/ui/advanced-editor";
+import { FlowbiteEditor } from "@/components/ui/flowbite-editor";
+
 
 const newsFormSchema = z.object({
   title: z.string().min(1, "Título é obrigatório").max(255, "Título muito longo"),
@@ -499,7 +500,7 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
           <div className="space-y-4">
             {/* Rich Text Editor */}
             <div className="min-h-[300px]">
-              <AdvancedEditor
+              <FlowbiteEditor
                 content={content}
                 onChange={handleContentChange}
                 placeholder="Escreva o conteúdo da notícia aqui..."
