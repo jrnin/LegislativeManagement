@@ -621,7 +621,7 @@ export default function HomePage() {
         {/* Overlay escuro para melhorar legibilidade do texto */}
         <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center text-white">
             
             <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
@@ -647,7 +647,7 @@ export default function HomePage() {
 
       {/* Seção de Serviços Rápidos */}
       <section className="py-4 px-2 bg-white">
-        <div className="container mx-auto">     
+        <div className="max-w-7xl mx-auto px-4">     
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickServices.slice(0, 8).map((service, index) => (
               <QuickServiceCard
@@ -667,7 +667,7 @@ export default function HomePage() {
 
       {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">
-        <div className="container mx-auto">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
             <h2 className="text-2xl font-bold flex items-center">
               <FileText className="mr-2" style={{color: '#48654e'}} />
@@ -962,7 +962,7 @@ export default function HomePage() {
 
       {/* Seção de Vereadores e Atividades Legislativas - Layout em Duas Colunas */}
       <section className="py-20 px-4 bg-white">
-        <div className="container mx-auto"> {/*
+        <div className="max-w-7xl mx-auto px-4"> {/*
           <div className="text-center mb-16">
             <div className="flex items-center justify-center mb-6">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{backgroundColor: '#48654e'}}>
@@ -1032,7 +1032,7 @@ export default function HomePage() {
                               {councilor.name}
                             </h4>
                             <p className="text-xs text-gray-600">
-                              {councilor.partido || councilor.occupation || "Vereador"}
+                              {/*{councilor.partido || councilor.occupation || "Vereador"}*/}
                             </p>
                           </div>
                         </div>
@@ -1118,7 +1118,7 @@ export default function HomePage() {
 
       {/* Seção de Vídeos da Câmara Municipal */}
       <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{color: '#48654e'}}>
               Vídeos da Câmara Municipal
@@ -1253,7 +1253,7 @@ export default function HomePage() {
 
       {/* Seção Central de Serviços */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
               <div className="flex items-center space-x-3">

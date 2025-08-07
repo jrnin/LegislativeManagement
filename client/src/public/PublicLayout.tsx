@@ -267,8 +267,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       </Helmet>
 
       {/* Top bar com opções de acessibilidade e redes sociais */}
-      <div className="w-full py-4 px-6 text-white text-sm" style={{backgroundColor: '#253529'}}>
-        <div className="container mx-auto flex flex-wrap justify-between items-center">
+      <div className="w-full py-3 px-4 text-white text-sm" style={{backgroundColor: '#253529'}}>
+        <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
               <span className="mr-2 font-medium ">Acessibilidade:</span>
@@ -363,7 +363,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 : `relative ${isDarkMode ? 'bg-slate-800' : 'bg-white shadow'}`
           }`}
         >
-          <div className="container mx-auto">
+          <div className="max-w-7xl mx-auto px-4">
             <div className="flex justify-between items-center">
               {/* Logo */}
               <Link href="/">
@@ -598,7 +598,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       <footer className="w-full mt-8" style={{backgroundColor: '#1a3e1f'}}>
         {/* Header do Footer com ícone, redes sociais e botões */}
         <div className="w-full py-4 px-6 border-b border-green-700/30">
-          <div className="container mx-auto flex flex-wrap justify-between items-center">
+          <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
             {/* Logo/Ícone da Câmara */}
             <div className="flex items-center space-x-3">              
               <div className="hidden sm:block">
@@ -645,7 +645,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
         {/* Conteúdo Principal do Footer */}
         <div className="w-full py-8 px-6">
-          <div className="container mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               
               {/* Telefone */}
@@ -693,7 +693,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
         {/* Rodapé Final */}
         <div className="w-full py-4 px-6 border-t border-green-700/30">
-          <div className="container mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <p className="text-white text-sm">&copy; 2025 - Câmara Municipal de Jaíba - Todos os direitos reservados</p>
               <div className="flex items-center space-x-4 mt-2 md:mt-0">

@@ -104,7 +104,7 @@ export default function VereadoresPage() {
 
       {/* Hero Section */}
       <div className="text-white py-16" style={{background: 'linear-gradient(to right, #007825, #1c873d)'}}>
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-4">Vereadores</h1>
@@ -124,7 +124,7 @@ export default function VereadoresPage() {
 
       {/* Barra de Filtros */}
       <div className="bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex flex-col sm:flex-row gap-4 flex-1">
@@ -192,7 +192,7 @@ export default function VereadoresPage() {
         </div>
       </div>
 
-      <div className="container mx-auto py-12 px-4">
+      <div className="max-w-7xl mx-auto py-12 px-4">
 
       {isLoading ? (
         <div className="flex justify-center py-20">
