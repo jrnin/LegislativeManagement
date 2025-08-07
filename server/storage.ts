@@ -53,7 +53,7 @@ import {
   type InsertEventImage
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, inArray, notInArray, or, not } from "drizzle-orm";
+import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, ilike, inArray, notInArray, or, not } from "drizzle-orm";
 import crypto from "crypto";
 
 // Interface for storage operations
@@ -2328,8 +2328,8 @@ export class DatabaseStorage implements IStorage {
         .from(users)
         .where(
           or(
-            like(sql`LOWER(${users.name})`, searchTerm),
-            like(sql`LOWER(${users.email})`, searchTerm)
+            ilike(users.name, `%${query}%`),
+            ilike(users.email, `%${query}%`)
           )
         )
         .limit(10);
@@ -2354,8 +2354,8 @@ export class DatabaseStorage implements IStorage {
         .from(legislatures)
         .where(
           or(
-            like(sql`LOWER(${legislatures.name})`, searchTerm),
-            like(sql`LOWER(${legislatures.description})`, searchTerm)
+            ilike(legislatures.name, `%${query}%`),
+            ilike(legislatures.description, `%${query}%`)
           )
         )
         .limit(10);
@@ -2382,9 +2382,9 @@ export class DatabaseStorage implements IStorage {
         .from(events)
         .where(
           or(
-            like(sql`LOWER(${events.category})`, searchTerm),
-            like(sql`LOWER(${events.description})`, searchTerm),
-            like(sql`LOWER(${events.location})`, searchTerm)
+            ilike(events.category, `%${query}%`),
+            ilike(events.description, `%${query}%`),
+            ilike(events.location, `%${query}%`)
           )
         )
         .limit(10);
@@ -2411,8 +2411,8 @@ export class DatabaseStorage implements IStorage {
         .from(legislativeActivities)
         .where(
           or(
-            like(sql`LOWER(${legislativeActivities.activityType})`, searchTerm),
-            like(sql`LOWER(${legislativeActivities.description})`, searchTerm)
+            ilike(legislativeActivities.activityType, `%${query}%`),
+            ilike(legislativeActivities.description, `%${query}%`)
           )
         )
         .limit(10);
@@ -2439,9 +2439,8 @@ export class DatabaseStorage implements IStorage {
         .from(documents)
         .where(
           or(
-            like(sql`LOWER(${documents.title})`, searchTerm),
-            like(sql`LOWER(${documents.description})`, searchTerm),
-            like(sql`LOWER(${documents.content})`, searchTerm)
+            ilike(documents.documentType, `%${query}%`),
+            ilike(documents.description, `%${query}%`)
           )
         )
         .limit(10);
@@ -2539,12 +2538,11 @@ export class DatabaseStorage implements IStorage {
       conditions.push(eq(newsArticles.featured, filters.featured));
     }
     if (filters?.search) {
-      const searchTerm = `%${filters.search.toLowerCase()}%`;
       conditions.push(
         or(
-          like(sql`LOWER(${newsArticles.title})`, searchTerm),
-          like(sql`LOWER(${newsArticles.content})`, searchTerm),
-          like(sql`LOWER(${newsArticles.excerpt})`, searchTerm)
+          ilike(newsArticles.title, `%${filters.search}%`),
+          ilike(newsArticles.content, `%${filters.search}%`),
+          ilike(newsArticles.excerpt, `%${filters.search}%`)
         )
       );
     }
