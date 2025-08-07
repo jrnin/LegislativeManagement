@@ -1517,12 +1517,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const objectStorageService = new ObjectStorageService();
         const userId = req.user?.id || 'admin';
         
-        // Set ACL policy and get normalized path
+        // Set ACL policy and get normalized path - documents should be public for transparency
         const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
           validated.uploadedFileURL,
           {
             owner: userId,
-            visibility: 'private'
+            visibility: 'public' // Documents are public for transparency
           }
         );
         
@@ -1596,16 +1596,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const objectStorageService = new ObjectStorageService();
         const userId = req.user?.id || req.user?.claims?.sub;
         
-        // Set ACL policy and get normalized path
+        // Set ACL policy and get normalized path - documents should be public for transparency
         const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
           req.body.uploadedFileURL,
           {
             owner: userId,
-            visibility: 'private',
-            aclRules: [{
-              group: { type: 'admin_only' as any, id: 'admin' },
-              permission: ObjectPermission.READ
-            }]
+            visibility: 'public' // Documents are public for transparency
           }
         );
         
@@ -5859,6 +5855,68 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
   // DOCUMENT MIGRATION ROUTES
   
   // Migrate documents to Object Storage with organized structure
+  // Update existing documents ACL to public
+  app.post('/api/admin/documents/update-acl-to-public', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      
+      // Get all documents with Object Storage file paths
+      const documents = await storage.getAllDocuments({}, 1, 1000);
+      
+      let updated = 0;
+      let errors = 0;
+      const errorDetails = [];
+      
+      console.log(`📄 Updating ACL for ${documents.length} documents...`);
+      
+      for (const doc of documents) {
+        if (doc.filePath && doc.filePath.startsWith('/objects/')) {
+          try {
+            console.log(`Updating ACL for document ${doc.id}: ${doc.filePath}`);
+            
+            // Get the object file
+            const objectFile = await objectStorageService.getObjectEntityFile(doc.filePath);
+            
+            // Set public ACL policy using the object storage service method
+            const { setObjectAclPolicy } = await import('./objectAcl');
+            await setObjectAclPolicy(objectFile, {
+              owner: 'admin',
+              visibility: 'public'
+            });
+            
+            updated++;
+            console.log(`✅ Updated ACL for document ${doc.id}`);
+          } catch (error) {
+            errors++;
+            const errorMsg = `Document ${doc.id} (${doc.filePath}): ${error.message}`;
+            errorDetails.push(errorMsg);
+            console.error(`❌ Error updating ACL for document ${doc.id}:`, error.message);
+          }
+        }
+      }
+      
+      console.log(`📊 ACL update completed: ${updated} updated, ${errors} errors`);
+      
+      res.json({
+        success: true,
+        message: 'ACL update completed',
+        result: {
+          totalDocuments: documents.length,
+          updated,
+          errors,
+          errorDetails
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error updating document ACLs:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao atualizar ACLs dos documentos',
+        error: error.message
+      });
+    }
+  });
+
   app.post('/api/admin/documents/migrate-to-object-storage', requireAuth, requireAdmin, async (req, res) => {
     try {
       const { migrateDocumentsToObjectStorage } = await import('../scripts/migrate-documents-to-object-storage');
@@ -6074,6 +6132,27 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     } catch (error) {
       console.error("Error searching for public object:", error);
       return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Serve public documents from object storage (all documents are public for transparency)
+  // NOTE: This route must come BEFORE the general /objects/* route
+  app.get("/objects/documents/:objectPath(*)", async (req, res) => {
+    console.log(`[DEBUG AUTH] Serving public document: ${req.path}`);
+    
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      
+      // All documents are considered public for transparency - no ACL check needed
+      console.log(`[DEBUG AUTH] Public document access granted for ${req.path}`);
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error serving public document:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
     }
   });
 
