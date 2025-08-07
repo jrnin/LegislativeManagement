@@ -39,6 +39,9 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Debug log
+  console.log('SearchModal renderizado, isOpen:', isOpen);
+
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {

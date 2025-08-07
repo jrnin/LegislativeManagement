@@ -27,7 +27,10 @@ export default function SearchButton() {
     <>
       <Button 
         variant="outline" 
-        onClick={() => setIsSearchOpen(true)}
+        onClick={() => {
+          console.log('Botão de busca clicado');
+          setIsSearchOpen(true);
+        }}
         className={`relative bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900 ${
           isMobile ? 'w-full justify-between' : ''
         }`}
