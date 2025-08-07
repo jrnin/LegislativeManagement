@@ -238,7 +238,159 @@ export default function VereadorDetalhesModerno() {
         
       </div>
 
-      {/* Métricas do Vereador */}
+
+
+      {/* Conteúdo principal */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Coluna esquerda - Informações pessoais */}
+          <div className="space-y-6">
+            <Card className="shadow-lg border-l-4 border-l-green-600">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-green-800">
+                  <Building2 className="h-5 w-5" />
+                  Informações de Contato
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Mail className="h-5 w-5 text-green-600" />
+                  <div>
+                    <p className="text-sm text-gray-600">E-mail</p>
+                    <a href={`mailto:${councilor.email}`} className="text-green-700 hover:underline font-normal">
+                      {councilor.email}
+                    </a>
+                  </div>
+                </div>
+                
+                {councilor.phone && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Phone className="h-5 w-5 text-green-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Telefone</p>
+                      <a href={`tel:${councilor.phone}`} className="text-green-700 hover:underline font-medium">
+                        {councilor.phone}
+                      </a>
+                    </div>
+                  </div>
+                )}
+                
+                {councilor.partido && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <MapPin className="h-5 w-5 text-green-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Partido</p>
+                      <p className="text-gray-900 font-normal">{councilor.partido}</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Informações pessoais */}
+            <Card className="shadow-lg border-l-4 border-l-blue-600">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-800">
+                  <GraduationCap className="h-5 w-5" />
+                  Informações Pessoais
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* {councilor.birthDate && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Data de Nascimento</p>
+                      <p className="text-gray-900 font-medium">
+                        {new Date(councilor.birthDate).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                  </div>
+                )} */}
+                
+                {councilor.education && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <GraduationCap className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Formação</p>
+                      <p className="text-gray-900 font-medium">{councilor.education}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {councilor.occupation && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Briefcase className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Ocupação</p>
+                      <p className="text-gray-900 font-medium">{councilor.occupation}</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Coluna direita - Documentos e Atividades */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            
+
+            {/* Atividades */}
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-800">
+                  <Award className="h-5 w-5 text-green-600" />
+                  Atividades Legislativas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isActivitiesLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Carregando atividades...</p>
+                  </div>
+                ) : activities.length > 0 ? (
+                  <div className="space-y-4">
+                    {activities.slice(0, 5).map((activity: any) => (
+                      <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3 flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {activity.type} • {
+                              activity.date ? 
+                              new Date(activity.date).toLocaleDateString('pt-BR') : 
+                              'Data não informada'
+                            }
+                          </p>
+                        </div>
+                        {(activity.filePath || activity.file) && (
+                          <a 
+                            href={`/api/public/activities/${activity.id}/download`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-4"
+                          >
+                            <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50">
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </Button>
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-600 text-center py-8">Nenhuma atividade encontrada</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Métricas de Desempenho - Movida para o final */}
       {metrics && !isMetricsLoading && (
         <div className="bg-gray-50 py-8">
           <div className="max-w-7xl mx-auto px-4">
@@ -409,156 +561,6 @@ export default function VereadorDetalhesModerno() {
           </div>
         </div>
       )}
-
-      {/* Conteúdo principal */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Coluna esquerda - Informações pessoais */}
-          <div className="space-y-6">
-            <Card className="shadow-lg border-l-4 border-l-green-600">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-green-800">
-                  <Building2 className="h-5 w-5" />
-                  Informações de Contato
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Mail className="h-5 w-5 text-green-600" />
-                  <div>
-                    <p className="text-sm text-gray-600">E-mail</p>
-                    <a href={`mailto:${councilor.email}`} className="text-green-700 hover:underline font-normal">
-                      {councilor.email}
-                    </a>
-                  </div>
-                </div>
-                
-                {councilor.phone && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Phone className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="text-sm text-gray-600">Telefone</p>
-                      <a href={`tel:${councilor.phone}`} className="text-green-700 hover:underline font-medium">
-                        {councilor.phone}
-                      </a>
-                    </div>
-                  </div>
-                )}
-                
-                {councilor.partido && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <MapPin className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="text-sm text-gray-600">Partido</p>
-                      <p className="text-gray-900 font-normal">{councilor.partido}</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Informações pessoais */}
-            <Card className="shadow-lg border-l-4 border-l-blue-600">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-800">
-                  <GraduationCap className="h-5 w-5" />
-                  Informações Pessoais
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* {councilor.birthDate && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Calendar className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm text-gray-600">Data de Nascimento</p>
-                      <p className="text-gray-900 font-medium">
-                        {new Date(councilor.birthDate).toLocaleDateString('pt-BR')}
-                      </p>
-                    </div>
-                  </div>
-                )} */}
-                
-                {councilor.education && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <GraduationCap className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm text-gray-600">Formação</p>
-                      <p className="text-gray-900 font-medium">{councilor.education}</p>
-                    </div>
-                  </div>
-                )}
-                
-                {councilor.occupation && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Briefcase className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm text-gray-600">Ocupação</p>
-                      <p className="text-gray-900 font-medium">{councilor.occupation}</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Coluna direita - Documentos e Atividades */}
-          <div className="lg:col-span-2 space-y-6">
-            
-            
-
-            {/* Atividades */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <Award className="h-5 w-5 text-green-600" />
-                  Atividades Legislativas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isActivitiesLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Carregando atividades...</p>
-                  </div>
-                ) : activities.length > 0 ? (
-                  <div className="space-y-4">
-                    {activities.slice(0, 5).map((activity: any) => (
-                      <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3 flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
-                          <p className="text-sm text-gray-600 mb-2">
-                            {activity.type} • {
-                              activity.date ? 
-                              new Date(activity.date).toLocaleDateString('pt-BR') : 
-                              'Data não informada'
-                            }
-                          </p>
-                        </div>
-                        {(activity.filePath || activity.file) && (
-                          <a 
-                            href={`/api/public/activities/${activity.id}/download`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-4"
-                          >
-                            <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50">
-                              <Download className="h-4 w-4 mr-2" />
-                              Download
-                            </Button>
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-600 text-center py-8">Nenhuma atividade encontrada</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
     </>
   );
 }
