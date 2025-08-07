@@ -5207,11 +5207,11 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
       .from(activityVotes)
       .where(eq(activityVotes.userId, userId));
       
-      // Calcular métricas de votação
+      // Calcular métricas de votação (vote é boolean: true = favorável, false = contrário)
       const totalVotes = votingData.length;
-      const favorableVotes = votingData.filter(v => v.vote === 'Favorável').length;
-      const unfavorableVotes = votingData.filter(v => v.vote === 'Contrário').length;
-      const abstentions = votingData.filter(v => v.vote === 'Abstenção').length;
+      const favorableVotes = votingData.filter(v => v.vote === true).length;
+      const unfavorableVotes = votingData.filter(v => v.vote === false).length;
+      const abstentions = 0; // Não há campo para abstenção no schema atual
       
       // Buscar atividades legislativas do vereador
       const userActivities = await storage.getLegislativeActivitiesByAuthor(userId);

@@ -307,16 +307,16 @@ export default function VereadorDetalhesModerno() {
                 <CardContent>
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     <div className="text-center">
+                      <div className="text-xl font-bold text-blue-600">{metrics.voting.totalVotes}</div>
+                      <div className="text-xs text-gray-600">Total de Votos</div>
+                    </div>
+                    <div className="text-center">
                       <div className="text-xl font-bold text-green-600">{metrics.voting.favorableVotes}</div>
                       <div className="text-xs text-gray-600">Favorável</div>
                     </div>
                     <div className="text-center">
                       <div className="text-xl font-bold text-red-600">{metrics.voting.unfavorableVotes}</div>
                       <div className="text-xs text-gray-600">Contrário</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-yellow-600">{metrics.voting.abstentions}</div>
-                      <div className="text-xs text-gray-600">Abstenção</div>
                     </div>
                   </div>
                   
@@ -328,9 +328,8 @@ export default function VereadorDetalhesModerno() {
                           <Pie
                             data={[
                               { name: 'Favorável', value: metrics.voting.favorableVotes, fill: '#16a34a' },
-                              { name: 'Contrário', value: metrics.voting.unfavorableVotes, fill: '#dc2626' },
-                              { name: 'Abstenção', value: metrics.voting.abstentions, fill: '#ca8a04' }
-                            ]}
+                              { name: 'Contrário', value: metrics.voting.unfavorableVotes, fill: '#dc2626' }
+                            ].filter(item => item.value > 0)}
                             cx="50%"
                             cy="50%"
                             innerRadius={40}
@@ -339,9 +338,8 @@ export default function VereadorDetalhesModerno() {
                           >
                             {[
                               { name: 'Favorável', value: metrics.voting.favorableVotes, fill: '#16a34a' },
-                              { name: 'Contrário', value: metrics.voting.unfavorableVotes, fill: '#dc2626' },
-                              { name: 'Abstenção', value: metrics.voting.abstentions, fill: '#ca8a04' }
-                            ].map((entry, index) => (
+                              { name: 'Contrário', value: metrics.voting.unfavorableVotes, fill: '#dc2626' }
+                            ].filter(item => item.value > 0).map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.fill} />
                             ))}
                           </Pie>
