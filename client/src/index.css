@@ -74,6 +74,82 @@
   transform: scale(1.05) !important;
 }
 
+/* React Quill Editor Styles */
+.ql-container {
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.ql-editor {
+  min-height: 250px;
+  padding: 16px;
+  line-height: 1.6;
+}
+
+.ql-toolbar {
+  border-top: 1px solid #e2e8f0;
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: #f8fafc;
+}
+
+.ql-container {
+  border-bottom: 1px solid #e2e8f0;
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+}
+
+.ql-toolbar .ql-stroke {
+  fill: none;
+  stroke: #64748b;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.ql-toolbar .ql-fill {
+  fill: #64748b;
+  stroke: none;
+}
+
+.ql-toolbar button:hover {
+  background-color: #e2e8f0;
+}
+
+.ql-toolbar button.ql-active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.ql-toolbar button.ql-active .ql-stroke {
+  stroke: white;
+}
+
+.ql-toolbar button.ql-active .ql-fill {
+  fill: white;
+}
+
+.ql-editor.ql-blank::before {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Responsive adjustments for Quill toolbar */
+@media (max-width: 768px) {
+  .ql-toolbar {
+    padding: 8px;
+  }
+  
+  .ql-editor {
+    padding: 12px;
+    min-height: 200px;
+  }
+}
+
 /* Estilos para Alto Contraste */
 .high-contrast {
   filter: contrast(150%) !important;

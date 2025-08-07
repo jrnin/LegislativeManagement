@@ -15,6 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { NewsArticle, NewsCategory } from "@shared/schema";
 import { formatDate } from "@/lib/utils";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { 
   Image, 
   Calendar, 
@@ -22,14 +24,6 @@ import {
   Star, 
   Save, 
   Upload,
-  Bold,
-  Italic,
-  Underline,
-  List,
-  ListOrdered,
-  Quote,
-  Link,
-  Code,
   X
 } from "lucide-react";
 
@@ -60,8 +54,36 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
+  const [content, setContent] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // React Quill configuration
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      [{ 'align': [] }],
+      ['blockquote', 'code-block'],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
+
+  const quillFormats = [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'script',
+    'list', 'bullet', 'indent',
+    'align', 'direction',
+    'blockquote', 'code-block',
+    'link', 'image'
+  ];
 
   const form = useForm<NewsFormData>({
     resolver: zodResolver(newsFormSchema),
@@ -95,11 +117,18 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
         metaDescription: news.metaDescription || "",
         publishedAt: news.publishedAt ? new Date(news.publishedAt).toISOString().slice(0, 16) : "",
       });
+      setContent(news.content); // Set content for React Quill
       if (news.imageUrl) {
         setCoverImagePreview(news.imageUrl);
       }
     }
   }, [news, form]);
+
+  // Handle content changes from React Quill
+  const handleContentChange = (value: string) => {
+    setContent(value);
+    form.setValue("content", value);
+  };
 
   // Generate slug from title
   const generateSlug = (title: string) => {
@@ -261,64 +290,7 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
     saveNewsMutation.mutate(data);
   };
 
-  // Simple text formatting functions
-  const formatText = (format: string) => {
-    const textarea = document.getElementById("content") as HTMLTextAreaElement;
-    if (!textarea) return;
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    const currentValue = form.getValues("content");
-    
-    let newText = "";
-    let newCursorPos = start;
-
-    switch (format) {
-      case "bold":
-        newText = `**${selectedText}**`;
-        newCursorPos = start + (selectedText ? newText.length : 2);
-        break;
-      case "italic":
-        newText = `*${selectedText}*`;
-        newCursorPos = start + (selectedText ? newText.length : 1);
-        break;
-      case "underline":
-        newText = `<u>${selectedText}</u>`;
-        newCursorPos = start + (selectedText ? newText.length : 3);
-        break;
-      case "quote":
-        newText = `> ${selectedText}`;
-        newCursorPos = start + newText.length;
-        break;
-      case "list":
-        newText = `- ${selectedText}`;
-        newCursorPos = start + newText.length;
-        break;
-      case "ordered":
-        newText = `1. ${selectedText}`;
-        newCursorPos = start + newText.length;
-        break;
-      case "code":
-        newText = `\`${selectedText}\``;
-        newCursorPos = start + (selectedText ? newText.length : 1);
-        break;
-      case "link":
-        newText = `[${selectedText}](url)`;
-        newCursorPos = start + newText.length - 4;
-        break;
-      default:
-        return;
-    }
-
-    const newValue = currentValue.substring(0, start) + newText + currentValue.substring(end);
-    form.setValue("content", newValue);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
-  };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -551,97 +523,21 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Toolbar */}
-            <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-gray-50">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => formatText("bold")}
-                title="Negrito"
-              >
-                <Bold className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => formatText("italic")}
-                title="Itálico"
-              >
-                <Italic className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => formatText("underline")}
-                title="Sublinhado"
-              >
-                <Underline className="h-4 w-4" />
-              </Button>
-              <div className="w-px h-6 bg-gray-300" />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => formatText("list")}
-                title="Lista"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => formatText("ordered")}
-                title="Lista Numerada"
-              >
-                <ListOrdered className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => formatText("quote")}
-                title="Citação"
-              >
-                <Quote className="h-4 w-4" />
-              </Button>
-              <div className="w-px h-6 bg-gray-300" />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => formatText("link")}
-                title="Link"
-              >
-                <Link className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => formatText("code")}
-                title="Código"
-              >
-                <Code className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Content textarea */}
-            <div>
-              <Textarea
-                id="content"
-                {...form.register("content")}
+            {/* React Quill Editor */}
+            <div className="min-h-[300px]">
+              <ReactQuill
+                value={content}
+                onChange={handleContentChange}
+                modules={quillModules}
+                formats={quillFormats}
                 placeholder="Escreva o conteúdo da notícia aqui..."
-                rows={15}
-                className="font-mono text-sm"
+                className="bg-white"
+                style={{ height: '300px' }}
               />
-              {form.formState.errors.content && (
-                <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
-              )}
             </div>
+            {form.formState.errors.content && (
+              <p className="text-sm text-red-500 mt-2">{form.formState.errors.content.message}</p>
+            )}
           </div>
         </CardContent>
       </Card>
