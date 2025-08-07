@@ -243,7 +243,7 @@ export default function SessoesPage() {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white border-b">
-          <div className="container mx-auto px-4 py-8">
+          <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="text-center">
               <h1 className="text-4xl font-bold mb-4" style={{color: '#48654e'}}>
                 Sessões da Câmara Municipal
@@ -256,7 +256,7 @@ export default function SessoesPage() {
         </div>
 
         {/* Filters */}
-        <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-8">
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center gap-2" style={{color: '#48654e'}}>
