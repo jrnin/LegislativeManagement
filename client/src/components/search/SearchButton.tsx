@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SearchModal } from '@/components/ui/search-modal';
+import { SimpleSearchModal } from '@/components/ui/simple-search-modal';
 import { useIsMobile } from '@/mobile/hooks/useIsMobile';
 
 export default function SearchButton() {
@@ -27,10 +27,7 @@ export default function SearchButton() {
     <>
       <Button 
         variant="outline" 
-        onClick={() => {
-          console.log('Botão de busca clicado');
-          setIsSearchOpen(true);
-        }}
+        onClick={() => setIsSearchOpen(true)}
         className={`relative bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900 ${
           isMobile ? 'w-full justify-between' : ''
         }`}
@@ -44,7 +41,7 @@ export default function SearchButton() {
         )}
       </Button>
       
-      <SearchModal 
+      <SimpleSearchModal 
         isOpen={isSearchOpen} 
         onClose={() => setIsSearchOpen(false)} 
       />
