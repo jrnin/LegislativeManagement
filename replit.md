@@ -29,6 +29,7 @@ Preferred communication style: Simple, everyday language.
 - **Comments System**: Advanced comment functionality with mentions (@events, #activities, !documents) and deletion.
 - **Timeline System**: Comprehensive audit trail tracking user actions across major system components (activities, documents, voting, attendance, comments).
 - **User Management**: Support for admin, councilor, and executive roles with comprehensive profile information display.
+- **Metrics Visualization**: Councilor-specific performance metrics with Recharts library integration, including presence tracking, voting statistics (boolean-based: true=favorable, false=unfavorable), activity distribution by type, and monthly attendance charts. Real-time data visualization with bar charts and pie charts for comprehensive performance analysis.
 - **Accessibility**: Dark mode and high contrast mode features for improved accessibility.
 
 ### Feature Specifications
