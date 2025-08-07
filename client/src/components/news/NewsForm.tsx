@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,8 +15,6 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { NewsArticle, NewsCategory } from "@shared/schema";
 import { formatDate } from "@/lib/utils";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import { 
   Image, 
   Calendar, 
@@ -26,6 +24,106 @@ import {
   Upload,
   X
 } from "lucide-react";
+
+// Rich text editor component
+const RichTextEditor = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
+  const [editorValue, setEditorValue] = useState(value || '');
+
+  const handleChange = (content: string) => {
+    setEditorValue(content);
+    onChange(content);
+  };
+
+  return (
+    <div className="border border-gray-300 rounded-lg">
+      <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap gap-1">
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => document.execCommand('bold')}
+        >
+          <strong>B</strong>
+        </button>
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => document.execCommand('italic')}
+        >
+          <em>I</em>
+        </button>
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => document.execCommand('underline')}
+        >
+          <u>U</u>
+        </button>
+        <div className="border-l border-gray-300 mx-1"></div>
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => document.execCommand('formatBlock', false, 'h1')}
+        >
+          H1
+        </button>
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => document.execCommand('formatBlock', false, 'h2')}
+        >
+          H2
+        </button>
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => document.execCommand('formatBlock', false, 'h3')}
+        >
+          H3
+        </button>
+        <div className="border-l border-gray-300 mx-1"></div>
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => document.execCommand('insertUnorderedList')}
+        >
+          UL
+        </button>
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => document.execCommand('insertOrderedList')}
+        >
+          OL
+        </button>
+        <button
+          type="button"
+          className="px-2 py-1 text-sm border rounded hover:bg-gray-100"
+          onClick={() => {
+            const url = prompt('Digite a URL do link:');
+            if (url) document.execCommand('createLink', false, url);
+          }}
+        >
+          Link
+        </button>
+      </div>
+      <div
+        contentEditable
+        suppressContentEditableWarning={true}
+        className="min-h-[250px] p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+        style={{ whiteSpace: 'pre-wrap' }}
+        dangerouslySetInnerHTML={{ __html: editorValue }}
+        onInput={(e) => {
+          const content = e.currentTarget.innerHTML;
+          handleChange(content);
+        }}
+        onBlur={(e) => {
+          const content = e.currentTarget.innerHTML;
+          handleChange(content);
+        }}
+      />
+    </div>
+  );
+};
 
 const newsFormSchema = z.object({
   title: z.string().min(1, "Título é obrigatório").max(255, "Título muito longo"),
@@ -58,32 +156,7 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // React Quill configuration
-  const quillModules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'align': [] }],
-      ['blockquote', 'code-block'],
-      ['link', 'image'],
-      ['clean']
-    ],
-  };
 
-  const quillFormats = [
-    'header', 'font', 'size',
-    'bold', 'italic', 'underline', 'strike',
-    'color', 'background',
-    'script',
-    'list', 'bullet', 'indent',
-    'align', 'direction',
-    'blockquote', 'code-block',
-    'link', 'image'
-  ];
 
   const form = useForm<NewsFormData>({
     resolver: zodResolver(newsFormSchema),
@@ -117,14 +190,14 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
         metaDescription: news.metaDescription || "",
         publishedAt: news.publishedAt ? new Date(news.publishedAt).toISOString().slice(0, 16) : "",
       });
-      setContent(news.content); // Set content for React Quill
+      setContent(news.content);
       if (news.imageUrl) {
         setCoverImagePreview(news.imageUrl);
       }
     }
   }, [news, form]);
 
-  // Handle content changes from React Quill
+  // Handle content changes from editor
   const handleContentChange = (value: string) => {
     setContent(value);
     form.setValue("content", value);
@@ -523,16 +596,11 @@ export default function NewsForm({ news, categories, onSuccess }: NewsFormProps)
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* React Quill Editor */}
+            {/* Rich Text Editor */}
             <div className="min-h-[300px]">
-              <ReactQuill
+              <RichTextEditor
                 value={content}
                 onChange={handleContentChange}
-                modules={quillModules}
-                formats={quillFormats}
-                placeholder="Escreva o conteúdo da notícia aqui..."
-                className="bg-white"
-                style={{ height: '300px' }}
               />
             </div>
             {form.formState.errors.content && (
