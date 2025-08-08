@@ -419,112 +419,101 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 </button>
               </Link>
               
-              {/* Lado direito: busca e menus */}
+              {/* Lado direito: menu hambúrguer */}
               <div className="flex items-center space-x-4">
-                {/* Menu flutuante dentro do header - alinhado à direita */}
-                <div className={`hidden lg:flex transition-transform duration-300 ease-in-out ${
-                  isMenuHidden ? 'opacity-70 scale-95' : 'opacity-100 scale-100'
-                }`}>
-                  <nav className="flex items-center justify-center">
-                    <div className="bg-white/95 backdrop-blur-lg rounded-full px-4 py-2 shadow-lg border border-gray-200/30 dark:bg-slate-800/95 dark:border-slate-700/30">
-                      <div className="flex items-center space-x-1">
-                        {mainMenuLinks.map((link) => (
-                          link.submenu ? (
-                            <DropdownMenu key={link.name}>
-                              <DropdownMenuTrigger asChild>
-                                <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer flex items-center ${
-                                  location === link.href 
-                                    ? 'bg-green-600 text-white shadow-lg transform scale-105' 
-                                    : 'text-gray-700 hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-slate-700'
-                                }`}>
-                                  {link.name}
-                                  <ChevronDown size={12} className="ml-1" />
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent className={`${isDarkMode ? "bg-slate-800 text-white border-slate-700" : "bg-white"} shadow-2xl border-0 rounded-xl p-2`}>
-                                {link.submenu?.map((subItem) => (
-                                  subItem.external ? (
-                                    <DropdownMenuItem key={subItem.name} asChild>
-                                      <a 
-                                        href={subItem.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`block px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                                          isDarkMode 
-                                            ? 'hover:bg-slate-700 text-gray-300' 
-                                            : 'hover:bg-green-50 text-gray-700'
-                                        }`}
-                                      >
-                                        {subItem.name}
-                                      </a>
-                                    </DropdownMenuItem>
-                                  ) : (
-                                    <DropdownMenuItem key={subItem.name} asChild>
-                                      <Link href={subItem.href}>
-                                        <button className={`block px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer w-full text-left ${
-                                          isDarkMode 
-                                            ? 'hover:bg-slate-700 text-gray-300' 
-                                            : 'hover:bg-green-50 text-gray-700'
-                                        }`}>
-                                          {subItem.name}
-                                        </button>
-                                      </Link>
-                                    </DropdownMenuItem>
-                                  )
-                                ))}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          ) : (
-                            <Link key={link.href} href={link.href}>
-                              <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer ${
-                                location === link.href 
-                                  ? 'bg-green-600 text-white shadow-lg transform scale-105' 
-                                  : 'text-gray-700 hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-slate-700'
-                              }`}>
-                                {link.name}
-                              </button>
-                            </Link>
-                          )
-                        ))}
-                      </div>
-                    </div>
-                  </nav>
-                </div>
-
-                {/* Componente Último Evento - compacto */}
+                {/* Menu hambúrguer secundário para desktop */}
                 <div className="hidden lg:flex">
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200/50 dark:border-green-700/50 rounded-lg px-3 py-2 shadow-sm hover:shadow-md transition-all duration-300">
-                    <div className="flex items-center space-x-2">
-                      <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
-                          <Calendar size={14} className="text-green-600 dark:text-green-400" />
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        aria-label="Menu Secundário"
+                        className={`rounded-full p-2 transition-colors ${
+                          location === '/public' && !isScrolled 
+                            ? "text-white hover:bg-white/20" 
+                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
+                        }`}
+                      >
+                        <Menu size={20} />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className={`w-80 ${isDarkMode ? "bg-slate-800 text-white" : "bg-white"}`}>
+                      <div className="flex flex-col h-full">
+                        <div className="flex justify-between items-center pb-4 border-b">
+                          <div className="text-xl font-bold">Menu Rápido</div>
+                          <SheetClose asChild>
+                            <Button variant="ghost" size="icon">
+                              <X />
+                            </Button>
+                          </SheetClose>
+                        </div>
+
+                        {/* Serviços de acesso rápido */}
+                        <div className="py-6">
+                          <h3 className="font-semibold mb-4 text-lg">Acesso Rápido</h3>
+                          <div className="grid grid-cols-2 gap-3">
+                            {quickServices.map((service) => (
+                              <Link key={service.href} href={service.href}>
+                                <SheetClose asChild>
+                                  <button className={`flex flex-col items-center p-4 rounded-lg border transition-colors w-full ${
+                                    isDarkMode 
+                                      ? 'border-slate-600 hover:bg-slate-700 text-gray-300' 
+                                      : 'border-gray-200 hover:bg-gray-50 text-gray-700'
+                                  }`}>
+                                    <service.icon size={24} className="mb-2" />
+                                    <span className="text-sm font-medium text-center">{service.name}</span>
+                                  </button>
+                                </SheetClose>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Links úteis */}
+                        <div className="py-4 border-t">
+                          <h3 className="font-semibold mb-4 text-lg">Links Úteis</h3>
+                          <div className="space-y-2">
+                            <a 
+                              href="https://cmjaiba.cidadesmg.com.br/portaltransparencia" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className={`block p-3 rounded-lg transition-colors ${
+                                isDarkMode 
+                                  ? 'hover:bg-slate-700 text-gray-300' 
+                                  : 'hover:bg-gray-50 text-gray-700'
+                              }`}
+                            >
+                              Portal da Transparência
+                            </a>
+                            <a 
+                              href="https://cmjaiba.cidadesmg.com.br/webmail" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className={`block p-3 rounded-lg transition-colors ${
+                                isDarkMode 
+                                  ? 'hover:bg-slate-700 text-gray-300' 
+                                  : 'hover:bg-gray-50 text-gray-700'
+                              }`}
+                            >
+                              Webmail
+                            </a>
+                            <Link href="/contato">
+                              <SheetClose asChild>
+                                <button className={`block p-3 rounded-lg transition-colors w-full text-left ${
+                                  isDarkMode 
+                                    ? 'hover:bg-slate-700 text-gray-300' 
+                                    : 'hover:bg-gray-50 text-gray-700'
+                                }`}>
+                                  Ouvidoria/Contato
+                                </button>
+                              </SheetClose>
+                            </Link>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-xs font-semibold text-green-800 dark:text-green-200">
-                          Último Evento
-                        </h3>
-                        {latestEvent && typeof latestEvent === 'object' && 'title' in latestEvent ? (
-                          <Link href="/sessoes">
-                            <div className="cursor-pointer group">
-                              <p className="text-xs text-green-700 dark:text-green-300 group-hover:text-green-900 dark:group-hover:text-green-100 transition-colors truncate max-w-40">
-                                {(latestEvent as any).title}
-                              </p>
-                            </div>
-                          </Link>
-                        ) : (
-                          <div className="text-xs text-green-600 dark:text-green-400">
-                            Carregando...
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Barra de pesquisa - visível em telas médias ou maiores */}
-                <div className="hidden md:flex">
-                  <SearchButton />
+                    </SheetContent>
+                  </Sheet>
                 </div>
 
                 {/* Menu para dispositivos móveis */}
@@ -641,6 +630,49 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
         
 
+      </div>
+
+      {/* Componentes fixos fora do header - alinhados à direita */}
+      <div className="hidden lg:block fixed top-32 right-4 z-40 space-y-3">
+        {/* Componente Último Evento - fixo */}
+        <div className={`transition-transform duration-300 ease-in-out ${
+          isMenuHidden ? 'translate-x-20 opacity-0' : 'translate-x-0 opacity-100'
+        }`}>
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200/50 dark:border-green-700/50 rounded-lg px-3 py-2 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center space-x-2">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
+                  <Calendar size={14} className="text-green-600 dark:text-green-400" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xs font-semibold text-green-800 dark:text-green-200">
+                  Último Evento
+                </h3>
+                {latestEvent && typeof latestEvent === 'object' && 'title' in latestEvent ? (
+                  <Link href="/sessoes">
+                    <div className="cursor-pointer group">
+                      <p className="text-xs text-green-700 dark:text-green-300 group-hover:text-green-900 dark:group-hover:text-green-100 transition-colors truncate max-w-40">
+                        {(latestEvent as any).title}
+                      </p>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="text-xs text-green-600 dark:text-green-400">
+                    Carregando...
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Botão de busca - fixo */}
+        <div className={`transition-transform duration-300 ease-in-out ${
+          isMenuHidden ? 'translate-x-20 opacity-0' : 'translate-x-0 opacity-100'
+        }`}>
+          <SearchButton />
+        </div>
       </div>
 
       {/* Conteúdo principal */}
