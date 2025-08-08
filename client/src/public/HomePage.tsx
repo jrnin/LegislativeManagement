@@ -449,7 +449,7 @@ const servicesData = {
   ],
   acessoRapido: [
     { title: "Portal da Transparência", icon: Eye, color: "bg-green-600" },
-    { title: "Consulta Pública", icon: FileCheck, color: "bg-blue-600" },
+    { title: "Nota Fiscal Eletrônica", icon: FileCheck, color: "bg-blue-600", url: "https://jaibamg.webiss.com.br/"  },
     { title: "Ouvidoria Municipal", icon: Users, color: "bg-orange-600" },
     { title: "E-SIC - Informações", icon: Shield, color: "bg-purple-600" },
     { title: "Licitações e Contratos", icon: FileBarChart, color: "bg-red-600" },
