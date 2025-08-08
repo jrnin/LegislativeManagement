@@ -805,7 +805,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">População</p>
-                        <p className="text-lg font-bold text-blue-700">37.000</p>
+                        <p className="text-sm font-medium text-blue-700">37.000</p>
                       </div>
                     </div>
 
@@ -816,7 +816,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Área</p>
-                        <p className="text-lg font-bold text-green-700">1.182 km²</p>
+                        <p className="text-sm font-medium text-green-700">1.182 km²</p>
                       </div>
                     </div>
 
@@ -827,7 +827,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">IDH</p>
-                        <p className="text-lg font-bold text-purple-700">0.681</p>
+                        <p className="text-sm font-medium text-purple-700">0.681</p>
                       </div>
                     </div>
 
@@ -838,7 +838,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">PIB per capita</p>
-                        <p className="text-lg font-bold text-yellow-700">R$ 28.450</p>
+                        <p className="text-sm font-medium text-yellow-700">R$ 28.450</p>
                       </div>
                     </div>
 
@@ -849,7 +849,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Taxa Alfabetização</p>
-                        <p className="text-lg font-bold text-red-700">89.2%</p>
+                        <p className="text-sm font-medium text-red-700">89.2%</p>
                       </div>
                     </div>
 
@@ -860,7 +860,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Densidade</p>
-                        <p className="text-lg font-bold text-teal-700">31.3 hab/km²</p>
+                        <p className="text-sm font-medium text-teal-700">31.3 hab/km²</p>
                       </div>
                     </div>
                   </div>

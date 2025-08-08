@@ -391,63 +391,58 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 <SearchButton />
               </div>
 
-              {/* Menu para desktop */}
-              <nav className="hidden lg:flex items-center space-x-1">
-                {mainMenuLinks.map((link) => (
-                  link.submenu ? (
-                    <DropdownMenu key={link.name}>
-                      <DropdownMenuTrigger asChild>
-                        <button className={`px-3 py-2 rounded-[10px] text-base
- font-normal transition-colors cursor-pointer flex items-center ${
-                          location === link.href 
-                            ? 'text-white' 
-                            : location === '/public' && !isScrolled
-                              ? 'text-white hover:bg-white/20'
-                              : isDarkMode 
-                                ? 'text-gray-300 hover:bg-slate-400 hover:text-white' 
-                                : 'hover:opacity-100'
-                        }`} style={location === link.href ? {backgroundColor: '#48654e'} : {color: '#253529'}}>
-                          {link.name}
-                          <ChevronDown className="ml-1 h-4 w-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="rounded-[10px]">
-                        {link.submenu.map((subItem) => (
-                          <DropdownMenuItem key={subItem.name} className="text-base rounded-[10px]">
-                            {subItem.external ? (
-                              <a 
-                                href={subItem.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full"
-                              >
-                                {subItem.name}
-                              </a>
-                            ) : (
-                              <Link href={subItem.href} className="w-full">
-                                {subItem.name}
-                              </Link>
-                            )}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : (
-                    <Link key={link.href} href={link.href}>
-                      <button className={`px-3 py-2 rounded-[10px] text-base font-normal transition-colors cursor-pointer ${
-                        location === link.href 
-                          ? 'text-white' 
-                          : location === '/public' && !isScrolled
-                            ? 'text-white hover:bg-white/20'
-                            : isDarkMode 
-                              ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
-                              : 'hover:opacity-80'
-                      }`} style={location === link.href ? {backgroundColor: '#007825'} : {color: '#253529'}}>
-                        {link.name}
-                      </button>
-                    </Link>
-                  )
-                ))}
+              {/* Menu para desktop com barra suspensa arredondada */}
+              <nav className="hidden lg:flex items-center">
+                <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-gray-200/50 dark:bg-slate-800/90 dark:border-slate-700/50">
+                  <div className="flex items-center space-x-1">
+                    {mainMenuLinks.map((link) => (
+                      link.submenu ? (
+                        <DropdownMenu key={link.name}>
+                          <DropdownMenuTrigger asChild>
+                            <button className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer flex items-center ${
+                              location === link.href 
+                                ? 'bg-green-600 text-white shadow-md' 
+                                : 'text-gray-700 hover:bg-green-50 hover:text-green-700 dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
+                            }`}>
+                              {link.name}
+                              <ChevronDown className="ml-1 h-3 w-3" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="rounded-2xl shadow-xl border-0 bg-white/95 backdrop-blur-sm dark:bg-slate-800/95 mt-2 min-w-[200px]">
+                            {link.submenu.map((subItem) => (
+                              <DropdownMenuItem key={subItem.name} className="text-sm rounded-xl mx-1 my-1 py-2 px-3 focus:bg-green-50 dark:focus:bg-slate-700">
+                                {subItem.external ? (
+                                  <a 
+                                    href={subItem.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors"
+                                  >
+                                    {subItem.name}
+                                  </a>
+                                ) : (
+                                  <Link href={subItem.href} className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors">
+                                    {subItem.name}
+                                  </Link>
+                                )}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <Link key={link.href} href={link.href}>
+                          <button className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer ${
+                            location === link.href 
+                              ? 'bg-green-600 text-white shadow-md' 
+                              : 'text-gray-700 hover:bg-green-50 hover:text-green-700 dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
+                          }`}>
+                            {link.name}
+                          </button>
+                        </Link>
+                      )
+                    ))}
+                  </div>
+                </div>
                 
                 <div className="ml-2">
                   
