@@ -312,39 +312,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 aria-label={isDarkMode ? "Modo claro" : "Modo escuro"}
               >
                 {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-              <button 
-                onClick={toggleHighContrast} 
-                className="p-1 rounded-md hover:opacity-80 text-xs" 
-                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
-                aria-label={isHighContrast ? "Contraste normal" : "Alto contraste"}
-              >
-                {isHighContrast ? "Contraste normal" : "Alto contraste"}
-              </button>
-              <button 
-                onClick={increaseFontSize} 
-                className="p-1 rounded-md hover:opacity-80 text-xs" 
-                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
-                aria-label="Aumentar fonte"
-              >
-                Fonte maior
-              </button>
-              <button 
-                onClick={decreaseFontSize} 
-                className="p-1 rounded-md hover:opacity-80 text-xs" 
-                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
-                aria-label="Diminuir fonte"
-              >
-                Fonte menor
-              </button>
-              <button 
-                onClick={resetFontSize} 
-                className="p-1 rounded-md hover:opacity-80 text-xs" 
-                style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
-                aria-label="Resetar fonte"
-              >
-                Fonte normal
-              </button>
+              </button>         
+              
             </div>
             <button 
               onClick={resetFontSize} 

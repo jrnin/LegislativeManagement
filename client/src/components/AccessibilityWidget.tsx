@@ -121,7 +121,7 @@ export function AccessibilityWidget() {
       {/* Main accessibility button */}
       <Button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-300 mb-2"
+        className="w-12 h-12 rounded-full bg-green-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-300 mb-2"
         aria-label="Opções de Acessibilidade"
       >
         <Accessibility size={20} />
