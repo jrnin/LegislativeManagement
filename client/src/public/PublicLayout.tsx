@@ -505,7 +505,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         </header>
         
         {/* Menu flutuante centralizado para desktop */}
-        <div className="hidden lg:block fixed top-24 left-1/2 transform -translate-x-1/2 z-40">
+        <div className="hidden lg:block fixed top-26 left-1/2 transform -translate-x-1/2 z-40">
           <nav className="flex items-center justify-center">
             <div className="bg-white/95 backdrop-blur-lg rounded-full px-6 py-3 shadow-2xl border border-gray-200/30 dark:bg-slate-800/95 dark:border-slate-700/30">
               <div className="flex items-center space-x-2">

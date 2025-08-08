@@ -13,7 +13,7 @@ Preferred communication style: Simple, everyday language.
 - **Component Library**: Leverages Shadcn/ui for consistent and modern UI components.
 - **Design Approach**: Emphasizes responsive design, clean layouts, and intuitive interfaces. Examples include streamlined image galleries, simplified login, and clear visual indicators for required fields and legislative statuses.
 - **Visual Enhancements**: Incorporates subtle animations, hover effects, gradient stylings, and enhanced typography for an improved user experience.
-- **Layout Optimization**: Applied max-w-7xl container width across all public pages for better margin utilization and consistent screen width usage.
+- **Layout Optimization**: Applied max-w-7xl container width across all public pages for better margin utilization and consistent screen width usage. Menu público redesenhado como barra flutuante centralizada com bordas arredondadas, posicionado fora do header sobrepondo elegantemente o conteúdo (Agosto 2025).
 
 ### Technical Implementations
 - **Backend**: Express.js with TypeScript, PostgreSQL (Drizzle ORM), Replit Auth for session management, local file system for storage, and SendGrid for emails.
