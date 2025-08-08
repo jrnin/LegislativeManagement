@@ -30,7 +30,7 @@ Preferred communication style: Simple, everyday language.
 - **Timeline System**: Comprehensive audit trail tracking user actions across major system components (activities, documents, voting, attendance, comments).
 - **User Management**: Support for admin, councilor, and executive roles with comprehensive profile information display.
 - **Metrics Visualization**: Councilor-specific performance metrics with Recharts library integration, including presence tracking, voting statistics (boolean-based: true=favorable, false=unfavorable), activity distribution by type, and monthly attendance charts. Real-time data visualization with bar charts and pie charts for comprehensive performance analysis.
-- **Accessibility**: Dark mode and high contrast mode features for improved accessibility.
+- **Accessibility**: Comprehensive floating accessibility widget positioned on the left side with features including: high contrast mode, dark mode, adjustable font size (12-24px), text spacing enhancement, reading mode with serif fonts, sound controls, and settings persistence via localStorage. All accessibility changes apply smooth CSS transitions for better user experience.
 
 ### Feature Specifications
 - **Public Interface**: Responsive pages for transparency, browsing legislative activities, document access, councilor profiles, and news.
