@@ -348,7 +348,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           </div>
         </div>
       </div>
-
+      
       {/* Header principal com vídeo de background */}
       <div className="relative">
         
@@ -365,6 +365,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         >
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex justify-between items-center">
+              
               {/* Logo */}
               <Link href="/">
                 <button className="flex items-center space-x-3">
@@ -385,69 +386,15 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   </div>
                 </button>
               </Link>
+              
 
               {/* Barra de pesquisa - visível apenas em telas médias ou maiores */}
               <div className="hidden md:flex flex-1 max-w-md mx-6">
                 <SearchButton />
               </div>
 
-              {/* Menu para desktop com barra suspensa arredondada */}
-              <nav className="hidden lg:flex items-center">
-                <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-gray-200/50 dark:bg-slate-800/90 dark:border-slate-700/50">
-                  <div className="flex items-center space-x-1">
-                    {mainMenuLinks.map((link) => (
-                      link.submenu ? (
-                        <DropdownMenu key={link.name}>
-                          <DropdownMenuTrigger asChild>
-                            <button className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer flex items-center ${
-                              location === link.href 
-                                ? 'bg-green-600 text-white shadow-md' 
-                                : 'text-gray-700 hover:bg-green-50 hover:text-green-700 dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
-                            }`}>
-                              {link.name}
-                              <ChevronDown className="ml-1 h-3 w-3" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="rounded-2xl shadow-xl border-0 bg-white/95 backdrop-blur-sm dark:bg-slate-800/95 mt-2 min-w-[200px]">
-                            {link.submenu.map((subItem) => (
-                              <DropdownMenuItem key={subItem.name} className="text-sm rounded-xl mx-1 my-1 py-2 px-3 focus:bg-green-50 dark:focus:bg-slate-700">
-                                {subItem.external ? (
-                                  <a 
-                                    href={subItem.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors"
-                                  >
-                                    {subItem.name}
-                                  </a>
-                                ) : (
-                                  <Link href={subItem.href} className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors">
-                                    {subItem.name}
-                                  </Link>
-                                )}
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      ) : (
-                        <Link key={link.href} href={link.href}>
-                          <button className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer ${
-                            location === link.href 
-                              ? 'bg-green-600 text-white shadow-md' 
-                              : 'text-gray-700 hover:bg-green-50 hover:text-green-700 dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
-                          }`}>
-                            {link.name}
-                          </button>
-                        </Link>
-                      )
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="ml-2">
-                  
-                </div>
-              </nav>
+              {/* Espaço vazio onde ficava o menu desktop */}
+              <div className="hidden lg:block w-32"></div>
 
               {/* Menu para dispositivos móveis */}
               <div className="lg:hidden flex items-center">
@@ -472,6 +419,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                           </Button>
                         </SheetClose>
                       </div>
+
+                  
                       
                       {/* Barra de pesquisa para mobile */}
                       <div className="py-4">
@@ -544,19 +493,9 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                           )
                         ))}
                       </nav>
+                                        
                       
-                      <div className="mt-auto pt-4 border-t">
-                        <SheetClose asChild>
-                          <Button 
-                            variant="default" 
-                            size="sm" 
-                            className="w-full"
-                            onClick={() => window.location.href = "/login"}
-                          >
-                            Área Restrita
-                          </Button>
-                        </SheetClose>
-                      </div>
+                      
                     </div>
                   </SheetContent>
                 </Sheet>
@@ -564,6 +503,62 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             </div>
           </div>
         </header>
+        
+        {/* Menu flutuante centralizado para desktop */}
+        <div className="hidden lg:block fixed top-24 left-1/2 transform -translate-x-1/2 z-40">
+          <nav className="flex items-center justify-center">
+            <div className="bg-white/95 backdrop-blur-lg rounded-full px-6 py-3 shadow-2xl border border-gray-200/30 dark:bg-slate-800/95 dark:border-slate-700/30">
+              <div className="flex items-center space-x-2">
+                {mainMenuLinks.map((link) => (
+                  link.submenu ? (
+                    <DropdownMenu key={link.name}>
+                      <DropdownMenuTrigger asChild>
+                        <button className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer flex items-center ${
+                          location === link.href 
+                            ? 'bg-green-600 text-white shadow-lg transform scale-105' 
+                            : 'text-gray-700 hover:bg-green-50 hover:text-green-700 hover:shadow-md dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
+                        }`}>
+                          {link.name}
+                          <ChevronDown className="ml-1 h-3 w-3" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="rounded-2xl shadow-xl border-0 bg-white/95 backdrop-blur-lg dark:bg-slate-800/95 mt-3 min-w-[220px] animate-in fade-in-0 zoom-in-95">
+                        {link.submenu.map((subItem) => (
+                          <DropdownMenuItem key={subItem.name} className="text-sm rounded-xl mx-2 my-1 py-3 px-4 focus:bg-green-50 dark:focus:bg-slate-700 transition-all duration-200">
+                            {subItem.external ? (
+                              <a 
+                                href={subItem.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors font-medium"
+                              >
+                                {subItem.name}
+                              </a>
+                            ) : (
+                              <Link href={subItem.href} className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors font-medium">
+                                {subItem.name}
+                              </Link>
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Link key={link.href} href={link.href}>
+                      <button className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer ${
+                        location === link.href 
+                          ? 'bg-green-600 text-white shadow-lg transform scale-105' 
+                          : 'text-gray-700 hover:bg-green-50 hover:text-green-700 hover:shadow-md dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
+                      }`}>
+                        {link.name}
+                      </button>
+                    </Link>
+                  )
+                ))}
+              </div>
+            </div>
+          </nav>
+        </div>
       </div>
 
       {/* Conteúdo principal */}
