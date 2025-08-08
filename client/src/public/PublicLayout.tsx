@@ -713,10 +713,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               </div>
             )}
 
-            {/* Botão de busca */}
-            <div className="flex-shrink-0">
-              <SearchButton />
-            </div>
+           
           </div>
         </div>
       </div>
