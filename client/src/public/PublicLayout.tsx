@@ -700,7 +700,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
       {/* Componentes fixos responsivos */}
       {/* Desktop e Tablet (md+) */}
-      <div className="hidden md:block fixed top-32 left-1/2 transform -translate-x-1/2 z-40 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="hidden md:block fixed top-40 left-1/2 transform -translate-x-1/2 z-40 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex justify-end">
           <div className={`flex items-center space-x-2 sm:space-x-3 transition-all duration-300 ease-in-out ${
             isMenuHidden ? 'translate-x-5 opacity-0' : 'translate-x-0 opacity-100'
@@ -743,7 +743,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       </div>
 
       {/* Mobile (sm) */}
-      <div className="md:hidden fixed top-20 right-2 z-40 space-y-2">
+      <div className="md:hidden fixed top-24 right-2 z-40 space-y-2">
         <div className={`transition-all duration-300 ease-in-out ${
           isMenuHidden ? 'translate-x-5 opacity-0' : 'translate-x-0 opacity-100'
         }`}>
