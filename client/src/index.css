@@ -74,6 +74,85 @@
   transform: scale(1.05) !important;
 }
 
+/* Estilos de Acessibilidade */
+/* Alto Contraste */
+.accessibility-high-contrast {
+  filter: contrast(150%) brightness(120%);
+}
+
+.accessibility-high-contrast * {
+  border-color: #000 !important;
+  outline: 1px solid #000 !important;
+}
+
+.accessibility-high-contrast .text-gray-500 {
+  color: #000 !important;
+}
+
+.accessibility-high-contrast .text-gray-600 {
+  color: #000 !important;
+}
+
+.accessibility-high-contrast .bg-gray-100 {
+  background-color: #fff !important;
+}
+
+.accessibility-high-contrast .bg-gray-200 {
+  background-color: #fff !important;
+}
+
+/* Espaçamento de Texto */
+.accessibility-text-spacing {
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+  line-height: 1.8 !important;
+}
+
+.accessibility-text-spacing p,
+.accessibility-text-spacing span,
+.accessibility-text-spacing div,
+.accessibility-text-spacing a,
+.accessibility-text-spacing button {
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+  line-height: 1.8 !important;
+}
+
+/* Modo de Leitura */
+.accessibility-reading-mode {
+  font-family: Georgia, 'Times New Roman', serif !important;
+}
+
+.accessibility-reading-mode * {
+  font-family: Georgia, 'Times New Roman', serif !important;
+  line-height: 1.6 !important;
+}
+
+.accessibility-reading-mode .bg-white {
+  background-color: #fefefe !important;
+}
+
+.accessibility-reading-mode .text-gray-900 {
+  color: #2a2a2a !important;
+}
+
+.accessibility-reading-mode .text-gray-800 {
+  color: #3a3a3a !important;
+}
+
+.accessibility-reading-mode .text-gray-700 {
+  color: #4a4a4a !important;
+}
+
+/* Animações de transição para mudanças de acessibilidade */
+html {
+  transition: font-size 0.3s ease, filter 0.3s ease !important;
+}
+
+body * {
+  transition: letter-spacing 0.3s ease, word-spacing 0.3s ease, line-height 0.3s ease !important;
+}
+
 /* React Quill Editor Styles */
 .ql-container {
   font-size: 14px;

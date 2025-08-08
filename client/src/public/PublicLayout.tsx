@@ -30,6 +30,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import SearchButton from '@/components/search/SearchButton';
+import { AccessibilityWidget } from '@/components/AccessibilityWidget';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -345,7 +346,17 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 Fonte normal
               </button>
             </div>
+            <button 
+              onClick={resetFontSize} 
+              className="p-1 rounded-md hover:opacity-80 text-xs" 
+              style={{backgroundColor: 'rgba(127, 166, 83, 0.3)'}}
+              aria-label="Resetar fonte"
+            >Webmail            </button>
+            <div className="flex-shrink-0">
+              <SearchButton />
+            </div>
           </div>
+          
 
           <div className="flex items-center space-x-4 mt-2 sm:mt-0">
             <div className="flex items-center space-x-2">
@@ -557,7 +568,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                               Portal da Transparência
                             </a>
                             <a 
-                              href="https://cmjaiba.cidadesmg.com.br/webmail" 
+                              href="https://mail.hostinger.com" 
                               target="_blank" 
                               rel="noopener noreferrer"
                               className={`block p-3 rounded-lg transition-colors ${
@@ -734,10 +745,10 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               </div>
             </div>
 
-            {/* Botão de busca */}
+            {/* Botão de busca 
             <div className="flex-shrink-0">
               <SearchButton />
-            </div>
+            </div>*/}
           </div>
         </div>
       </div>
@@ -775,11 +786,13 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               </div>
             </div>
           </div>
-
           {/* Botão de busca mobile */}
           <SearchButton />
         </div>
       </div>
+
+      {/* Widget de Acessibilidade */}
+      <AccessibilityWidget />
 
       {/* Conteúdo principal */}
       <main className="flex-1">
@@ -819,7 +832,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 <Button 
                   size="sm" 
                   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm"
-                  onClick={() => window.open('https://cmjaiba.cidadesmg.com.br/webmail', '_blank')}
+                  onClick={() => window.open('https://mail.hostinger.com', '_blank')}
                 >
                   Acessar Webmail
                 </Button>
