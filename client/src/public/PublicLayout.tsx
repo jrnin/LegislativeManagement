@@ -419,46 +419,165 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 </button>
               </Link>
               
-              {/* Lado direito: busca e menus */}
-              <div className="flex items-center space-x-4">
-                {/* Componente Último Evento - compacto */}
-                <div className="hidden lg:flex">
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200/50 dark:border-green-700/50 rounded-lg px-3 py-2 shadow-sm hover:shadow-md transition-all duration-300">
-                    <div className="flex items-center space-x-2">
-                      <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
-                          <Calendar size={14} className="text-green-600 dark:text-green-400" />
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-xs font-semibold text-green-800 dark:text-green-200">
-                          Último Evento
-                        </h3>
-                        {latestEvent && typeof latestEvent === 'object' && 'title' in latestEvent ? (
-                          <Link href="/eventos">
-                            <div className="cursor-pointer group">
-                              <p className="text-xs text-green-700 dark:text-green-300 group-hover:text-green-900 dark:group-hover:text-green-100 transition-colors truncate max-w-40">
-                                {(latestEvent as any).title}
-                              </p>
-                            </div>
-                          </Link>
-                        ) : (
-                          <div className="text-xs text-green-600 dark:text-green-400">
-                            Carregando...
-                          </div>
-                        )}
-                      </div>
+              {/* Menu de navegação principal no header - desktop */}
+              <div className="hidden lg:flex items-center space-x-2">
+                {mainMenuLinks.map((link) => (
+                  link.submenu ? (
+                    <DropdownMenu key={link.name}>
+                      <DropdownMenuTrigger asChild>
+                        <button className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer flex items-center ${
+                          location === link.href 
+                            ? 'bg-green-600 text-white shadow-lg' 
+                            : location === '/public' && !isScrolled 
+                              ? 'text-white hover:bg-white/20' 
+                              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700'
+                        }`}>
+                          {link.name}
+                          <ChevronDown size={16} className="ml-1" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className={`${isDarkMode ? "bg-slate-800 text-white border-slate-700" : ""}`}>
+                        {link.submenu.map((subItem) => (
+                          subItem.external ? (
+                            <DropdownMenuItem key={subItem.name} asChild>
+                              <a 
+                                href={subItem.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="cursor-pointer"
+                              >
+                                {subItem.name}
+                              </a>
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem key={subItem.name} asChild>
+                              <Link href={subItem.href}>
+                                <span className="cursor-pointer">{subItem.name}</span>
+                              </Link>
+                            </DropdownMenuItem>
+                          )
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Link key={link.href} href={link.href}>
+                      <button className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${
+                        location === link.href 
+                          ? 'bg-green-600 text-white shadow-lg' 
+                          : location === '/public' && !isScrolled 
+                            ? 'text-white hover:bg-white/20' 
+                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700'
+                      }`}>
+                        {link.name}
+                      </button>
+                    </Link>
+                  )
+                ))}
+              </div>
+
+              {/* Menu hambúrguer para mobile */}
+              <div className="lg:hidden flex items-center">
+                <Sheet>
+                <SheetTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    aria-label="Menu"
+                    className={location === '/public' && !isScrolled ? "text-white hover:bg-white/20" : ""}
+                  >
+                    <Menu />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className={isDarkMode ? "bg-slate-800 text-white" : ""}>
+                  <div className="flex flex-col h-full">
+                    <div className="flex justify-between items-center pb-4 border-b">
+                      <div className="text-xl font-bold">Menu</div>
+                      <SheetClose asChild>
+                        <Button variant="ghost" size="icon">
+                          <X />
+                        </Button>
+                      </SheetClose>
                     </div>
+
+                
+                    
+                    {/* Menu de navegação */}
+                    <nav className="flex flex-col space-y-1 py-4">
+                      {mainMenuLinks.map((link) => (
+                        link.submenu ? (
+                          <div key={link.name} className="space-y-1">
+                            <Link href={link.href}>
+                              <SheetClose asChild>
+                                <button className={`px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                                  location === link.href 
+                                    ? 'text-white' 
+                                    : isDarkMode 
+                                      ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                                      : 'text-gray-700 hover:bg-gray-100'
+                                }`} style={location === link.href ? {backgroundColor: '#48654e'} : {}}>
+                                  {link.name}
+                                </button>
+                              </SheetClose>
+                            </Link>
+                            <div className="pl-4 space-y-1">
+                              {link.submenu.map((subItem) => (
+                                subItem.external ? (
+                                  <a 
+                                    key={subItem.name}
+                                    href={subItem.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`block px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer ${
+                                      isDarkMode 
+                                        ? 'text-gray-400 hover:bg-slate-700 hover:text-white' 
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                    }`}
+                                  >
+                                    {subItem.name}
+                                  </a>
+                                ) : (
+                                  <Link key={subItem.name} href={subItem.href}>
+                                    <SheetClose asChild>
+                                      <button className={`block px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                                        isDarkMode 
+                                          ? 'text-gray-400 hover:bg-slate-700 hover:text-white' 
+                                          : 'text-gray-600 hover:bg-gray-100'
+                                      }`}>
+                                        {subItem.name}
+                                      </button>
+                                    </SheetClose>
+                                  </Link>
+                                )
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <Link key={link.href} href={link.href}>
+                            <SheetClose asChild>
+                              <button className={`px-3 py-2 rounded-[10px] text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                                location === link.href 
+                                  ? 'text-white' 
+                                  : isDarkMode 
+                                    ? 'text-gray-300 hover:bg-slate-700 hover:text-white' 
+                                    : 'text-gray-700 hover:bg-gray-100'
+                              }`} style={location === link.href ? {backgroundColor: '#48654e'} : {}}>
+                                {link.name}
+                              </button>
+                            </SheetClose>
+                          </Link>
+                        )
+                      ))}
+                    </nav>
+                                      
+                    
+                    
                   </div>
-                </div>
+                </SheetContent>
+                </Sheet>
+              </div>
 
-                {/* Barra de pesquisa - visível em telas médias ou maiores */}
-                <div className="hidden md:flex">
-                  <SearchButton />
-                </div>
-
-                {/* Menu hambúrguer secundário para desktop */}
-                <div className="hidden lg:flex">
+              {/* Menu hambúrguer secundário para desktop */}
+              <div className="hidden lg:flex">
                   <Sheet>
                     <SheetTrigger asChild>
                       <Button 
@@ -661,62 +780,45 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           </div>
         </header>
         
-        {/* Menu flutuante centralizado para desktop */}
-        <div className={`hidden lg:block fixed top-26 left-1/2 transform -translate-x-1/2 z-40 transition-transform duration-300 ease-in-out ${
+        {/* Barra de busca e último evento - fixos fora do header */}
+        <div className={`fixed top-32 left-1/2 transform -translate-x-1/2 z-40 transition-transform duration-300 ease-in-out ${
           isMenuHidden ? '-translate-y-20 opacity-0' : 'translate-y-0 opacity-100'
         }`}>
-          <nav className="flex items-center justify-center">
-            <div className="bg-white/95 backdrop-blur-lg rounded-full px-6 py-3 shadow-2xl border border-gray-200/30 dark:bg-slate-800/95 dark:border-slate-700/30">
+          <div className="flex items-center space-x-4">
+            {/* Componente Último Evento - fixo */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200/50 dark:border-green-700/50 rounded-lg px-3 py-2 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm">
               <div className="flex items-center space-x-2">
-                {mainMenuLinks.map((link) => (
-                  link.submenu ? (
-                    <DropdownMenu key={link.name}>
-                      <DropdownMenuTrigger asChild>
-                        <button className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer flex items-center ${
-                          location === link.href 
-                            ? 'bg-green-600 text-white shadow-lg transform scale-105' 
-                            : 'text-gray-700 hover:bg-green-50 hover:text-green-700 hover:shadow-md dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
-                        }`}>
-                          {link.name}
-                          <ChevronDown className="ml-1 h-3 w-3" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="rounded-2xl shadow-xl border-0 bg-white/95 backdrop-blur-lg dark:bg-slate-800/95 mt-3 min-w-[220px] animate-in fade-in-0 zoom-in-95">
-                        {link.submenu.map((subItem) => (
-                          <DropdownMenuItem key={subItem.name} className="text-sm rounded-xl mx-2 my-1 py-3 px-4 focus:bg-green-50 dark:focus:bg-slate-700 transition-all duration-200">
-                            {subItem.external ? (
-                              <a 
-                                href={subItem.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors font-medium"
-                              >
-                                {subItem.name}
-                              </a>
-                            ) : (
-                              <Link href={subItem.href} className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors font-medium">
-                                {subItem.name}
-                              </Link>
-                            )}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : (
-                    <Link key={link.href} href={link.href}>
-                      <button className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer ${
-                        location === link.href 
-                          ? 'bg-green-600 text-white shadow-lg transform scale-105' 
-                          : 'text-gray-700 hover:bg-green-50 hover:text-green-700 hover:shadow-md dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
-                      }`}>
-                        {link.name}
-                      </button>
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
+                    <Calendar size={14} className="text-green-600 dark:text-green-400" />
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xs font-semibold text-green-800 dark:text-green-200">
+                    Último Evento
+                  </h3>
+                  {latestEvent && typeof latestEvent === 'object' && 'title' in latestEvent ? (
+                    <Link href="/eventos">
+                      <div className="cursor-pointer group">
+                        <p className="text-xs text-green-700 dark:text-green-300 group-hover:text-green-900 dark:group-hover:text-green-100 transition-colors truncate max-w-40">
+                          {(latestEvent as any).title}
+                        </p>
+                      </div>
                     </Link>
-                  )
-                ))}
+                  ) : (
+                    <div className="text-xs text-green-600 dark:text-green-400">
+                      Carregando...
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </nav>
+
+            {/* Botão de busca - fixo */}
+            <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/50 dark:border-slate-700/50">
+              <SearchButton />
+            </div>
+          </div>
         </div>
       </div>
 
