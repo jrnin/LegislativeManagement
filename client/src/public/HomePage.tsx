@@ -437,16 +437,7 @@ const quickServices = [
 ];
 // Dados dos serviços por categoria
 const servicesData = {
-  servicos: [
-    { title: "Nota Fiscal Eletrônica", icon: FileBarChart, color: "bg-blue-600", url: "https://jaibamg.webiss.com.br/" },
-    { title: "Farmácia Básica da Saúde", icon: Scissors, color: "bg-blue-600", url: "https://jaiba.mg.gov.br/farmacia-basica-da-saude/" },
-    { title: "Cartão Estacionamento Idoso - PCD", icon: Car, color: "bg-blue-600" },
-    { title: "Consulta de Multas", icon: CreditCard, color: "bg-green-600" },
-    { title: "Consulta de Processos Físicos", icon: FolderOpen, color: "bg-blue-600" },
-    { title: "Diário Oficial", icon: Newspaper, color: "bg-blue-600" },
-    { title: "Editais da Cultura", icon: Theater, color: "bg-purple-600" },
-    { title: "Emendas Parlamentares", icon: Edit, color: "bg-blue-600" }
-  ],
+  
   acessoRapido: [
     { title: "Portal da Transparência", icon: Eye, color: "bg-green-600" },
     { title: "Nota Fiscal Eletrônica", icon: FileCheck, color: "bg-blue-600", url: "https://jaibamg.webiss.com.br/"  },
@@ -480,7 +471,7 @@ const servicesData = {
 };
 
 export default function HomePage() {
-  const [activeServiceTab, setActiveServiceTab] = useState('servicos');
+  const [activeServiceTab, setActiveServiceTab] = useState('acessoRapido');
   
   // Consulta real à API para obter dados de eventos
   const { data: events = [], isLoading: eventsLoading } = useQuery({
@@ -1193,16 +1184,7 @@ export default function HomePage() {
                 <span className="text-sm font-medium text-gray-600">Exibir:</span>
               </div>
               <div className="flex space-x-6">
-                <button 
-                  onClick={() => setActiveServiceTab('servicos')}
-                  className={`text-sm font-medium pb-1 transition-colors ${
-                    activeServiceTab === 'servicos' 
-                      ? 'text-blue-600 border-b-2 border-blue-600' 
-                      : 'text-gray-500 hover:text-blue-600'
-                  }`}
-                >
-                  Serviços
-                </button>
+                
                 <button 
                   onClick={() => setActiveServiceTab('acessoRapido')}
                   className={`text-sm font-medium pb-1 transition-colors ${
