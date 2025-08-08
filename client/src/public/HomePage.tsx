@@ -53,9 +53,7 @@ import {
   Globe,
   Building2,
   FileBarChart,
-  TrendingUp,
-  ChevronDown,
-  Menu
+  TrendingUp
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -67,58 +65,6 @@ import WeatherWidget from "@/components/WeatherWidget";
 // Função auxiliar para obter iniciais
 const getInitials = (name: string) => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase();
-};
-
-// Componente de Dropdown Menu
-const DropdownMenu = ({ 
-  title, 
-  items, 
-  isOpen, 
-  onToggle,
-  className = "" 
-}: {
-  title: string;
-  items: any[];
-  isOpen: boolean;
-  onToggle: () => void;
-  className?: string;
-}) => {
-  return (
-    <div className={`relative ${className}`}>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggle();
-        }}
-        className="flex items-center justify-between w-full px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-[10px] hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm transition-all duration-200"
-      >
-        <span>{title}</span>
-        <ChevronDown 
-          className={`h-5 w-5 transition-transform duration-200 ${
-            isOpen ? 'transform rotate-180' : ''
-          }`} 
-        />
-      </button>
-      
-      {isOpen && (
-        <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-200 rounded-[10px] shadow-lg z-50 max-h-60 overflow-y-auto">
-          {items.map((item, index) => (
-            <div
-              key={index}
-              className="px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer flex items-center space-x-3 first:rounded-t-[10px] last:rounded-b-[10px]"
-            >
-              <div 
-                className={`w-8 h-8 ${item.color} rounded-full flex items-center justify-center`}
-              >
-                <item.icon className="h-4 w-4 text-white" />
-              </div>
-              <span>{item.title}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 };
 // Componente para exibir as últimas atividades legislativas
 const LegislativeActivitiesWidget = () => {
@@ -534,24 +480,7 @@ const servicesData = {
 };
 
 export default function HomePage() {
-  const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
-  
-  const toggleDropdown = (key: string) => {
-    setOpenDropdowns(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
-  // Fechar dropdowns quando clicar fora
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setOpenDropdowns({});
-    };
-    
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
+  const [activeServiceTab, setActiveServiceTab] = useState('servicos');
   
   // Consulta real à API para obter dados de eventos
   const { data: events = [], isLoading: eventsLoading } = useQuery({
@@ -876,7 +805,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">População</p>
-                        <p className="text-sm font-medium text-blue-700">37.000</p>
+                        <p className="text-lg font-bold text-blue-700">37.000</p>
                       </div>
                     </div>
 
@@ -887,7 +816,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Área</p>
-                        <p className="text-sm font-medium text-green-700">1.182 km²</p>
+                        <p className="text-lg font-bold text-green-700">1.182 km²</p>
                       </div>
                     </div>
 
@@ -898,7 +827,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">IDH</p>
-                        <p className="text-sm font-medium text-purple-700">0.681</p>
+                        <p className="text-lg font-bold text-purple-700">0.681</p>
                       </div>
                     </div>
 
@@ -909,7 +838,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">PIB per capita</p>
-                        <p className="text-sm font-medium text-yellow-700">R$ 28.450</p>
+                        <p className="text-lg font-bold text-yellow-700">R$ 28.450</p>
                       </div>
                     </div>
 
@@ -920,7 +849,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Taxa Alfabetização</p>
-                        <p className="text-sm font-medium text-red-700">89.2%</p>
+                        <p className="text-lg font-bold text-red-700">89.2%</p>
                       </div>
                     </div>
 
@@ -931,7 +860,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Densidade</p>
-                        <p className="text-sm font-medium text-teal-700">31.3 hab/km²</p>
+                        <p className="text-lg font-bold text-teal-700">31.3 hab/km²</p>
                       </div>
                     </div>
                   </div>
@@ -1259,44 +1188,91 @@ export default function HomePage() {
               </div>
             </div>
             
-            <div className="flex justify-center mb-8">
-              <div className="flex flex-wrap justify-center gap-4 p-4 bg-gray-50 rounded-[10px] border border-gray-200">
-                <DropdownMenu
-                  title="Serviços"
-                  items={servicesData.servicos}
-                  isOpen={openDropdowns['servicos'] || false}
-                  onToggle={() => toggleDropdown('servicos')}
-                  className="min-w-[180px]"
-                />
-                
-                <DropdownMenu
-                  title="Acesso Rápido"
-                  items={servicesData.acessoRapido}
-                  isOpen={openDropdowns['acessoRapido'] || false}
-                  onToggle={() => toggleDropdown('acessoRapido')}
-                  className="min-w-[180px]"
-                />
-                
-                <DropdownMenu
-                  title="Servidor"
-                  items={servicesData.servidor}
-                  isOpen={openDropdowns['servidor'] || false}
-                  onToggle={() => toggleDropdown('servidor')}
-                  className="min-w-[180px]"
-                />
-                
-                <DropdownMenu
-                  title="Empresas"
-                  items={servicesData.empresas}
-                  isOpen={openDropdowns['empresas'] || false}
-                  onToggle={() => toggleDropdown('empresas')}
-                  className="min-w-[180px]"
-                />
+            <div className="flex justify-center space-x-8 mb-8">
+              <div className="text-center">
+                <span className="text-sm font-medium text-gray-600">Exibir:</span>
+              </div>
+              <div className="flex space-x-6">
+                <button 
+                  onClick={() => setActiveServiceTab('servicos')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'servicos' 
+                      ? 'text-blue-600 border-b-2 border-blue-600' 
+                      : 'text-gray-500 hover:text-blue-600'
+                  }`}
+                >
+                  Serviços
+                </button>
+                <button 
+                  onClick={() => setActiveServiceTab('acessoRapido')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'acessoRapido' 
+                      ? 'text-purple-600 border-b-2 border-purple-600' 
+                      : 'text-gray-500 hover:text-purple-600'
+                  }`}
+                >
+                  Acesso Rápido
+                </button>
+                <button 
+                  onClick={() => setActiveServiceTab('servidor')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'servidor' 
+                      ? 'text-yellow-600 border-b-2 border-yellow-600' 
+                      : 'text-gray-500 hover:text-yellow-600'
+                  }`}
+                >
+                  Servidor
+                </button>
+                <button 
+                  onClick={() => setActiveServiceTab('empresas')}
+                  className={`text-sm font-medium pb-1 transition-colors ${
+                    activeServiceTab === 'empresas' 
+                      ? 'text-blue-400 border-b-2 border-blue-400' 
+                      : 'text-gray-500 hover:text-blue-400'
+                  }`}
+                >
+                  Empresas
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Os serviços agora são exibidos através dos menus dropdown acima */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {servicesData[activeServiceTab as keyof typeof servicesData].map((service, index) => {
+              const IconComponent = service.icon;
+              const cardContent = (
+                <Card key={index} className="p-6 hover:shadow-lg transition-shadow duration-300 bg-gray-50 cursor-pointer">
+                  <div className="flex items-start space-x-4">
+                    <div className={`w-12 h-12 rounded-full ${service.color} flex items-center justify-center flex-shrink-0`}>
+                      <IconComponent className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 mb-1">
+                        {service.title}
+                      </h3>
+                    </div>
+                  </div>
+                </Card>
+              );
+
+              // Se o serviço tem URL, envolver com link
+              if ((service as any).url) {
+                return (
+                  <a 
+                    key={index} 
+                    href={(service as any).url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    {cardContent}
+                  </a>
+                );
+              }
+
+              return cardContent;
+            })}
+          </div>
 
           <div className="text-center mt-12">
             <Button 
