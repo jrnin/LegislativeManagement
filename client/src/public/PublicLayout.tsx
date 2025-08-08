@@ -53,6 +53,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState(16);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuHidden, setIsMenuHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
 
   // Buscar dados meteorológicos da API
@@ -83,14 +85,33 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     return iconMap[iconName] || Cloud;
   };
   
-  // Detectar quando o usuário rola a página para aplicar o efeito do menu fixo
+  // Detectar quando o usuário rola a página para aplicar o efeito do menu fixo e auto-hide
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
+      const currentScrollY = window.scrollY;
+      
+      // Determinar se rolou para baixo (>100px) para aplicar efeito glass
+      if (currentScrollY > 100) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
+      
+      // Auto-hide do menu flutuante baseado na direção do scroll
+      if (currentScrollY > 200) { // Só começar a esconder após 200px
+        if (currentScrollY > lastScrollY && currentScrollY > 300) {
+          // Rolando para baixo - esconder menu
+          setIsMenuHidden(true);
+        } else if (currentScrollY < lastScrollY) {
+          // Rolando para cima - mostrar menu
+          setIsMenuHidden(false);
+        }
+      } else {
+        // No topo da página - sempre mostrar menu
+        setIsMenuHidden(false);
+      }
+      
+      setLastScrollY(currentScrollY);
     };
     
     window.addEventListener('scroll', handleScroll);
@@ -99,7 +120,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [lastScrollY]);
 
   // Opções para configurações de acessibilidade
   const toggleDarkMode = () => {
@@ -641,7 +662,9 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         </header>
         
         {/* Menu flutuante centralizado para desktop */}
-        <div className="hidden lg:block fixed top-26 left-1/2 transform -translate-x-1/2 z-40">
+        <div className={`hidden lg:block fixed top-26 left-1/2 transform -translate-x-1/2 z-40 transition-transform duration-300 ease-in-out ${
+          isMenuHidden ? '-translate-y-20 opacity-0' : 'translate-y-0 opacity-100'
+        }`}>
           <nav className="flex items-center justify-center">
             <div className="bg-white/95 backdrop-blur-lg rounded-full px-6 py-3 shadow-2xl border border-gray-200/30 dark:bg-slate-800/95 dark:border-slate-700/30">
               <div className="flex items-center space-x-2">
