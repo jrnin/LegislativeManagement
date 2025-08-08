@@ -421,6 +421,76 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               
               {/* Lado direito: busca e menus */}
               <div className="flex items-center space-x-4">
+                {/* Menu flutuante dentro do header - alinhado à direita */}
+                <div className={`hidden lg:flex transition-transform duration-300 ease-in-out ${
+                  isMenuHidden ? 'opacity-70 scale-95' : 'opacity-100 scale-100'
+                }`}>
+                  <nav className="flex items-center justify-center">
+                    <div className="bg-white/95 backdrop-blur-lg rounded-full px-4 py-2 shadow-lg border border-gray-200/30 dark:bg-slate-800/95 dark:border-slate-700/30">
+                      <div className="flex items-center space-x-1">
+                        {mainMenuLinks.map((link) => (
+                          link.submenu ? (
+                            <DropdownMenu key={link.name}>
+                              <DropdownMenuTrigger asChild>
+                                <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer flex items-center ${
+                                  location === link.href 
+                                    ? 'bg-green-600 text-white shadow-lg transform scale-105' 
+                                    : 'text-gray-700 hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-slate-700'
+                                }`}>
+                                  {link.name}
+                                  <ChevronDown size={12} className="ml-1" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className={`${isDarkMode ? "bg-slate-800 text-white border-slate-700" : "bg-white"} shadow-2xl border-0 rounded-xl p-2`}>
+                                {link.submenu?.map((subItem) => (
+                                  subItem.external ? (
+                                    <DropdownMenuItem key={subItem.name} asChild>
+                                      <a 
+                                        href={subItem.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`block px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
+                                          isDarkMode 
+                                            ? 'hover:bg-slate-700 text-gray-300' 
+                                            : 'hover:bg-green-50 text-gray-700'
+                                        }`}
+                                      >
+                                        {subItem.name}
+                                      </a>
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem key={subItem.name} asChild>
+                                      <Link href={subItem.href}>
+                                        <button className={`block px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer w-full text-left ${
+                                          isDarkMode 
+                                            ? 'hover:bg-slate-700 text-gray-300' 
+                                            : 'hover:bg-green-50 text-gray-700'
+                                        }`}>
+                                          {subItem.name}
+                                        </button>
+                                      </Link>
+                                    </DropdownMenuItem>
+                                  )
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          ) : (
+                            <Link key={link.href} href={link.href}>
+                              <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer ${
+                                location === link.href 
+                                  ? 'bg-green-600 text-white shadow-lg transform scale-105' 
+                                  : 'text-gray-700 hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-slate-700'
+                              }`}>
+                                {link.name}
+                              </button>
+                            </Link>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  </nav>
+                </div>
+
                 {/* Componente Último Evento - compacto */}
                 <div className="hidden lg:flex">
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200/50 dark:border-green-700/50 rounded-lg px-3 py-2 shadow-sm hover:shadow-md transition-all duration-300">
@@ -435,7 +505,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                           Último Evento
                         </h3>
                         {latestEvent && typeof latestEvent === 'object' && 'title' in latestEvent ? (
-                          <Link href="/eventos">
+                          <Link href="/sessoes">
                             <div className="cursor-pointer group">
                               <p className="text-xs text-green-700 dark:text-green-300 group-hover:text-green-900 dark:group-hover:text-green-100 transition-colors truncate max-w-40">
                                 {(latestEvent as any).title}
@@ -455,101 +525,6 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 {/* Barra de pesquisa - visível em telas médias ou maiores */}
                 <div className="hidden md:flex">
                   <SearchButton />
-                </div>
-
-                {/* Menu hambúrguer secundário para desktop */}
-                <div className="hidden lg:flex">
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        aria-label="Menu Secundário"
-                        className={`rounded-full p-2 transition-colors ${
-                          location === '/public' && !isScrolled 
-                            ? "text-white hover:bg-white/20" 
-                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
-                        }`}
-                      >
-                        <Menu size={20} />
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent side="right" className={`w-80 ${isDarkMode ? "bg-slate-800 text-white" : "bg-white"}`}>
-                      <div className="flex flex-col h-full">
-                        <div className="flex justify-between items-center pb-4 border-b">
-                          <div className="text-xl font-bold">Menu Rápido</div>
-                          <SheetClose asChild>
-                            <Button variant="ghost" size="icon">
-                              <X />
-                            </Button>
-                          </SheetClose>
-                        </div>
-
-                        {/* Serviços de acesso rápido */}
-                        <div className="py-6">
-                          <h3 className="font-semibold mb-4 text-lg">Acesso Rápido</h3>
-                          <div className="grid grid-cols-2 gap-3">
-                            {quickServices.map((service) => (
-                              <Link key={service.href} href={service.href}>
-                                <SheetClose asChild>
-                                  <button className={`flex flex-col items-center p-4 rounded-lg border transition-colors w-full ${
-                                    isDarkMode 
-                                      ? 'border-slate-600 hover:bg-slate-700 text-gray-300' 
-                                      : 'border-gray-200 hover:bg-gray-50 text-gray-700'
-                                  }`}>
-                                    <service.icon size={24} className="mb-2" />
-                                    <span className="text-sm font-medium text-center">{service.name}</span>
-                                  </button>
-                                </SheetClose>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Links úteis */}
-                        <div className="py-4 border-t">
-                          <h3 className="font-semibold mb-4 text-lg">Links Úteis</h3>
-                          <div className="space-y-2">
-                            <a 
-                              href="https://cmjaiba.cidadesmg.com.br/portaltransparencia" 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className={`block p-3 rounded-lg transition-colors ${
-                                isDarkMode 
-                                  ? 'hover:bg-slate-700 text-gray-300' 
-                                  : 'hover:bg-gray-50 text-gray-700'
-                              }`}
-                            >
-                              Portal da Transparência
-                            </a>
-                            <a 
-                              href="https://cmjaiba.cidadesmg.com.br/webmail" 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className={`block p-3 rounded-lg transition-colors ${
-                                isDarkMode 
-                                  ? 'hover:bg-slate-700 text-gray-300' 
-                                  : 'hover:bg-gray-50 text-gray-700'
-                              }`}
-                            >
-                              Webmail
-                            </a>
-                            <Link href="/contato">
-                              <SheetClose asChild>
-                                <button className={`block p-3 rounded-lg transition-colors w-full text-left ${
-                                  isDarkMode 
-                                    ? 'hover:bg-slate-700 text-gray-300' 
-                                    : 'hover:bg-gray-50 text-gray-700'
-                                }`}>
-                                  Ouvidoria/Contato
-                                </button>
-                              </SheetClose>
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    </SheetContent>
-                  </Sheet>
                 </div>
 
                 {/* Menu para dispositivos móveis */}
@@ -661,63 +636,11 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           </div>
         </header>
         
-        {/* Menu flutuante centralizado para desktop */}
-        <div className={`hidden lg:block fixed top-26 left-1/2 transform -translate-x-1/2 z-40 transition-transform duration-300 ease-in-out ${
-          isMenuHidden ? '-translate-y-20 opacity-0' : 'translate-y-0 opacity-100'
-        }`}>
-          <nav className="flex items-center justify-center">
-            <div className="bg-white/95 backdrop-blur-lg rounded-full px-6 py-3 shadow-2xl border border-gray-200/30 dark:bg-slate-800/95 dark:border-slate-700/30">
-              <div className="flex items-center space-x-2">
-                {mainMenuLinks.map((link) => (
-                  link.submenu ? (
-                    <DropdownMenu key={link.name}>
-                      <DropdownMenuTrigger asChild>
-                        <button className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer flex items-center ${
-                          location === link.href 
-                            ? 'bg-green-600 text-white shadow-lg transform scale-105' 
-                            : 'text-gray-700 hover:bg-green-50 hover:text-green-700 hover:shadow-md dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
-                        }`}>
-                          {link.name}
-                          <ChevronDown className="ml-1 h-3 w-3" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="rounded-2xl shadow-xl border-0 bg-white/95 backdrop-blur-lg dark:bg-slate-800/95 mt-3 min-w-[220px] animate-in fade-in-0 zoom-in-95">
-                        {link.submenu.map((subItem) => (
-                          <DropdownMenuItem key={subItem.name} className="text-sm rounded-xl mx-2 my-1 py-3 px-4 focus:bg-green-50 dark:focus:bg-slate-700 transition-all duration-200">
-                            {subItem.external ? (
-                              <a 
-                                href={subItem.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors font-medium"
-                              >
-                                {subItem.name}
-                              </a>
-                            ) : (
-                              <Link href={subItem.href} className="w-full text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-white transition-colors font-medium">
-                                {subItem.name}
-                              </Link>
-                            )}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : (
-                    <Link key={link.href} href={link.href}>
-                      <button className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer ${
-                        location === link.href 
-                          ? 'bg-green-600 text-white shadow-lg transform scale-105' 
-                          : 'text-gray-700 hover:bg-green-50 hover:text-green-700 hover:shadow-md dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white'
-                      }`}>
-                        {link.name}
-                      </button>
-                    </Link>
-                  )
-                ))}
-              </div>
-            </div>
-          </nav>
-        </div>
+
+
+
+        
+
       </div>
 
       {/* Conteúdo principal */}
