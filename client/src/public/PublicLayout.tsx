@@ -20,7 +20,12 @@ import {
   CloudSun,
   Snowflake,
   Volume2,
-  VolumeX
+  VolumeX,
+  FileText,
+  Calendar,
+  Users,
+  Building,
+  Phone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,15 +134,24 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     document.documentElement.style.fontSize = '16px';
   };
 
+  // Serviços de acesso rápido para o menu hambúrguer
+  const quickServices = [
+    { name: 'Documentos', href: '/documentos', icon: FileText },
+    { name: 'Eventos', href: '/eventos', icon: Calendar },
+    { name: 'Vereadores', href: '/vereadores', icon: Users },
+    { name: 'Mesa Diretora', href: '/mesa-diretora', icon: Building },
+    { name: 'Contato', href: '/contato', icon: Phone },
+  ];
+
   // Links do menu principal
   const mainMenuLinks = [
     { name: 'Início', href: '/' },
     { name: 'Vereadores',
      href: '/vereadores',
     submenu: [
-      { name: 'Mesa Diretora', href: '/mesa-diretora' },
-      { name: 'Comissões', href: '/comissoes'},
-      { name: 'Vereadores', href: '/vereadores?tipo=Vereador' }
+      { name: 'Mesa Diretora', href: '/mesa-diretora', external: false },
+      { name: 'Comissões', href: '/comissoes', external: false },
+      { name: 'Vereadores', href: '/vereadores?tipo=Vereador', external: false }
     ]},    
     { name: 
       'Atividades Legislativas',
@@ -181,17 +195,17 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       {
         name: 'Sessões Legislativas', 
         href: '/sessoes',
-          external: true
+        external: false
       },
       {
         name: 'Documentos', 
         href: '/documentos',
-          external: true
+        external: false
       },
       {
         name: 'Comissões', 
         href: '/comissoes',
-          external: true
+        external: false
       }
     ]
     },
@@ -247,17 +261,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     },
   ];
 
-  // Serviços de acesso rápido
-  const quickServices = [
-    { name: 'Sessões', href: '/sessoes', icon: Zap },
-    { name: 'Atas', href: '/atas', icon: Zap },
-    { name: 'Transparência', href: '/transparencia', icon: Zap },
-    { name: 'Licitações', href: '/licitacoes', icon: Zap },
-    { name: 'Contratos', href: '/contratos', icon: Zap },
-    { name: 'Documentos', href: '/documentos', icon: Zap },
-    { name: 'Relatórios', href: '/relatorios', icon: Zap },
-    { name: 'Audiências', href: '/audiencias', icon: Zap },
-  ];
+
 
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? 'dark bg-slate-900 text-white' : 'bg-white'} ${isHighContrast ? 'high-contrast' : ''}`}>
@@ -317,11 +321,11 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
           <div className="flex items-center space-x-4 mt-2 sm:mt-0">
             <div className="flex items-center space-x-2">
-              {weather ? (
+              {weather && typeof weather === 'object' && 'temperature' in weather ? (
                 <>
-                  {React.createElement(getWeatherIcon(weather.icon), { size: 16 })}
-                  <span>{weather.temperature}°C</span>
-                  <span className="hidden sm:inline">{weather.weatherDescription}</span>
+                  {React.createElement(getWeatherIcon((weather as any).icon || 'cloud'), { size: 16 })}
+                  <span>{(weather as any).temperature}°C</span>
+                  <span className="hidden sm:inline">{(weather as any).weatherDescription || ''}</span>
                 </>
               ) : (
                 <>
@@ -387,18 +391,111 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 </button>
               </Link>
               
+              {/* Lado direito: busca e menus */}
+              <div className="flex items-center space-x-4">
+                {/* Barra de pesquisa - visível em telas médias ou maiores */}
+                <div className="hidden md:flex">
+                  <SearchButton />
+                </div>
 
-              {/* Barra de pesquisa - visível apenas em telas médias ou maiores */}
-              <div className="hidden md:flex flex-1 max-w-md mx-6">
-                <SearchButton />
-              </div>
+                {/* Menu hambúrguer secundário para desktop */}
+                <div className="hidden lg:flex">
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        aria-label="Menu Secundário"
+                        className={`rounded-full p-2 transition-colors ${
+                          location === '/public' && !isScrolled 
+                            ? "text-white hover:bg-white/20" 
+                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
+                        }`}
+                      >
+                        <Menu size={20} />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className={`w-80 ${isDarkMode ? "bg-slate-800 text-white" : "bg-white"}`}>
+                      <div className="flex flex-col h-full">
+                        <div className="flex justify-between items-center pb-4 border-b">
+                          <div className="text-xl font-bold">Menu Rápido</div>
+                          <SheetClose asChild>
+                            <Button variant="ghost" size="icon">
+                              <X />
+                            </Button>
+                          </SheetClose>
+                        </div>
 
-              {/* Espaço vazio onde ficava o menu desktop */}
-              <div className="hidden lg:block w-32"></div>
+                        {/* Serviços de acesso rápido */}
+                        <div className="py-6">
+                          <h3 className="font-semibold mb-4 text-lg">Acesso Rápido</h3>
+                          <div className="grid grid-cols-2 gap-3">
+                            {quickServices.map((service) => (
+                              <Link key={service.href} href={service.href}>
+                                <SheetClose asChild>
+                                  <button className={`flex flex-col items-center p-4 rounded-lg border transition-colors w-full ${
+                                    isDarkMode 
+                                      ? 'border-slate-600 hover:bg-slate-700 text-gray-300' 
+                                      : 'border-gray-200 hover:bg-gray-50 text-gray-700'
+                                  }`}>
+                                    <service.icon size={24} className="mb-2" />
+                                    <span className="text-sm font-medium text-center">{service.name}</span>
+                                  </button>
+                                </SheetClose>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
 
-              {/* Menu para dispositivos móveis */}
-              <div className="lg:hidden flex items-center">
-                <Sheet>
+                        {/* Links úteis */}
+                        <div className="py-4 border-t">
+                          <h3 className="font-semibold mb-4 text-lg">Links Úteis</h3>
+                          <div className="space-y-2">
+                            <a 
+                              href="https://cmjaiba.cidadesmg.com.br/portaltransparencia" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className={`block p-3 rounded-lg transition-colors ${
+                                isDarkMode 
+                                  ? 'hover:bg-slate-700 text-gray-300' 
+                                  : 'hover:bg-gray-50 text-gray-700'
+                              }`}
+                            >
+                              Portal da Transparência
+                            </a>
+                            <a 
+                              href="https://cmjaiba.cidadesmg.com.br/webmail" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className={`block p-3 rounded-lg transition-colors ${
+                                isDarkMode 
+                                  ? 'hover:bg-slate-700 text-gray-300' 
+                                  : 'hover:bg-gray-50 text-gray-700'
+                              }`}
+                            >
+                              Webmail
+                            </a>
+                            <Link href="/contato">
+                              <SheetClose asChild>
+                                <button className={`block p-3 rounded-lg transition-colors w-full text-left ${
+                                  isDarkMode 
+                                    ? 'hover:bg-slate-700 text-gray-300' 
+                                    : 'hover:bg-gray-50 text-gray-700'
+                                }`}>
+                                  Ouvidoria/Contato
+                                </button>
+                              </SheetClose>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                </div>
+
+                {/* Menu para dispositivos móveis */}
+                <div className="lg:hidden flex items-center">
+                  <Sheet>
                   <SheetTrigger asChild>
                     <Button 
                       variant="ghost" 
@@ -498,7 +595,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                       
                     </div>
                   </SheetContent>
-                </Sheet>
+                  </Sheet>
+                </div>
               </div>
             </div>
           </div>
