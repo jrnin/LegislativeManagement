@@ -419,8 +419,78 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 </button>
               </Link>
               
-              {/* Lado direito: menu hambúrguer */}
+              {/* Lado direito: menu flutuante e hambúrguer */}
               <div className="flex items-center space-x-4">
+                {/* Menu flutuante - visível em desktop */}
+                <div className={`hidden lg:flex transition-transform duration-300 ease-in-out ${
+                  isMenuHidden ? 'opacity-70 scale-95' : 'opacity-100 scale-100'
+                }`}>
+                  <nav className="flex items-center justify-center">
+                    <div className="bg-white/95 backdrop-blur-lg rounded-full px-4 py-2 shadow-lg border border-gray-200/30 dark:bg-slate-800/95 dark:border-slate-700/30">
+                      <div className="flex items-center space-x-1">
+                        {mainMenuLinks.map((link) => (
+                          link.submenu ? (
+                            <DropdownMenu key={link.name}>
+                              <DropdownMenuTrigger asChild>
+                                <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer flex items-center ${
+                                  location === link.href 
+                                    ? 'bg-green-600 text-white shadow-lg transform scale-105' 
+                                    : 'text-gray-700 hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-slate-700'
+                                }`}>
+                                  {link.name}
+                                  <ChevronDown size={12} className="ml-1" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className={`${isDarkMode ? "bg-slate-800 text-white border-slate-700" : "bg-white"} shadow-2xl border-0 rounded-xl p-2`}>
+                                {link.submenu?.map((subItem) => (
+                                  subItem.external ? (
+                                    <DropdownMenuItem key={subItem.name} asChild>
+                                      <a 
+                                        href={subItem.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`block px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
+                                          isDarkMode 
+                                            ? 'hover:bg-slate-700 text-gray-300' 
+                                            : 'hover:bg-green-50 text-gray-700'
+                                        }`}
+                                      >
+                                        {subItem.name}
+                                      </a>
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem key={subItem.name} asChild>
+                                      <Link href={subItem.href}>
+                                        <button className={`block px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer w-full text-left ${
+                                          isDarkMode 
+                                            ? 'hover:bg-slate-700 text-gray-300' 
+                                            : 'hover:bg-green-50 text-gray-700'
+                                        }`}>
+                                          {subItem.name}
+                                        </button>
+                                      </Link>
+                                    </DropdownMenuItem>
+                                  )
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          ) : (
+                            <Link key={link.href} href={link.href}>
+                              <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer ${
+                                location === link.href 
+                                  ? 'bg-green-600 text-white shadow-lg transform scale-105' 
+                                  : 'text-gray-700 hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-slate-700'
+                              }`}>
+                                {link.name}
+                              </button>
+                            </Link>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  </nav>
+                </div>
+
                 {/* Menu hambúrguer secundário para desktop */}
                 <div className="hidden lg:flex">
                   <Sheet>
