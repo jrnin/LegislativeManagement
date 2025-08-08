@@ -38,3 +38,6 @@ externalPort = 80
 
 [objectStorage]
 defaultBucketID = "replit-objstore-53753410-6a5b-4d3f-96cf-df8bc5201da8"
+
+[agent]
+integrations = ["javascript_websocket==1.0.0"]

@@ -4740,6 +4740,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter o último evento cadastrado em tempo real
+  app.get('/api/public/events/latest', async (req, res) => {
+    try {
+      // Buscar todos os eventos do sistema
+      const allEvents = await storage.getAllEvents();
+      
+      if (!allEvents || allEvents.length === 0) {
+        return res.json(null);
+      }
+      
+      // Ordenar por data de criação (mais recente primeiro) e pegar o primeiro
+      const sortedEvents = allEvents.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(a.eventDate);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(b.eventDate);
+        return dateB.getTime() - dateA.getTime();
+      });
+      
+      const latestEvent = sortedEvents[0];
+      
+      // Formatar evento para o frontend público
+      const formattedEvent = {
+        id: latestEvent.id,
+        title: `${latestEvent.category} Nº ${latestEvent.eventNumber}`,
+        date: format(new Date(latestEvent.eventDate), 'dd/MM/yyyy'),
+        time: latestEvent.eventTime || '00:00',
+        location: latestEvent.location || 'Local não informado',
+        type: latestEvent.category,
+        status: latestEvent.status,
+        description: latestEvent.description,
+        eventDate: latestEvent.eventDate
+      };
+      
+      res.json(formattedEvent);
+    } catch (error) {
+      console.error("Erro ao buscar último evento público:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Rota pública para obter detalhes de um evento específico (sem autenticação)
   app.get('/api/public/events/:id', async (req, res) => {
     try {

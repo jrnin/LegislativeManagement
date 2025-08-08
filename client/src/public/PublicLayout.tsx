@@ -62,6 +62,13 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     staleTime: 5 * 60 * 1000, // Considerar stale após 5 minutos
   });
 
+  // Buscar último evento cadastrado em tempo real
+  const { data: latestEvent } = useQuery({
+    queryKey: ['/api/public/events/latest'],
+    refetchInterval: 30 * 1000, // Atualizar a cada 30 segundos
+    staleTime: 15 * 1000, // Considerar stale após 15 segundos
+  });
+
   // Mapear ícones do clima para componentes Lucide
   const getWeatherIcon = (iconName: string) => {
     const iconMap: { [key: string]: any } = {
@@ -320,6 +327,20 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           </div>
 
           <div className="flex items-center space-x-4 mt-2 sm:mt-0">
+            {/* Último evento em tempo real */}
+            <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-green-600/20 border border-green-500/30">
+              <Calendar size={16} className="text-green-300" />
+              {latestEvent && typeof latestEvent === 'object' && 'title' in latestEvent ? (
+                <Link href="/eventos">
+                  <span className="text-xs font-medium text-green-100 hover:text-white transition-colors cursor-pointer truncate max-w-48">
+                    Próximo: {(latestEvent as any).title}
+                  </span>
+                </Link>
+              ) : (
+                <span className="text-xs text-green-200">Carregando eventos...</span>
+              )}
+            </div>
+
             <div className="flex items-center space-x-2">
               {weather && typeof weather === 'object' && 'temperature' in weather ? (
                 <>
