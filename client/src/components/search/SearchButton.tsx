@@ -35,7 +35,7 @@ export default function SearchButton() {
         <Search className="h-4 w-4 mr-2" />
         <span>Buscar...</span>
         {!isMobile && (
-          <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-slate-200 bg-slate-100 px-1.5 font-mono text-xs font-medium text-slate-600">
+          <kbd className="ml-20 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-slate-200 bg-slate-100 px-1.5 font-mono text-xs font-medium text-slate-600">
             <span className="text-xs">⌘</span>K
           </kbd>
         )}

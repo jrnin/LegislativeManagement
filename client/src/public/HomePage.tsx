@@ -61,6 +61,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import WeatherWidget from "@/components/WeatherWidget";
+import { LatestEventWidget } from "@/components/LatestEventWidget";
 
 // Função auxiliar para obter iniciais
 const getInitials = (name: string) => {
@@ -577,6 +578,15 @@ export default function HomePage() {
       </section>
 
   
+
+      {/* Widget Último Evento - Visível apenas na HomePage */}
+      <section className="py-8 px-4 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-center">
+            <LatestEventWidget className="max-w-md" />
+          </div>
+        </div>
+      </section>
 
       {/* Seção de notícias com layout de duas colunas */}
       <section className="py-10 px-4 bg-gray-50">

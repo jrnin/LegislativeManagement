@@ -193,7 +193,7 @@ export default function DocumentDetails({}: DocumentDetailsPageProps) {
             transition={{ duration: 0.4 }}
           >
             <Card className="bg-white shadow-xl border-0 overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pb-8">
+              <CardHeader className="bg-gradient-to-r from-green-600 to-green-800 text-white pb-8">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-2xl font-bold mb-2">
@@ -226,10 +226,10 @@ export default function DocumentDetails({}: DocumentDetailsPageProps) {
                 {/* Descrição */}
                 <div className="mb-8">
                   <div className="flex items-center gap-2 mb-4">
-                    <FileText className="h-5 w-5 text-blue-600" />
+                    <FileText className="h-5 w-5 text-green-600" />
                     <h3 className="text-lg font-semibold text-gray-900">Descrição</h3>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500">
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-green-500">
                     <p className="text-gray-700 leading-relaxed">
                       {document.description}
                     </p>
@@ -290,7 +290,7 @@ export default function DocumentDetails({}: DocumentDetailsPageProps) {
                   {document.filePath ? (
                     <Button
                       onClick={handleDownload}
-                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2"
                       size="lg"
                     >
                       <Download className="h-5 w-5" />
