@@ -287,7 +287,9 @@ export default function ContatoPageFunctional() {
                   </div>
                   <div>
                     <h3 style={{ margin: 0, marginBottom: '5px' }}>Telefone</h3>
-                    <p style={{ margin: 0, color: '#666' }}>(38) 3625-1234</p>
+                    <p style={{ margin: 0, color: '#666' }}>(38) 3833-1492
+
+</p>
                   </div>
                 </div>
 
