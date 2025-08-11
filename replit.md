@@ -40,6 +40,7 @@ Preferred communication style: Simple, everyday language.
 - **Contact Form**: Fully functional contact form with email destination contato@jaiba.mg.leg.br, comprehensive validation, error handling, and SendGrid integration with development simulation mode.
 - **Object Storage**: Full production-ready integration with Google Cloud Storage backend, organized directory structure (/documents/YYYY/MM/), SimpleFileUploader component with native file input, presigned URL direct uploads, ACL policy management, seamless document creation workflow, 101 legacy files (24.3 MB) migrated, avatar cleanup capabilities, complete news image management with public ACL, and public councilor avatar access for deployment compatibility. Successfully tested with PORTARIA document upload and creation (January 2025). File upload limit increased to 10MB for documents (August 2025).
 - **Real-time Features**: WebSocket support for notifications.
+- **Search System**: Global site search functionality with real-time results across activities, events, documents, news, and users. Features include visual type indicators, fallback examples, and optimized queries for fast response times.
 
 ## External Dependencies
 - **Database**: PostgreSQL (`@neondatabase/serverless` for serverless connection), Drizzle ORM, Drizzle Kit for migrations.

@@ -141,7 +141,7 @@ export function SimpleSearchModal({ isOpen, onClose }: SimpleSearchModalProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2">
             <Search className="w-5 h-5" />
-            <h2 className="text-lg font-semibold">Buscar no Site</h2>
+            <h2 className="text-lg font-semibold text-gray-800">Buscar no Site</h2>
           </div>
           <Button
             variant="ghost"
@@ -156,14 +156,14 @@ export function SimpleSearchModal({ isOpen, onClose }: SimpleSearchModalProps) {
         {/* Search Input */}
         <div className="px-6 py-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-800" />
+            <Input 
               ref={inputRef}
               type="text"
               placeholder="Digite sua palavra-chave..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10"
+              className="pl-10 pr-10 text-black dark:text-white"
             />
             {searchQuery && (
               <Button
