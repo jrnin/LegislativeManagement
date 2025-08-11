@@ -710,7 +710,7 @@ export default function HomePage() {
                 )}
                 
                 {events.length > 0 && (
-                  <Link href="/public/eventos">
+                  <Link href="/public/sessoes">
                     <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
                       Ver agenda completa
                       <ArrowRight className="ml-2 h-4 w-4" />

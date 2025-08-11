@@ -117,7 +117,7 @@ export function AccessibilityWidget() {
   };
 
   return (
-    <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-50">
+    <div className="fixed left-4 top-80 transform -translate-y-1 z-50">
       {/* Main accessibility button */}
       <Button
         onClick={() => setIsExpanded(!isExpanded)}
