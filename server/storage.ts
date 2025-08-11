@@ -2313,18 +2313,14 @@ export class DatabaseStorage implements IStorage {
             .select({
               id: legislativeActivities.id,
               activityNumber: legislativeActivities.activityNumber,
-              title: legislativeActivities.title,
               activityType: legislativeActivities.activityType,
-              summary: legislativeActivities.summary,
               description: legislativeActivities.description,
               status: legislativeActivities.status,
-              exerciseYear: legislativeActivities.exerciseYear,
+              exercicio: legislativeActivities.exercicio,
               createdAt: legislativeActivities.createdAt
             })
             .from(legislativeActivities)
             .where(or(
-              ilike(legislativeActivities.title, searchTerm),
-              ilike(legislativeActivities.summary, searchTerm),
               ilike(legislativeActivities.description, searchTerm),
               ilike(legislativeActivities.activityType, searchTerm)
             ))
@@ -2333,8 +2329,8 @@ export class DatabaseStorage implements IStorage {
           
           results.push(...activities.map(activity => ({
             id: String(activity.id),
-            title: `${activity.activityType} nº ${activity.activityNumber}/${activity.exerciseYear} - ${activity.title || 'Sem título'}`,
-            description: activity.summary || activity.description || 'Atividade legislativa',
+            title: `${activity.activityType} nº ${activity.activityNumber}/${activity.exercicio}`,
+            description: activity.description || 'Atividade legislativa',
             type: 'activity' as const,
             date: activity.createdAt?.toISOString(),
             status: activity.status || '',
@@ -2353,32 +2349,28 @@ export class DatabaseStorage implements IStorage {
             .select({
               id: events.id,
               eventNumber: events.eventNumber,
-              eventType: events.eventType,
-              title: events.title,
+              category: events.category,
               description: events.description,
-              summary: events.summary,
               eventDate: events.eventDate,
               createdAt: events.createdAt
             })
             .from(events)
             .where(or(
-              ilike(events.title, searchTerm),
               ilike(events.description, searchTerm),
-              ilike(events.summary, searchTerm),
-              ilike(events.eventType, searchTerm)
+              ilike(events.category, searchTerm)
             ))
             .orderBy(desc(events.eventDate))
             .limit(10);
           
           results.push(...eventsData.map(event => ({
             id: String(event.id),
-            title: `${event.eventType} nº ${event.eventNumber} - ${event.title || event.description || 'Evento'}`,
-            description: event.summary || event.description || 'Evento do calendário legislativo',
+            title: `${event.category} nº ${event.eventNumber} - ${event.description.slice(0, 50)}...`,
+            description: event.description || 'Evento do calendário legislativo',
             type: 'event' as const,
             date: event.eventDate?.toISOString(),
             status: '',
             url: `/public/evento/${event.id}`,
-            category: event.eventType
+            category: event.category
           })));
         } catch (error) {
           console.error('Error searching events:', error);
@@ -2396,7 +2388,7 @@ export class DatabaseStorage implements IStorage {
               content: newsArticles.content,
               publishedAt: newsArticles.publishedAt,
               createdAt: newsArticles.createdAt,
-              category: newsArticles.category
+              categoryId: newsArticles.categoryId
             })
             .from(newsArticles)
             .where(and(
@@ -2404,8 +2396,7 @@ export class DatabaseStorage implements IStorage {
               or(
                 ilike(newsArticles.title, searchTerm),
                 ilike(newsArticles.excerpt, searchTerm),
-                ilike(newsArticles.content, searchTerm),
-                ilike(newsArticles.category, searchTerm)
+                ilike(newsArticles.content, searchTerm)
               )
             ))
             .orderBy(desc(newsArticles.publishedAt))
@@ -2419,7 +2410,7 @@ export class DatabaseStorage implements IStorage {
             date: article.publishedAt?.toISOString() || article.createdAt?.toISOString(),
             status: 'publicado',
             url: `/public/noticia/${article.id}`,
-            category: article.category
+            category: 'Notícia'
           })));
         } catch (error) {
           console.error('Error searching news:', error);
@@ -2434,24 +2425,21 @@ export class DatabaseStorage implements IStorage {
               id: documents.id,
               documentNumber: documents.documentNumber,
               documentType: documents.documentType,
-              title: documents.title,
               description: documents.description,
               createdAt: documents.createdAt,
               status: documents.status
             })
             .from(documents)
             .where(or(
-              ilike(documents.title, searchTerm),
               ilike(documents.description, searchTerm),
-              ilike(documents.documentType, searchTerm),
-              ilike(documents.documentNumber, searchTerm)
+              ilike(documents.documentType, searchTerm)
             ))
             .orderBy(desc(documents.createdAt))
             .limit(10);
           
           results.push(...docs.map(doc => ({
             id: String(doc.id),
-            title: `${doc.documentType} nº ${doc.documentNumber}/${new Date().getFullYear()} - ${doc.title || 'Documento'}`,
+            title: `${doc.documentType} nº ${doc.documentNumber}/${new Date().getFullYear()}`,
             description: doc.description || 'Documento oficial da câmara municipal',
             type: 'document' as const,
             date: doc.createdAt?.toISOString(),
@@ -2467,26 +2455,26 @@ export class DatabaseStorage implements IStorage {
       // Search users/councilors
       if (!type || type === 'all' || type === 'user') {
         try {
-          const users = await db
+          const usersData = await db
             .select({
-              id: usersTable.id,
-              name: usersTable.name,
-              email: usersTable.email,
-              role: usersTable.role,
-              createdAt: usersTable.createdAt
+              id: users.id,
+              name: users.name,
+              email: users.email,
+              role: users.role,
+              createdAt: users.createdAt
             })
-            .from(usersTable)
+            .from(users)
             .where(and(
               or(
-                ilike(usersTable.name, searchTerm),
-                ilike(usersTable.email, searchTerm)
+                ilike(users.name, searchTerm),
+                ilike(users.email, searchTerm)
               ),
-              eq(usersTable.role, 'councilor') // Only show councilors in public search
+              eq(users.role, 'councilor') // Only show councilors in public search
             ))
-            .orderBy(asc(usersTable.name))
+            .orderBy(asc(users.name))
             .limit(10);
           
-          results.push(...users.map(user => ({
+          results.push(...usersData.map(user => ({
             id: String(user.id),
             title: user.name || 'Vereador',
             description: `Vereador da Câmara Municipal`,
