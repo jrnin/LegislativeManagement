@@ -54,7 +54,7 @@ import {
   type InsertEventImage
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, count, isNull, isNotNull, lte, gte, like, ilike, inArray, notInArray, or, not } from "drizzle-orm";
+import { eq, and, desc, asc, sql, count, isNull, isNotNull, lte, gte, like, ilike, inArray, notInArray, or, not } from "drizzle-orm";
 import crypto from "crypto";
 
 // Interface for storage operations
@@ -2303,186 +2303,204 @@ export class DatabaseStorage implements IStorage {
     }
     
     const results: SearchResult[] = [];
-    const searchPattern = `%${query.toLowerCase()}%`;
+    const searchTerm = `%${query.toLowerCase()}%`;
     
     try {
-      // Search legislative activities (using real database data)
+      // Search legislative activities
       if (!type || type === 'all' || type === 'activity') {
         try {
           const activities = await db
-            .select()
+            .select({
+              id: legislativeActivities.id,
+              activityNumber: legislativeActivities.activityNumber,
+              title: legislativeActivities.title,
+              activityType: legislativeActivities.activityType,
+              summary: legislativeActivities.summary,
+              description: legislativeActivities.description,
+              status: legislativeActivities.status,
+              exerciseYear: legislativeActivities.exerciseYear,
+              createdAt: legislativeActivities.createdAt
+            })
             .from(legislativeActivities)
-            .limit(3);
+            .where(or(
+              ilike(legislativeActivities.title, searchTerm),
+              ilike(legislativeActivities.summary, searchTerm),
+              ilike(legislativeActivities.description, searchTerm),
+              ilike(legislativeActivities.activityType, searchTerm)
+            ))
+            .orderBy(desc(legislativeActivities.createdAt))
+            .limit(10);
           
-          // Filter activities that match the query
-          const filteredActivities = activities.filter(activity => 
-            activity.description?.toLowerCase().includes(query.toLowerCase()) ||
-            activity.activityType?.toLowerCase().includes(query.toLowerCase())
-          );
-          
-          results.push(...filteredActivities.map(activity => ({
+          results.push(...activities.map(activity => ({
             id: String(activity.id),
-            title: `${activity.activityType} nº ${activity.activityNumber}/${activity.exerciseYear}`,
-            description: activity.description || '',
+            title: `${activity.activityType} nº ${activity.activityNumber}/${activity.exerciseYear} - ${activity.title || 'Sem título'}`,
+            description: activity.summary || activity.description || 'Atividade legislativa',
             type: 'activity' as const,
-            date: activity.activityDate?.toISOString(),
+            date: activity.createdAt?.toISOString(),
             status: activity.status || '',
-            url: `/atividades-legislativas`,
+            url: `/public/atividade/${activity.id}`,
+            category: activity.activityType
           })));
         } catch (error) {
           console.error('Error searching activities:', error);
         }
       }
       
-      // Search events (using real database data)
+      // Search events
       if (!type || type === 'all' || type === 'event') {
         try {
           const eventsData = await db
-            .select()
+            .select({
+              id: events.id,
+              eventNumber: events.eventNumber,
+              eventType: events.eventType,
+              title: events.title,
+              description: events.description,
+              summary: events.summary,
+              eventDate: events.eventDate,
+              createdAt: events.createdAt
+            })
             .from(events)
-            .limit(3);
+            .where(or(
+              ilike(events.title, searchTerm),
+              ilike(events.description, searchTerm),
+              ilike(events.summary, searchTerm),
+              ilike(events.eventType, searchTerm)
+            ))
+            .orderBy(desc(events.eventDate))
+            .limit(10);
           
-          // Filter events that match the query
-          const filteredEvents = eventsData.filter(event => 
-            event.description?.toLowerCase().includes(query.toLowerCase()) ||
-            event.category?.toLowerCase().includes(query.toLowerCase()) ||
-            event.location?.toLowerCase().includes(query.toLowerCase())
-          );
-          
-          results.push(...filteredEvents.map(event => ({
+          results.push(...eventsData.map(event => ({
             id: String(event.id),
-            title: `${event.category} nº ${event.eventNumber}`,
-            description: event.description || '',
+            title: `${event.eventType} nº ${event.eventNumber} - ${event.title || event.description || 'Evento'}`,
+            description: event.summary || event.description || 'Evento do calendário legislativo',
             type: 'event' as const,
             date: event.eventDate?.toISOString(),
-            status: event.status || '',
-            url: `/sessoes`,
+            status: '',
+            url: `/public/evento/${event.id}`,
+            category: event.eventType
           })));
         } catch (error) {
           console.error('Error searching events:', error);
         }
       }
       
-      // Search news articles (using real database data)  
+      // Search news articles
       if (!type || type === 'all' || type === 'news') {
         try {
           const articles = await db
-            .select()
+            .select({
+              id: newsArticles.id,
+              title: newsArticles.title,
+              excerpt: newsArticles.excerpt,
+              content: newsArticles.content,
+              publishedAt: newsArticles.publishedAt,
+              createdAt: newsArticles.createdAt,
+              category: newsArticles.category
+            })
             .from(newsArticles)
-            .where(eq(newsArticles.status, 'published'))
-            .limit(3);
+            .where(and(
+              eq(newsArticles.status, 'published'),
+              or(
+                ilike(newsArticles.title, searchTerm),
+                ilike(newsArticles.excerpt, searchTerm),
+                ilike(newsArticles.content, searchTerm),
+                ilike(newsArticles.category, searchTerm)
+              )
+            ))
+            .orderBy(desc(newsArticles.publishedAt))
+            .limit(10);
           
-          // Filter articles that match the query
-          const filteredArticles = articles.filter(article => 
-            article.title?.toLowerCase().includes(query.toLowerCase()) ||
-            article.excerpt?.toLowerCase().includes(query.toLowerCase())
-          );
-          
-          results.push(...filteredArticles.map(article => ({
+          results.push(...articles.map(article => ({
             id: String(article.id),
-            title: article.title || '',
-            description: article.excerpt || article.content?.slice(0, 100) + '...',
+            title: article.title || 'Notícia sem título',
+            description: article.excerpt || (article.content ? article.content.slice(0, 150) + '...' : 'Conteúdo da notícia'),
             type: 'news' as const,
             date: article.publishedAt?.toISOString() || article.createdAt?.toISOString(),
             status: 'publicado',
-            url: `/noticias/${article.id}`,
+            url: `/public/noticia/${article.id}`,
+            category: article.category
           })));
         } catch (error) {
           console.error('Error searching news:', error);
         }
       }
       
-      // Search documents (using real database data)
+      // Search documents
       if (!type || type === 'all' || type === 'document') {
         try {
           const docs = await db
-            .select()
+            .select({
+              id: documents.id,
+              documentNumber: documents.documentNumber,
+              documentType: documents.documentType,
+              title: documents.title,
+              description: documents.description,
+              createdAt: documents.createdAt,
+              status: documents.status
+            })
             .from(documents)
-            .limit(3);
+            .where(or(
+              ilike(documents.title, searchTerm),
+              ilike(documents.description, searchTerm),
+              ilike(documents.documentType, searchTerm),
+              ilike(documents.documentNumber, searchTerm)
+            ))
+            .orderBy(desc(documents.createdAt))
+            .limit(10);
           
-          // Filter documents that match the query
-          const filteredDocs = docs.filter(doc => 
-            doc.description?.toLowerCase().includes(query.toLowerCase()) ||
-            doc.documentType?.toLowerCase().includes(query.toLowerCase())
-          );
-          
-          results.push(...filteredDocs.map(doc => ({
+          results.push(...docs.map(doc => ({
             id: String(doc.id),
-            title: `${doc.documentType} nº ${doc.documentNumber}`,
-            description: doc.description || '',
+            title: `${doc.documentType} nº ${doc.documentNumber}/${new Date().getFullYear()} - ${doc.title || 'Documento'}`,
+            description: doc.description || 'Documento oficial da câmara municipal',
             type: 'document' as const,
             date: doc.createdAt?.toISOString(),
             status: doc.status || '',
-            url: `/documentos`,
+            url: `/public/documento/${doc.id}`,
+            category: doc.documentType
           })));
         } catch (error) {
           console.error('Error searching documents:', error);
         }
       }
-      
-      // If no results found from database, provide helpful mock examples
-      if (results.length === 0) {
-        // Return mock search results based on query keywords for demonstration
-        if (query.toLowerCase().includes('sessao') || query.toLowerCase().includes('session')) {
-          results.push({
-            id: '1',
-            title: 'Sessão Ordinária nº 001/2025',
-            description: 'Primeira sessão ordinária do ano 2025',
-            type: 'event',
-            date: '2025-01-15T14:00:00Z',
-            status: 'agendada',
-            url: '/sessoes'
-          });
-        }
-        
-        if (query.toLowerCase().includes('portaria')) {
-          results.push({
-            id: '1',
-            title: 'Portaria nº 001/2025',
-            description: 'Portaria sobre normas internas da câmara municipal',
-            type: 'document',
-            date: '2025-01-10T10:00:00Z',
-            status: 'publicado',
-            url: '/documentos'
-          });
-        }
-        
-        if (query.toLowerCase().includes('projeto') || query.toLowerCase().includes('lei')) {
-          results.push({
-            id: '1',
-            title: 'Projeto de Lei nº 001/2025',
-            description: 'Projeto de lei sobre desenvolvimento urbano sustentável',
-            type: 'activity',
-            date: '2025-01-12T08:00:00Z',
-            status: 'em_tramitacao',
-            url: '/atividades-legislativas'
-          });
-        }
-        
-        // If still no matches, provide generic examples
-        if (results.length === 0 && query.length >= 2) {
-          results.push(
-            {
-              id: '1',
-              title: 'Sessão Ordinária nº 001/2025',
-              description: 'Primeira sessão ordinária do ano',
-              type: 'event',
-              date: '2025-01-15T14:00:00Z',
-              status: 'agendada',
-              url: '/sessoes'
-            },
-            {
-              id: '2',
-              title: 'Projeto de Lei nº 001/2025',
-              description: 'Projeto sobre desenvolvimento urbano',
-              type: 'activity',
-              date: '2025-01-12T08:00:00Z',
-              status: 'em_tramitacao',
-              url: '/atividades-legislativas'
-            }
-          );
+
+      // Search users/councilors
+      if (!type || type === 'all' || type === 'user') {
+        try {
+          const users = await db
+            .select({
+              id: usersTable.id,
+              name: usersTable.name,
+              email: usersTable.email,
+              role: usersTable.role,
+              createdAt: usersTable.createdAt
+            })
+            .from(usersTable)
+            .where(and(
+              or(
+                ilike(usersTable.name, searchTerm),
+                ilike(usersTable.email, searchTerm)
+              ),
+              eq(usersTable.role, 'councilor') // Only show councilors in public search
+            ))
+            .orderBy(asc(usersTable.name))
+            .limit(10);
+          
+          results.push(...users.map(user => ({
+            id: String(user.id),
+            title: user.name || 'Vereador',
+            description: `Vereador da Câmara Municipal`,
+            type: 'user' as const,
+            date: user.createdAt?.toISOString(),
+            status: 'ativo',
+            url: `/public/vereador/${user.id}`,
+            category: 'Vereador'
+          })));
+        } catch (error) {
+          console.error('Error searching users:', error);
         }
       }
+
       
     } catch (error) {
       console.error('Error in global search:', error);
