@@ -9,7 +9,9 @@ import {
   Newspaper, 
   Gavel,
   Loader2,
-  X
+  X,
+  Users,
+  Building
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
@@ -30,9 +32,21 @@ interface SimpleSearchModalProps {
   onClose: () => void;
 }
 
+type TabType = 'all' | 'document' | 'activity' | 'event' | 'news' | 'user';
+
+const searchTabs = [
+  { key: 'all', label: 'Todos os resultados', icon: Search },
+  { key: 'document', label: 'Documentos', icon: FileText },
+  { key: 'activity', label: 'Atividades Legislativas', icon: Gavel },
+  { key: 'event', label: 'Eventos', icon: Calendar },
+  { key: 'news', label: 'Notícias', icon: Newspaper },
+  { key: 'user', label: 'Usuários', icon: Users }
+] as const;
+
 export function SimpleSearchModal({ isOpen, onClose }: SimpleSearchModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<TabType>('all');
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Debounce search query
@@ -70,15 +84,32 @@ export function SimpleSearchModal({ isOpen, onClose }: SimpleSearchModalProps) {
     };
   }, [isOpen, onClose]);
 
-  // Search API call using public endpoint
+  // Search API call using public endpoint with type filter
   const { data: searchResults = [], isLoading } = useQuery<SearchResult[]>({
-    queryKey: ['/api/public/search', debouncedQuery],
-    queryFn: () => fetch(`/api/public/search?q=${encodeURIComponent(debouncedQuery)}`).then(res => res.json()),
+    queryKey: ['/api/public/search', debouncedQuery, activeTab],
+    queryFn: async () => {
+      if (!debouncedQuery || debouncedQuery.length < 2) return [];
+      const typeParam = activeTab === 'all' ? '' : `&type=${activeTab}`;
+      const response = await fetch(`/api/public/search?q=${encodeURIComponent(debouncedQuery)}${typeParam}`);
+      if (!response.ok) throw new Error('Search failed');
+      return response.json();
+    },
     enabled: debouncedQuery.length >= 2,
   });
 
   const handleResultClick = () => {
     onClose();
+  };
+
+  // Filter results based on active tab and get counts
+  const filteredResults = activeTab === 'all' 
+    ? searchResults 
+    : searchResults.filter(result => result.type === activeTab);
+
+  // Get counts by type
+  const getTabCount = (tabType: TabType) => {
+    if (tabType === 'all') return searchResults.length;
+    return searchResults.filter(result => result.type === tabType).length;
   };
 
   const getResultIcon = (type: SearchResult['type']) => {
@@ -178,6 +209,44 @@ export function SimpleSearchModal({ isOpen, onClose }: SimpleSearchModalProps) {
           </div>
         </div>
 
+        {/* Search Tabs */}
+        <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-2">
+          <div className="flex flex-wrap gap-2">
+            {searchTabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`
+                    flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full transition-colors
+                    ${activeTab === tab.key
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
+                    }
+                  `}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                  {debouncedQuery && debouncedQuery.length >= 2 && (
+                    <Badge 
+                      variant="secondary" 
+                      className={`ml-1 text-xs ${
+                        activeTab === tab.key
+                          ? 'bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200'
+                          : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      {getTabCount(tab.key)}
+                    </Badge>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Results */}
         <div className="border-t border-gray-200 dark:border-gray-700">
           <div className="max-h-[400px] overflow-y-auto">
@@ -203,23 +272,24 @@ export function SimpleSearchModal({ isOpen, onClose }: SimpleSearchModalProps) {
                     </div>
                   )}
 
-                  {!isLoading && searchResults.length === 0 && (
+                  {!isLoading && filteredResults.length === 0 && (
                     <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                       <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
                       <p className="text-lg font-medium">Nenhum resultado encontrado</p>
                       <p className="text-sm mt-2">
-                        Tente usar palavras-chave diferentes
+                        Tente usar palavras-chave diferentes{activeTab !== 'all' ? ` em ${searchTabs.find(tab => tab.key === activeTab)?.label}` : ''}
                       </p>
                     </div>
                   )}
 
-                  {!isLoading && searchResults.length > 0 && (
+                  {!isLoading && filteredResults.length > 0 && (
                     <div className="space-y-3">
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        {searchResults.length} resultado{searchResults.length !== 1 ? 's' : ''} encontrado{searchResults.length !== 1 ? 's' : ''}
+                        {filteredResults.length} resultado{filteredResults.length !== 1 ? 's' : ''} encontrado{filteredResults.length !== 1 ? 's' : ''}
+                        {activeTab !== 'all' && ` em ${searchTabs.find(tab => tab.key === activeTab)?.label}`}
                       </p>
                       
-                      {searchResults.map((result) => (
+                      {filteredResults.map((result) => (
                         <Link
                           key={result.id}
                           href={result.url}
