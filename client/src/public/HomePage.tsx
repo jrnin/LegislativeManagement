@@ -598,7 +598,7 @@ export default function HomePage() {
           {/* Seção de notícias do banco de dados - Layout responsivo 3 colunas */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Coluna principal (maior) - ocupa mais espaço */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                 <div className="p-6">                
                   {newsLoading ? (
@@ -722,7 +722,7 @@ export default function HomePage() {
             </div>
 
             {/* Terceira coluna - Clima e outros widgets */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               <div className="space-y-6">
                 {/* Widget do clima */}
                 <div className="bg-[#e4e6da] rounded-lg shadow-md p-4">
