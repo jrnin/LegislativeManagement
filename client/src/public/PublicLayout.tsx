@@ -300,7 +300,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? 'dark bg-slate-900 text-white' : 'bg-white'} ${isHighContrast ? 'high-contrast' : ''}`}>
       <Helmet>
-        <title>Sistema Legislativo - Portal Público</title>
+        <title>Câmara de Jaíba - Poder Legislativo</title>
         <meta name="description" content="Portal público do Sistema Legislativo Municipal. Acesse informações sobre vereadores, documentos, atividades legislativas e mais." />
       </Helmet>
 

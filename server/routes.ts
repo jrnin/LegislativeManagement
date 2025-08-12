@@ -4542,6 +4542,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para obter estatísticas de votação de uma atividade (sem autenticação)
+  app.get('/api/public/activities/:activityId/votes/stats', async (req, res) => {
+    try {
+      const activityId = Number(req.params.activityId);
+      const eventId = req.query.eventId ? Number(req.query.eventId) : null;
+      
+      // Verificar se a atividade existe
+      const activity = await storage.getLegislativeActivity(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Verificar se a atividade está aprovada para exibição pública
+      if (activity.approved === false) {
+        return res.status(404).json({ message: "Atividade não encontrada" });
+      }
+      
+      // Buscar estatísticas de votação
+      let stats;
+      if (eventId) {
+        stats = await storage.getActivityVotesStatsByEvent(activityId, eventId);
+      } else {
+        stats = await storage.getActivityVotesStats(activityId);
+      }
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching public vote statistics:", error);
+      res.status(500).json({ message: "Erro ao buscar estatísticas de votação" });
+    }
+  });
+
   // Rota pública para obter atividades legislativas (sem autenticação)
   app.get('/api/public/legislative-activities', async (req, res) => {
     console.log("API de atividades legislativas chamada");

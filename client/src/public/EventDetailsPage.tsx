@@ -65,7 +65,7 @@ export default function EventDetailsPage() {
       
       const promises = eventDetails.activities.map(async (activity: any) => {
         try {
-          const response = await fetch(`/api/activities/${activity.id}/votes/stats?eventId=${id}`);
+          const response = await fetch(`/api/public/activities/${activity.id}/votes/stats?eventId=${id}`);
           if (!response.ok) return null;
           const stats = await response.json();
           return {

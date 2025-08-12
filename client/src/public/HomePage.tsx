@@ -504,7 +504,7 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title>Sistema Legislativo - Portal Público</title>
+        <title>Câmara de Jaíba - Poder Legislativo</title>
         <meta name="description" content="Portal público do Sistema Legislativo Municipal. Acesse informações sobre vereadores, documentos, atividades legislativas e mais." />
       </Helmet>
 
