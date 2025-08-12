@@ -720,10 +720,27 @@ export default function EventDetailsPage() {
                                     <div className="flex gap-2">
                                       {document.filePath && (
                                         <>
-                                          <Button size="sm" variant="outline">
+                                          <Button 
+                                            size="sm" 
+                                            variant="outline"
+                                            onClick={() => window.open(document.filePath, '_blank')}
+                                            title="Visualizar documento"
+                                          >
                                             <Eye className="h-4 w-4" />
                                           </Button>
-                                          <Button size="sm" variant="outline">
+                                          <Button 
+                                            size="sm" 
+                                            variant="outline"
+                                            onClick={() => {
+                                              const link = document.createElement('a');
+                                              link.href = document.filePath;
+                                              link.download = document.fileName || `documento-${document.documentNumber}.pdf`;
+                                              document.body.appendChild(link);
+                                              link.click();
+                                              document.body.removeChild(link);
+                                            }}
+                                            title="Baixar documento"
+                                          >
                                             <Download className="h-4 w-4" />
                                           </Button>
                                         </>
