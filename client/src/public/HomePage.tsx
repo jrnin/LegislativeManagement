@@ -66,6 +66,39 @@ import WeatherWidget from "@/components/WeatherWidget";
 const getInitials = (name: string) => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase();
 };
+
+// Funções para cores dos tipos de evento
+const getEventTypeColor = (category: string) => {
+  switch (category?.toLowerCase()) {
+    case 'sessão ordinária':
+    case 'sessao ordinaria':
+      return 'bg-blue-50 text-blue-700 border-blue-300 relative';
+    case 'sessão extraordinária':
+    case 'sessao extraordinaria':
+      return 'bg-orange-50 text-orange-700 border-orange-300 relative';
+    case 'reunião comissão':
+    case 'reuniao comissao':
+      return 'bg-purple-50 text-purple-700 border-purple-300 relative';
+    default:
+      return 'bg-gray-50 text-gray-700 border-gray-300 relative';
+  }
+};
+
+const getEventTypeDot = (category: string) => {
+  switch (category?.toLowerCase()) {
+    case 'sessão ordinária':
+    case 'sessao ordinaria':
+      return 'bg-blue-500';
+    case 'sessão extraordinária':
+    case 'sessao extraordinaria':
+      return 'bg-orange-500';
+    case 'reunião comissão':
+    case 'reuniao comissao':
+      return 'bg-purple-500';
+    default:
+      return 'bg-gray-500';
+  }
+};
 // Componente para exibir as últimas atividades legislativas
 const LegislativeActivitiesWidget = () => {
   const { data: activities, isLoading } = useQuery({
@@ -356,7 +389,8 @@ const EventCard = ({ id, title, date, time, location, type }: EventCardProps) =>
     <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg border-l-4" style={{borderLeftColor: '#7FA653'}}>
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <Badge variant="outline" className="text-xs" style={{borderColor: '#7FA653', color: '#63783D'}}>
+          <Badge variant="outline" className={`text-xs ${getEventTypeColor(type)}`}>
+            <div className={`w-2 h-2 rounded-full mr-1 ${getEventTypeDot(type)}`}></div>
             {type}
           </Badge>
           <span className="text-xs text-gray-500">{time}</span>

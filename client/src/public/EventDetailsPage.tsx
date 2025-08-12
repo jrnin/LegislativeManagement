@@ -37,6 +37,39 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
+// Funções para cores dos tipos de evento
+const getEventTypeColor = (category: string) => {
+  switch (category?.toLowerCase()) {
+    case 'sessão ordinária':
+    case 'sessao ordinaria':
+      return 'bg-blue-50 text-blue-700 border-blue-300 relative';
+    case 'sessão extraordinária':
+    case 'sessao extraordinaria':
+      return 'bg-orange-50 text-orange-700 border-orange-300 relative';
+    case 'reunião comissão':
+    case 'reuniao comissao':
+      return 'bg-purple-50 text-purple-700 border-purple-300 relative';
+    default:
+      return 'bg-gray-50 text-gray-700 border-gray-300 relative';
+  }
+};
+
+const getEventTypeDot = (category: string) => {
+  switch (category?.toLowerCase()) {
+    case 'sessão ordinária':
+    case 'sessao ordinaria':
+      return 'bg-blue-500';
+    case 'sessão extraordinária':
+    case 'sessao extraordinaria':
+      return 'bg-orange-500';
+    case 'reunião comissão':
+    case 'reuniao comissao':
+      return 'bg-purple-500';
+    default:
+      return 'bg-gray-500';
+  }
+};
+
 export default function EventDetailsPage() {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState('overview');
@@ -253,7 +286,8 @@ export default function EventDetailsPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <Badge variant="outline" className="mb-3" style={{borderColor: '#7FA653', color: '#63783D'}}>
+                    <Badge variant="outline" className={`mb-3 ${getEventTypeColor(event.category)}`}>
+                      <div className={`w-2 h-2 rounded-full mr-2 ${getEventTypeDot(event.category)}`}></div>
                       {event.category}
                     </Badge>
                     <CardTitle className="text-3xl font-bold mb-4" style={{color: '#48654e'}}>

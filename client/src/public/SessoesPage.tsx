@@ -160,6 +160,38 @@ export default function SessoesPage() {
     }
   };
 
+  const getEventTypeColor = (category: string) => {
+    switch (category?.toLowerCase()) {
+      case 'sessão ordinária':
+      case 'sessao ordinaria':
+        return 'bg-blue-50 text-blue-700 border-blue-300 relative';
+      case 'sessão extraordinária':
+      case 'sessao extraordinaria':
+        return 'bg-orange-50 text-orange-700 border-orange-300 relative';
+      case 'reunião comissão':
+      case 'reuniao comissao':
+        return 'bg-purple-50 text-purple-700 border-purple-300 relative';
+      default:
+        return 'bg-gray-50 text-gray-700 border-gray-300 relative';
+    }
+  };
+
+  const getEventTypeDot = (category: string) => {
+    switch (category?.toLowerCase()) {
+      case 'sessão ordinária':
+      case 'sessao ordinaria':
+        return 'bg-blue-500';
+      case 'sessão extraordinária':
+      case 'sessao extraordinaria':
+        return 'bg-orange-500';
+      case 'reunião comissão':
+      case 'reuniao comissao':
+        return 'bg-purple-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedType('all');
@@ -444,7 +476,8 @@ export default function SessoesPage() {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <Badge variant="outline" style={{borderColor: '#7FA653', color: '#63783D'}}>
+                          <Badge variant="outline" className={getEventTypeColor(event.category)}>
+                            <div className={`w-2 h-2 rounded-full mr-2 ${getEventTypeDot(event.category)}`}></div>
                             {event.category}
                           </Badge>
                           <Badge className={getStatusColor(event.status)}>
