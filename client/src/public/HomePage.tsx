@@ -494,17 +494,13 @@ export default function HomePage() {
 
   // Hook para detectar scroll e ocultar o componente "Últimos Eventos"
   useEffect(() => {
-    let lastScrollY = 0;
-
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      // Ocultar o componente se o usuário rolou mais de 50px em qualquer direção
-      if (Math.abs(currentScrollY - lastScrollY) > 50) {
+      // Ocultar o componente assim que o usuário começar a rolar (mais de 10px)
+      if (currentScrollY > 10) {
         setShowLatestEvents(false);
       }
-      
-      lastScrollY = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
