@@ -472,6 +472,7 @@ const servicesData = {
 
 export default function HomePage() {
   const [activeServiceTab, setActiveServiceTab] = useState('acessoRapido');
+  const [showLatestEvents, setShowLatestEvents] = useState(true);
   
   // Consulta real à API para obter dados de eventos
   const { data: events = [], isLoading: eventsLoading } = useQuery({
@@ -490,6 +491,28 @@ export default function HomePage() {
   });
   
   const news = newsResponse?.articles || [];
+
+  // Hook para detectar scroll e ocultar o componente "Últimos Eventos"
+  useEffect(() => {
+    let lastScrollY = 0;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Ocultar o componente se o usuário rolou mais de 50px em qualquer direção
+      if (Math.abs(currentScrollY - lastScrollY) > 50) {
+        setShowLatestEvents(false);
+      }
+      
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Formatador de datas
   const formatDate = (dateString: string) => {
@@ -677,47 +700,55 @@ export default function HomePage() {
             
             {/* Coluna da direita (sidebar) - ocupa 1/3 do espaço */}
             
-              {/* Últimos eventos cadastrados */}
-              <div className="bg-white rounded-lg shadow-md p-4">
-                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
-                  <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
-                  Últimos Eventos
-                </h3>
-                
-                {eventsLoading ? (
-                  <div className="flex justify-center items-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
-                  </div>
-                ) : events.length > 0 ? (
-                  <div className="space-y-4">
-                    {events.slice(0, 4).map((event) => (
-                      <EventCard
-                        key={event.id}
-                        id={event.id}
-                        title={event.title}
-                        date={event.date}
-                        time={event.time}
-                        location={event.location}
-                        type={event.type}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Calendar className="mx-auto mb-2 h-12 w-12 text-gray-300" />
-                    <p className="text-sm">Nenhum evento próximo</p>
-                  </div>
-                )}
-                
-                {events.length > 0 && (
-                  <Link href="/public/sessoes">
-                    <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
-                      Ver agenda completa
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                )}
-              </div>
+              {/* Últimos eventos cadastrados - oculto durante scroll */}
+              {showLatestEvents && (
+                <div 
+                  className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 ease-in-out"
+                  style={{
+                    transform: showLatestEvents ? 'translateY(0)' : 'translateY(-100%)',
+                    opacity: showLatestEvents ? 1 : 0
+                  }}
+                >
+                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
+                    <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
+                    Últimos Eventos
+                  </h3>
+                  
+                  {eventsLoading ? (
+                    <div className="flex justify-center items-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
+                    </div>
+                  ) : events.length > 0 ? (
+                    <div className="space-y-4">
+                      {events.slice(0, 4).map((event) => (
+                        <EventCard
+                          key={event.id}
+                          id={event.id}
+                          title={event.title}
+                          date={event.date}
+                          time={event.time}
+                          location={event.location}
+                          type={event.type}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <Calendar className="mx-auto mb-2 h-12 w-12 text-gray-300" />
+                      <p className="text-sm">Nenhum evento próximo</p>
+                    </div>
+                  )}
+                  
+                  {events.length > 0 && (
+                    <Link href="/public/sessoes">
+                      <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
+                        Ver agenda completa
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              )}
            
             
               {/* Widget do clima */}
