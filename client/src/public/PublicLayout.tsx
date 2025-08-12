@@ -103,17 +103,12 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         setIsScrolled(false);
       }
       
-      // Auto-hide do menu flutuante baseado na direção do scroll
-      if (currentScrollY > 200) { // Só começar a esconder após 200px
-        if (currentScrollY > lastScrollY && currentScrollY > 300) {
-          // Rolando para baixo - esconder menu
-          setIsMenuHidden(true);
-        } else if (currentScrollY < lastScrollY) {
-          // Rolando para cima - mostrar menu
-          setIsMenuHidden(false);
-        }
+      // Auto-hide do menu flutuante - esconder componentes assim que usuário rolar mais de 10px
+      if (currentScrollY > 10) {
+        // Esconder componentes flutuantes imediatamente após rolar 10px
+        setIsMenuHidden(true);
       } else {
-        // No topo da página - sempre mostrar menu
+        // No topo da página (0-10px) - sempre mostrar componentes
         setIsMenuHidden(false);
       }
       

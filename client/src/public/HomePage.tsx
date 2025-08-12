@@ -472,7 +472,6 @@ const servicesData = {
 
 export default function HomePage() {
   const [activeServiceTab, setActiveServiceTab] = useState('acessoRapido');
-  const [showLatestEvents, setShowLatestEvents] = useState(true);
   
   // Consulta real à API para obter dados de eventos
   const { data: events = [], isLoading: eventsLoading } = useQuery({
@@ -492,23 +491,7 @@ export default function HomePage() {
   
   const news = newsResponse?.articles || [];
 
-  // Hook para detectar scroll e ocultar o componente "Últimos Eventos"
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Ocultar o componente assim que o usuário começar a rolar (mais de 10px)
-      if (currentScrollY > 10) {
-        setShowLatestEvents(false);
-      }
-    };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
 
   // Formatador de datas
   const formatDate = (dateString: string) => {
@@ -696,14 +679,9 @@ export default function HomePage() {
             
             {/* Coluna da direita (sidebar) - ocupa 2/4 do espaço */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Últimos eventos cadastrados - oculto durante scroll */}
-              {showLatestEvents && (
-                <div 
-                  className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 ease-in-out"
-                  style={{
-                    transform: showLatestEvents ? 'translateY(0)' : 'translateY(-100%)',
-                    opacity: showLatestEvents ? 1 : 0
-                  }}
+              {/* Últimos eventos cadastrados */}
+              <div 
+                className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 ease-in-out"
                 >
                   <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
                     <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
@@ -744,8 +722,6 @@ export default function HomePage() {
                     </Link>
                   )}
                 </div>
-              )}
-           
             
               {/* Widget do clima */}
               <div className="bg-[#e4e6da] rounded-lg shadow-md p-4">
