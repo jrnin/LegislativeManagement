@@ -694,8 +694,8 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Coluna da direita (sidebar) - ocupa 1/3 do espaço */}
-            
+            {/* Coluna da direita (sidebar) - ocupa 2/4 do espaço */}
+            <div className="lg:col-span-2 space-y-6">
               {/* Últimos eventos cadastrados - oculto durante scroll */}
               {showLatestEvents && (
                 <div 
@@ -891,10 +891,7 @@ export default function HomePage() {
                 </div>
                 
               </div>
-              
-                
-                      
-             
+            </div> {/* Fecha div da sidebar */}
             
           </div>
         </div>
