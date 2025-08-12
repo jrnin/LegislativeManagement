@@ -4923,7 +4923,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: record.user.id,
             name: record.user.name,
             role: record.user.role,
-            profileImageUrl: record.user.profileImageUrl
+            // Convert avatar URLs to public format for display without authentication
+            profileImageUrl: record.user.profileImageUrl ? 
+              record.user.profileImageUrl.replace('/objects/', '/public-objects/') : 
+              record.user.profileImageUrl
           } : null
         }))
       };
