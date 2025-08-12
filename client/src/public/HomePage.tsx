@@ -809,8 +809,8 @@ export default function HomePage() {
 
                 {/* Mini Banner Instagram */}
                 <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300"
-                     style={{height: '70px', width: '100%', maxWidth: '286px', margin: '0 auto'}}
-                     onClick={() => window.open('https://instagram.com/camarajaiba', '_blank')}>
+                     style={{height: '70px', width: '100%', maxWidth: '286px', margin: '20px auto 0 auto'}}
+                     onClick={() => window.open('https://www.instagram.com/camaradejaiba/', '_blank')}>
                   <div className="h-full flex items-center justify-between px-4 text-white">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
