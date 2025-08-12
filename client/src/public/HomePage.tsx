@@ -595,10 +595,10 @@ export default function HomePage() {
             </Link>
           </div>
           
-          {/* Seção de notícias do banco de dados */}
-          <div className="grid grid-cols-4 gap-4">
-            {/* Coluna da esquerda (maior, com imagens) - ocupa 2/3 do espaço */}
-            <div className="lg:col-span-2">
+          {/* Seção de notícias do banco de dados - Layout responsivo 3 colunas */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Coluna principal (maior) - ocupa mais espaço */}
+            <div className="lg:col-span-7">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                 <div className="p-6">                
                   {newsLoading ? (
@@ -677,198 +677,137 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Coluna da direita (sidebar) - ocupa 2/4 do espaço */}
-            <div className="space-x-12 m-2 flex">
-              {/* Últimos eventos cadastrados */}
-              <div 
-                className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 ease-in-out"
-                >
-                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
-                    <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
-                    Últimos Eventos
-                  </h3>
-                  
-                  {eventsLoading ? (
-                    <div className="flex justify-center items-center py-8">
-                      <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
-                    </div>
-                  ) : events.length > 0 ? (
-                    <div className="space-y-4">
-                      {events.slice(0, 4).map((event) => (
-                        <EventCard
-                          key={event.id}
-                          id={event.id}
-                          title={event.title}
-                          date={event.date}
-                          time={event.time}
-                          location={event.location}
-                          type={event.type}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <Calendar className="mx-auto mb-2 h-12 w-12 text-gray-300" />
-                      <p className="text-sm">Nenhum evento próximo</p>
-                    </div>
-                  )}
-                  
-                  {events.length > 0 && (
-                    <Link href="/public/sessoes">
-                      <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
-                        Ver agenda completa
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-            
-              {/* Widget do clima */}
-              <div className="bg-[#e4e6da] rounded-lg shadow-md p-4">
-                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
-                  <Sun className="mr-2" style={{color: '#7FA653'}} size={20} />
-                  Clima Hoje
+            {/* Segunda coluna - Últimos eventos */}
+            <div className="lg:col-span-3">
+              <div className="bg-white rounded-lg shadow-md p-4 h-full">
+                <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
+                  <Calendar className="mr-2" style={{color: '#48654e'}} size={20} />
+                  Últimos Eventos
                 </h3>
                 
-                <div className="text-center mb-4">
-                  <div className="flex items-center justify-center mb-2">
-                    <Sun size={32} style={{color: '#7FA653'}} />
-                    <span className="text-3xl font-bold ml-2">28°C</span>
+                {eventsLoading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin" style={{color: '#48654e'}} />
                   </div>
-                  <p className="text-gray-600 text-sm">Ensolarado</p>
-                  <p className="text-xs text-gray-500">Máx: 32°C • Mín: 22°C</p>
-                </div>
-                
-                <div className="grid grid-cols-4 gap-2 mb-4">
-                  {[
-                    { day: 'Seg', temp: '27°', icon: Sun, desc: 'Ensolarado' },
-                    { day: 'Ter', temp: '25°', icon: CloudSun, desc: 'Parcialmente nublado' },
-                    { day: 'Qua', temp: '26°', icon: Cloud, desc: 'Nublado' },
-                    { day: 'Qui', temp: '24°', icon: CloudRain, desc: 'Chuva' },
-                  ].map((item, index) => (
-                    <div key={index} className="text-center p-2 bg-gray-50 rounded">
-                      <div className="text-xs font-medium mb-1">{item.day}</div>
-                      <div style={{color: '#7FA653'}}>
-                        {React.createElement(item.icon, { size: 24 })}
-                      </div>
-                      <div className="text-sm font-semibold mt-1">{item.temp}</div>
-                    </div>
-                  ))}
-                </div>  
-                {/* Widget de Assuntos em Alta - Nuvem de Tags 
-                <div className="bg-white rounded-lg shadow-md p-4 mt-6">
-                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
-                    <Zap className="mr-2" style={{color: '#7FA653'}} size={20} />
-                    Assuntos em alta
-                  </h3>
-
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { text: "Iptu 2025", size: "text-lg", color: "bg-blue-100 hover:bg-blue-200 text-blue-800" },
-                      { text: "Nota Fiscal", size: "text-sm", color: "bg-green-100 hover:bg-green-200 text-green-800" }, 
-                      { text: "Pregão Eletrônico", size: "text-base", color: "bg-purple-100 hover:bg-purple-200 text-purple-800" },
-                      { text: "Processos", size: "text-sm", color: "bg-orange-100 hover:bg-orange-200 text-orange-800" },
-                      { text: "Ouvidoria", size: "text-xs", color: "bg-red-100 hover:bg-red-200 text-red-800" },
-                      { text: "Serviços Online", size: "text-base", color: "bg-teal-100 hover:bg-teal-200 text-teal-800" },
-                      { text: "Licitações", size: "text-sm", color: "bg-indigo-100 hover:bg-indigo-200 text-indigo-800" },
-                      { text: "Documentos", size: "text-xs", color: "bg-pink-100 hover:bg-pink-200 text-pink-800" },
-                      { text: "Transparência", size: "text-sm", color: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800" }
-                    ].map((tag, index) => (
-                      <button 
-                        key={index} 
-                        className={`px-3 py-1 rounded-full transition-all duration-200 transform hover:scale-105 ${tag.size} ${tag.color} font-medium shadow-sm hover:shadow-md`}
-                      >
-                        {tag.text}
-                      </button>
+                ) : events.length > 0 ? (
+                  <div className="space-y-4">
+                    {events.slice(0, 4).map((event) => (
+                      <EventCard
+                        key={event.id}
+                        id={event.id}
+                        title={event.title}
+                        date={event.date}
+                        time={event.time}
+                        location={event.location}
+                        type={event.type}
+                      />
                     ))}
-                  </div>                
-                </div>   */}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Calendar className="mx-auto mb-2 h-12 w-12 text-gray-300" />
+                    <p className="text-sm">Nenhum evento próximo</p>
+                  </div>
+                )}
+                
+                {events.length > 0 && (
+                  <Link href="/public/sessoes">
+                    <Button variant="ghost" size="sm" className="w-full mt-4 hover:opacity-80" style={{color: '#48654e'}}>
+                      Ver agenda completa
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {/* Terceira coluna - Clima e outros widgets */}
+            <div className="lg:col-span-2">
+              <div className="space-y-6">
+                {/* Widget do clima */}
+                <div className="bg-[#e4e6da] rounded-lg shadow-md p-4">
+                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#63783D'}}>
+                    <Sun className="mr-2" style={{color: '#7FA653'}} size={20} />
+                    Clima Hoje
+                  </h3>
+                  
+                  <div className="text-center mb-4">
+                    <div className="flex items-center justify-center mb-2">
+                      <Sun size={32} style={{color: '#7FA653'}} />
+                      <span className="text-3xl font-bold ml-2">28°C</span>
+                    </div>
+                    <p className="text-gray-600 text-sm">Ensolarado</p>
+                    <p className="text-xs text-gray-500">Máx: 32°C • Mín: 22°C</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { day: 'Seg', temp: '27°', icon: Sun, desc: 'Ensolarado' },
+                      { day: 'Ter', temp: '25°', icon: CloudSun, desc: 'Parcialmente nublado' },
+                      { day: 'Qua', temp: '26°', icon: Cloud, desc: 'Nublado' },
+                      { day: 'Qui', temp: '24°', icon: CloudRain, desc: 'Chuva' },
+                    ].map((item, index) => (
+                      <div key={index} className="text-center p-2 bg-gray-50 rounded">
+                        <div className="text-xs font-medium mb-1">{item.day}</div>
+                        <div style={{color: '#7FA653'}}>
+                          {React.createElement(item.icon, { size: 16 })}
+                        </div>
+                        <div className="text-xs font-semibold mt-1">{item.temp}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Widget de Dados Demográficos - Jaíba/MG */}
-                <div className="bg-white rounded-lg shadow-md p-4 mt-6">
+                <div className="bg-white rounded-lg shadow-md p-4">
                   <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center" style={{color: '#48654e'}}>
                     <Building className="mr-2" style={{color: '#7FA653'}} size={20} />
                     Jaíba em Números
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-3">
                     {/* População */}
-                    <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Users2 size={20} className="text-blue-600" />
+                    <div className="flex items-center space-x-3 p-2 bg-blue-50 rounded-lg">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Users2 size={16} className="text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">População</p>
+                        <p className="text-xs text-gray-600">População</p>
                         <p className="text-sm font-medium text-blue-700">37.000</p>
                       </div>
                     </div>
 
                     {/* Área */}
-                    <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <MapPin size={20} className="text-green-600" />
+                    <div className="flex items-center space-x-3 p-2 bg-green-50 rounded-lg">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <MapPin size={16} className="text-green-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">Área</p>
+                        <p className="text-xs text-gray-600">Área</p>
                         <p className="text-sm font-medium text-green-700">1.182 km²</p>
                       </div>
                     </div>
 
-                    {/* IDH */}
-                    <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
-                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                        <Heart size={20} className="text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">IDH</p>
-                        <p className="text-sm font-medium text-purple-700">0.681</p>
-                      </div>
-                    </div>
-
                     {/* PIB per capita */}
-                    <div className="flex items-center space-x-3 p-3 bg-yellow-50 rounded-lg">
-                      <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                        <Briefcase size={20} className="text-yellow-600" />
+                    <div className="flex items-center space-x-3 p-2 bg-yellow-50 rounded-lg">
+                      <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <Briefcase size={16} className="text-yellow-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">PIB per capita</p>
+                        <p className="text-xs text-gray-600">PIB per capita</p>
                         <p className="text-sm font-medium text-yellow-700">R$ 28.450</p>
                       </div>
                     </div>
-
-                    {/* Escolaridade */}
-                    <div className="flex items-center space-x-3 p-3 bg-red-50 rounded-lg">
-                      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                        <GraduationCap size={20} className="text-red-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Taxa Alfabetização</p>
-                        <p className="text-sm font-medium text-red-700">89.2%</p>
-                      </div>
-                    </div>
-
-                    {/* Densidade */}
-                    <div className="flex items-center space-x-3 p-3 bg-teal-50 rounded-lg">
-                      <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
-                        <Home size={20} className="text-teal-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Densidade</p>
-                        <p className="text-sm font-medium text-teal-700">31.3 hab/km²</p>
-                      </div>
-                    </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-gray-200">
+                  <div className="mt-3 pt-2 border-t border-gray-200">
                     <p className="text-xs text-gray-500 text-center">
-                      Fonte: IBGE - Censo 2022 e estimativas atuais
+                      Fonte: IBGE - Censo 2022
                     </p>
                   </div>
                 </div>
-                
               </div>
-            </div> {/* Fecha div da sidebar */}
-            
+            </div>
           </div>
         </div>
       </section>
