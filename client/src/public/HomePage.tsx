@@ -678,7 +678,7 @@ export default function HomePage() {
             </div>
             
             {/* Coluna da direita (sidebar) - ocupa 2/4 do espaço */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="space-x-12 m-2 flex">
               {/* Últimos eventos cadastrados */}
               <div 
                 className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 ease-in-out"
