@@ -732,12 +732,12 @@ export default function EventDetailsPage() {
                                             size="sm" 
                                             variant="outline"
                                             onClick={() => {
-                                              const link = document.createElement('a');
+                                              const link = window.document.createElement('a');
                                               link.href = document.filePath;
                                               link.download = document.fileName || `documento-${document.documentNumber}.pdf`;
-                                              document.body.appendChild(link);
+                                              window.document.body.appendChild(link);
                                               link.click();
-                                              document.body.removeChild(link);
+                                              window.document.body.removeChild(link);
                                             }}
                                             title="Baixar documento"
                                           >
