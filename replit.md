@@ -42,6 +42,7 @@ Preferred communication style: Simple, everyday language.
 - **Real-time Features**: WebSocket support for notifications.
 - **Search System**: Global site search functionality with real-time results across activities, events, documents, news, and users. Features include visual type indicators, case-insensitive ILIKE queries, authentic database results only (no mock data), and optimized SQL queries for fast response times. Successfully searches through document types like "Ata" and "Requerimento" with proper field mapping (Janeiro 2025).
 - **Public Voting Statistics**: Comprehensive public API for voting statistics (`/api/public/activities/:id/votes/stats`) allowing public access to legislative voting data without authentication. System displays real voting statistics with 1251+ votes in database, enabling full transparency of legislative processes on public pages (Agosto 2025).
+- **Avatar Display Fix**: Complete resolution of avatar display issues in public event attendance lists. Backend route `/api/public/events/:id/details` now converts avatar URLs from `/objects/` to `/public-objects/` format, enabling public access to user avatars without authentication. Applied consistent pattern used across all public routes for seamless avatar display in event details pages (Agosto 2025).
 
 ## External Dependencies
 - **Database**: PostgreSQL (`@neondatabase/serverless` for serverless connection), Drizzle ORM, Drizzle Kit for migrations.
