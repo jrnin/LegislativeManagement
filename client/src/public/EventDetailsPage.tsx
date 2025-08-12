@@ -581,7 +581,7 @@ export default function EventDetailsPage() {
                         <Card className="text-center">
                           <CardContent className="pt-6">
                             <Vote className="h-8 w-8 mx-auto mb-2" style={{color: '#48654e'}} />
-                            <div className="text-2xl font-bold" style={{color: '#48654e'}}>
+                            <div className="text-2xl font-semibold" style={{color: '#48654e'}}>
                               {votingStats?.reduce((total, stat) => total + (stat.totalVotes || 0), 0) || 0}
                             </div>
                             <p className="text-sm text-gray-600">Votações</p>

@@ -207,6 +207,11 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         external: false
       },
       {
+        name: 'Pauta', 
+        href: '/atividades?tipo=Pauta',
+        external: false
+      },
+      {
         name: 'Projeto de Lei', 
         href: '/atividades?tipo=Projeto%20de%20Lei',
         external: false
