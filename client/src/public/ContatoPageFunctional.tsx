@@ -306,7 +306,7 @@ export default function ContatoPageFunctional() {
                   <div>
                     <h3 style={{ margin: 0, marginBottom: '5px' }}>Endereço</h3>
                     <p style={{ margin: 0, color: '#666' }}>
-                      Câmara Municipal de Jaíba<br />
+                      Rua Amândio José de Carvalho, nº 371<br />
                       Centro, Jaíba - MG<br />
                       CEP: 39480-000
                     </p>
@@ -325,7 +325,7 @@ export default function ContatoPageFunctional() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 'bold' }}>Segunda a Sexta</span>
-                  <span style={{ color: '#666' }}>8h às 17h</span>
+                  <span style={{ color: '#666' }}>7h às 13h</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 'bold' }}>Sábado</span>
