@@ -605,15 +605,14 @@ export default function ActivityForm() {
                   <FormLabel htmlFor="file">Documento</FormLabel>
                   <div className="mt-2">
                     <SimpleFileUploader
-                      uploadUrlEndpoint="/api/activities/upload-url"
-                      onUploadSuccess={(uploadedFileURL: string, fileName: string) => {
+                      onUploadComplete={(uploadedFileURL: string, fileName: string) => {
                         setUploadedFileURL(uploadedFileURL);
                         setUploadedFileName(fileName);
                         console.log("File uploaded successfully:", { uploadedFileURL, fileName });
                       }}
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-                      maxSizeMB={10}
-                      description="PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT (max. 10MB)"
+                      acceptedTypes=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                      maxFileSize={10485760}
+                      className="w-full"
                     />
                   </div>
                   {activity && activity.fileName && (
