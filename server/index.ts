@@ -45,7 +45,7 @@ async function setupRootUser() {
       email: rootEmail,
       password: hashedPassword,
       role: "admin", // Nível máximo de acesso
-      emailVerified: true // Já verificado
+      email_verified: true // Já verificado
     });
     
     log("Usuário root criado com sucesso");
