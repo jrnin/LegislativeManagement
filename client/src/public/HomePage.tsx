@@ -336,6 +336,7 @@ const NewsCard = ({ id, title, excerpt, date, imageUrl, category }: NewsCardProp
 // Interface para CouncilorCard
 interface CouncilorCardProps {
   id: string;
+  slug?: string;
   name: string;
   role?: string;
   party?: string;
@@ -345,8 +346,8 @@ interface CouncilorCardProps {
   education?: string;
 }
 
-const CouncilorCard = ({ id, name, role, party, imageUrl, profileImageUrl, occupation, education }: CouncilorCardProps) => (
-  <Link href={`/public/vereadores/${id}`}>
+const CouncilorCard = ({ id, slug, name, role, party, imageUrl, profileImageUrl, occupation, education }: CouncilorCardProps) => (
+  <Link href={`/public/vereadores/${slug || id}`}>
     <Card className="group cursor-pointer transition-all duration-300 hover:shadow-lg">
       <CardHeader className="pb-2 pt-6">
         <div className="flex justify-center mb-4">
@@ -899,7 +900,7 @@ export default function HomePage() {
                   {/* Primeira linha - 6 vereadores */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-4">
                     {(councilors?.length > 0 ? councilors : []).slice(0, 13).map((councilor, index) => (
-                      <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
+                      <Link key={councilor.id} href={`/public/vereadores/${councilor.slug || councilor.id}`}>
                         <div className="group cursor-pointer text-center">
                           <div className="relative mb-3">
                             {councilor.role && (
@@ -953,7 +954,7 @@ export default function HomePage() {
                   {/* Segunda linha - 6 vereadores 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
                     {(councilors?.length > 0 ? councilors : []).slice(6, 12).map((councilor, index) => (
-                      <Link key={councilor.id} href={`/public/vereadores/${councilor.id}`}>
+                      <Link key={councilor.id} href={`/public/vereadores/${councilor.slug || councilor.id}`}>
                         <div className="group cursor-pointer text-center">
                           <div className="relative mb-3">
                             {councilor.role && (
