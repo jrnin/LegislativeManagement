@@ -104,12 +104,12 @@ export default function ActivityForm() {
         file: undefined,
       });
       
-      // Reset file upload state when editing existing activity (only clear if no new file uploaded)
-      if (!uploadedFileURL) {
-        setUploadedFileURL("");
-        setUploadedFileName("");
-        setFormFile(null);
-      }
+      // Don't reset file upload state when editing - preserve any uploaded files
+      console.log("Activity loaded in edit mode, preserving file upload state:", {
+        uploadedFileURL,
+        uploadedFileName,
+        formFile: !!formFile
+      });
     }
   }, [activity, form]);
 
@@ -637,11 +637,21 @@ export default function ActivityForm() {
                         setUploadedFileURL(uploadedFileURL);
                         setUploadedFileName(fileName);
                         console.log("File uploaded successfully:", { uploadedFileURL, fileName });
+                        console.log("State updated - uploadedFileURL:", uploadedFileURL);
+                        console.log("State updated - uploadedFileName:", fileName);
                       }}
                       acceptedTypes=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
                       maxFileSize={10485760}
                       className="w-full"
                     />
+                    {/* Debug info */}
+                    {uploadedFileURL && (
+                      <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
+                        <p><strong>Novo arquivo carregado:</strong></p>
+                        <p>URL: {uploadedFileURL}</p>
+                        <p>Nome: {uploadedFileName}</p>
+                      </div>
+                    )}
                   </div>
                   {activity && activity.fileName && (
                     <div className="mt-4">
