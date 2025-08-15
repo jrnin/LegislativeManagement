@@ -103,13 +103,6 @@ export default function ActivityForm() {
         authorIds: activity.authors ? activity.authors.map(author => author.id) : [],
         file: undefined,
       });
-      
-      // Reset file upload state when editing existing activity (only clear if no new file uploaded)
-      if (!uploadedFileURL) {
-        setUploadedFileURL("");
-        setUploadedFileName("");
-        setFormFile(null);
-      }
     }
   }, [activity, form]);
 
