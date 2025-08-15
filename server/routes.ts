@@ -5112,22 +5112,59 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
         return res.status(400).json({ error: "ID do documento inválido" });
       }
       
+      console.log(`[PUBLIC] Download request for document ${documentId}`);
+      
       const document = await storage.getDocumentById(documentId);
       
       if (!document || !document.filePath || !document.fileName) {
+        console.log(`[PUBLIC] Document ${documentId} not found or has no file`);
         return res.status(404).json({ error: "Documento não encontrado ou sem arquivo" });
       }
       
+      console.log(`[PUBLIC] Document ${documentId} file path: ${document.filePath}`);
+      
+      // Check if this is an Object Storage file path (starts with /objects/)
+      if (document.filePath.startsWith('/objects/')) {
+        console.log(`[PUBLIC] File is in Object Storage: ${document.filePath}`);
+        
+        try {
+          const objectStorageService = new ObjectStorageService();
+          const objectFile = await objectStorageService.getObjectEntityFile(document.filePath);
+          
+          // For public downloads, we need to set proper headers and stream the file
+          res.setHeader('Content-Type', document.fileType || 'application/pdf');
+          res.setHeader('Content-Disposition', `attachment; filename="${document.fileName}"`);
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+          
+          console.log(`[PUBLIC] Streaming Object Storage file: ${document.fileName}`);
+          
+          // Stream the file directly from Object Storage
+          await objectStorageService.downloadObject(objectFile, res);
+          return;
+          
+        } catch (error) {
+          console.error(`[PUBLIC] Error accessing Object Storage file:`, error);
+          return res.status(404).json({ error: "Arquivo não encontrado no Object Storage" });
+        }
+      }
+      
+      // Handle local file system files (legacy support)
       const filePath = path.join(process.cwd(), document.filePath);
+      
+      console.log(`[PUBLIC] Checking local file: ${filePath}`);
       
       // Verificar se o arquivo existe
       if (!fs.existsSync(filePath)) {
+        console.log(`[PUBLIC] Local file not found: ${filePath}`);
         return res.status(404).json({ error: "Arquivo não encontrado no servidor" });
       }
       
       // Definir headers para download
       res.setHeader('Content-Disposition', `attachment; filename="${document.fileName}"`);
-      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Content-Type', document.fileType || 'application/octet-stream');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      
+      console.log(`[PUBLIC] Sending local file: ${document.fileName}`);
       
       // Enviar o arquivo
       res.sendFile(filePath);
@@ -5146,19 +5183,50 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
         return res.status(400).json({ message: "ID da atividade inválido" });
       }
       
+      console.log(`[PUBLIC] Download request for activity ${activityId}`);
+      
       // Buscar a atividade no banco de dados
       const activity = await storage.getLegislativeActivity(activityId);
       
       if (!activity) {
+        console.log(`[PUBLIC] Activity ${activityId} not found`);
         return res.status(404).json({ message: "Atividade não encontrada" });
       }
       
       // Verificar se a atividade tem arquivo anexado
       if (!activity.filePath || !activity.fileName) {
+        console.log(`[PUBLIC] Activity ${activityId} has no file attached`);
         return res.status(404).json({ message: "Arquivo não encontrado para esta atividade" });
       }
       
-      // Verificar se o arquivo existe no sistema de arquivos
+      console.log(`[PUBLIC] Activity ${activityId} file path: ${activity.filePath}`);
+      
+      // Check if this is an Object Storage file path (starts with /objects/)
+      if (activity.filePath.startsWith('/objects/')) {
+        console.log(`[PUBLIC] File is in Object Storage: ${activity.filePath}`);
+        
+        try {
+          const objectStorageService = new ObjectStorageService();
+          const objectFile = await objectStorageService.getObjectEntityFile(activity.filePath);
+          
+          // For public downloads, we need to set proper headers and stream the file
+          res.setHeader('Content-Type', activity.fileType || 'application/pdf');
+          res.setHeader('Content-Disposition', `attachment; filename="${activity.fileName}"`);
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+          
+          console.log(`[PUBLIC] Streaming Object Storage file: ${activity.fileName}`);
+          
+          // Stream the file directly from Object Storage
+          await objectStorageService.downloadObject(objectFile, res);
+          return;
+          
+        } catch (error) {
+          console.error(`[PUBLIC] Error accessing Object Storage file:`, error);
+          return res.status(404).json({ message: "Arquivo não encontrado no Object Storage" });
+        }
+      }
+      
+      // Handle local file system files (legacy support)
       let filePath;
       
       // Se o filePath já é absoluto, use-o diretamente
@@ -5169,7 +5237,10 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
         filePath = path.join(process.cwd(), activity.filePath);
       }
       
+      console.log(`[PUBLIC] Checking local file: ${filePath}`);
+      
       if (!fs.existsSync(filePath)) {
+        console.log(`[PUBLIC] Local file not found: ${filePath}`);
         return res.status(404).json({ message: "Arquivo não encontrado no servidor" });
       }
       
@@ -5197,14 +5268,16 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
       // Configurar cabeçalhos para download
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', `attachment; filename="${activity.fileName}"`);
-      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      
+      console.log(`[PUBLIC] Streaming local file: ${activity.fileName}`);
       
       // Enviar o arquivo
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);
       
       fileStream.on('error', (error) => {
-        console.error('Erro ao ler arquivo:', error);
+        console.error('Erro ao ler arquivo local:', error);
         if (!res.headersSent) {
           res.status(500).json({ message: "Erro ao ler o arquivo" });
         }
