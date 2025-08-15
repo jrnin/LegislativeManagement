@@ -99,23 +99,24 @@ function ActivitiesByTypeTab({ councilorId, activityType }: ActivitiesByTypeTabP
       {activities.slice(0, 5).map((activity: any) => (
         <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3 flex items-start justify-between">
           <div className="flex-1">
-            <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
+            <h4 className="font-medium text-gray-900">{activity.description}</h4>
             <p className="text-sm text-gray-600 mb-2">
-              {activity.type} • {
-                activity.date ? 
-                new Date(activity.date).toLocaleDateString('pt-BR') : 
+              {activity.activityType} Nº {activity.activityNumber}/{new Date(activity.activityDate).getFullYear()} • {
+                activity.activityDate ? 
+                new Date(activity.activityDate).toLocaleDateString('pt-BR') : 
                 'Data não informada'
               }
             </p>
             <Badge className={
-              activity.status === 'Aprovado' ? 'bg-green-100 text-green-800' :
-              activity.status === 'Rejeitado' ? 'bg-red-100 text-red-800' :
+              activity.situacao === 'Aprovado' ? 'bg-green-100 text-green-800' :
+              activity.situacao === 'Rejeitado' ? 'bg-red-100 text-red-800' :
+              activity.situacao === 'Em tramitação' ? 'bg-blue-100 text-blue-800' :
               'bg-yellow-100 text-yellow-800'
             }>
-              {activity.status || 'Em análise'}
+              {activity.situacao || 'Em análise'}
             </Badge>
           </div>
-          {(activity.filePath || activity.file) && (
+          {activity.filePath && (
             <a 
               href={`/api/public/activities/${activity.id}/download`}
               target="_blank"
