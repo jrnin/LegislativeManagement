@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
 interface SimpleFileUploaderProps {
-  onUploadComplete: (fileUrl: string, fileName: string) => void;
+  onUploadComplete: (fileUrl: string, fileName: string, file?: File) => void;
   maxFileSize?: number;
   acceptedTypes?: string;
   className?: string;
@@ -69,7 +69,7 @@ export function SimpleFileUploader({
       console.log('Upload successful, final URL:', finalObjectUrl);
       
       setUploadedFile(file.name);
-      onUploadComplete(finalObjectUrl, file.name);
+      onUploadComplete(finalObjectUrl, file.name, file);
       
       toast({
         title: "Arquivo carregado",
