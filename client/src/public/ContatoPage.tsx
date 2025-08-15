@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +33,11 @@ export default function ContatoPage() {
     cidade: '',
     mensagem: ''
   });
+
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({

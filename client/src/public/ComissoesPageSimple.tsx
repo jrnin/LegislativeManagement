@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 interface Committee {
@@ -26,6 +26,11 @@ export default function ComissoesPageSimple() {
   const { data: committees = [], isLoading, error } = useQuery<Committee[]>({
     queryKey: ["/api/public/committees"],
   });
+
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const filteredCommittees = committees.filter((committee: Committee) => {
     const matchesSearch = committee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -142,6 +142,11 @@ export default function DocumentosPageBasic() {
     }
   };
   
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   // Efeito para carregar documentos na inicialização e quando filtros/página mudam
   useEffect(() => {
     fetchDocuments();

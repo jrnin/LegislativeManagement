@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface FormData {
   nome: string;
@@ -18,6 +18,11 @@ export default function ContatoPageFunctional() {
     cidade: '',
     mensagem: ''
   });
+
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({

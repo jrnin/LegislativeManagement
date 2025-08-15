@@ -66,6 +66,11 @@ export default function AtividadesPage() {
     setPage(1);
   }, [search, type, status]);
 
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   // Construir query string para filtros e paginação
   const getQueryString = () => {
     const params = new URLSearchParams();

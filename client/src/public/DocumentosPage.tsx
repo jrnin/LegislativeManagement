@@ -105,6 +105,11 @@ export default function DocumentosPage() {
     setPage(1);
   };
 
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   // Executar busca quando filtros mudam
   useEffect(() => {
     refetch();

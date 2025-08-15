@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -68,6 +68,11 @@ export default function ComissoesPage() {
   const { data: committees = [], isLoading } = useQuery<Committee[]>({
     queryKey: ["/api/public/committees"],
   });
+
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // Buscar eventos de reunião de comissão
   const { data: committeeEvents = [], isLoading: loadingEvents } = useQuery<CommitteeEvent[]>({

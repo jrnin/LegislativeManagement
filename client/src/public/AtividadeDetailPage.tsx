@@ -156,6 +156,11 @@ export default function AtividadeDetailPage() {
     fetchActivity();
   }, [location]);
 
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
