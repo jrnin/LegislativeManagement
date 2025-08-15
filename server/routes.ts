@@ -1691,27 +1691,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = schema.parse(data);
       
-      // Handle Object Storage file upload if present
+      // Handle Object Storage file upload ONLY if new file was uploaded
       let fileInfo = {};
       
-      if (req.body.uploadedFileURL) {
-        const objectStorageService = new ObjectStorageService();
-        const userId = req.user?.id || req.user?.claims?.sub;
+      if (req.body.uploadedFileURL && req.body.uploadedFileURL.trim() !== '') {
+        console.log(`[DEBUG] Processing NEW file upload for document ${documentId}:`, req.body.uploadedFileURL);
         
-        // Set ACL policy and get normalized path - documents should be public for transparency
-        const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
-          req.body.uploadedFileURL,
-          {
-            owner: userId,
-            visibility: 'public' // Documents are public for transparency
+        try {
+          const objectStorageService = new ObjectStorageService();
+          const userId = req.user?.id || req.user?.claims?.sub || 'system';
+          
+          // Set ACL policy and get normalized path - documents should be public for transparency
+          const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
+            req.body.uploadedFileURL,
+            {
+              owner: userId,
+              visibility: 'public' // Documents are public for transparency
+            }
+          );
+          
+          fileInfo = {
+            filePath: cloudPath,
+            fileName: req.body.originalFileName || 'document',
+            fileType: req.body.mimeType || 'application/pdf',
+          };
+          
+          console.log(`[DEBUG] NEW file stored in Object Storage:`, { cloudPath, fileName: fileInfo.fileName });
+          
+          // Clean up old file if it exists and is not an Object Storage path
+          if (currentDocument.filePath && 
+              !currentDocument.filePath.startsWith('/objects/') && 
+              fs.existsSync(currentDocument.filePath)) {
+            console.log(`[DEBUG] Cleaning up old local file: ${currentDocument.filePath}`);
+            fs.unlinkSync(currentDocument.filePath);
           }
-        );
-        
-        fileInfo = {
-          filePath: cloudPath,
-          fileName: req.body.originalFileName || 'document',
-          fileType: req.body.mimeType || 'application/pdf',
-        };
+          
+        } catch (error) {
+          console.error(`[ERROR] Failed to process Object Storage upload for document:`, error);
+          return res.status(500).json({ message: "Erro ao processar upload do arquivo" });
+        }
+      } else {
+        console.log(`[DEBUG] No new file uploaded for document ${documentId}, keeping existing file data`);
       }
       
       // Update document
