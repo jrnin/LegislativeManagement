@@ -44,8 +44,7 @@ interface ActivitiesResponse {
 // Interface para vereadores
 interface Councilor {
   id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
 }
 
 // Componente para filtro de vereadores
@@ -72,7 +71,7 @@ function CouncilorFilter({ value, onChange }: { value: string; onChange: (value:
         <option value="">Todos os vereadores</option>
         {councilors.map((councilor) => (
           <option key={councilor.id} value={councilor.id}>
-            {councilor.firstName} {councilor.lastName}
+            {councilor.name}
           </option>
         ))}
       </select>
@@ -87,7 +86,7 @@ function AuthorBadge({ authorId, onRemove }: { authorId: string; onRemove: () =>
   });
 
   const selectedCouncilor = councilors.find(c => c.id === authorId);
-  const authorName = selectedCouncilor ? `${selectedCouncilor.firstName} ${selectedCouncilor.lastName}` : 'Vereador';
+  const authorName = selectedCouncilor ? selectedCouncilor.name : 'Vereador';
 
   return (
     <Badge variant="outline" className="flex items-center gap-1 bg-green-50">
