@@ -4764,6 +4764,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activityType = req.query.activityType as string;
       const status = req.query.status as string;
       const search = req.query.search as string;
+      const author = req.query.author as string;
       
       // Buscar todas as atividades aprovadas do banco de dados
       const allActivities = await storage.getAllLegislativeActivities();
@@ -4793,6 +4794,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           activity.description.toLowerCase().includes(searchLower) ||
           activity.activityType.toLowerCase().includes(searchLower)
         );
+      }
+      
+      if (author) {
+        filteredActivities = filteredActivities.filter(activity => {
+          if (activity.authors && Array.isArray(activity.authors)) {
+            return activity.authors.some((authorObj: any) => authorObj.id === author);
+          }
+          return false;
+        });
       }
       
       // Ordenar por data mais recente

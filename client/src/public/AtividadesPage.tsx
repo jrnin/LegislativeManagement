@@ -51,9 +51,9 @@ interface Councilor {
 // Componente para filtro de vereadores
 function CouncilorFilter({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const { data: councilors = [] } = useQuery<Councilor[]>({
-    queryKey: ['/api/public/users/councilors'],
+    queryKey: ['/api/public/councilors'],
     queryFn: async () => {
-      const res = await fetch('/api/public/users/councilors');
+      const res = await fetch('/api/public/councilors');
       if (!res.ok) {
         throw new Error('Erro ao carregar vereadores');
       }
@@ -77,6 +77,26 @@ function CouncilorFilter({ value, onChange }: { value: string; onChange: (value:
         ))}
       </select>
     </div>
+  );
+}
+
+// Componente para badge do autor
+function AuthorBadge({ authorId, onRemove }: { authorId: string; onRemove: () => void }) {
+  const { data: councilors = [] } = useQuery<Councilor[]>({
+    queryKey: ['/api/public/councilors']
+  });
+
+  const selectedCouncilor = councilors.find(c => c.id === authorId);
+  const authorName = selectedCouncilor ? `${selectedCouncilor.firstName} ${selectedCouncilor.lastName}` : 'Vereador';
+
+  return (
+    <Badge variant="outline" className="flex items-center gap-1 bg-green-50">
+      <span>Vereador: {authorName}</span>
+      <X 
+        className="h-3 w-3 ml-1 cursor-pointer" 
+        onClick={onRemove}
+      />
+    </Badge>
   );
 }
 
@@ -367,7 +387,7 @@ export default function AtividadesPage() {
         </div>
 
         {/* Resumo dos filtros aplicados */}
-        {(search || type || status) && (
+        {(search || type || status || author) && (
           <div className="mb-6 flex flex-wrap gap-2 items-center">
             <span className="text-sm text-gray-500">
               Filtros aplicados:
@@ -401,6 +421,13 @@ export default function AtividadesPage() {
                   onClick={() => setStatus('')}
                 />
               </Badge>
+            )}
+            
+            {author && (
+              <AuthorBadge 
+                authorId={author} 
+                onRemove={() => setAuthor('')}
+              />
             )}
           </div>
         )}
