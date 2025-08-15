@@ -1,0 +1,43 @@
+33	2	/home/runner/workspace/uploads/activities/2025/07/1753874226243-e86b53bb8b52.pdf	INDICAÃÃO NÂº 002 2025.pdf
+37	4	/home/runner/workspace/uploads/activities/2025/07/1753874282306-1d5bcb56fdce.pdf	INDICAÃÃO NÂº 004 2025.pdf
+35	1	/home/runner/workspace/uploads/activities/2025/07/1753874348643-7761eda43f71.pdf	PROJETO RESOLUÃÃO 001 2025.pdf
+42	8	/home/runner/workspace/uploads/activities/2025/07/1753874802689-1eb9226e122f.pdf	INDICAÃÃO NÂº 008 2025.pdf
+34	1	/home/runner/workspace/uploads/activities/2025/07/1753890592534-c7daef17a495.pdf	PROJETO DE LEI NÂº 001 2025.pdf
+32	1	/home/runner/workspace/uploads/activities/2025/07/1753890637705-f9e48087d430.pdf	INDICAÃÃO NÂº 001 2025.pdf
+38	5	/home/runner/workspace/uploads/activities/2025/07/1753890667516-edcc10cc6d82.pdf	INDICAÃÃO NÂº 005 2025.pdf
+55	16	/home/runner/workspace/uploads/activities/2025/07/1753874949954-9b5e8a544b55.pdf	INDICAÃÃO NÂº 016 2025.pdf
+63	24	/home/runner/workspace/uploads/activities/2025/07/1753875064858-29ffe87c926e.pdf	INDICAÃÃO NÂº 024 2025.pdf
+39	6	/home/runner/workspace/uploads/activities/2025/07/1753874115691-90bffcb2c994.pdf	INDICAÃÃO NÂº 006 2025.pdf
+36	3	/home/runner/workspace/uploads/activities/2025/07/1753874259802-506a9779f8c1.pdf	INDICAÃÃO NÂº 003 2025.pdf
+52	3	/home/runner/workspace/uploads/activities/2025/07/1753874459485-7515d7257edb.pdf	REQUERIMENTO 003 2025.pdf
+50	1	/home/runner/workspace/uploads/activities/2025/07/1753874499288-496dd86ccfb2.pdf	REQUERIMENTO 001 2025.pdf
+47	12	/home/runner/workspace/uploads/activities/2025/07/1753874705962-d7482a2811d1.pdf	INDICAÃÃO NÂº 012 2025.pdf
+40	7	/home/runner/workspace/uploads/activities/2025/07/1753874750968-72ec1213be55.pdf	INDICAÃÃO NÂº 007 2025.pdf
+44	9	/home/runner/workspace/uploads/activities/2025/07/1753874830949-d9fbdc9012e1.pdf	INDICAÃÃO NÂº 009 2025.pdf
+45	10	/home/runner/workspace/uploads/activities/2025/07/1753874847756-f2b477ceb175.pdf	INDICAÃÃO NÂº 010 2025.pdf
+46	11	/home/runner/workspace/uploads/activities/2025/07/1753874865246-d0da4a299ef2.pdf	INDICAÃÃO NÂº 011 2025.pdf
+48	13	/home/runner/workspace/uploads/activities/2025/07/1753874894488-cd69fe097248.pdf	INDICAÃÃO NÂº 013 2025.pdf
+49	14	/home/runner/workspace/uploads/activities/2025/07/1753874909983-d40ae520b980.pdf	INDICAÃÃO NÂº 014 2025.pdf
+64	25	/home/runner/workspace/uploads/activities/2025/07/1753875079208-1c239e97bb79.pdf	INDICAÃÃO NÂº 025 2025.pdf
+74	71	/home/runner/workspace/uploads/activities/2025/07/1753843750426-659a3f7c3e96.pdf	INDICAÃÃO NÂº 071 2025.pdf
+53	4	/home/runner/workspace/uploads/activities/2025/07/1753874404535-28602eceb46f.pdf	REQUERIMENTO 004 2025.pdf
+51	2	/home/runner/workspace/uploads/activities/2025/07/1753874480440-111a6cddb239.pdf	REQUERIMENTO 002 2025.pdf
+54	15	/home/runner/workspace/uploads/activities/2025/07/1753874928164-c4932b0798ec.pdf	INDICAÃÃO NÂº 015 2025.pdf
+56	17	/home/runner/workspace/uploads/activities/2025/07/1753874970905-86c9e84ee226.pdf	INDICAÃÃO NÂº 017 2025.pdf
+57	18	/home/runner/workspace/uploads/activities/2025/07/1753874987219-5827927a4f25.pdf	INDICAÃÃO NÂº 018 2025.pdf
+58	19	/home/runner/workspace/uploads/activities/2025/07/1753875002914-73360bf465ab.pdf	INDICAÃÃO NÂº 019 2025.pdf
+59	20	/home/runner/workspace/uploads/activities/2025/07/1753875019432-c0f1612d2a47.pdf	INDICAÃÃO NÂº 020 2025.pdf
+61	21	/home/runner/workspace/uploads/activities/2025/07/1753875039854-6b47cd674d71.pdf	INDICAÃÃO NÂº 021 2025.pdf
+65	26	/home/runner/workspace/uploads/activities/2025/07/1753875095161-f15e0fda99fd.pdf	INDICAÃÃO NÂº 026 2025.pdf
+66	30	/home/runner/workspace/uploads/activities/2025/07/1753875110742-321e556ed23d.pdf	INDICAÃÃO NÂº 030 2025.pdf
+75	22	/home/runner/workspace/uploads/activities/2025/07/1753877636069-f4773d8d9835.pdf	INDICAÃÃO NÂº 022 2025.pdf
+76	27	/home/runner/workspace/uploads/activities/2025/07/1753877932423-b52c3285ecb2.pdf	INDICAÃÃO NÂº 027 2025.pdf
+77	28	/home/runner/workspace/uploads/activities/2025/07/1753878194199-e9520b7c078c.pdf	INDICAÃÃO NÂº 028 2025.pdf
+78	39	/home/runner/workspace/uploads/activities/2025/07/1753878553878-8738b7777af2.pdf	INDICAÃÃO NÂº 039 2025.pdf
+79	40	/home/runner/workspace/uploads/activities/2025/07/1753878831260-52ecfb4235b4.pdf	INDICAÃÃO NÂº 040 2025.pdf
+80	9	/home/runner/workspace/uploads/activities/2025/07/1753880160307-bce32ca82c41.pdf	PROJETO DE LEI NÂº 009 2025.pdf
+82	23	/home/runner/workspace/uploads/activities/2025/07/1753902228130-fc15aaa2d8ca.pdf	INDICAÃÃO NÂº 023 2025.pdf
+83	1	/home/runner/workspace/uploads/activities/2025/07/1753902876251-13928552cb01.pdf	PROJETO DE LEI NÂº 001 2025 EXECUTIVO.pdf
+84	29	/home/runner/workspace/uploads/activities/2025/07/1753904838739-7537dbe04865.pdf	INDICAÃÃO NÂº 029 2025.pdf
+85	31	/home/runner/workspace/uploads/activities/2025/07/1753905271351-9aee6590e308.pdf	INDICAÃÃO NÂº 031 2025.pdf
+86	44	/home/runner/workspace/uploads/activities/2025/07/1753905860048-d149112156ae.pdf	INDICAÃÃO NÂº 044 2025.pdf

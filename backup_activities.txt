@@ -1,0 +1,200 @@
+COPY public.legislative_activities (id, activity_number, activity_date, description, event_id, activity_type, file_path, file_name, file_type, approved, created_at, updated_at, approved_by, approved_at, approval_comment, approval_type, status, status_updated_by, status_updated_at, situacao, regime_tramitacao) FROM stdin;
+33	2	2025-01-15 00:00:00	Indicação referente ao cascalhamento na comunidade rural da linha 2 de Jaíba/MG.	40	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874226243-e86b53bb8b52.pdf	INDICAÃÃO NÂº 002 2025.pdf	application/pdf	\N	2025-07-28 11:48:31.476441	2025-07-30 11:17:06.961	\N	\N	\N		Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+37	4	2025-01-15 00:00:00	Providenciar a construção de uma praça para atender os feirantes do NS2, no Projeto Jaíba (em lote em freme ao posto de gasolina e o Bar Ailton Seboso). 	40	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874282306-1d5bcb56fdce.pdf	INDICAÃÃO NÂº 004 2025.pdf	application/pdf	\N	2025-07-28 12:07:11.178858	2025-07-30 11:18:02.797	\N	\N	\N		Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+35	1	2025-01-15 00:00:00	Altera Redação do Art. 8º da Resolução nº 02/2022.	40	Projeto de Resolução	/home/runner/workspace/uploads/activities/2025/07/1753874348643-7761eda43f71.pdf	PROJETO RESOLUÃÃO 001 2025.pdf	application/pdf	t	2025-07-28 11:55:44.235212	2025-07-30 11:19:09.171	51af7dcd-c5ba-47bb-a20f-183f0b14bfcd	2025-07-28 12:30:18.877	\N		Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+42	8	2025-02-03 00:00:00	Instalação de postes de iluminação pública.	41	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874802689-1eb9226e122f.pdf	INDICAÃÃO NÂº 008 2025.pdf	application/pdf	\N	2025-07-28 19:43:43.631515	2025-07-30 11:26:42.916	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+34	1	2025-01-15 00:00:00	Alteração da Lei Municipal nº 1.050/2022 de 04 de Março de 2022.	40	Projeto de Lei	/home/runner/workspace/uploads/activities/2025/07/1753890592534-c7daef17a495.pdf	PROJETO DE LEI NÂº 001 2025.pdf	application/pdf	\N	2025-07-28 11:51:23.713873	2025-07-30 15:49:53.527	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+32	1	2025-01-15 00:00:00	Indicação referente ao cascalhamento na comunidade rural da linha 1 de Jaíba/MG.	40	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753890637705-f9e48087d430.pdf	INDICAÃÃO NÂº 001 2025.pdf	application/pdf	\N	2025-07-28 11:47:01.83212	2025-07-30 15:50:37.936	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+38	5	2025-01-15 00:00:00	Construção de pontes da Fazenda Canadá, Morro do Albano e cascalhamento das estradas rurais.	40	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753890667516-edcc10cc6d82.pdf	INDICAÃÃO NÂº 005 2025.pdf	application/pdf	\N	2025-07-28 12:08:49.337719	2025-07-30 15:51:08.493	\N	\N	\N		Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+55	16	2025-02-17 00:00:00	Providencia serviços de manutenção e melhorias na praça da comunidade Nh1, localizada no município de Jaíba/MG.	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874949954-9b5e8a544b55.pdf	INDICAÃÃO NÂº 016 2025.pdf	application/pdf	\N	2025-07-29 15:36:44.877059	2025-07-30 11:29:10.201	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+63	24	2025-03-06 00:00:00	Solicita a abertura do plantão médico com equipe completa na UBS do NS2.	43	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753875064858-29ffe87c926e.pdf	INDICAÃÃO NÂº 024 2025.pdf	application/pdf	\N	2025-07-29 20:25:08.300443	2025-07-30 11:31:05.097	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+70	3	2025-03-06 00:00:00	Institui o Estatuto da Pessoa com Câncer no município de Jaíba/MG, e dá outras providências.	43	Projeto de Lei	/home/runner/workspace/uploads/1753799116167-2d402fa493d5.pdf	PROJETO DE LEI NÂº 003 2025.pdf	application/pdf	\N	2025-07-29 21:07:42.662988	2025-07-29 21:07:42.662988	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+39	6	2025-02-03 00:00:00	Providenciar Creche para atender as crianças do bairro Bandeirantes.	41	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874115691-90bffcb2c994.pdf	INDICAÃÃO NÂº 006 2025.pdf	application/pdf	t	2025-07-28 13:10:34.525113	2025-07-30 11:15:16.41	51af7dcd-c5ba-47bb-a20f-183f0b14bfcd	2025-07-28 13:12:20.501	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+71	6	2025-03-06 00:00:00	Institui o Programa Municipal de Parcerias Público-Privadas e Concessões e dá outras providências.	43	Projeto de Lei	/home/runner/workspace/uploads/1753799099488-7e46acda2cbf.pdf	PROJETO DE LEI NÂº 006 2025.pdf	application/pdf	\N	2025-07-29 21:13:29.99327	2025-07-29 21:13:29.99327	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+72	8	2025-03-06 00:00:00	Requere a alteração da circulação da Rua Elói de Oliveira, localizada no centro de Jaíba/MG, para mão única. Considerando os seguintes motivos:\r\nSegurança Viária\r\nTrânsito e Mobilidade\r\nPedestres e Moradores \r\nSolicitação da Comunidade	43	Requerimento	/home/runner/workspace/uploads/1753799099488-7e46acda2cbf.pdf	REQUERIMENTO 008 2025.pdf	application/pdf	\N	2025-07-29 21:27:23.164547	2025-07-29 21:27:23.164547	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+73	7	2025-03-06 00:00:00	Moção de Requerimento 07/2025\r\nRequere a aprovação de Moção de Apoio ao PDL 3/2025, que susta os efeitos da Resolução nº 258 de 23 de Dezembro de 2024, do CONANDA                ( Conselho Nacional dos Direitos da Criança e do Adolescente) e ao PL 1904/2024 que visa impedir que o aborto seja reconhecido como direito, sem previsão de limite de tempo gestacional durante todos os nove meses da gravidez até o momento do parto.	43	Moção	/home/runner/workspace/uploads/1753841980025-14d35bb2a7ab.pdf	REQUERIMENTO 007 2025.pdf	application/pdf	\N	2025-07-29 21:40:02.474062	2025-07-30 02:19:40.614	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+36	3	2025-01-15 00:00:00	Providenciar uma proteção, cerca de isolamento com um buraco(retenção água da chuva) feito pela gestão pública na comunidade da frente 3 localizada rua saborosa. 	40	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874259802-506a9779f8c1.pdf	INDICAÃÃO NÂº 003 2025.pdf	application/pdf	\N	2025-07-28 12:05:41.888822	2025-07-30 11:17:40.288	\N	\N	\N		Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+52	3	2025-02-03 00:00:00	Providencia junto as secretarias do município as seguintes informações: \r\nRelação da frota municipal e suas distribuições por setores.\r\nPrevisão das vistorias do transporte escolar.\r\nRelação dos motoristas com suas respectivas categorias de habilitação.\r\n 	41	Requerimento	/home/runner/workspace/uploads/activities/2025/07/1753874459485-7515d7257edb.pdf	REQUERIMENTO 003 2025.pdf	application/pdf	\N	2025-07-29 13:31:09.040977	2025-07-30 11:20:59.718	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+50	1	2025-02-03 00:00:00	Requerimento 01/2025. Solicitação de informações acerca dos serviços foram afetados pela situação de calamidade, quais as assistências oferecidas aos pacientes em tratamento fora domicílio, relação de contratados no mês de Janeiro, relação das UBS com seus respectivos quadros funcionais.	41	Requerimento	/home/runner/workspace/uploads/activities/2025/07/1753874499288-496dd86ccfb2.pdf	REQUERIMENTO 001 2025.pdf	application/pdf	\N	2025-07-29 11:17:49.56311	2025-07-30 11:21:39.51	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+47	12	2025-02-03 00:00:00	Solicitar, com urgência, a instalação de uma creche para atender a comunidade do Morro do Albano, 	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874705962-d7482a2811d1.pdf	INDICAÃÃO NÂº 012 2025.pdf	application/pdf	\N	2025-07-28 20:31:04.57752	2025-07-30 11:25:06.55	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+40	7	2025-02-03 00:00:00	Construção de creche nos bairros: Nova Esperança, Campos Altos, Jardins, Ns 1, Nh 1 e Bandeirantes.	41	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874750968-72ec1213be55.pdf	INDICAÃÃO NÂº 007 2025.pdf	application/pdf	\N	2025-07-28 14:05:38.22793	2025-07-30 11:25:51.41	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+44	9	2025-02-03 00:00:00	Retomar, em caráter de urgência, parceria com Distrito de Irrigação de Jaíba ( DIJ), em Jaíba.	41	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874830949-d9fbdc9012e1.pdf	INDICAÃÃO NÂº 009 2025.pdf	application/pdf	\N	2025-07-28 19:58:00.325103	2025-07-30 11:27:11.18	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+45	10	2025-02-03 00:00:00	Providenciar a recuperação ( manutenção ) da rua 03 no bairro pioneiro, Jaíba/MG.	41	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874847756-f2b477ceb175.pdf	INDICAÃÃO NÂº 010 2025.pdf	application/pdf	\N	2025-07-28 20:13:17.914264	2025-07-30 11:27:28.113	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+46	11	2025-02-03 00:00:00	Providenciar um veículo para a comunidade rural do Morro do Albano, localizada no município de Jaíba-MG.	41	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874865246-d0da4a299ef2.pdf	INDICAÃÃO NÂº 011 2025.pdf	application/pdf	\N	2025-07-28 20:17:18.094766	2025-07-30 11:27:45.467	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+48	13	2025-02-17 00:00:00	Instalação de uma creche para atender a comunidade de Serraria, no município de Jaíba/MG.	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874894488-cd69fe097248.pdf	INDICAÃÃO NÂº 013 2025.pdf	application/pdf	\N	2025-07-28 20:39:59.752798	2025-07-30 11:28:14.945	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+49	14	2025-02-17 00:00:00	Solicitar, com urgência, a correção da drenagem da Rua Domingos Rodrigues da Cruz, a execução da drenagem na Avenida Joaquim Barbosa no bairro Veredas e do bairro Nova Colônia, no município de Jaíba/MG. 	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874909983-d40ae520b980.pdf	INDICAÃÃO NÂº 014 2025.pdf	application/pdf	\N	2025-07-28 21:06:55.913737	2025-07-30 11:28:30.248	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+64	25	2025-03-06 00:00:00	Solicita, com urgência, a instalação de postes de iluminação pública nos seguintes locais:\r\nRua Guilherme Ferreira, próximo ao nº 185\r\nRua João Luiz Quaresma, próximo ao nº 301\r\nRua Projetada II, próximo ao nº 345	43	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753875079208-1c239e97bb79.pdf	INDICAÃÃO NÂº 025 2025.pdf	application/pdf	\N	2025-07-29 20:31:38.330386	2025-07-30 11:31:19.441	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+60	5	2025-02-17 00:00:00	Requere a extensão do direito de atendimento prioritário, em serviços públicos, às pessoas com doenças raras.	42	Requerimento	/home/runner/workspace/uploads/1753798806981-e97713b88789.pdf	REQUERIMENTO 005 2025.pdf	application/pdf	\N	2025-07-29 18:53:06.051063	2025-07-29 18:53:06.051063	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+69	2	2025-03-06 00:00:00	Dispõe sobre a dispensa do pedido de mamografia por médico oncologista para rastreamento do câncer nas mulheres residentes no município, e realizadas através do serviço prestado no âmbito do município de Jaíba/MG, e dá outras providências.	43	Projeto de Lei	/home/runner/workspace/uploads/1753799099488-7e46acda2cbf.pdf	PROJETO DE LEI NÂº 002 2025.pdf	application/pdf	\N	2025-07-29 21:01:38.955334	2025-07-29 21:01:38.955334	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+67	37	2025-03-06 00:00:00	Solicita a construção de uma creche no Bairro Jardins no município de Jaíba/MG.	43	Indicação	/home/runner/workspace/uploads/1753837386399-8b317a072497.pdf	indicacao37.pdf	application/pdf	\N	2025-07-29 20:51:36.265106	2025-07-30 01:03:06.883	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+68	38	2025-03-06 00:00:00	Providencia a reforma e cobertura da quadra no Bairro Alfavile e o recapeamento da Avenida Ediston Alves de Souza no Bairro Veredas.	43	Indicação	/home/runner/workspace/uploads/1753839201306-c61b229c6c80.pdf	INDICAÃÃO NÂº 038 2025.pdf	application/pdf	\N	2025-07-29 20:54:30.212483	2025-07-30 01:33:21.799	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+74	71	2025-05-16 00:00:00	Instalação da Iluminação Pública no bairro Córrego Escuro.	50	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753843750426-659a3f7c3e96.pdf	INDICAÃÃO NÂº 071 2025.pdf	application/pdf	\N	2025-07-30 02:49:13.415262	2025-07-30 02:49:13.415262	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+53	4	2025-02-03 00:00:00	Providencia junto as secretarias do município as seguintes informações:\r\nAcerca do processo seletivo dos diretores escolares conforme decreto municipal nº 1394/2023.	41	Requerimento	/home/runner/workspace/uploads/activities/2025/07/1753874404535-28602eceb46f.pdf	REQUERIMENTO 004 2025.pdf	application/pdf	\N	2025-07-29 13:39:30.73276	2025-07-30 11:20:05.121	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+51	2	2025-02-03 00:00:00	Providencia junto a Secretaria de Finanças do município extratos das contas referentes as receitas de ICMS, FPM, IPVA, IPTU, ISS  e o saldo em contas utilizadas para recebimento de recursos provenientes de Resolução/ Convênio. Notificação da Receita Federal e Banco do Brasil referente a possibilidade de bloqueio de valores de repasse do FPM. Valor de restos a pagar referentes à remuneração dos servidores públicos.\r\n 	41	Requerimento	/home/runner/workspace/uploads/activities/2025/07/1753874480440-111a6cddb239.pdf	REQUERIMENTO 002 2025.pdf	application/pdf	\N	2025-07-29 13:15:58.644238	2025-07-30 11:21:20.935	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+54	15	2025-02-17 00:00:00	Providencia junto ao setor de obras a construção de praças com parquinhos nos Bairros São Francisco, Jardins, e nas comunidades Morro do Albano, Gorutuba, Canudos, Ns1, Ns4, Nsj e Nh1 e praça da Igreja Cidade Nova em Jaíba/MG.	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874928164-c4932b0798ec.pdf	INDICAÃÃO NÂº 015 2025.pdf	application/pdf	\N	2025-07-29 15:27:05.946571	2025-07-30 11:28:48.389	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+56	17	2025-02-17 00:00:00	Solicita melhoria das vias públicas: asfaltamento e limpeza, do Bairro Jardins  no município de Jaíba/MG.	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874970905-86c9e84ee226.pdf	INDICAÃÃO NÂº 017 2025.pdf	application/pdf	\N	2025-07-29 18:34:16.716932	2025-07-30 11:29:31.14	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+57	18	2025-02-17 00:00:00	Providencia ondulação transversal ( quebra-molas) nas ruas do NS2 Projeto Jaíba/MG.	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753874987219-5827927a4f25.pdf	INDICAÃÃO NÂº 018 2025.pdf	application/pdf	\N	2025-07-29 18:40:03.058913	2025-07-30 11:29:47.45	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+58	19	2025-02-17 00:00:00	Solicita melhoria das vias públicas: asfaltamento e limpeza, do Bairro Colônia, Avenida de Mocambinho e Avenida da EPAMIG, localizadas no Projeto Jaíba.	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753875002914-73360bf465ab.pdf	INDICAÃÃO NÂº 019 2025.pdf	application/pdf	\N	2025-07-29 18:43:52.085864	2025-07-30 11:30:03.137	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+59	20	2025-02-17 00:00:00	Providencia a construção de uma Quadra Poliesportiva no Núcleo de Serviço ( NS1), localizada no Projeto Jaíba.	42	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753875019432-c0f1612d2a47.pdf	INDICAÃÃO NÂº 020 2025.pdf	application/pdf	\N	2025-07-29 18:47:39.412501	2025-07-30 11:30:19.658	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+61	21	2025-03-06 00:00:00	Solicita tomada de providências legais junto a Secretaria de Educação, vistas à necessidade de construção de uma creche municipal no Bairro São Francisco em Jaíba/MG.	43	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753875039854-6b47cd674d71.pdf	INDICAÃÃO NÂº 021 2025.pdf	application/pdf	\N	2025-07-29 20:03:49.282106	2025-07-30 11:30:40.306	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+65	26	2025-03-06 00:00:00	Solicita junto à Secretaria de Infraestrutura a premente necessidade de obras de drenagem e pavimentação asfáltica nas ruas: Edson Novais, Madre Tereza e Rua Ipê no Bairro Nova Esperança. Rua José de Souza Coutinho no Bairro Pioneiro. Rua Roque Cardoso na altura do nº 265, e na Rua Filomena de Assis, ao lado da rua de tábua perto de piqui, e no Bairro São Geraldo e em todas as ruas e bairros que ainda não têm pavimentação asfáltica e drenagem no município de Jaíba/MG.	43	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753875095161-f15e0fda99fd.pdf	INDICAÃÃO NÂº 026 2025.pdf	application/pdf	\N	2025-07-29 20:38:39.869601	2025-07-30 11:31:35.397	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+66	30	2025-03-06 00:00:00	Solicita criação de lei que aumente o valor do TFD ( Tratamento Fora de Domicílio) no município de Jaíba/MG.	43	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753875110742-321e556ed23d.pdf	INDICAÃÃO NÂº 030 2025.pdf	application/pdf	\N	2025-07-29 20:49:31.205093	2025-07-30 11:31:50.977	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+75	22	2025-03-17 00:00:00	Solicita tomada de providências legais junto à Secretaria de Obras, mostrando a premente necessidade da construção de dois Quebra - Molas na Rua B, Bairro Independência em Jaíba/MG.	44	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753877636069-f4773d8d9835.pdf	INDICAÃÃO NÂº 022 2025.pdf	application/pdf	\N	2025-07-30 12:13:56.706644	2025-07-30 12:13:56.706644	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+76	27	2025-03-17 00:00:00	Solicita, com urgência, a disponibilização de um veículo para atender a demanda da Comunidade do Marabá, no município de Jaíba/MG.	44	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753877932423-b52c3285ecb2.pdf	INDICAÃÃO NÂº 027 2025.pdf	application/pdf	\N	2025-07-30 12:18:55.557689	2025-07-30 12:18:55.557689	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+77	28	2025-03-17 00:00:00	Solicita a tomada de providências legais junto a Secretaria de Obras para realizar a limpeza e manutenção no Bairro Novo na frente 3, Projeto Jaíba, fundo à escola.	44	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753878194199-e9520b7c078c.pdf	INDICAÃÃO NÂº 028 2025.pdf	application/pdf	\N	2025-07-30 12:23:14.756852	2025-07-30 12:23:14.756852	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+78	39	2025-03-17 00:00:00	Providencia a construção da praça com parquinho infantil e uma quadra poliesportiva, no Bairro Independência, no município de Jaíba/MG.	44	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753878553878-8738b7777af2.pdf	INDICAÃÃO NÂº 039 2025.pdf	application/pdf	\N	2025-07-30 12:29:14.430005	2025-07-30 12:29:14.430005	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+79	40	2025-03-17 00:00:00	Providencia a pavimentação asfáltica na Comunidade de Mocambinho nas ruas do Colono e adjacente à EPAMIG.	44	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753878831260-52ecfb4235b4.pdf	INDICAÃÃO NÂº 040 2025.pdf	application/pdf	\N	2025-07-30 12:33:54.239826	2025-07-30 12:33:54.239826	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+80	9	2025-03-17 00:00:00	Institui a semana municipal escolar de combate à violência contra a mulher nas escolas públicas e privadas de ensino fundamental e ensino médio, localizadas no município de Jaíba/MG e dá outras providências.	44	Projeto de Lei	/home/runner/workspace/uploads/activities/2025/07/1753880160307-bce32ca82c41.pdf	PROJETO DE LEI NÂº 009 2025.pdf	application/pdf	\N	2025-07-30 12:56:03.416252	2025-07-30 12:56:03.416252	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+82	23	2025-04-01 00:00:00	Solicita a tomada de providências legais junto à Secretaria de Obras, mostrando a premente necessidade da construção de dois Quebra-Molas na Rua Joaquim dos Santos, Bairro São Francisco em Jaíba/MG.	45	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753902228130-fc15aaa2d8ca.pdf	INDICAÃÃO NÂº 023 2025.pdf	application/pdf	\N	2025-07-30 19:03:50.350291	2025-07-30 19:03:50.350291	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+83	1	2025-03-17 00:00:00	Dispõe sobre a abertura de crédito adicional especial ao orçamento do Município de Jaíba/MG para exercício financeiro de 2025 e atualiza a Lei Municipal N.º 1.037/ 2021 - Plano Plurianual para o período de 2022 a 2025, com fundamento no Artigo 43, da Lei 4.320/ 1964 e dá outras providências.	44	Projeto de Lei	/home/runner/workspace/uploads/activities/2025/07/1753902876251-13928552cb01.pdf	PROJETO DE LEI NÂº 001 2025 EXECUTIVO.pdf	application/pdf	\N	2025-07-30 19:14:36.964115	2025-07-30 19:14:36.964115	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+84	29	2025-02-24 00:00:00	Placas de sinalização na comunidade frente 3 nas ruas Saborosa, Leotério Costa, projetada 1 e 2 e na av principal frente a creche municipal da frente 3.	45	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753904838739-7537dbe04865.pdf	INDICAÃÃO NÂº 029 2025.pdf	application/pdf	\N	2025-07-30 19:47:19.785423	2025-07-30 19:47:19.785423	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+85	31	2025-04-01 00:00:00	Solicita a construção da cobertura da quadra poliesportiva do Bairro Cidade Nova.	45	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753905271351-9aee6590e308.pdf	INDICAÃÃO NÂº 031 2025.pdf	application/pdf	\N	2025-07-30 19:54:34.553158	2025-07-30 19:54:34.553158	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+86	44	2025-04-01 00:00:00	Providencia para a comunidade do NS2, no Projeto Jaíba, placas de identificação das ruas e nomeação das mesmas.	45	Indicação	/home/runner/workspace/uploads/activities/2025/07/1753905860048-d149112156ae.pdf	INDICAÃÃO NÂº 044 2025.pdf	application/pdf	\N	2025-07-30 20:04:20.995259	2025-07-30 20:04:20.995259	\N	\N	\N	councilors	Aguardando Análise	\N	\N	Tramitação Finalizada	Ordinária
+\.
+
+
+--
+-- Data for Name: legislative_activities_authors; Type: TABLE DATA; Schema: public; Owner: neondb_owner
+--
+
+COPY public.legislative_activities_authors (activity_id, user_id) FROM stdin;
+47	386ad838-7ba2-4594-84d7-160ecdfa546d
+40	abd21023-22d9-4bcc-a560-6388cd25a236
+42	386ad838-7ba2-4594-84d7-160ecdfa546d
+44	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+45	b7556bfe-e46a-4045-90fc-e585615f08de
+46	34837ef0-cb68-488a-8b54-f2e71f033fdc
+48	34837ef0-cb68-488a-8b54-f2e71f033fdc
+49	34837ef0-cb68-488a-8b54-f2e71f033fdc
+54	abd21023-22d9-4bcc-a560-6388cd25a236
+55	34837ef0-cb68-488a-8b54-f2e71f033fdc
+56	016abf4a-ec1a-4bdf-8d64-1d27ba731040
+57	627ec7e7-be3d-4bcb-8c38-2af98a9a74fc
+58	016abf4a-ec1a-4bdf-8d64-1d27ba731040
+59	627ec7e7-be3d-4bcb-8c38-2af98a9a74fc
+61	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+63	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+64	386ad838-7ba2-4594-84d7-160ecdfa546d
+65	abd21023-22d9-4bcc-a560-6388cd25a236
+66	04ab0e32-0049-4d41-a493-8f1e7e76947c
+75	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+76	386ad838-7ba2-4594-84d7-160ecdfa546d
+77	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+78	abd21023-22d9-4bcc-a560-6388cd25a236
+79	627ec7e7-be3d-4bcb-8c38-2af98a9a74fc
+79	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+80	abd21023-22d9-4bcc-a560-6388cd25a236
+34	04ab0e32-0049-4d41-a493-8f1e7e76947c
+34	016abf4a-ec1a-4bdf-8d64-1d27ba731040
+34	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+32	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+38	abd21023-22d9-4bcc-a560-6388cd25a236
+82	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+83	4b991e08-7dd9-4eac-a719-c8ce77d427c3
+84	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+85	04ab0e32-0049-4d41-a493-8f1e7e76947c
+86	627ec7e7-be3d-4bcb-8c38-2af98a9a74fc
+60	04ab0e32-0049-4d41-a493-8f1e7e76947c
+69	b7556bfe-e46a-4045-90fc-e585615f08de
+70	abd21023-22d9-4bcc-a560-6388cd25a236
+70	b7556bfe-e46a-4045-90fc-e585615f08de
+71	04ab0e32-0049-4d41-a493-8f1e7e76947c
+72	9b818975-dfb8-4677-8214-a6bb394f01bc
+67	9b818975-dfb8-4677-8214-a6bb394f01bc
+68	34837ef0-cb68-488a-8b54-f2e71f033fdc
+73	abd21023-22d9-4bcc-a560-6388cd25a236
+74	3da78447-048f-4934-af29-82d9d6d1bcd9
+39	91a663f3-0280-422d-b33c-976e5808d873
+33	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+36	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+37	627ec7e7-be3d-4bcb-8c38-2af98a9a74fc
+35	04ab0e32-0049-4d41-a493-8f1e7e76947c
+35	016abf4a-ec1a-4bdf-8d64-1d27ba731040
+35	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+53	04ab0e32-0049-4d41-a493-8f1e7e76947c
+53	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+53	34837ef0-cb68-488a-8b54-f2e71f033fdc
+53	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+53	abd21023-22d9-4bcc-a560-6388cd25a236
+53	b7556bfe-e46a-4045-90fc-e585615f08de
+52	04ab0e32-0049-4d41-a493-8f1e7e76947c
+52	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+52	34837ef0-cb68-488a-8b54-f2e71f033fdc
+52	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+52	abd21023-22d9-4bcc-a560-6388cd25a236
+52	b7556bfe-e46a-4045-90fc-e585615f08de
+51	04ab0e32-0049-4d41-a493-8f1e7e76947c
+51	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+51	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+51	abd21023-22d9-4bcc-a560-6388cd25a236
+51	b7556bfe-e46a-4045-90fc-e585615f08de
+50	04ab0e32-0049-4d41-a493-8f1e7e76947c
+50	c2c9812c-2aa8-49e9-b691-f724a7eafe3c
+50	34837ef0-cb68-488a-8b54-f2e71f033fdc
+50	ef8de069-dd7a-4a7f-ad26-8ceea11a5596
+50	abd21023-22d9-4bcc-a560-6388cd25a236
+50	b7556bfe-e46a-4045-90fc-e585615f08de
+\.
+
+
+--
+-- Data for Name: legislatures; Type: TABLE DATA; Schema: public; Owner: neondb_owner
+--
+
+COPY public.legislatures (id, number, start_date, end_date, created_at, updated_at) FROM stdin;
+1	9	2025-01-01 00:00:00	2026-12-31 00:00:00	2025-05-11 02:04:12.774748	2025-05-11 02:04:12.774748
+\.
+
+
+--
+-- Data for Name: news_articles; Type: TABLE DATA; Schema: public; Owner: neondb_owner
+--
+
+COPY public.news_articles (id, title, slug, excerpt, content, author_id, category_id, published_at, status, featured, views, likes, image_url, meta_title, meta_description, tags, gallery, created_at, updated_at) FROM stdin;
+4	Inauguração da Saúde	inauguracao-da-saude	Inauguração da Saúde recebe o governador	Inauguração da SaúdeInauguração da SaúdeInauguração da SaúdeInauguração da SaúdeInauguração da SaúdeInauguração da SaúdeInauguração da SaúdeInauguração da SaúdeInauguração da SaúdeInauguração da Saúde	root	4	2025-07-18 17:56:49.695	published	t	0	0	/uploads/news/news-1752861409118-50da7b0c6c4a.jpg			{saude}	\N	2025-07-18 17:56:49.976181	2025-07-18 17:56:49.976181
+5	Maio Laranja em Jaíba	maio-laranja-em-jaiba	Na noite desta quarta-feira, 29 de maio, a Câmara Municipal de Jaíba promoveu uma importante palestra de conscientização contra o abuso e a exploração sexual de crianças e adolescentes, reforçando seu compromisso com a campanha Maio Laranja.	Na noite desta quarta-feira, 29 de maio, a Câmara Municipal de Jaíba promoveu uma importante palestra de conscientização contra o abuso e a exploração sexual de crianças e adolescentes, reforçando seu compromisso com a campanha Maio Laranja.\r\n\r\nO evento reuniu representantes da sociedade civil, das associações Casa da Sopa Chico Xavier, Ascoja, AJAM, do Conselho Tutelar, da Polícia Militar, além de todos os vereadores e do presidente da Câmara, Sr. Diego Moreira.\r\n\r\nUm agradecimento especial ao promotor de justiça Dr. Marcos Vinícius, pela presença e contribuição fundamental ao debate, e à psicóloga Ana Luíza, que trouxe reflexões valiosas sobre a proteção da infância.\r\n\r\n🌼 A luta contra o abuso sexual é de todos nós.\r\n📞 Denuncie. Disque 100.	root	4	2025-07-18 23:42:49.115	published	f	0	0	/uploads/news/news-1752882168902-54deaabf18c6.png			{maiolaranja}	\N	2025-07-18 23:42:49.149396	2025-07-18 23:42:49.149396
+6	Jaiba 33 Anos	jaiba-33-anos	Parabéns Jaiba	Neste momento especial em que celebramos o aniversário da nossa querida Jaíba, a Câmara Municipal reafirma seu compromisso de ser a verdadeira casa do povo.\r\n\r\nDesejamos que o progresso e o desenvolvimento continuem a ser marcas da nossa história, estaremos sempre ao lado da população, colocando o povo no centro de todas as decisões.\r\n\r\nEsses são os votos dos vereadores, vereadoras e de todos os servidores desta Casa Legislativa.\r\nParabéns, Jaíba! Não.	root	4	2025-07-18 23:44:59.013	published	f	0	0	/uploads/news/news-1752882298758-a5fb03b340e0.png			{}	\N	2025-07-18 23:44:59.274729	2025-07-18 23:44:59.274729
+7	Junho Violeta	junho-violeta	Encerramento do Junho Lilás - Valorizando a Pessoa Idosa	Encerramento do Junho Lilás - Valorizando a Pessoa Idosa\r\n\r\nOntem, tivemos a honra de participar do encerramento do Junho Lilás, mês dedicado à conscientização e valorização da pessoa idosa. Foi um momento emocionante, de grande aprendizado e respeito, onde reafirmamos nosso compromisso com aqueles que tanto contribuíram para o crescimento da nossa sociedade.\r\n\r\nO evento celebrou não apenas os direitos da pessoa idosa, mas também sua sabedoria, sua força e sua história. A cada abraço, a cada sorriso e a cada palavra, ficou claro o quanto ainda temos a aprender com essa geração que merece, acima de tudo, dignidade, cuidado e atenção.\r\n\r\nAgradecemos a todos os envolvidos na organização deste momento tão especial. Seguimos firmes na luta por políticas públicas que garantam qualidade de vida, inclusão e respeito aos nossos idosos.\r\n\r\nPorque quem cuida do presente, honra o passado e constrói um futuro melhor.\r\n\r\n- Diego Moreira\r\nPresidente da Câmara Municipal de Jaíba	root	4	2025-07-18 23:47:33.626	published	f	0	0	/uploads/news/news-1752882453043-a26d352dee3e.png			{junhovioleta}	\N	2025-07-18 23:47:33.88048	2025-07-18 23:47:33.88048
+\.
+
+
+--
+-- Data for Name: news_categories; Type: TABLE DATA; Schema: public; Owner: neondb_owner
+--
+
+COPY public.news_categories (id, name, slug, description, color, created_at, updated_at) FROM stdin;
+1	Notícias Gerais	noticias-gerais	Informações gerais sobre a câmara municipal	#3B82F6	2025-06-12 10:59:05.735228	2025-06-12 10:59:05.735228
+2	Sessões Plenárias	sessoes-plenarias	Cobertura das sessões e votações	#10B981	2025-06-12 10:59:05.735228	2025-06-12 10:59:05.735228
+3	Projetos de Lei	projetos-lei	Informações sobre projetos em tramitação	#F59E0B	2025-06-12 10:59:05.735228	2025-06-12 10:59:05.735228
+4	Eventos	eventos	Agenda e cobertura de eventos municipais	#8B5CF6	2025-06-12 10:59:05.735228	2025-06-12 10:59:05.735228
+5	Comunicados	comunicados	Comunicados oficiais da câmara	#EF4444	2025-06-12 10:59:05.735228	2025-06-12 10:59:05.735228
+6	Política	politica	Notícias relacionadas à política municipal	#3B82F6	2025-07-18 17:16:46.242397	2025-07-18 17:16:46.242397
+8	Legislação	legislacao	Notícias sobre leis e projetos	#F59E0B	2025-07-18 17:16:46.242397	2025-07-18 17:16:46.242397
+\.
+
+
+--
+-- Data for Name: news_comments; Type: TABLE DATA; Schema: public; Owner: neondb_owner
+--
+
+COPY public.news_comments (id, article_id, author_name, author_email, content, status, parent_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: neondb_owner
+--
+
+COPY public.sessions (sid, sess, expire) FROM stdin;
+PtCZ42K7eQQZCjve9B5ISwHNv4ZZE2xW	{"cookie": {"path": "/", "secure": true, "expires": "2025-05-18T01:48:54.826Z", "httpOnly": true, "originalMaxAge": 604800000}, "userId": "root"}	2025-05-18 01:53:00
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: neondb_owner
+--
+
+COPY public.users (id, email, name, profile_image_url, cpf, birth_date, zip_code, address, neighborhood, number, city, state, role, legislature_id, marital_status, occupation, education, password, email_verified, verification_token, email_verification_sent_at, created_at, updated_at, partido) FROM stdin;
+04ab0e32-0049-4d41-a493-8f1e7e76947c	angelakarine@jaiba.mg.gov.br	Ângela Karine	/uploads/avatars/avatar-1752851071752-de4355270d2d.jpg	395.289.562-32	1991-06-05 00:00:00	15700-288	Rua Califórnia	Jardim Estados Unidos	56	Jales	SP	councilor	1		Vice-Presidente	doutorado	$2b$10$2Ln0dh523k9x7ULmMxMSR.GQaznVv4E6APmAgB1JUGpYOCYHuIDgi	t	7cef54b919908caf67bfbbe2eaaae9fd2e1faf95212c8fcd6b7446457dc1d8c4	2025-05-11 18:27:19.619	2025-05-11 18:27:19.655585	2025-07-18 15:04:31.834	PP
+root	root@sistema-legislativo.com	Administrador do Sistema	/uploads/avatars/avatar-1747182621490-604cffc2d68e.jpeg	\N	\N	\N	\N	\N	\N	\N	\N	admin	\N	\N	\N	\N	$2b$10$ls3m24PowRvLegZcKlqtIO3lw/c5sMZfaKoxRGpUSlw70.R1Zz5Qm	t	\N	\N	2025-05-11 01:47:13.911011	2025-05-14 00:30:22.151	MDB
+91a663f3-0280-422d-b33c-976e5808d873	leiliane@jaiba.mg.leg.br	Leiliane Soares	/uploads/avatars/avatar-1752851059543-99a951e1fc68.jpg	965.959.595-55	1985-05-11 00:00:00	15700-288	Rua Califórnia	Jardim Estados Unidos	45	Jales	SP	councilor	1				$2b$10$BQfTHc1uIgk9gp1rFLqxZOWOlKv5emcIuWiHFaN7nm35H5RibcS1u	f	0245eeeeb1d8900a0b700a7ccf810abb649de3dabdf97b83c87067dd736d0108	2025-05-16 23:46:32.72	2025-05-16 23:46:32.753266	2025-07-18 15:04:20.136	MDB
