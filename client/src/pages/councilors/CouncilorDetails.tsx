@@ -15,15 +15,7 @@ import { ArrowLeft, Mail, Phone, MapPin, Calendar, FileText, Users, Activity, Cl
 import { getInitials } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-
-interface Activity {
-  id: number;
-  activityNumber: number;
-  activityDate: string;
-  description: string;
-  activityType: string;
-  status?: string;
-}
+import { User, LegislativeActivity, Document } from "@shared/schema";
 
 interface Committee {
   id: number;
@@ -34,40 +26,30 @@ interface Committee {
   role: string;
 }
 
-interface Document {
-  id: number;
-  description: string;
-  documentNumber: number;
-  documentType: string;
-  documentDate: string;
-  status?: string;
-  filePath?: string;
-}
-
 export default function CouncilorDetails() {
   const { id } = useParams();
   const [_, setLocation] = useLocation();
 
   // Buscar dados do vereador
-  const { data: councilor, isLoading: isCouncilorLoading } = useQuery({
+  const { data: councilor, isLoading: isCouncilorLoading } = useQuery<User>({
     queryKey: [`/api/users/${id}`],
     enabled: !!id,
   });
 
   // Buscar atividades legislativas do vereador
-  const { data: activities, isLoading: isActivitiesLoading } = useQuery({
+  const { data: activities, isLoading: isActivitiesLoading } = useQuery<LegislativeActivity[]>({
     queryKey: [`/api/users/${id}/activities`],
     enabled: !!id,
   });
 
   // Buscar documentos do vereador
-  const { data: councilorDocuments, isLoading: isDocumentsLoading } = useQuery({
+  const { data: councilorDocuments, isLoading: isDocumentsLoading } = useQuery<Document[]>({
     queryKey: [`/api/users/${id}/documents`],
     enabled: !!id,
   });
 
   // Buscar documentos gerais da câmara (todos os documentos do sistema)
-  const { data: allDocumentsResponse } = useQuery({
+  const { data: allDocumentsResponse } = useQuery<{ documents: Document[] }>({
     queryKey: ["/api/documents"],
     enabled: true,
   });
@@ -78,7 +60,7 @@ export default function CouncilorDetails() {
     : (allDocumentsResponse?.documents || []);
 
   // Buscar comissões do vereador
-  const { data: committees, isLoading: isCommitteesLoading } = useQuery({
+  const { data: committees, isLoading: isCommitteesLoading } = useQuery<Committee[]>({
     queryKey: [`/api/users/${id}/committees`],
     enabled: !!id,
   });
@@ -150,22 +132,16 @@ export default function CouncilorDetails() {
                 <h1 className="text-3xl font-bold mb-1">{councilor?.name}</h1>
                 <div className="space-y-1 text-white/90">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">Role:</span>
-                    <span className="font-medium">{councilor?.position || 'Vereador'}</span>
+                    <span className="text-sm">Cargo:</span>
+                    <span className="font-medium">{councilor?.role === 'admin' ? 'Administrador' : councilor?.role === 'executive' ? 'Executivo' : 'Vereador'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm">Email:</span>
                     <span className="font-medium">{councilor?.email || 'Não informado'}</span>
-                    <span className="text-xs text-white/70">({councilor?.phone ? formatPhone(councilor.phone) : 'Sem telefone'})</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">Status:</span>
-                    <Badge className={cn(
-                      "text-xs",
-                      councilor?.active ? "bg-green-500/20 text-green-100 border-green-300" : "bg-gray-500/20 text-gray-100 border-gray-300"
-                    )}>
-                      {councilor?.active ? "Ativo" : "Inativo"}
-                    </Badge>
+                    <span className="text-sm">Partido:</span>
+                    <span className="font-medium">{councilor?.partido || 'Não informado'}</span>
                   </div>
                 </div>
               </div>
