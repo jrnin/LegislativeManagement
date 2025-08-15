@@ -173,10 +173,10 @@ export default function ActivityForm() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: FormData) => {
+    mutationFn: async (data: any) => {
       const formData = new FormData();
       
-      // Append basic fields
+      // Append basic fields from the form data object (not FormData)
       if (data.activityNumber) formData.append("activityNumber", data.activityNumber.toString());
       if (data.activityDate) formData.append("activityDate", data.activityDate);
       if (data.description) formData.append("description", data.description);
@@ -192,7 +192,7 @@ export default function ActivityForm() {
       }
       
       // Append authors
-      data.authorIds.forEach(authorId => {
+      (data.authorIds || []).forEach(authorId => {
         formData.append("authorIds", authorId);
       });
       
