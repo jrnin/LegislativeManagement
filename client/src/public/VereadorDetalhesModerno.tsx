@@ -99,7 +99,7 @@ function ActivitiesByTypeTab({ councilorId, activityType }: ActivitiesByTypeTabP
       {activities.slice(0, 5).map((activity: any) => (
         <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3 flex items-start justify-between">
           <div className="flex-1">
-            <h4 className="font-medium text-gray-900">{activity.description}</h4>
+            <h4 className="text-sm font-semibold text-gray-900">{activity.description}</h4>
             <p className="text-sm text-gray-600 mb-2">
               {activity.activityType} Nº {activity.activityNumber}/{new Date(activity.activityDate).getFullYear()} • {
                 activity.activityDate ? 
@@ -111,7 +111,7 @@ function ActivitiesByTypeTab({ councilorId, activityType }: ActivitiesByTypeTabP
               activity.situacao === 'Aprovado' ? 'bg-green-100 text-green-800' :
               activity.situacao === 'Rejeitado' ? 'bg-red-100 text-red-800' :
               activity.situacao === 'Em tramitação' ? 'bg-blue-100 text-blue-800' :
-              'bg-yellow-100 text-yellow-800'
+              'bg-green-100 text-black-800'
             }>
               {activity.situacao || 'Em análise'}
             </Badge>
@@ -412,15 +412,12 @@ export default function VereadorDetalhesModerno() {
             {/* Atividades por Categoria */}
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <Award className="h-5 w-5 text-green-600" />
-                  Atividades Legislativas
-                </CardTitle>
+                
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="indicacoes" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="indicacoes" className="flex items-center gap-2">
+                  <TabsList className="grid w-full grid-cols-3 ">
+                    <TabsTrigger value="indicacoes" className="flex items-center gap-2 ">
                       <Lightbulb className="h-4 w-4" />
                       Indicações
                     </TabsTrigger>
