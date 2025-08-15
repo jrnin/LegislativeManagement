@@ -17,6 +17,7 @@ import bcrypt from "bcryptjs";
 import { format } from "date-fns";
 import { WebSocketServer, WebSocket } from 'ws';
 import { getCurrentWeather, getWeatherForecast, getCachedWeather } from './weather';
+import formidable from 'express-formidable';
 import { 
   committees,
   committeeMembers, 
@@ -1286,7 +1287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/activities/:id', requireAuth, async (req: any, res) => {
+  app.put('/api/activities/:id', requireAuth, formidable(), async (req: any, res) => {
     try {
       const activityId = Number(req.params.id);
       
@@ -1346,15 +1347,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         authorIds: z.array(z.string()).min(1, "Pelo menos um autor deve ser selecionado").optional(),
       });
       
-      // Parse form data
+      // Parse form data (using req.fields from formidable)
+      const fields = req.fields || {};
       const data = {
-        ...req.body,
-        activityNumber: req.body.activityNumber ? Number(req.body.activityNumber) : undefined,
-        eventId: req.body.eventId ? Number(req.body.eventId) : undefined,
-        needsApproval: req.body.needsApproval !== undefined ? req.body.needsApproval === 'true' : undefined,
-        approved: req.body.approved !== undefined ? req.body.approved === 'true' : undefined,
-        authorIds: req.body.authorIds ? 
-          (Array.isArray(req.body.authorIds) ? req.body.authorIds : [req.body.authorIds]) : 
+        ...fields,
+        activityNumber: fields.activityNumber ? Number(fields.activityNumber) : undefined,
+        eventId: fields.eventId ? Number(fields.eventId) : undefined,
+        needsApproval: fields.needsApproval !== undefined ? fields.needsApproval === 'true' : undefined,
+        approved: fields.approved !== undefined ? fields.approved === 'true' : undefined,
+        authorIds: fields.authorIds ? 
+          (Array.isArray(fields.authorIds) ? fields.authorIds : [fields.authorIds]) : 
           undefined,
       };
       
@@ -1363,15 +1365,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle Object Storage file upload ONLY if new file was uploaded
       let fileInfo = {};
       
-      if (req.body.uploadedFileURL && req.body.uploadedFileURL.trim() !== '') {
-        console.log(`[DEBUG] Processing NEW file upload for activity ${activityId}:`, req.body.uploadedFileURL);
+      console.log(`[DEBUG] Activity update request body:`, {
+        uploadedFileURL: req.fields.uploadedFileURL,
+        originalFileName: req.fields.originalFileName,
+        fileType: req.fields.fileType,
+        hasUploadedFileURL: !!req.fields.uploadedFileURL,
+        allFields: Object.keys(req.fields || {}),
+        allFiles: Object.keys(req.files || {})
+      });
+      
+      if (req.fields.uploadedFileURL && req.fields.uploadedFileURL.trim() !== '') {
+        console.log(`[DEBUG] Processing NEW file upload for activity ${activityId}:`, req.fields.uploadedFileURL);
         
         try {
           const objectStorageService = new ObjectStorageService();
           
           // Set ACL policy for uploaded file
           const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
-            req.body.uploadedFileURL,
+            req.fields.uploadedFileURL,
             {
               owner: currentUserId || 'system',
               visibility: 'private',
@@ -1384,8 +1395,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           fileInfo = {
             filePath: cloudPath,
-            fileName: req.body.originalFileName || 'document.pdf',
-            fileType: req.body.fileType || 'application/pdf',
+            fileName: req.fields.originalFileName || 'document.pdf',
+            fileType: req.fields.fileType || 'application/pdf',
           };
           
           console.log(`[DEBUG] NEW file stored in Object Storage:`, { cloudPath, fileName: fileInfo.fileName });
