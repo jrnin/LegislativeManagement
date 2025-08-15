@@ -41,6 +41,45 @@ interface ActivitiesResponse {
   };
 }
 
+// Interface para vereadores
+interface Councilor {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
+// Componente para filtro de vereadores
+function CouncilorFilter({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const { data: councilors = [] } = useQuery<Councilor[]>({
+    queryKey: ['/api/public/users/councilors'],
+    queryFn: async () => {
+      const res = await fetch('/api/public/users/councilors');
+      if (!res.ok) {
+        throw new Error('Erro ao carregar vereadores');
+      }
+      return res.json();
+    }
+  });
+
+  return (
+    <div className="flex items-center gap-2">
+      <label className="text-sm text-gray-600">Vereador:</label>
+      <select 
+        value={value} 
+        onChange={(e) => onChange(e.target.value)}
+        className="w-48 h-10 px-3 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+      >
+        <option value="">Todos os vereadores</option>
+        {councilors.map((councilor) => (
+          <option key={councilor.id} value={councilor.id}>
+            {councilor.firstName} {councilor.lastName}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 export default function AtividadesPage() {
   const [location] = useLocation();
   
@@ -48,6 +87,7 @@ export default function AtividadesPage() {
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
+  const [author, setAuthor] = useState('');
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 8;
   
@@ -64,7 +104,7 @@ export default function AtividadesPage() {
   // Resetar página quando filtros mudam
   useEffect(() => {
     setPage(1);
-  }, [search, type, status]);
+  }, [search, type, status, author]);
 
   // Scroll para o topo quando a página for carregada
   useEffect(() => {
@@ -77,6 +117,7 @@ export default function AtividadesPage() {
     if (search) params.append('search', search);
     if (type) params.append('activityType', type);
     if (status) params.append('status', status);
+    if (author) params.append('author', author);
     params.append('page', page.toString());
     params.append('limit', ITEMS_PER_PAGE.toString());
     return params.toString();
@@ -84,7 +125,7 @@ export default function AtividadesPage() {
   
   // Query para buscar atividades em tempo real
   const { data: response, isLoading, error } = useQuery<ActivitiesResponse>({
-    queryKey: ['/api/public/legislative-activities', search, type, status, page],
+    queryKey: ['/api/public/legislative-activities', search, type, status, author, page],
     queryFn: async () => {
       const queryString = getQueryString();
       const url = `/api/public/legislative-activities${queryString ? `?${queryString}` : ''}`;
@@ -123,6 +164,7 @@ export default function AtividadesPage() {
     setSearch('');
     setType('');
     setStatus('');
+    setAuthor('');
   };
 
   // Função para fazer download do arquivo da atividade
@@ -304,8 +346,13 @@ export default function AtividadesPage() {
                 ))}
               </select>
             </div>
+
+            <CouncilorFilter 
+              value={author} 
+              onChange={setAuthor}
+            />
             
-            {(search || type || status) && (
+            {(search || type || status || author) && (
               <Button 
                 variant="ghost" 
                 size="sm"
