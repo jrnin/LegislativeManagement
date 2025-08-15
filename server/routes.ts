@@ -1125,10 +1125,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = schema.parse(data);
       
-      // Handle Object Storage file upload if present
+      // Handle Object Storage file upload ONLY if file was uploaded
       let fileInfo = {};
       
-      if (req.body.uploadedFileURL) {
+      if (req.body.uploadedFileURL && req.body.uploadedFileURL.trim() !== '') {
         console.log(`[DEBUG] Processing file upload for new activity:`, req.body.uploadedFileURL);
         
         try {
@@ -1181,6 +1181,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error(`[ERROR] Failed to process Object Storage upload:`, error);
           return res.status(500).json({ message: "Erro ao processar upload do arquivo" });
         }
+      } else {
+        console.log(`[DEBUG] No file uploaded for new activity, creating without file attachment`);
       }
       
       // Create activity
@@ -1358,11 +1360,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = schema.parse(data);
       
-      // Handle Object Storage file upload if present
+      // Handle Object Storage file upload ONLY if new file was uploaded
       let fileInfo = {};
       
-      if (req.body.uploadedFileURL) {
-        console.log(`[DEBUG] Processing file upload for activity ${activityId}:`, req.body.uploadedFileURL);
+      if (req.body.uploadedFileURL && req.body.uploadedFileURL.trim() !== '') {
+        console.log(`[DEBUG] Processing NEW file upload for activity ${activityId}:`, req.body.uploadedFileURL);
         
         try {
           const objectStorageService = new ObjectStorageService();
@@ -1386,7 +1388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             fileType: req.body.fileType || 'application/pdf',
           };
           
-          console.log(`[DEBUG] File stored in Object Storage:`, { cloudPath, fileName: fileInfo.fileName });
+          console.log(`[DEBUG] NEW file stored in Object Storage:`, { cloudPath, fileName: fileInfo.fileName });
           
           // Clean up old file if it exists and is not an Object Storage path
           if (currentActivity.filePath && 
@@ -1400,6 +1402,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error(`[ERROR] Failed to process Object Storage upload:`, error);
           return res.status(500).json({ message: "Erro ao processar upload do arquivo" });
         }
+      } else {
+        console.log(`[DEBUG] No new file uploaded for activity ${activityId}, keeping existing file data`);
       }
       
       // Update activity

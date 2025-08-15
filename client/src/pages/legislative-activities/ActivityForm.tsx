@@ -132,11 +132,14 @@ export default function ActivityForm() {
         formData.append("authorIds", authorId);
       });
       
-      // Append Object Storage file info if present
-      if (uploadedFileURL) {
+      // Append Object Storage file info ONLY if new file was uploaded
+      if (uploadedFileURL && uploadedFileURL.trim() !== '' && formFile) {
+        console.log(`[DEBUG] Sending new file data for creation:`, { uploadedFileURL, uploadedFileName });
         formData.append("uploadedFileURL", uploadedFileURL);
         formData.append("originalFileName", uploadedFileName);
         formData.append("fileType", formFile?.type || "application/pdf");
+      } else {
+        console.log(`[DEBUG] No file uploaded for new activity creation`);
       }
       
       const response = await fetch("/api/activities", {
@@ -193,11 +196,14 @@ export default function ActivityForm() {
         formData.append("authorIds", authorId);
       });
       
-      // Append Object Storage file info if present
-      if (uploadedFileURL) {
+      // Append Object Storage file info ONLY if new file was uploaded
+      if (uploadedFileURL && uploadedFileURL.trim() !== '' && formFile) {
+        console.log(`[DEBUG] Sending new file data for update:`, { uploadedFileURL, uploadedFileName });
         formData.append("uploadedFileURL", uploadedFileURL);
         formData.append("originalFileName", uploadedFileName);
         formData.append("fileType", formFile?.type || "application/pdf");
+      } else {
+        console.log(`[DEBUG] No new file uploaded for update, preserving existing file data`);
       }
       
       const response = await fetch(`/api/activities/${activityId}`, {
