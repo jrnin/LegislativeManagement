@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Helmet } from 'react-helmet';
@@ -27,6 +27,11 @@ export default function CouncilorList() {
   const { data: councilors, isLoading } = useQuery<Councilor[]>({
     queryKey: ['/api/councilors'],
   });
+  
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
   
   // Filtrar vereadores com base no termo de busca
   const filteredCouncilors = councilors?.filter((councilor: Councilor) => {

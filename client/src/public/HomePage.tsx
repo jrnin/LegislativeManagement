@@ -526,7 +526,10 @@ export default function HomePage() {
   
   const news = newsResponse?.articles || [];
 
-
+  // Scroll para o topo quando a página for carregada
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // Formatador de datas
   const formatDate = (dateString: string) => {

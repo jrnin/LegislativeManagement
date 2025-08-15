@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { format, parseISO } from "date-fns";
@@ -64,6 +64,11 @@ export default function CouncilorDetails() {
     queryKey: [`/api/public/councilors/${identifier}/committees`],
     enabled: !!identifier,
   });
+
+  // Scroll para o topo quando o componente for montado ou quando o identificador mudar
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [identifier]);
 
   const handleBack = () => {
     setLocation("/councilors");
