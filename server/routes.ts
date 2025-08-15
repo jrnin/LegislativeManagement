@@ -1232,6 +1232,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update legislative activity with Object Storage support
+  // Fix orphaned file paths for activities (admin)
+  app.post('/api/activities/fix-orphaned-paths', requireAuth, async (req: any, res) => {
+    try {
+      const currentUser = await storage.getUser(req.userId);
+      if (currentUser?.role !== "admin") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      // Get all activities with file paths
+      const activities = await storage.getAllLegislativeActivities();
+      const orphanedActivities = [];
+
+      for (const activity of activities) {
+        if (activity.filePath && !activity.filePath.startsWith('/objects/')) {
+          // Check if local file exists
+          const fs = require('fs');
+          if (!fs.existsSync(activity.filePath)) {
+            // Clear orphaned file path
+            await storage.updateLegislativeActivity(
+              activity.id,
+              {
+                filePath: null,
+                fileName: null,
+                fileType: null,
+              },
+              undefined
+            );
+            
+            orphanedActivities.push({
+              id: activity.id,
+              activityNumber: activity.activityNumber,
+              description: activity.description,
+              oldPath: activity.filePath
+            });
+            
+            console.log(`[FIX] Cleared orphaned file path for activity ${activity.id}: ${activity.filePath}`);
+          }
+        }
+      }
+
+      res.json({
+        message: `Corrigidas ${orphanedActivities.length} atividades com caminhos órfãos`,
+        orphanedActivities,
+        total: activities.length
+      });
+
+    } catch (error) {
+      console.error("Error fixing orphaned paths:", error);
+      res.status(500).json({ message: "Erro ao corrigir caminhos órfãos" });
+    }
+  });
+
   app.put('/api/activities/:id', requireAuth, async (req: any, res) => {
     try {
       const activityId = Number(req.params.id);
