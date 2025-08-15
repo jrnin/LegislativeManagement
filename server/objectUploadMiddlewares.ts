@@ -113,15 +113,36 @@ export const processObjectUpload = async (req: UploadRequest, res: Response, nex
     }
 
     const { uploadedFileURL, entityType = 'general', visibility = 'private' } = req.body;
-    const userId = req.user?.id;
+    
+    // Determine user ID from different authentication sources
+    let userId: string | undefined;
+    
+    if ((req as any).user) {
+      // Check Replit auth first
+      if ((req as any).user.claims?.sub) {
+        userId = (req as any).user.claims.sub;
+      } else if ((req as any).user.id) {
+        userId = (req as any).user.id;
+      }
+    }
+    
+    // Fallback to session authentication
+    if (!userId && (req.session as any)?.userId) {
+      userId = (req.session as any).userId;
+    }
+    
+    // Final fallback to middleware-attached userId
+    if (!userId && (req as any).userId) {
+      userId = (req as any).userId;
+    }
 
     const objectStorageService = new ObjectStorageService();
     
-    // Set ACL policy for uploaded file
+    // Set ACL policy for uploaded file (only if userId is available)
     const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
       uploadedFileURL,
       {
-        owner: userId,
+        owner: userId || 'system', // Fallback to 'system' if no user ID available
         visibility: visibility,
         aclRules: visibility === 'private' ? [{
           group: { type: 'admin_only' as any, id: 'admin' },

@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+
 import { eventAttendance, events, activityVotes } from "@shared/schema";
 import { setupAuth } from "./replitAuth";
 import { requireAuth, requireAdmin, handleFileUpload, handleAvatarUpload, handleNewsUpload, handleActivityUpload, handleEventUpload } from "./middlewares";
@@ -1133,13 +1133,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         try {
           const objectStorageService = new ObjectStorageService();
-          const userId = req.user?.id;
+          
+          // Determine user ID from different authentication sources
+          let userId: string | undefined;
+          
+          if (req.user) {
+            // Check Replit auth first
+            if ((req.user as any).claims?.sub) {
+              userId = (req.user as any).claims.sub;
+            } else if ((req.user as any).id) {
+              userId = (req.user as any).id;
+            }
+          }
+          
+          // Fallback to session authentication
+          if (!userId && (req.session as any)?.userId) {
+            userId = (req.session as any).userId;
+          }
+          
+          // Final fallback to middleware-attached userId
+          if (!userId && (req as any).userId) {
+            userId = (req as any).userId;
+          }
           
           // Set ACL policy for uploaded file
           const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
             req.body.uploadedFileURL,
             {
-              owner: userId,
+              owner: userId || 'system',
               visibility: 'private',
               aclRules: [{
                 group: { type: 'admin_only' as any, id: 'admin' },
@@ -1223,7 +1244,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user is authorized (either admin or one of the authors)
-      const currentUser = await storage.getUser(req.user.id);
+      // Determine user ID from different authentication sources
+      let currentUserId: string | undefined;
+      
+      if (req.user) {
+        // Check Replit auth first
+        if ((req.user as any).claims?.sub) {
+          currentUserId = (req.user as any).claims.sub;
+        } else if ((req.user as any).id) {
+          currentUserId = (req.user as any).id;
+        }
+      }
+      
+      // Fallback to session authentication
+      if (!currentUserId && (req.session as any)?.userId) {
+        currentUserId = (req.session as any).userId;
+      }
+      
+      // Final fallback to middleware-attached userId
+      if (!currentUserId && (req as any).userId) {
+        currentUserId = (req as any).userId;
+      }
+      
+      if (!currentUserId) {
+        return res.status(401).json({ message: "Usuário não autenticado" });
+      }
+      
+      const currentUser = await storage.getUser(currentUserId);
       const isAdmin = currentUser?.role === "admin";
       const isAuthor = currentActivity.authors?.some(author => author.id === currentUser?.id);
       
@@ -1267,13 +1314,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         try {
           const objectStorageService = new ObjectStorageService();
-          const userId = req.user?.id;
           
           // Set ACL policy for uploaded file
           const cloudPath = await objectStorageService.trySetObjectEntityAclPolicy(
             req.body.uploadedFileURL,
             {
-              owner: userId,
+              owner: currentUserId || 'system',
               visibility: 'private',
               aclRules: [{
                 group: { type: 'admin_only' as any, id: 'admin' },
@@ -2846,13 +2892,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Determine user ID from different authentication sources
+      let authorId: string | undefined;
+      
+      if (req.user) {
+        // Check Replit auth first
+        if ((req.user as any).claims?.sub) {
+          authorId = (req.user as any).claims.sub;
+        } else if ((req.user as any).id) {
+          authorId = (req.user as any).id;
+        }
+      }
+      
+      // Fallback to session authentication
+      if (!authorId && (req.session as any)?.userId) {
+        authorId = (req.session as any).userId;
+      }
+      
+      // Final fallback to middleware-attached userId
+      if (!authorId && (req as any).userId) {
+        authorId = (req as any).userId;
+      }
+
       const articleData = {
         title,
         slug,
         excerpt,
         content,
         categoryId: categoryId ? parseInt(categoryId) : undefined,
-        authorId: req.user.id,
+        authorId: authorId || 'system',
         status: status || 'draft',
         featured: featured === 'true',
         tags: parsedTags,
@@ -2876,7 +2944,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await objectStorageService.trySetObjectEntityAclPolicy(
             req.body.imageUrl,
             {
-              owner: req.user.id,
+              owner: authorId || 'system',
               visibility: "public", // News images should be publicly accessible
               aclRules: []
             }
@@ -2946,12 +3014,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Convert to public path for news images so they work without authentication
         updateData.imageUrl = normalizedPath.replace('/objects/', '/public-objects/');
         
+        // Determine user ID from different authentication sources
+        let userId: string | undefined;
+        
+        if (req.user) {
+          // Check Replit auth first
+          if ((req.user as any).claims?.sub) {
+            userId = (req.user as any).claims.sub;
+          } else if ((req.user as any).id) {
+            userId = (req.user as any).id;
+          }
+        }
+        
+        // Fallback to session authentication
+        if (!userId && (req.session as any)?.userId) {
+          userId = (req.session as any).userId;
+        }
+        
+        // Final fallback to middleware-attached userId
+        if (!userId && (req as any).userId) {
+          userId = (req as any).userId;
+        }
+        
         // Set ACL policy for the uploaded image
         try {
           await objectStorageService.trySetObjectEntityAclPolicy(
             req.body.imageUrl,
             {
-              owner: req.user.id,
+              owner: userId || 'system',
               visibility: "public", // News images should be publicly accessible
               aclRules: []
             }
