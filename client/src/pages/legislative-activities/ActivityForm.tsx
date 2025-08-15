@@ -213,10 +213,10 @@ export default function ActivityForm() {
         hasFormFile: !!formFile
       });
       
-      if (uploadedFileURL && uploadedFileURL.trim() !== '' && formFile) {
+      if (uploadedFileURL && uploadedFileURL.trim() !== '') {
         console.log(`[DEBUG] Sending new file data for update:`, { uploadedFileURL, uploadedFileName });
         formData.append("uploadedFileURL", uploadedFileURL);
-        formData.append("originalFileName", uploadedFileName);
+        formData.append("originalFileName", uploadedFileName || 'document.pdf');
         formData.append("fileType", formFile?.type || "application/pdf");
       } else {
         console.log(`[DEBUG] No new file uploaded for update, preserving existing file data`);
