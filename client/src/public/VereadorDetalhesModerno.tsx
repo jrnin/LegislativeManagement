@@ -5,7 +5,8 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Mail, Phone, MapPin, Calendar, GraduationCap, Briefcase, Award, FileText, Users, Building2, Download, ExternalLink, TrendingUp, CheckCircle, XCircle, Minus, BarChart3 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, ArrowLeft, Mail, Phone, MapPin, Calendar, GraduationCap, Briefcase, Award, FileText, Users, Building2, Download, ExternalLink, TrendingUp, CheckCircle, XCircle, Minus, BarChart3, Lightbulb, Scale } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { Helmet } from 'react-helmet';
 import texturaUrl from '@/assets/textura.jpg';
@@ -61,6 +62,76 @@ interface CouncilorMetrics {
     activitiesByType: Array<{ type: string; count: number }>;
   };
   monthlyAttendance: Array<{ month: string; present: number; total: number }>;
+}
+
+// Componente para exibir atividades por tipo
+interface ActivitiesByTypeTabProps {
+  councilorId: string;
+  activityType: string;
+}
+
+function ActivitiesByTypeTab({ councilorId, activityType }: ActivitiesByTypeTabProps) {
+  const { data: activities = [], isLoading } = useQuery({
+    queryKey: [`/api/public/councilors/${councilorId}/activities/type/${activityType}`],
+    enabled: !!councilorId,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+        <p className="mt-2 text-gray-600">Carregando {activityType.toLowerCase()}s...</p>
+      </div>
+    );
+  }
+
+  if (activities.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <XCircle className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+        <p>Nenhuma {activityType.toLowerCase()} encontrada</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {activities.slice(0, 5).map((activity: any) => (
+        <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3 flex items-start justify-between">
+          <div className="flex-1">
+            <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
+            <p className="text-sm text-gray-600 mb-2">
+              {activity.type} • {
+                activity.date ? 
+                new Date(activity.date).toLocaleDateString('pt-BR') : 
+                'Data não informada'
+              }
+            </p>
+            <Badge className={
+              activity.status === 'Aprovado' ? 'bg-green-100 text-green-800' :
+              activity.status === 'Rejeitado' ? 'bg-red-100 text-red-800' :
+              'bg-yellow-100 text-yellow-800'
+            }>
+              {activity.status || 'Em análise'}
+            </Badge>
+          </div>
+          {(activity.filePath || activity.file) && (
+            <a 
+              href={`/api/public/activities/${activity.id}/download`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-4"
+            >
+              <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50">
+                <Download className="h-4 w-4 mr-2" />
+                Download
+              </Button>
+            </a>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function VereadorDetalhesModerno() {
@@ -337,7 +408,7 @@ export default function VereadorDetalhesModerno() {
             
             
 
-            {/* Atividades */}
+            {/* Atividades por Categoria */}
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-gray-800">
@@ -346,44 +417,34 @@ export default function VereadorDetalhesModerno() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {isActivitiesLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Carregando atividades...</p>
-                  </div>
-                ) : activities.length > 0 ? (
-                  <div className="space-y-4">
-                    {activities.slice(0, 3).map((activity: any) => (
-                      <div key={activity.id} className="border-l-4 border-green-500 pl-4 py-3 flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{activity.description || activity.title}</h4>
-                          <p className="text-sm text-gray-600 mb-2">
-                            {activity.type} • {
-                              activity.date ? 
-                              new Date(activity.date).toLocaleDateString('pt-BR') : 
-                              'Data não informada'
-                            }
-                          </p>
-                        </div>
-                        {(activity.filePath || activity.file) && (
-                          <a 
-                            href={`/api/public/activities/${activity.id}/download`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-4"
-                          >
-                            <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50">
-                              <Download className="h-4 w-4 mr-2" />
-                              Download
-                            </Button>
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-600 text-center py-8">Nenhuma atividade encontrada</p>
-                )}
+                <Tabs defaultValue="indicacoes" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="indicacoes" className="flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4" />
+                      Indicações
+                    </TabsTrigger>
+                    <TabsTrigger value="requerimentos" className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Requerimentos
+                    </TabsTrigger>
+                    <TabsTrigger value="mocao" className="flex items-center gap-2">
+                      <Scale className="h-4 w-4" />
+                      Moção
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="indicacoes" className="space-y-4 mt-4">
+                    <ActivitiesByTypeTab councilorId={id!} activityType="Indicação" />
+                  </TabsContent>
+
+                  <TabsContent value="requerimentos" className="space-y-4 mt-4">
+                    <ActivitiesByTypeTab councilorId={id!} activityType="Requerimento" />
+                  </TabsContent>
+
+                  <TabsContent value="mocao" className="space-y-4 mt-4">
+                    <ActivitiesByTypeTab councilorId={id!} activityType="Moção" />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>

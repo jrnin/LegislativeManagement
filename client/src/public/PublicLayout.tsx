@@ -325,32 +325,15 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           
 
           <div className="flex items-center space-x-4 mt-2 sm:mt-0">
+            
             <div className="flex items-center space-x-2">
-              {weather && typeof weather === 'object' && 'temperature' in weather ? (
-                <>
-                  {React.createElement(getWeatherIcon((weather as any).icon || 'cloud'), { size: 16 })}
-                  <span>{(weather as any).temperature}°C</span>
-                  <span className="hidden sm:inline">{(weather as any).weatherDescription || ''}</span>
-                </>
-              ) : (
-                <>
-                  <Cloud size={16} />
-                  <span>--°C</span>
-                  <span className="hidden sm:inline">Carregando...</span>
-                </>
-              )}
-            </div>
-            <div className="flex items-center space-x-2">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <a href="hhttps://www.facebook.com/share/1CTdSLuYEF/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                 <Facebook size={16} />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                <Twitter size={16} />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              </a>              
+              <a href="https://www.instagram.com/camaradejaiba/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <Instagram size={16} />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="Youtube">
+              <a href="https://www.youtube.com/@C%C3%A2maraMunicipaldeJa%C3%ADba" target="_blank" rel="noopener noreferrer" aria-label="Youtube">
                 <Youtube size={16} />
               </a>
             </div>
@@ -780,15 +763,15 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
             {/* Redes Sociais */}
             <div className="flex items-center space-x-3">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.facebook.com/share/1CTdSLuYEF/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" 
                  className="text-white hover:text-green-300 transition-colors" aria-label="Facebook">
                 <Facebook size={20} />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.youtube.com/@C%C3%A2maraMunicipaldeJa%C3%ADba" target="_blank" rel="noopener noreferrer" 
                  className="text-white hover:text-green-300 transition-colors" aria-label="YouTube">
                 <Youtube size={20} />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.instagram.com/camaradejaiba/" target="_blank" rel="noopener noreferrer" 
                  className="text-white hover:text-green-300 transition-colors" aria-label="Instagram">
                 <Instagram size={20} />
               </a>
@@ -869,18 +852,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             <div className="flex flex-col md:flex-row justify-between items-center">
               <p className="text-white text-sm">&copy; 2025 - Câmara Municipal de Jaíba - Todos os direitos reservados</p>
               <div className="flex items-center space-x-4 mt-2 md:mt-0">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
-                   className="text-white hover:text-green-300 transition-colors" aria-label="Facebook">
-                  <Facebook size={16} />
-                </a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" 
-                   className="text-white hover:text-green-300 transition-colors" aria-label="YouTube">
-                  <Youtube size={16} />
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" 
-                   className="text-white hover:text-green-300 transition-colors" aria-label="Instagram">
-                  <Instagram size={16} />
-                </a>
+                
                 <span className="text-white text-xs">HubPúblico</span>
               </div>
             </div>

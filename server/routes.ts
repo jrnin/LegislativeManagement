@@ -5402,6 +5402,51 @@ Esta mensagem foi enviada através do formulário de contato do site da Câmara 
     }
   });
 
+  // Rota pública para obter atividades legislativas de um vereador específico filtradas por tipo (sem autenticação)
+  app.get('/api/public/councilors/:identifier/activities/type/:activityType', async (req, res) => {
+    try {
+      const { identifier, activityType } = req.params;
+      
+      // Tentar buscar por slug primeiro, depois por ID
+      let user = await storage.getUserBySlug(identifier);
+      
+      if (!user) {
+        user = await storage.getUser(identifier);
+      }
+      
+      if (!user) {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      // Verificar se é realmente um vereador
+      if (user.role !== 'councilor') {
+        return res.status(404).json({ message: "Vereador não encontrado" });
+      }
+      
+      console.log(`Buscando atividades legislativas do tipo ${activityType} para o usuário ${user.id}`);
+      
+      // Buscar atividades legislativas do vereador
+      const allActivities = await storage.getLegislativeActivitiesByAuthor(user.id);
+      
+      // Filtrar por tipo
+      const filteredActivities = allActivities.filter(activity => 
+        activity.activityType === activityType
+      );
+      
+      // Ordenar por data mais recente e limitar a 5
+      const sortedActivities = filteredActivities
+        .sort((a, b) => new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime())
+        .slice(0, 5);
+      
+      console.log(`Encontradas ${sortedActivities.length} atividades do tipo ${activityType} para o usuário ${user.id}`);
+      
+      res.json(sortedActivities);
+    } catch (error) {
+      console.error("Erro ao buscar atividades do vereador por tipo:", error);
+      res.status(500).json({ message: "Erro ao buscar atividades", error: error.message });
+    }
+  });
+
   // Rota pública para obter comissões de um vereador específico por ID ou slug (sem autenticação)
   app.get('/api/public/councilors/:identifier/committees', async (req, res) => {
     try {
