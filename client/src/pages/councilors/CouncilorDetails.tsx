@@ -27,25 +27,25 @@ interface Committee {
 }
 
 export default function CouncilorDetails() {
-  const { id } = useParams();
+  const { id: identifier } = useParams();
   const [_, setLocation] = useLocation();
 
-  // Buscar dados do vereador
+  // Buscar dados do vereador usando rota pública que aceita slug ou ID
   const { data: councilor, isLoading: isCouncilorLoading } = useQuery<User>({
-    queryKey: [`/api/users/${id}`],
-    enabled: !!id,
+    queryKey: [`/api/public/councilors/${identifier}`],
+    enabled: !!identifier,
   });
 
   // Buscar atividades legislativas do vereador
   const { data: activities, isLoading: isActivitiesLoading } = useQuery<LegislativeActivity[]>({
-    queryKey: [`/api/users/${id}/activities`],
-    enabled: !!id,
+    queryKey: [`/api/public/councilors/${identifier}/activities`],
+    enabled: !!identifier,
   });
 
   // Buscar documentos do vereador
   const { data: councilorDocuments, isLoading: isDocumentsLoading } = useQuery<Document[]>({
-    queryKey: [`/api/users/${id}/documents`],
-    enabled: !!id,
+    queryKey: [`/api/public/councilors/${identifier}/documents`],
+    enabled: !!identifier,
   });
 
   // Buscar documentos gerais da câmara (todos os documentos do sistema)
@@ -61,8 +61,8 @@ export default function CouncilorDetails() {
 
   // Buscar comissões do vereador
   const { data: committees, isLoading: isCommitteesLoading } = useQuery<Committee[]>({
-    queryKey: [`/api/users/${id}/committees`],
-    enabled: !!id,
+    queryKey: [`/api/public/councilors/${identifier}/committees`],
+    enabled: !!identifier,
   });
 
   const handleBack = () => {

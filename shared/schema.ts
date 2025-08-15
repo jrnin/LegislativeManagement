@@ -45,6 +45,7 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey(),
   email: varchar("email").unique().notNull(),
   name: varchar("name").notNull(),
+  slug: varchar("slug").unique(), // URL-friendly version of name for public pages
   profileImageUrl: varchar("profile_image_url"),
   cpf: varchar("cpf").unique(),
   birthDate: timestamp("birth_date"),

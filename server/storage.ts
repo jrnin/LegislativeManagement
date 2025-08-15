@@ -310,6 +310,23 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user;
   }
+
+  async getUserBySlug(slug: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.slug, slug));
+    return user;
+  }
+
+  // Helper function to generate slug from name
+  generateSlug(name: string): string {
+    return name
+      .toLowerCase()
+      .normalize('NFD') // Decompose accented characters
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .trim()
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-'); // Remove multiple consecutive hyphens
+  }
   
 
   

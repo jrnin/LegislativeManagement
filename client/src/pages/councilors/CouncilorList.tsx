@@ -14,16 +14,10 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@
 import { Search, Plus, MoreHorizontal, Mail, Phone, ArrowUpDown } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { User } from "@shared/schema";
 
-interface Councilor {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  role: string;
-  profileImageUrl?: string;
-  active?: boolean;
-}
+// Usar o tipo User do schema que já inclui o campo slug
+type Councilor = User;
 
 export default function CouncilorList() {
   const [_, setLocation] = useLocation();
@@ -41,8 +35,7 @@ export default function CouncilorList() {
     const term = searchTerm.toLowerCase();
     return (
       councilor.name?.toLowerCase().includes(term) ||
-      councilor.email?.toLowerCase().includes(term) ||
-      councilor.phone?.toLowerCase().includes(term)
+      councilor.email?.toLowerCase().includes(term)
     );
   });
   
@@ -150,8 +143,7 @@ export default function CouncilorList() {
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
                     <div className="flex items-center space-x-1">
-                      <Phone className="h-3.5 w-3.5" />
-                      <span>Telefone</span>
+                      <span>Partido</span>
                     </div>
                   </TableHead>
                   <TableHead className="hidden md:table-cell">Status</TableHead>
@@ -160,7 +152,7 @@ export default function CouncilorList() {
               </TableHeader>
               <TableBody>
                 {filteredCouncilors?.map((councilor: Councilor) => (
-                  <TableRow key={councilor.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => setLocation(`/councilors/${councilor.id}`)}>
+                  <TableRow key={councilor.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => setLocation(`/councilors/${councilor.slug || councilor.id}`)}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-9 w-9">
@@ -185,16 +177,11 @@ export default function CouncilorList() {
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {councilor.phone ? formatPhone(councilor.phone) : "Não informado"}
+                      {councilor.partido || "Não informado"}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      <Badge 
-                        variant={councilor.active ? "default" : "secondary"}
-                        className={cn(
-                          councilor.active ? "bg-green-500" : "bg-gray-500"
-                        )}
-                      >
-                        {councilor.active ? "Ativo" : "Inativo"}
+                      <Badge variant="default" className="bg-green-500">
+                        Vereador
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -207,7 +194,7 @@ export default function CouncilorList() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
-                            setLocation(`/councilors/${councilor.id}`);
+                            setLocation(`/councilors/${councilor.slug || councilor.id}`);
                           }}>
                             Ver detalhes
                           </DropdownMenuItem>
